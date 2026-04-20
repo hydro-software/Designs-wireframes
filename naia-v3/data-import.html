@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Données — Naia v3</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="css/style.css" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+
+<div class="flex min-h-screen">
+  <aside class="sidebar w-60 flex-shrink-0 flex flex-col">
+    <div class="p-5 flex items-center gap-3">
+      <div class="w-9 h-9 rounded-lg bg-blue-500/20 flex items-center justify-center">
+        <i data-lucide="waves" class="text-blue-300"></i>
+      </div>
+      <div>
+        <div class="text-white font-semibold text-sm">Naia</div>
+        <div class="text-slate-400 text-xs">Hydroélectricité</div>
+      </div>
+    </div>
+    <nav class="px-3 flex-1 flex flex-col gap-1 mt-4">
+      <a href="index.html" class="sidebar-item"><i data-lucide="layout-dashboard"></i> Tableau de bord</a>
+      <a href="data-import.html" class="sidebar-item active"><i data-lucide="upload"></i> Données</a>
+      <a href="settings.html" class="sidebar-item"><i data-lucide="settings"></i> Paramètres</a>
+    </nav>
+    <div class="p-4 border-t border-white/5 flex items-center gap-3">
+      <div class="w-9 h-9 rounded-full bg-blue-600 text-white text-xs font-semibold flex items-center justify-center">JD</div>
+      <div class="min-w-0">
+        <div class="text-white text-sm font-medium truncate">Jean Dupont</div>
+        <div class="text-slate-400 text-xs truncate">jean@example.com</div>
+      </div>
+    </div>
+  </aside>
+
+  <main class="flex-1 min-w-0">
+    <div class="px-8 pt-8 pb-6">
+      <h1 class="font-display text-3xl text-slate-900">Données</h1>
+      <p class="muted text-sm mt-1">Importer des données de production, indicateurs et comparateurs</p>
+    </div>
+
+    <div class="px-8 pb-10 max-w-4xl">
+
+      <div class="card mb-4">
+        <div class="card-body">
+          <div class="font-semibold mb-1">Sélection de la centrale et du type de données</div>
+          <p class="muted text-sm mb-5">Choisissez la centrale et le type de données à importer</p>
+
+          <div class="grid grid-cols-2 gap-4 mb-4">
+            <div>
+              <label class="block text-xs font-medium muted mb-2">Centrale</label>
+              <select class="select" id="plant-select">
+                <option value="">Sélectionner une centrale</option>
+                <option selected>Centrale de la Dordogne</option>
+                <option>Moulin de Saint-Jean</option>
+                <option>HPP Ardèche</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-medium muted mb-2">Type de données</label>
+              <select class="select" id="type-select" onchange="onTypeChange(this.value)">
+                <option value="">Sélectionner un type</option>
+                <option value="production" selected>Production</option>
+                <option value="indicateurs">Indicateurs contextuels</option>
+                <option value="comparateurs">Comparateurs</option>
+              </select>
+            </div>
+          </div>
+
+          <div id="entity-picker" class="grid grid-cols-2 gap-4" style="display:none">
+            <div>
+              <label class="block text-xs font-medium muted mb-2" id="entity-label">Indicateur</label>
+              <select class="select" id="entity-select">
+                <option>Sélectionner...</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" id="upload-card" style="display: block">
+        <div class="card-body">
+          <div class="font-semibold mb-1">Importer les données CSV</div>
+          <p class="muted text-sm mb-5" id="upload-context">Données de production pour <strong>Centrale de la Dordogne</strong></p>
+
+          <div id="unit-row">
+            <label class="block text-xs font-medium muted mb-2">Unité des données</label>
+            <select class="select max-w-[200px] mb-5">
+              <option selected>kWh</option>
+              <option>MWh</option>
+              <option>kW</option>
+            </select>
+          </div>
+
+          <div class="dropzone">
+            <i data-lucide="upload-cloud" class="mx-auto mb-3" style="width:32px;height:32px;color:#94a3b8"></i>
+            <div class="text-sm">Glissez votre fichier CSV ici ou cliquez pour sélectionner</div>
+            <div class="text-xs subtle mt-1">Format accepté : .csv</div>
+          </div>
+
+          <div class="text-xs muted mt-4 flex items-center gap-2">
+            <i data-lucide="info" style="width:14px;height:14px"></i>
+            Les données seront ajoutées à la centrale sélectionnée. Les doublons (mêmes horodatages) seront remplacés.
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<script src="js/app.js"></script>
+<script>
+function onTypeChange(value) {
+  const picker = document.getElementById('entity-picker');
+  const upload = document.getElementById('upload-card');
+  const context = document.getElementById('upload-context');
+  const entityLabel = document.getElementById('entity-label');
+  const entitySelect = document.getElementById('entity-select');
+  const unitRow = document.getElementById('unit-row');
+
+  if (value === 'production') {
+    picker.style.display = 'none';
+    upload.style.display = 'block';
+    context.innerHTML = 'Données de production pour <strong>Centrale de la Dordogne</strong>';
+    unitRow.style.display = 'block';
+  } else if (value === 'indicateurs') {
+    picker.style.display = 'grid';
+    upload.style.display = 'block';
+    entityLabel.textContent = 'Indicateur';
+    entitySelect.innerHTML = '<option>Précipitations Bergerac (Météo)</option><option>Débit Dordogne amont (Hydro)</option><option selected>Prix spot EPEX (Prix)</option>';
+    context.innerHTML = 'Données pour l\'indicateur <strong>Prix spot EPEX</strong>';
+    unitRow.style.display = 'none';
+  } else if (value === 'comparateurs') {
+    picker.style.display = 'grid';
+    upload.style.display = 'block';
+    entityLabel.textContent = 'Comparateur';
+    entitySelect.innerHTML = '<option selected>Production N-1</option><option>Comparaison avec Saint-Jean</option><option>Simulation optimale</option>';
+    context.innerHTML = 'Données pour le comparateur <strong>Production N-1</strong>';
+    unitRow.style.display = 'none';
+  } else {
+    picker.style.display = 'none';
+    upload.style.display = 'none';
+  }
+}
+// Initialise default selection
+onTypeChange('production');
+</script>
+</body>
+</html>

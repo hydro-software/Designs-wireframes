@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tableau de bord — Naia v3</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="css/style.css" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+<div class="flex min-h-screen">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar w-60 flex-shrink-0 flex flex-col">
+    <div class="p-5 flex items-center gap-3">
+      <div class="w-9 h-9 rounded-lg bg-blue-500/20 flex items-center justify-center">
+        <i data-lucide="waves" class="text-blue-300"></i>
+      </div>
+      <div>
+        <div class="text-white font-semibold text-sm">Naia</div>
+        <div class="text-slate-400 text-xs">Hydroélectricité</div>
+      </div>
+    </div>
+    <nav class="px-3 flex-1 flex flex-col gap-1 mt-4">
+      <a href="index.html" class="sidebar-item active">
+        <i data-lucide="layout-dashboard"></i> Tableau de bord
+      </a>
+      <a href="data-import.html" class="sidebar-item">
+        <i data-lucide="upload"></i> Données
+      </a>
+      <a href="settings.html" class="sidebar-item">
+        <i data-lucide="settings"></i> Paramètres
+      </a>
+    </nav>
+    <div class="p-4 border-t border-white/5 flex items-center gap-3">
+      <div class="w-9 h-9 rounded-full bg-blue-600 text-white text-xs font-semibold flex items-center justify-center">JD</div>
+      <div class="min-w-0">
+        <div class="text-white text-sm font-medium truncate">Jean Dupont</div>
+        <div class="text-slate-400 text-xs truncate">jean@example.com</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="flex-1 min-w-0">
+    <!-- Header -->
+    <div class="px-8 pt-8 pb-6 flex items-start justify-between gap-6">
+      <div>
+        <h1 class="font-display text-3xl text-slate-900">Tableau de bord</h1>
+        <p class="muted text-sm mt-1">Vue d'ensemble de vos centrales hydroélectriques</p>
+      </div>
+      <select class="select max-w-[260px]">
+        <option>Centrale de la Dordogne</option>
+        <option>Moulin de Saint-Jean</option>
+        <option>HPP Ardèche</option>
+      </select>
+    </div>
+
+    <!-- KPIs -->
+    <div class="px-8 grid grid-cols-4 gap-4 mb-6">
+      <div class="kpi-card">
+        <div class="flex items-start justify-between">
+          <span class="text-sm muted">Production totale</span>
+          <i data-lucide="zap" class="text-slate-300"></i>
+        </div>
+        <div class="font-display text-2xl mt-2 tabular">1 245 MWh</div>
+        <div class="text-xs mt-1" style="color: var(--naia-success)">+12.5% vs mois dernier</div>
+      </div>
+      <div class="kpi-card">
+        <div class="flex items-start justify-between">
+          <span class="text-sm muted">Revenu estimé</span>
+          <i data-lucide="euro" class="text-slate-300"></i>
+        </div>
+        <div class="font-display text-2xl mt-2 tabular">87 450 €</div>
+        <div class="text-xs mt-1" style="color: var(--naia-success)">+8.3% vs mois dernier</div>
+      </div>
+      <div class="kpi-card">
+        <div class="flex items-start justify-between">
+          <span class="text-sm muted">Centrales actives</span>
+          <i data-lucide="activity" class="text-slate-300"></i>
+        </div>
+        <div class="font-display text-2xl mt-2 tabular">2 / 3</div>
+        <div class="text-xs mt-1 muted">1 centrale en arrêt</div>
+      </div>
+      <div class="kpi-card">
+        <div class="flex items-start justify-between">
+          <span class="text-sm muted">Pertes identifiées</span>
+          <i data-lucide="alert-triangle" class="text-slate-300"></i>
+        </div>
+        <div class="font-display text-2xl mt-2 tabular">45 heures</div>
+        <div class="text-xs mt-1" style="color: var(--naia-warning)">Ce mois-ci</div>
+      </div>
+    </div>
+
+    <!-- Chart card -->
+    <div class="px-8 pb-10">
+      <div class="card relative">
+        <div class="card-head">
+          <div class="flex items-center gap-3">
+            <span class="tf-tabs">
+              <span class="tf-tab">Intraday</span>
+              <span class="tf-tab active">30 jours</span>
+              <span class="tf-tab">12 mois</span>
+              <span class="tf-tab">Années</span>
+            </span>
+          </div>
+          <div class="flex items-center gap-2">
+            <button class="btn btn-ghost text-xs">
+              <i data-lucide="image" style="width:14px;height:14px"></i> Exporter
+            </button>
+            <button class="btn btn-ghost text-xs">
+              <i data-lucide="file-text" style="width:14px;height:14px"></i> Rapport
+            </button>
+          </div>
+        </div>
+        <div class="px-6 pt-6 pb-4 chart-container">
+          <canvas id="main-chart"></canvas>
+          <button class="fab" style="bottom: 20px; right: 20px;" onclick="openDrawer('config-drawer')" title="Configurer le panneau">
+            <i data-lucide="sliders-horizontal"></i>
+          </button>
+        </div>
+        <div class="chart-legend">
+          <span><span class="dot" style="background:#2563eb"></span>Production</span>
+          <span><span class="dot" style="background:#a78bfa"></span>DAILY MDA</span>
+          <span><span class="dot" style="background:#10b981"></span>Débit</span>
+          <span><span class="dot" style="background:#60a5fa"></span>Météo (pluie)</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+</div>
+
+<!-- CONFIGURATION DRAWER -->
+<div id="config-drawer-overlay" class="drawer-overlay" onclick="closeDrawer('config-drawer')"></div>
+<aside id="config-drawer" class="drawer">
+  <div class="drawer-head">
+    <div>
+      <h2 class="font-display text-lg">Configuration du panneau</h2>
+      <p class="muted text-xs mt-1">Configurez les axes, les indicateurs et leur visibilité</p>
+    </div>
+    <button class="btn-ghost p-1 rounded" onclick="closeDrawer('config-drawer')">
+      <i data-lucide="x"></i>
+    </button>
+  </div>
+
+  <div class="drawer-body">
+
+    <!-- SECTION 1: AXES -->
+    <div class="section-title">Axes</div>
+
+    <div class="mb-6">
+      <div class="text-xs muted mb-2">Axe gauche — Puissance</div>
+      <div class="grid grid-cols-[60px_repeat(4,1fr)] gap-2 items-center text-xs">
+        <div></div>
+        <div class="text-center muted text-[11px]">Intraday</div>
+        <div class="text-center muted text-[11px]">30 jours</div>
+        <div class="text-center muted text-[11px]">12 mois</div>
+        <div class="text-center muted text-[11px]">Années</div>
+
+        <div class="muted text-[11px]">Unité</div>
+        <select class="select input-sm"><option>kW</option><option>W</option></select>
+        <select class="select input-sm"><option selected>MWh</option><option>kWh</option></select>
+        <select class="select input-sm"><option selected>MWh</option><option>GWh</option></select>
+        <select class="select input-sm"><option selected>MWh</option><option>GWh</option></select>
+
+        <div class="muted text-[11px]">Min</div>
+        <input type="number" class="input input-sm" value="0">
+        <input type="number" class="input input-sm" value="0">
+        <input type="number" class="input input-sm" value="0">
+        <input type="number" class="input input-sm" value="0">
+
+        <div class="muted text-[11px]">Max</div>
+        <input type="number" class="input input-sm" value="250">
+        <input type="number" class="input input-sm" value="9">
+        <input type="number" class="input input-sm" value="280">
+        <input type="number" class="input input-sm" value="2232">
+      </div>
+    </div>
+
+    <div class="mb-6">
+      <div class="text-xs muted mb-2">Axe droit — Pluie</div>
+      <div class="grid grid-cols-[60px_repeat(4,1fr)] gap-2 items-center text-xs">
+        <div></div>
+        <div class="text-center muted text-[11px]">Intraday</div>
+        <div class="text-center muted text-[11px]">30 jours</div>
+        <div class="text-center muted text-[11px]">12 mois</div>
+        <div class="text-center muted text-[11px]">Années</div>
+
+        <div class="muted text-[11px]">Unité</div>
+        <select class="select input-sm"><option>mm</option></select>
+        <select class="select input-sm"><option>mm</option></select>
+        <select class="select input-sm"><option>mm</option></select>
+        <select class="select input-sm"><option>mm</option></select>
+
+        <div class="muted text-[11px]">Min</div>
+        <input type="number" class="input input-sm" value="0">
+        <input type="number" class="input input-sm" value="0">
+        <input type="number" class="input input-sm" value="0">
+        <input type="number" class="input input-sm" value="0">
+
+        <div class="muted text-[11px]">Max</div>
+        <input type="number" class="input input-sm" value="25">
+        <input type="number" class="input input-sm" value="50">
+        <input type="number" class="input input-sm" value="750">
+        <input type="number" class="input input-sm" value="1000">
+      </div>
+    </div>
+
+    <!-- SECTION 2: SLOTS -->
+    <div class="section-title mt-8">Slots & étiquettes</div>
+
+    <div class="subsection-label">Histogramme inversé</div>
+    <div class="space-y-2">
+      <div class="slot-row slot-row-inversé">
+        <input type="text" class="input input-sm" value="Météo">
+        <select class="select input-sm"><option selected>Précipitations Bergerac</option><option>Pluie Station Luxeuil</option></select>
+      </div>
+      <div class="slot-row slot-row-inversé">
+        <input type="text" class="input input-sm" placeholder="Précipitations 2">
+        <select class="select input-sm"><option>— Sélectionner un indicateur —</option></select>
+      </div>
+    </div>
+
+    <div class="subsection-label">Indicateurs courbes</div>
+    <div class="space-y-2">
+      <div class="slot-row slot-row-courbe">
+        <input type="text" class="input input-sm" value="Débit">
+        <select class="select input-sm"><option selected>Débit Dordogne amont</option></select>
+        <div class="plage">
+          <input type="number" class="input input-sm" value="0" title="Min">
+          <input type="number" class="input input-sm" value="15" title="Max">
+          <label class="flex items-center gap-1"><input type="checkbox" checked> <span class="text-[11px]">Rogner</span></label>
+        </div>
+      </div>
+      <div class="slot-row slot-row-courbe">
+        <input type="text" class="input input-sm" placeholder="Courbe 2">
+        <select class="select input-sm"><option>— Sélectionner —</option></select>
+        <div class="plage">
+          <input type="number" class="input input-sm" placeholder="Min">
+          <input type="number" class="input input-sm" placeholder="Max">
+          <label class="flex items-center gap-1 opacity-40"><input type="checkbox" disabled> <span class="text-[11px]">Rogner</span></label>
+        </div>
+      </div>
+      <div class="slot-row slot-row-courbe">
+        <input type="text" class="input input-sm" placeholder="Courbe 3">
+        <select class="select input-sm"><option>— Sélectionner —</option></select>
+        <div class="plage">
+          <input type="number" class="input input-sm" placeholder="Min">
+          <input type="number" class="input input-sm" placeholder="Max">
+          <label class="flex items-center gap-1 opacity-40"><input type="checkbox" disabled> <span class="text-[11px]">Rogner</span></label>
+        </div>
+      </div>
+    </div>
+
+    <div class="subsection-label">Comparateurs</div>
+    <div class="space-y-2">
+      <div class="slot-row slot-row-comparateur">
+        <input type="text" class="input input-sm" value="DAILY MDA">
+        <select class="select input-sm"><option selected>Comparaison avec Saint-Jean</option></select>
+        <input type="number" class="input input-sm" value="1" title="Facteur">
+        <a class="link text-[11px] flex items-center gap-1"><i data-lucide="rotate-ccw" style="width:12px;height:12px"></i>Réinit.</a>
+      </div>
+      <div class="slot-row slot-row-comparateur">
+        <input type="text" class="input input-sm" placeholder="Comparateur 2">
+        <select class="select input-sm"><option>— Sélectionner —</option></select>
+        <input type="number" class="input input-sm" placeholder="1">
+        <a class="link text-[11px] opacity-40">Réinit.</a>
+      </div>
+      <div class="slot-row slot-row-comparateur">
+        <input type="text" class="input input-sm" placeholder="Comparateur 3">
+        <select class="select input-sm"><option>— Sélectionner —</option></select>
+        <input type="number" class="input input-sm" placeholder="1">
+        <a class="link text-[11px] opacity-40">Réinit.</a>
+      </div>
+      <div class="slot-row slot-row-comparateur">
+        <input type="text" class="input input-sm" placeholder="Comparateur 4">
+        <select class="select input-sm"><option>— Sélectionner —</option></select>
+        <input type="number" class="input input-sm" placeholder="1">
+        <a class="link text-[11px] opacity-40">Réinit.</a>
+      </div>
+    </div>
+
+    <!-- SECTION 3: VISIBILITÉ -->
+    <div class="section-title mt-8">Visibilité</div>
+    <table class="vis-matrix">
+      <thead>
+        <tr>
+          <th></th>
+          <th>Intraday</th>
+          <th>30 jours</th>
+          <th>12 mois</th>
+          <th>Années</th>
+        </tr>
+        <tr>
+          <th></th>
+          <th><a>Tout</a><a>Aucun</a></th>
+          <th><a>Tout</a><a>Aucun</a></th>
+          <th><a>Tout</a><a>Aucun</a></th>
+          <th><a>Tout</a><a>Aucun</a></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="vis-group-header"><td colspan="5">Indicateurs inversés</td></tr>
+        <tr>
+          <td><span class="dot" style="background:#60a5fa"></span>Météo</td>
+          <td><input type="checkbox" checked></td>
+          <td><input type="checkbox" checked></td>
+          <td><input type="checkbox" checked></td>
+          <td><input type="checkbox" checked></td>
+        </tr>
+
+        <tr class="vis-group-header"><td colspan="5">Indicateurs courbes</td></tr>
+        <tr>
+          <td><span class="dot" style="background:#10b981"></span>Débit</td>
+          <td><input type="checkbox" checked></td>
+          <td><input type="checkbox" checked></td>
+          <td><input type="checkbox" checked></td>
+          <td><input type="checkbox" checked></td>
+        </tr>
+
+        <tr class="vis-group-header"><td colspan="5">Comparateurs</td></tr>
+        <tr>
+          <td><span class="dot" style="background:#a78bfa"></span>DAILY MDA</td>
+          <td><input type="checkbox" checked></td>
+          <td><input type="checkbox" checked></td>
+          <td><input type="checkbox" checked></td>
+          <td><input type="checkbox" checked></td>
+        </tr>
+      </tbody>
+    </table>
+
+  </div>
+
+  <div class="drawer-foot">
+    <button class="btn btn-secondary" onclick="closeDrawer('config-drawer')">Annuler</button>
+    <button class="btn btn-primary" onclick="closeDrawer('config-drawer')">Enregistrer</button>
+  </div>
+</aside>
+
+<script src="js/app.js"></script>
+</body>
+</html>

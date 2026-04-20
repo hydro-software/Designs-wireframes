@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Centrale de la Dordogne — Naia v3</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="css/style.css" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+
+<div class="flex min-h-screen">
+
+  <aside class="sidebar w-60 flex-shrink-0 flex flex-col">
+    <div class="p-5 flex items-center gap-3">
+      <div class="w-9 h-9 rounded-lg bg-blue-500/20 flex items-center justify-center">
+        <i data-lucide="waves" class="text-blue-300"></i>
+      </div>
+      <div>
+        <div class="text-white font-semibold text-sm">Naia</div>
+        <div class="text-slate-400 text-xs">Hydroélectricité</div>
+      </div>
+    </div>
+    <nav class="px-3 flex-1 flex flex-col gap-1 mt-4">
+      <a href="index.html" class="sidebar-item"><i data-lucide="layout-dashboard"></i> Tableau de bord</a>
+      <a href="data-import.html" class="sidebar-item"><i data-lucide="upload"></i> Données</a>
+      <a href="settings.html" class="sidebar-item active"><i data-lucide="settings"></i> Paramètres</a>
+    </nav>
+    <div class="p-4 border-t border-white/5 flex items-center gap-3">
+      <div class="w-9 h-9 rounded-full bg-blue-600 text-white text-xs font-semibold flex items-center justify-center">JD</div>
+      <div class="min-w-0">
+        <div class="text-white text-sm font-medium truncate">Jean Dupont</div>
+        <div class="text-slate-400 text-xs truncate">jean@example.com</div>
+      </div>
+    </div>
+  </aside>
+
+  <main class="flex-1 min-w-0">
+    <!-- Page header -->
+    <div class="px-8 pt-8 pb-5 flex items-start justify-between">
+      <div class="flex items-start gap-4">
+        <a href="settings.html" class="btn btn-ghost p-2 mt-1"><i data-lucide="arrow-left"></i></a>
+        <div>
+          <div class="flex items-center gap-3">
+            <h1 class="font-display text-3xl text-slate-900">Centrale de la Dordogne</h1>
+            <span class="badge badge-active"><span class="w-1.5 h-1.5 rounded-full bg-green-600 mr-1.5"></span>Active</span>
+          </div>
+          <p class="muted text-sm mt-1">Bergerac, Dordogne</p>
+        </div>
+      </div>
+      <button class="btn btn-danger">
+        <i data-lucide="trash-2" style="width:14px;height:14px"></i> Supprimer
+      </button>
+    </div>
+
+    <div class="px-8 pb-10 max-w-5xl">
+
+      <!-- SECTION 1: Informations générales -->
+      <div class="collapsible" data-open="true">
+        <div class="collapsible-head">
+          <div class="collapsible-title">Informations générales</div>
+          <i data-lucide="chevron-down" class="chevron muted"></i>
+        </div>
+        <div class="collapsible-body">
+          <div class="flex justify-end mb-3">
+            <button class="btn btn-secondary text-xs">
+              <i data-lucide="edit-3" style="width:14px;height:14px"></i> Modifier
+            </button>
+          </div>
+          <div class="grid grid-cols-2 gap-x-8 gap-y-4">
+            <div>
+              <label class="block text-xs muted mb-1">Nom de la centrale</label>
+              <div class="text-sm">Centrale de la Dordogne</div>
+            </div>
+            <div>
+              <label class="block text-xs muted mb-1">Localisation</label>
+              <div class="text-sm">Bergerac, Dordogne</div>
+            </div>
+            <div>
+              <label class="block text-xs muted mb-1">Latitude</label>
+              <div class="text-sm tabular">44.8533</div>
+            </div>
+            <div>
+              <label class="block text-xs muted mb-1">Longitude</label>
+              <div class="text-sm tabular">0.4831</div>
+            </div>
+            <div>
+              <label class="block text-xs muted mb-1">Fuseau horaire</label>
+              <div class="text-sm">Europe/Paris</div>
+            </div>
+            <div>
+              <label class="block text-xs muted mb-1">Puissance max (kW)</label>
+              <div class="text-sm tabular">250</div>
+            </div>
+            <div>
+              <label class="block text-xs muted mb-1">Date de mise en service</label>
+              <div class="text-sm">15/03/2015</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 2: Compteurs -->
+      <div class="collapsible" data-open="true">
+        <div class="collapsible-head">
+          <div class="collapsible-title">Compteurs <span class="muted text-sm font-normal ml-1">(3)</span></div>
+          <i data-lucide="chevron-down" class="chevron muted"></i>
+        </div>
+        <div class="collapsible-body">
+          <div class="flex justify-end mb-3">
+            <button class="btn btn-primary text-xs">
+              <i data-lucide="plus" style="width:14px;height:14px"></i> Ajouter un compteur
+            </button>
+          </div>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Code</th>
+                <th>Numéro matériel</th>
+                <th>Type</th>
+                <th>PRM Enedis</th>
+                <th>Statut</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="font-medium">DOR-001</td>
+                <td class="tabular">SN-2453678</td>
+                <td><span class="badge badge-meteo">Physique</span></td>
+                <td class="tabular">30001234567890</td>
+                <td><span class="badge badge-active">Actif</span></td>
+                <td class="text-right"><button class="btn-ghost p-1 text-red-500"><i data-lucide="trash-2" style="width:16px;height:16px"></i></button></td>
+              </tr>
+              <tr>
+                <td class="font-medium">DOR-002</td>
+                <td class="tabular">SN-2453679</td>
+                <td><span class="badge badge-meteo">Physique</span></td>
+                <td class="subtle">—</td>
+                <td><span class="badge badge-active">Actif</span></td>
+                <td class="text-right"><button class="btn-ghost p-1 text-red-500"><i data-lucide="trash-2" style="width:16px;height:16px"></i></button></td>
+              </tr>
+              <tr>
+                <td class="font-medium">DOR-GRID</td>
+                <td class="tabular">SN-2453680</td>
+                <td><span class="badge badge-comp">Réseau</span></td>
+                <td class="tabular">30001234567891</td>
+                <td><span class="badge badge-active">Actif</span></td>
+                <td class="text-right"><button class="btn-ghost p-1 text-red-500"><i data-lucide="trash-2" style="width:16px;height:16px"></i></button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- SECTION 3: Données de production -->
+      <div class="collapsible" data-open="true">
+        <div class="collapsible-head">
+          <div class="collapsible-title">Données de production</div>
+          <i data-lucide="chevron-down" class="chevron muted"></i>
+        </div>
+        <div class="collapsible-body">
+          <div class="text-xs muted mb-2 font-medium">Couverture actuelle des données</div>
+          <div class="bg-slate-50 rounded-lg p-4 mb-6">
+            <div class="flex justify-between text-xs muted mb-2"><span>Du 01/01/2020</span><span>Au 08/04/2026</span></div>
+            <div class="h-2 bg-slate-200 rounded-full overflow-hidden">
+              <div class="h-full bg-blue-500" style="width: 100%"></div>
+            </div>
+          </div>
+
+          <div class="text-xs muted mb-2 font-medium">Historique des imports</div>
+          <table class="data-table mb-6">
+            <thead>
+              <tr>
+                <th>Fichier</th>
+                <th>Date d'import</th>
+                <th>Lignes importées</th>
+                <th>Statut</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="font-mono text-xs">production_2026_Q1.csv</td>
+                <td class="tabular muted">01/04/2026 10:30:00</td>
+                <td class="tabular">2 160</td>
+                <td><span class="badge badge-active">Succès</span></td>
+              </tr>
+              <tr>
+                <td class="font-mono text-xs">production_2025_Q4.csv</td>
+                <td class="tabular muted">05/01/2026 14:22:00</td>
+                <td class="tabular">2 208</td>
+                <td><span class="badge badge-active">Succès</span></td>
+              </tr>
+              <tr>
+                <td class="font-mono text-xs">production_2025_Q3.csv</td>
+                <td class="tabular muted">02/10/2025 09:15:00</td>
+                <td class="tabular">1 845</td>
+                <td><span class="badge badge-inactive">Partiel</span></td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="text-xs muted mb-2 font-medium flex items-center gap-2">
+            <i data-lucide="refresh-cw" style="width:14px;height:14px"></i>
+            Récupération automatique Enedis
+          </div>
+          <div class="border border-slate-200 rounded-lg p-4 space-y-4">
+            <div class="flex items-center justify-between">
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="font-medium text-sm">DOR-001</span>
+                  <span class="badge badge-active"><i data-lucide="check-circle-2" style="width:10px;height:10px" class="mr-1"></i>Actif</span>
+                </div>
+                <div class="grid grid-cols-3 gap-x-8 mt-2 text-xs muted">
+                  <div><div class="subtle text-[11px]">PRM Enedis</div><div class="tabular">30001234567890</div></div>
+                  <div><div class="subtle text-[11px]">Dernière récupération</div><div class="tabular">18/04/2026 08:30</div></div>
+                  <div><div class="subtle text-[11px]">Dernière donnée</div><div class="tabular">17/04/2026</div></div>
+                </div>
+              </div>
+              <button class="btn btn-secondary text-xs">Récupérer maintenant</button>
+            </div>
+            <div class="flex items-center justify-between pt-4 border-t border-slate-100">
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="font-medium text-sm">DOR-GRID</span>
+                  <span class="badge badge-active"><i data-lucide="check-circle-2" style="width:10px;height:10px" class="mr-1"></i>Actif</span>
+                </div>
+                <div class="grid grid-cols-3 gap-x-8 mt-2 text-xs muted">
+                  <div><div class="subtle text-[11px]">PRM Enedis</div><div class="tabular">30001234567891</div></div>
+                  <div><div class="subtle text-[11px]">Dernière récupération</div><div class="tabular">18/04/2026 08:30</div></div>
+                  <div><div class="subtle text-[11px]">Dernière donnée</div><div class="tabular">17/04/2026</div></div>
+                </div>
+              </div>
+              <button class="btn btn-secondary text-xs">Récupérer maintenant</button>
+            </div>
+          </div>
+
+          <p class="text-xs muted mt-4 flex items-center gap-2">
+            <i data-lucide="info" style="width:14px;height:14px"></i>
+            Pour importer de nouvelles données manuellement, utilisez la page <a href="data-import.html" class="link">Données</a> dans le menu.
+          </p>
+        </div>
+      </div>
+
+      <!-- SECTION 4: Catégories de pertes -->
+      <div class="collapsible" data-open="false">
+        <div class="collapsible-head">
+          <div class="collapsible-title">Catégories de pertes</div>
+          <i data-lucide="chevron-down" class="chevron muted"></i>
+        </div>
+        <div class="collapsible-body">
+          <p class="muted text-sm">Configuration des catégories de pertes pour cette centrale (#220).</p>
+        </div>
+      </div>
+
+      <!-- SECTION 5: Tarification -->
+      <div class="collapsible" data-open="false">
+        <div class="collapsible-head">
+          <div class="collapsible-title">Tarification</div>
+          <i data-lucide="chevron-down" class="chevron muted"></i>
+        </div>
+        <div class="collapsible-body">
+          <p class="muted text-sm">Configuration des prix et contrats (#221).</p>
+        </div>
+      </div>
+
+      <!-- SECTION 6: Indicateurs contextuels -->
+      <div class="collapsible" data-open="true">
+        <div class="collapsible-head">
+          <div class="collapsible-title">
+            Indicateurs contextuels
+            <span class="badge badge-meteo ml-2" style="font-weight:500">4 sélectionnés sur 8 disponibles</span>
+          </div>
+          <i data-lucide="chevron-down" class="chevron muted"></i>
+        </div>
+        <div class="collapsible-body">
+          <p class="muted text-sm mb-4">
+            Indicateurs (Météo, Hydro, Prix) et comparateurs disponibles sur vos tableaux de bord pour cette centrale.
+          </p>
+          <table class="data-table mb-4">
+            <thead>
+              <tr>
+                <th>Nom</th>
+                <th>Type</th>
+                <th>Unité / Source</th>
+                <th>Couverture des données</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="font-medium">Précipitations Bergerac</td>
+                <td><span class="badge badge-meteo">Météo</span></td>
+                <td class="tabular">mm</td>
+                <td class="tabular text-xs muted">01/01/2020 — 08/04/2026</td>
+                <td class="text-right">
+                  <button class="btn-ghost p-1"><i data-lucide="edit-3" style="width:14px;height:14px"></i></button>
+                  <button class="btn-ghost p-1 text-red-500"><i data-lucide="trash-2" style="width:14px;height:14px"></i></button>
+                </td>
+              </tr>
+              <tr>
+                <td class="font-medium">Débit Dordogne amont</td>
+                <td><span class="badge badge-hydro">Hydro</span></td>
+                <td class="tabular">m³/s</td>
+                <td class="tabular text-xs muted">01/06/2019 — 08/04/2026</td>
+                <td class="text-right">
+                  <button class="btn-ghost p-1"><i data-lucide="edit-3" style="width:14px;height:14px"></i></button>
+                  <button class="btn-ghost p-1 text-red-500"><i data-lucide="trash-2" style="width:14px;height:14px"></i></button>
+                </td>
+              </tr>
+              <tr>
+                <td class="font-medium">Prix spot EPEX</td>
+                <td><span class="badge badge-prix">Prix</span></td>
+                <td class="tabular">EUR/MWh</td>
+                <td class="tabular text-xs muted">01/01/2020 — 08/04/2026</td>
+                <td class="text-right">
+                  <button class="btn-ghost p-1"><i data-lucide="edit-3" style="width:14px;height:14px"></i></button>
+                  <button class="btn-ghost p-1 text-red-500"><i data-lucide="trash-2" style="width:14px;height:14px"></i></button>
+                </td>
+              </tr>
+              <tr>
+                <td class="font-medium">Comparaison avec Saint-Jean</td>
+                <td><span class="badge badge-comp">Comparateur</span></td>
+                <td class="text-xs muted">Moulin de Saint-Jean</td>
+                <td class="tabular text-xs muted">01/01/2020 — 08/04/2026</td>
+                <td class="text-right">
+                  <button class="btn-ghost p-1"><i data-lucide="edit-3" style="width:14px;height:14px"></i></button>
+                  <button class="btn-ghost p-1 text-red-500"><i data-lucide="trash-2" style="width:14px;height:14px"></i></button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="flex gap-2 flex-wrap">
+            <button class="btn btn-secondary" onclick="openOverlay('gerer-modal')">
+              <i data-lucide="shuffle" style="width:14px;height:14px"></i> Gérer la sélection
+            </button>
+            <button class="btn btn-primary" onclick="openOverlay('indicateur-modal')">
+              <i data-lucide="plus" style="width:14px;height:14px"></i> Ajouter un indicateur
+            </button>
+            <button class="btn btn-primary" onclick="openOverlay('comparateur-modal')">
+              <i data-lucide="plus" style="width:14px;height:14px"></i> Ajouter un comparateur
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<!-- ======================= MODALS ======================= -->
+
+<!-- NOUVEL INDICATEUR -->
+<div id="indicateur-modal" class="overlay" onclick="if(event.target===this)closeOverlay('indicateur-modal')">
+  <div class="modal">
+    <div class="flex items-start justify-between mb-4">
+      <div>
+        <h3 class="modal-title">Nouvel indicateur</h3>
+        <p class="modal-subtitle">Créer un nouvel indicateur contextuel pour cette centrale</p>
+      </div>
+      <button class="btn-ghost p-1" onclick="closeOverlay('indicateur-modal')"><i data-lucide="x"></i></button>
+    </div>
+
+    <div class="mb-4">
+      <label class="block text-sm font-medium mb-2">Type d'indicateur</label>
+      <label class="radio-row selected" onclick="setIndicatorType('simple')">
+        <input type="radio" name="ind-type" value="simple" checked>
+        <span class="text-sm">Simple</span>
+      </label>
+      <label class="radio-row" onclick="setIndicatorType('compose')">
+        <input type="radio" name="ind-type" value="compose">
+        <span class="text-sm">Composé (moyenne pondérée)</span>
+      </label>
+    </div>
+
+    <div class="mb-4">
+      <label class="block text-sm font-medium mb-2">Nom</label>
+      <input class="input" placeholder="Ex: Précipitations totales">
+    </div>
+
+    <div class="grid grid-cols-2 gap-3 mb-4">
+      <div>
+        <label class="block text-sm font-medium mb-2">Catégorie</label>
+        <select class="select"><option>Météo</option><option>Hydro</option><option>Prix</option></select>
+      </div>
+      <div>
+        <label class="block text-sm font-medium mb-2">Unité</label>
+        <input class="input" placeholder="Ex: mm, m³/s, €/MWh">
+      </div>
+    </div>
+
+    <!-- Composé-only block -->
+    <div id="compose-block" class="border border-slate-200 rounded-lg p-4 mb-4" style="display:none">
+      <div class="flex items-center justify-between mb-3">
+        <div class="font-medium text-sm">Sources et pondérations</div>
+        <div class="text-sm font-medium" style="color: var(--naia-success)" id="weight-total">Total : 100%</div>
+      </div>
+      <div id="sources-list" class="space-y-3">
+        <div class="source-row">
+          <select class="select input-sm mb-2"><option>Sélectionner une source</option><option>Précipitations Bergerac</option><option>Pluie Station Luxeuil</option></select>
+          <div class="flex items-center gap-3">
+            <input type="range" min="0" max="100" value="50" class="weight-slider flex-1" oninput="updateWeightLabel(this)">
+            <span class="tabular text-sm muted w-12 text-right">50%</span>
+          </div>
+        </div>
+        <div class="source-row">
+          <select class="select input-sm mb-2"><option>Sélectionner une source</option><option>Précipitations Bergerac</option><option>Pluie Station Luxeuil</option></select>
+          <div class="flex items-center gap-3">
+            <input type="range" min="0" max="100" value="50" class="weight-slider flex-1" oninput="updateWeightLabel(this)">
+            <span class="tabular text-sm muted w-12 text-right">50%</span>
+          </div>
+        </div>
+      </div>
+      <button class="btn btn-secondary w-full mt-3 text-xs" onclick="addSourceRow()">
+        <i data-lucide="plus" style="width:14px;height:14px"></i> Ajouter une source
+      </button>
+    </div>
+
+    <div class="flex justify-end gap-2 mt-6">
+      <button class="btn btn-secondary" onclick="closeOverlay('indicateur-modal')">Annuler</button>
+      <button class="btn btn-primary" id="ind-submit">Créer et importer les données</button>
+    </div>
+  </div>
+</div>
+
+<!-- NOUVEAU COMPARATEUR -->
+<div id="comparateur-modal" class="overlay" onclick="if(event.target===this)closeOverlay('comparateur-modal')">
+  <div class="modal">
+    <div class="flex items-start justify-between mb-4">
+      <div>
+        <h3 class="modal-title">Nouveau comparateur</h3>
+        <p class="modal-subtitle">Créer un nouveau comparateur pour analyser la production</p>
+      </div>
+      <button class="btn-ghost p-1" onclick="closeOverlay('comparateur-modal')"><i data-lucide="x"></i></button>
+    </div>
+
+    <div class="mb-4">
+      <label class="block text-sm font-medium mb-2">Type de comparateur</label>
+      <label class="radio-row selected" onclick="setComparatorType('autre-centrale')">
+        <input type="radio" name="comp-type" value="autre-centrale" checked>
+        <span class="text-sm">Production (autre centrale)</span>
+      </label>
+      <label class="radio-row" onclick="setComparatorType('simulation')">
+        <input type="radio" name="comp-type" value="simulation">
+        <span class="text-sm">Simulation</span>
+      </label>
+      <label class="radio-row" onclick="setComparatorType('regional')">
+        <input type="radio" name="comp-type" value="regional">
+        <span class="text-sm">Régional</span>
+      </label>
+      <label class="radio-row" onclick="setComparatorType('annee-prec')">
+        <input type="radio" name="comp-type" value="annee-prec">
+        <span class="text-sm">Année précédente (N-1, N-2)</span>
+      </label>
+    </div>
+
+    <div class="mb-4">
+      <label class="block text-sm font-medium mb-2">Nom</label>
+      <input class="input" placeholder="Ex: Comparaison avec Saint-Jean" id="comp-name">
+    </div>
+
+    <!-- Conditional fields -->
+    <div id="comp-autre-centrale" class="mb-4">
+      <label class="block text-sm font-medium mb-2">Centrale source</label>
+      <select class="select">
+        <option>Sélectionner une centrale</option>
+        <option>Moulin de Saint-Jean</option>
+        <option>HPP Ardèche</option>
+      </select>
+    </div>
+
+    <div id="comp-simulation" class="mb-4" style="display:none">
+      <div class="border border-slate-200 rounded-lg p-4 mb-3">
+        <div class="flex items-center justify-between mb-3">
+          <span class="text-sm font-medium">Sans dimension</span>
+          <div class="toggle"><div class="toggle-knob"></div></div>
+        </div>
+        <label class="block text-xs muted mb-2">Unité</label>
+        <input class="input input-sm" value="kW">
+      </div>
+    </div>
+
+    <div id="comp-regional" class="mb-4" style="display:none">
+      <label class="block text-sm font-medium mb-2">Code région</label>
+      <select class="select">
+        <option>Sélectionner une région</option>
+        <option>Occitanie</option>
+        <option>Nouvelle-Aquitaine</option>
+        <option>Auvergne-Rhône-Alpes</option>
+      </select>
+    </div>
+
+    <div id="comp-annee-prec" class="mb-4" style="display:none">
+      <label class="block text-sm font-medium mb-2">Décalage</label>
+      <select class="select">
+        <option>N-1 (année précédente)</option>
+        <option>N-2 (il y a 2 ans)</option>
+      </select>
+    </div>
+
+    <div class="border border-slate-200 rounded-lg p-4 mb-5">
+      <div class="flex items-center justify-between mb-2">
+        <span class="text-sm font-medium">Facteur d'échelle</span>
+        <a class="link text-xs flex items-center gap-1"><i data-lucide="rotate-ccw" style="width:12px;height:12px"></i>Réinitialiser</a>
+      </div>
+      <div class="flex items-center gap-3">
+        <input type="number" value="1" disabled class="input input-sm max-w-[100px] bg-slate-50">
+        <label class="flex items-center gap-2 text-sm">
+          <div class="toggle on"><div class="toggle-knob"></div></div>
+          Calculer automatiquement
+        </label>
+      </div>
+    </div>
+
+    <div class="flex justify-end gap-2">
+      <button class="btn btn-secondary" onclick="closeOverlay('comparateur-modal')">Annuler</button>
+      <button class="btn btn-primary" id="comp-submit">Créer</button>
+    </div>
+  </div>
+</div>
+
+<!-- GÉRER LA SÉLECTION -->
+<div id="gerer-modal" class="overlay" onclick="if(event.target===this)closeOverlay('gerer-modal')">
+  <div class="modal modal-lg">
+    <div class="flex items-start justify-between mb-4">
+      <div>
+        <h3 class="modal-title">Gérer la sélection</h3>
+        <p class="modal-subtitle">Sélectionnez les indicateurs et comparateurs disponibles sur les tableaux de bord</p>
+      </div>
+      <button class="btn-ghost p-1" onclick="closeOverlay('gerer-modal')"><i data-lucide="x"></i></button>
+    </div>
+
+    <div class="dual-panel">
+      <div class="panel-column">
+        <div class="panel-column-head">
+          <div class="flex items-center justify-between">
+            <div class="font-semibold text-sm">Indicateurs disponibles</div>
+            <span class="badge badge-meteo">4</span>
+          </div>
+          <div class="mt-2">
+            <input class="input input-sm" placeholder="Rechercher..." type="search">
+          </div>
+        </div>
+        <div class="panel-list">
+          <div class="panel-group-head">Météo <span>1</span></div>
+          <div class="panel-item">
+            <div>
+              <div>Température Saint-Jean</div>
+              <div class="panel-item-meta">°C</div>
+            </div>
+            <span class="badge badge-meteo">Météo</span>
+          </div>
+          <div class="panel-group-head">Hydro <span>1</span></div>
+          <div class="panel-item">
+            <div>
+              <div>Débit composé Garonne</div>
+              <div class="panel-item-meta">m³/s</div>
+            </div>
+            <span class="badge badge-hydro">Hydro</span>
+          </div>
+          <div class="panel-group-head">Comparateurs <span>2</span></div>
+          <div class="panel-item">
+            <div>
+              <div>Production N-1</div>
+              <div class="panel-item-meta">Année précédente</div>
+            </div>
+            <span class="badge badge-comp">Comparateur</span>
+          </div>
+          <div class="panel-item">
+            <div>
+              <div>Moyenne régionale</div>
+              <div class="panel-item-meta">Occitanie</div>
+            </div>
+            <span class="badge badge-comp">Comparateur</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="transfer-col">
+        <button class="transfer-btn" title="Ajouter à la sélection">
+          <i data-lucide="arrow-right" style="width:16px;height:16px"></i>
+        </button>
+        <button class="transfer-btn" title="Retirer de la sélection">
+          <i data-lucide="arrow-left" style="width:16px;height:16px"></i>
+        </button>
+      </div>
+
+      <div class="panel-column">
+        <div class="panel-column-head">
+          <div class="flex items-center justify-between">
+            <div class="font-semibold text-sm">Indicateurs sélectionnés</div>
+            <span class="badge badge-meteo">4</span>
+          </div>
+          <div class="mt-2">
+            <input class="input input-sm" placeholder="Rechercher..." type="search">
+          </div>
+        </div>
+        <div class="panel-list">
+          <div class="panel-group-head">Météo <span>1</span></div>
+          <div class="panel-item">
+            <div>
+              <div>Précipitations Bergerac</div>
+              <div class="panel-item-meta">mm</div>
+            </div>
+            <span class="badge badge-meteo">Météo</span>
+          </div>
+          <div class="panel-group-head">Hydro <span>1</span></div>
+          <div class="panel-item">
+            <div>
+              <div>Débit Dordogne amont</div>
+              <div class="panel-item-meta">m³/s</div>
+            </div>
+            <span class="badge badge-hydro">Hydro</span>
+          </div>
+          <div class="panel-group-head">Prix <span>1</span></div>
+          <div class="panel-item">
+            <div>
+              <div>Prix spot EPEX</div>
+              <div class="panel-item-meta">EUR/MWh</div>
+            </div>
+            <span class="badge badge-prix">Prix</span>
+          </div>
+          <div class="panel-group-head">Comparateurs <span>1</span></div>
+          <div class="panel-item">
+            <div>
+              <div>Comparaison avec Saint-Jean</div>
+              <div class="panel-item-meta">Moulin de Saint-Jean</div>
+            </div>
+            <span class="badge badge-comp">Comparateur</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex justify-end gap-2 mt-6">
+      <button class="btn btn-secondary" onclick="closeOverlay('gerer-modal')">Annuler</button>
+      <button class="btn btn-primary" onclick="closeOverlay('gerer-modal')">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/app.js"></script>
+<script>
+// --- Indicator type toggle + button logic ---
+function setIndicatorType(type) {
+  document.querySelectorAll('#indicateur-modal .radio-row').forEach(r => r.classList.remove('selected'));
+  const input = document.querySelector(`#indicateur-modal input[value="${type}"]`);
+  if (input) {
+    input.checked = true;
+    input.closest('.radio-row').classList.add('selected');
+  }
+  const composeBlock = document.getElementById('compose-block');
+  const btn = document.getElementById('ind-submit');
+  if (type === 'compose') {
+    composeBlock.style.display = 'block';
+    btn.textContent = 'Créer';
+  } else {
+    composeBlock.style.display = 'none';
+    btn.textContent = 'Créer et importer les données';
+  }
+}
+
+function updateWeightLabel(slider) {
+  const label = slider.parentElement.querySelector('span');
+  if (label) label.textContent = slider.value + '%';
+  // Update total
+  const sliders = document.querySelectorAll('#sources-list input[type=range]');
+  let total = 0;
+  sliders.forEach(s => total += parseInt(s.value));
+  const totalEl = document.getElementById('weight-total');
+  totalEl.textContent = 'Total : ' + total + '%';
+  totalEl.style.color = total === 100 ? 'var(--naia-success)' : 'var(--naia-danger)';
+}
+
+function addSourceRow() {
+  const list = document.getElementById('sources-list');
+  const row = document.createElement('div');
+  row.className = 'source-row';
+  row.innerHTML = `
+    <select class="select input-sm mb-2"><option>Sélectionner une source</option><option>Précipitations Bergerac</option></select>
+    <div class="flex items-center gap-3">
+      <input type="range" min="0" max="100" value="0" class="weight-slider flex-1" oninput="updateWeightLabel(this)">
+      <span class="tabular text-sm muted w-12 text-right">0%</span>
+    </div>
+  `;
+  list.appendChild(row);
+  updateWeightLabel(row.querySelector('input[type=range]'));
+}
+
+// --- Comparator type toggle + button logic ---
+function setComparatorType(type) {
+  document.querySelectorAll('#comparateur-modal .radio-row').forEach(r => r.classList.remove('selected'));
+  const input = document.querySelector(`#comparateur-modal input[value="${type}"]`);
+  if (input) {
+    input.checked = true;
+    input.closest('.radio-row').classList.add('selected');
+  }
+  // Hide all conditional blocks
+  ['comp-autre-centrale', 'comp-simulation', 'comp-regional', 'comp-annee-prec'].forEach(id => {
+    document.getElementById(id).style.display = 'none';
+  });
+  // Show relevant block
+  document.getElementById('comp-' + type).style.display = 'block';
+  // Update button text
+  const btn = document.getElementById('comp-submit');
+  btn.textContent = (type === 'simulation') ? 'Créer et importer les données' : 'Créer';
+  // Update name placeholder
+  const namePlaceholders = {
+    'autre-centrale': 'Ex: Comparaison avec Saint-Jean',
+    'simulation': 'Ex: Simulation optimale',
+    'regional': 'Ex: Production régionale Occitanie',
+    'annee-prec': 'Ex: Production N-1'
+  };
+  document.getElementById('comp-name').placeholder = namePlaceholders[type] || '';
+}
+</script>
+</body>
+</html>
