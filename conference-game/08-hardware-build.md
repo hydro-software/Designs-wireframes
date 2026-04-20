@@ -185,9 +185,21 @@ No aluminum U-channel needed — the foamboard strip spacers (2cm wide, cut from
 | White foamboard 3mm | 55 × 17.9 cm (×2: one for back, one cut into 2cm spacer strips) | Any craft store (Action, Pipoos, Ava) — ~€3 each |
 | LED strip 24V | 120 LEDs/m, 4000K neutral white, ~1.2m needed | [Leds-store.be — LED strip 120 LEDs 4000K](https://leds-store.be/led-strip-120-leds-4000k-neutraal-wit-ip20) |
 | 24V 60W transformer | Powers the LED strip, plugs into power strip in cabinet | [Leds-store.be — transformator 24V 60W](https://leds-store.be/led-strip-transformators-24v-60w) |
-| Vinyl decal | Naia hydro logo + wave design, 55×17.9cm | [Drukland.be — vinyl sticker op maat](https://www.drukland.be/ProductController/calc/groot-formaat-vinyl-stickers?product_id=996114&width=55&height=17.9&qty=3) — 3 stuks bestellen (1 + reserve) |
+| Vinyl decal | Naia logo + wave design, 55×17.9cm | [Drukland.be — vinyl sticker op maat](https://www.drukland.be/ProductController/calc/groot-formaat-vinyl-stickers?product_id=996114&width=55&height=17.9&qty=3) — 3 stuks bestellen (1 + reserve) |
 
-**Assembly**: Apply vinyl decal on the *inside* of the opal acrylic (protected, backlit evenly). Mount LED strip on foamboard in zigzag pattern. Glue 2cm foamboard spacer strips around the perimeter. Sandwich acrylic (front) onto spacers. Place the assembly on the soffit panel. Connect to 24V supply.
+#### Vinyl Decal Design
+
+![Logo panel design](logo-panel-design.png)
+
+Retro arcade-style design with the Naia logo centered on a dark background with radial glow. Key elements:
+- **Center**: Naia logo (blue-cyan-purple gradient) with bright radial glow behind it
+- **Background**: Dark with subtle grid lines and colored particle dots (arcade aesthetic)
+- **Border**: Neon magenta/pink frame with cyan outer edge
+- **Backlight effect**: The bright glow zone around the logo lets LED light through the opal acrylic, creating a halo effect. Dark areas block the light, providing contrast
+
+The vinyl decal is applied on the *inside* of the opal acrylic (protected from scratches, backlit evenly by LED).
+
+**Assembly**: Mount LED strip on foamboard in zigzag pattern. Glue 2cm foamboard spacer strips around the perimeter. Sandwich acrylic (front) onto spacers. Place the assembly on the soffit panel. Connect to 24V supply.
 
 **Total lightbox cost: ~€20-35** (no aluminum U-channel needed)
 
@@ -357,7 +369,7 @@ The monitor **stays on its stand** — no VESA mount, no brackets. It sits on sh
 
 ### Color Scheme
 - **Cabinet body**: Naia Blue (#1A5F7A) — spray painted or vinyl wrapped
-- **Logo panel**: Illuminated lightbox with Naia hydro logo (blue/purple wave design on opal acrylic, backlit with LED)
+- **Logo panel**: Illuminated lightbox with Naia logo in retro arcade style (blue/purple gradient logo with radial glow on dark background, neon pink border, backlit with LED through opal acrylic)
 - **Side panels**: Printed vinyl with Naia branding / hydro imagery
 - **Mouse shelves**: Black or dark gray accent
 
