@@ -6,7 +6,7 @@ A custom tabletop arcade cabinet houses the game screen and provides a comfortab
 
 The cabinet is built from **poplar plywood 15mm** panels, with a slot for the Acer monitor, a flat mouse shelf, and a Naia-branded illuminated logo panel (lightbox).
 
-> **Interactive panel drawings**: Open `cabinet-panels.html` in a browser for detailed SVG diagrams of all panels with exact dimensions, assembled front/perspective views, cut list with weights, and transport crate packing layout.
+> **Interactive panel drawings**: See [`cabinet-panels.html`](cabinet-panels.html) ([open live preview](https://htmlpreview.github.io/?https://github.com/hydro-software/Wireframe-captures/blob/main/conference-game/cabinet-panels.html)) for detailed SVG diagrams of all panels with exact dimensions, assembled front/perspective views, cut list with weights, and transport crate packing layout.
 
 ---
 
@@ -83,7 +83,7 @@ The cabinet's front panel has a **window opening** sized to the visible display 
 
 ### Key Geometry
 
-The front panel is tilted 20° backward — bottom at the front edge, top receding 28cm into the cabinet. Above it, a vertical logo panel faces the player directly. The roof slopes from 95cm (front) to 80cm (back).
+The front panel is tilted 20° backward — bottom at the front edge, top receding 28cm into the cabinet. A horizontal **soffit panel** (G) bridges the gap between the front panel top and the logo panel, blocking lightbox light from shining downward and supporting the lightbox assembly. Above the soffit, a vertical logo panel faces the player directly. The roof slopes from 95cm (front) to 80cm (back).
 
 ```
 Side profile points (depth, height in cm):
@@ -97,7 +97,7 @@ F (50, 0)      — back bottom
 
 ### Assembled Views
 
-See `cabinet-panels.html` for interactive SVG views:
+See [`cabinet-panels.html`](cabinet-panels.html) for interactive SVG views:
 - **Front view**: Shows the cabinet as the player sees it — logo lightbox panel at top, front panel with screen window, mouse shelf with overhangs
 - **45° perspective view**: Shows the tilted front panel receding backward, side panel profile, angled roof, and the screen visible through the window cutout
 
@@ -105,7 +105,7 @@ See `cabinet-panels.html` for interactive SVG views:
 
 ## 4. Panel Cut List
 
-All panels cut from **poplar plywood 15mm**. See `cabinet-panels.html` for detailed drawings with exact dimensions per panel.
+All panels cut from **poplar plywood 15mm**. See [`cabinet-panels.html`](cabinet-panels.html) for detailed drawings with exact dimensions per panel.
 
 ### Panel A: Side Panels (×2, mirrored)
 
@@ -114,7 +114,7 @@ Complex 6-point shape defining the cabinet profile.
 | Edge | From → To | Length |
 |------|-----------|--------|
 | Front bottom → Front panel top | A→B | 82 cm (along 20° tilt) |
-| Front panel top → Logo bottom | B→C | 28.0 cm (horizontal, open — no soffit panel) |
+| Front panel top → Logo bottom | B→C | 28.0 cm (horizontal — soffit panel G sits here) |
 | Logo bottom → Logo top | C→D | 17.9 cm (vertical, front edge) |
 | Logo top → Roof back | D→E | 52.2 cm (roof slope) |
 | Back edge | E→F | 80 cm (vertical) |
@@ -160,30 +160,49 @@ Angled panel spanning from front top (95cm) to back top (80cm).
 
 Vertical panel at the front of the cabinet, above the tilted front panel. This is the main branding surface — the first thing visitors see. **Built as an illuminated lightbox** with backlit Naia logo.
 
-#### Lightbox Construction (3 layers)
+#### Lightbox Construction (2 layers + soffit)
 
 ```
 ┌──────────────────────────────────────┐
 │  Front: 3mm opal acrylic             │  ← diffuses LED light evenly
 │  ──────────────────────────────────  │
-│  Spacer: 2cm aluminum U-channel      │  ← frame around edges
-│  ──────────────────────────────────  │
 │  Back: 3mm white foamboard + LED     │  ← LED strip in zigzag pattern
+│  ──────────────────────────────────  │
+│  Bottom: Soffit panel (plywood 15mm) │  ← blocks light downward, supports lightbox
 └──────────────────────────────────────┘
 ```
+
+The logo panel lightbox rests on the **soffit panel** (Panel G) which closes the gap between the logo panel and the top of the tilted front panel. The soffit:
+- **Supports the lightbox**: acrylic + foamboard sandwich sits on top of the soffit
+- **Blocks downward light**: prevents LED light from shining into the player's face
+- **Adds structural rigidity**: connects logo panel area to front panel top
+
+No aluminum U-channel needed — the foamboard strip spacers (2cm wide, cut from the same foamboard sheet) create the gap between acrylic and LED backing. These are glued around the perimeter edges.
 
 | Component | Spec | Source (Belgium) |
 |-----------|------|-----------------|
 | Opal acrylic XT 3mm | 55 × 17.9 cm, cut to size | [Kunststofplaten.be — Plexiglas opaalwit XT 3mm](https://kunststofplaten.be/product/plexiglas-opaalwit-xt-3-mm/) — free custom cutting |
-| White foamboard 3mm | 55 × 17.9 cm | Any craft store (Action, Pipoos, Ava) — ~€3 |
-| LED strip 12V | 120 LEDs/m, 4000K neutral white, ~1.2m needed | [Leds-store.be — LED strip 120 LEDs 4000K](https://leds-store.be/led-strip-120-leds-4000k-neutraal-wit-ip20) |
-| Aluminum U-channel 20mm | ~1.5m (perimeter frame) | [LedprofielKoning.be](https://www.ledprofielkoning.be/) |
+| White foamboard 3mm | 55 × 17.9 cm (×2: one for back, one cut into 2cm spacer strips) | Any craft store (Action, Pipoos, Ava) — ~€3 each |
+| LED strip 24V | 120 LEDs/m, 4000K neutral white, ~1.2m needed | [Leds-store.be — LED strip 120 LEDs 4000K](https://leds-store.be/led-strip-120-leds-4000k-neutraal-wit-ip20) |
 | 24V 60W transformer | Powers the LED strip, plugs into power strip in cabinet | [Leds-store.be — transformator 24V 60W](https://leds-store.be/led-strip-transformators-24v-60w) |
 | Vinyl decal | Naia hydro logo + wave design, 55×17.9cm | [Drukland.be — vinyl sticker op maat](https://www.drukland.be/ProductController/calc/groot-formaat-vinyl-stickers?product_id=996114&width=55&height=17.9&qty=3) — 3 stuks bestellen (1 + reserve) |
 
-**Assembly**: Apply vinyl decal on the *inside* of the opal acrylic (protected, backlit evenly). Mount LED strip on foamboard in zigzag pattern. Assemble with U-channel spacer frame. Connect to 12V supply.
+**Assembly**: Apply vinyl decal on the *inside* of the opal acrylic (protected, backlit evenly). Mount LED strip on foamboard in zigzag pattern. Glue 2cm foamboard spacer strips around the perimeter. Sandwich acrylic (front) onto spacers. Place the assembly on the soffit panel. Connect to 24V supply.
 
-**Total lightbox cost: ~€25-40**
+**Total lightbox cost: ~€20-35** (no aluminum U-channel needed)
+
+### Panel G: Soffit Panel (×1)
+
+| Dimension | Value |
+|-----------|-------|
+| Width | 55 cm |
+| Depth | 28.0 cm |
+| Weight | ~0.9 kg |
+
+Horizontal panel at Y=77.1cm (top of front panel / bottom of logo panel). Closes the gap between the vertical logo panel (front) and the top of the tilted front panel (rear). Functions:
+- Supports the lightbox assembly (acrylic + foamboard rest on top)
+- Blocks LED light from shining downward into the cabinet / player's face
+- Adds structural connection between logo panel and front panel
 
 ### Panel H: Monitor Shelf (×1)
 
@@ -214,11 +233,12 @@ Single wide panel that slides through slots in both side panels. The center sect
 | D | Front panel | 1 | 55 × 82 cm (window cutout) | 2.3 kg | Poplar ply 15mm |
 | E | Roof panel | 1 | 55 × 52.2 cm | 1.7 kg | Poplar ply 15mm |
 | F | Logo panel (lightbox) | 1 | 55 × 17.9 cm | 0.6 kg | Acrylic + foamboard + LED |
+| G | Soffit panel | 1 | 55 × 28.0 cm | 0.9 kg | Poplar ply 15mm |
 | H | Monitor shelf | 1 | 55 × 30 cm | 1.0 kg | Poplar ply 15mm |
 | M | Mouse shelf | 1 | 108 × 25 cm | 1.6 kg | Poplar ply 15mm |
-| | **Total cabinet** | **7 panels** | | **~11 kg** | |
+| | **Total cabinet** | **8 panels** | | **~12 kg** | |
 
-No base panel — the structure is stable enough with the roof panel, monitor shelf, front panel, logo panel, and mouse shelf providing 5 connection points between the side panels.
+No base panel — the structure is stable enough with the roof panel, soffit, monitor shelf, front panel, logo panel, and mouse shelf providing 6 connection points between the side panels.
 
 ---
 
@@ -227,12 +247,13 @@ No base panel — the structure is stable enough with the roof panel, monitor sh
 1. **Glue + screw** side panels (A) to roof panel (E) — establishes the cabinet profile
 2. **Install** monitor shelf (H) at 38cm height — sturdy, load-bearing
 3. **Attach** front panel (D) to the inner face of side panels at the tilted angle
-4. **Attach** logo panel lightbox (F) vertically at the front, above the front panel
-5. **Insert** mouse shelf (M) through the slots in side panels at chosen height (8/12/16cm)
-6. **Finish**: Sand, prime, paint Naia Blue (#1A5F7A), apply vinyl on side panels
-7. **Connect** lightbox LED strip to 12V power supply
-8. **Place** monitor on shelf (on its stand), adjust stand height + tilt to align with window
-9. **Route** cables: HDMI + power through the body, out the open back
+4. **Install** soffit panel (G) horizontally at Y=77.1cm — connects front panel top to logo panel area
+5. **Place** logo panel lightbox (F) on top of the soffit — the acrylic/foamboard sandwich rests on the soffit surface
+6. **Insert** mouse shelf (M) through the slots in side panels at chosen height (8/12/16cm)
+7. **Finish**: Sand, prime, paint Naia Blue (#1A5F7A), apply vinyl on side panels
+8. **Connect** lightbox LED strip to 24V power supply
+9. **Place** monitor on shelf (on its stand), adjust stand height + tilt to align with window
+10. **Route** cables: HDMI + power through the body, out the open back
 
 No back panel — the open back provides easy access at all times.
 
@@ -255,20 +276,20 @@ All panels pack flat in a custom crate for transport. The crate is optimized for
 |-------|----------|----------------|
 | 1 | Side panel L (95×50) | 1.5 cm |
 | 2 | Side panel R (95×50) | 1.5 cm |
-| 3 | Front panel (82×54.4) + Logo panel (17.9×54.4) | 1.5 cm |
-| 4 | Roof panel (52.2×54.4) + Monitor shelf (54.4×30) | 1.5 cm |
-| 5 | Mouse shelf (108×25) | 1.5 cm |
+| 3 | Front panel (82×55) + Logo panel (17.9×55) | 1.5 cm |
+| 4 | Roof panel (52.2×55) + Soffit panel (28×55) | 1.5 cm |
+| 5 | Monitor shelf (55×30) + Mouse shelf (108×25) | 1.5 cm |
 
 ### Weight Breakdown
 
 | Item | Weight |
 |------|--------|
-| Cabinet panels | ~11 kg |
+| Cabinet panels | ~12 kg |
 | Crate (pine plywood 9mm) | ~7 kg |
 | Textile padding | ~0.5 kg |
-| **Total transport weight** | **~19 kg** |
+| **Total transport weight** | **~20 kg** |
 
-See `cabinet-panels.html` for detailed crate packing diagrams (top view per layer + side view of stack).
+See [`cabinet-panels.html`](cabinet-panels.html) for detailed crate packing diagrams (top view per layer + side view of stack).
 
 ---
 
@@ -281,7 +302,7 @@ See `cabinet-panels.html` for detailed crate packing diagrams (top view per laye
 | Poplar plywood 15mm sheet (122×244 cm) | ~€30-40 | One sheet is enough |
 | Carpenter labor (cut + assemble) | ~€150-250 | Side panels most complex |
 | Paint (Naia Blue spray) | ~€15-20 | 2 cans |
-| Lightbox components (see §4 above) | ~€25-40 | Acrylic + LED + foamboard + U-channel + vinyl |
+| Lightbox components (see §4 above) | ~€20-35 | Acrylic + LED + foamboard + vinyl (no U-channel) |
 | Vinyl side panels (printed) | ~€30-50 | Optional branding |
 | Mouse pads (×2) | ~€15 | For left + right overhangs |
 | **Total cabinet build** | **~€265-415** | |

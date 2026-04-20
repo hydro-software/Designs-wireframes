@@ -1,0 +1,1016 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Naia Arcade Cabinet — 2D Panel Layout</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #1a1a2e; color: #ccc; font-family: 'Segoe UI', sans-serif; padding: 20px; }
+  h1 { color: #4fc3f7; margin-bottom: 8px; font-size: 22px; }
+  h2 { color: #4fc3f7; font-size: 16px; margin: 20px 0 8px 0; }
+  .subtitle { color: #888; font-size: 13px; margin-bottom: 24px; }
+  .panels { display: flex; flex-wrap: wrap; gap: 24px; }
+  .panel-card {
+    background: rgba(255,255,255,0.04); border: 1px solid rgba(79,195,247,0.15);
+    border-radius: 10px; padding: 16px; min-width: 320px; flex: 1;
+  }
+  .panel-card h3 { color: #fff; font-size: 14px; margin-bottom: 4px; }
+  .panel-card .qty { color: #4fc3f7; font-size: 12px; margin-bottom: 12px; }
+  .panel-card .dims { color: #aaa; font-size: 12px; margin-top: 8px; }
+  svg { display: block; margin: 0 auto; }
+  .dim-line { stroke: #ff7043; stroke-width: 0.8; stroke-dasharray: 3,2; }
+  .dim-text { fill: #ff7043; font-size: 9px; font-family: 'Segoe UI', sans-serif; }
+  .panel-fill { fill: rgba(26,95,122,0.3); stroke: #4fc3f7; stroke-width: 1.5; }
+  .panel-label { fill: #fff; font-size: 10px; font-family: 'Segoe UI', sans-serif; text-anchor: middle; }
+  .cutout { fill: rgba(0,0,0,0.5); stroke: #ff7043; stroke-width: 1; stroke-dasharray: 4,2; }
+  .point-label { fill: #aaa; font-size: 7px; font-family: monospace; }
+  .angle-arc { fill: none; stroke: #ffd54f; stroke-width: 0.8; }
+  .angle-text { fill: #ffd54f; font-size: 8px; }
+  .section { margin-bottom: 30px; }
+  table { border-collapse: collapse; width: 100%; margin-top: 12px; }
+  th, td { text-align: left; padding: 6px 10px; border-bottom: 1px solid rgba(255,255,255,0.08); font-size: 13px; }
+  th { color: #4fc3f7; font-size: 12px; }
+  .note { color: #888; font-size: 12px; font-style: italic; margin-top: 8px; }
+</style>
+</head>
+<body>
+
+<h1>Naia Arcade Cabinet — Panel Dimensions</h1>
+<p class="subtitle">All dimensions in centimeters. Poplar plywood 15mm (1.5cm) thickness. Scale: 3px per cm in diagrams.</p>
+
+<script>
+// ========================
+// MASTER DIMENSIONS
+// ========================
+const T = 1.5;          // Poplar plywood thickness (15mm)
+const W = 58;           // cabinet outer width
+const D = 50;           // cabinet depth (front to back)
+const INNER_W = W - 2*T; // 54.4cm — inner width between side panels
+const H_FRONT = 95;     // side panel height at front
+const H_BACK = 80;      // side panel height at back
+
+const TILT_DEG = 20;    // front panel tilt from vertical
+const TILT = TILT_DEG * Math.PI / 180;
+
+// Front panel: tilted 20° backward
+// Bottom at (Z=0, Y=0), top at (Z=FP_TOP_Z, Y=FP_TOP_Y)
+const FP_SURF = 82;     // front panel surface length (along the tilted panel)
+const FP_TOP_Z = FP_SURF * Math.sin(TILT);   // ~28.0 — depth inward from front
+const FP_TOP_Y = FP_SURF * Math.cos(TILT);   // ~77.1 — height at top
+
+// Logo panel: vertical, at the FRONT (Z=0), from FP_TOP_Y up to H_FRONT
+const LOGO_H = H_FRONT - FP_TOP_Y;           // ~17.9cm
+
+// Soffit panel (G): horizontal at Y=FP_TOP_Y, from Z=0 back to Z=FP_TOP_Z
+// Blocks lightbox light downward + supports logo panel
+const SOFFIT_D = FP_TOP_Z;                   // ~28.0cm
+
+// Roof panel: angled from front top to back top
+const ROOF_LEN = Math.sqrt(D*D + (H_FRONT - H_BACK)**2); // ~52.2cm
+const ROOF_ANGLE = Math.atan2(H_FRONT - H_BACK, D) * 180 / Math.PI; // ~16.7°
+
+// Screen window cutout in front panel
+const WIN_W = 48.7, WIN_H = 31.0;
+// Window center at Y=57 → surface distance from bottom = 57/cos(20°) = 60.6cm
+const WIN_CENTER_S = 57 / Math.cos(TILT);    // ~60.6 along panel surface
+const WIN_H_S = WIN_H;                        // window height on surface (same, it's the actual cut)
+
+// Monitor shelf
+const SHELF_Y = 38;
+const SHELF_D = 30;
+
+// Mouse shelf
+const MOUSE_OVERHANG = 25;
+const MOUSE_TOTAL_W = W + 2 * MOUSE_OVERHANG; // 108cm
+const MOUSE_D = 25;
+const MOUSE_T = T;
+const MOUSE_CURRENT = 12;  // current slot height
+const SLOT_HEIGHTS = [8, 12, 16];
+
+// ========================
+// SVG HELPERS
+// ========================
+const S = 3; // scale: 3px per cm
+
+function svgDim(x1, y1, x2, y2, label, offset=12, side='left') {
+  // Dimension line with label
+  const mx = (x1+x2)/2, my = (y1+y2)/2;
+  const dx = x2-x1, dy = y2-y1;
+  const len = Math.sqrt(dx*dx+dy*dy);
+  // perpendicular offset
+  const nx = -dy/len * offset, ny = dx/len * offset;
+  return `
+    <line x1="${x1+nx}" y1="${y1+ny}" x2="${x2+nx}" y2="${y2+ny}" class="dim-line"/>
+    <line x1="${x1}" y1="${y1}" x2="${x1+nx*1.3}" y2="${y1+ny*1.3}" class="dim-line" stroke-dasharray="1,2"/>
+    <line x1="${x2}" y1="${y2}" x2="${x2+nx*1.3}" y2="${y2+ny*1.3}" class="dim-line" stroke-dasharray="1,2"/>
+    <text x="${mx+nx*1.4}" y="${my+ny*1.4}" class="dim-text" text-anchor="middle" dominant-baseline="middle">${label}</text>
+  `;
+}
+
+// ========================
+// RENDER PANELS
+// ========================
+document.addEventListener('DOMContentLoaded', () => {
+
+  // ---- SIDE PANEL (×2) ----
+  {
+    const svg = document.getElementById('side-panel-svg');
+    const pad = 40;
+    const w = D*S + pad*2;
+    const h = H_FRONT*S + pad*2;
+    svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
+    svg.setAttribute('width', w);
+    svg.setAttribute('height', h);
+
+    // In this SVG: x = depth (0=front, D=back), y = flipped (0=top)
+    // Points in cabinet coords (depth, height):
+    const pts = [
+      [0, 0],                 // A: front bottom
+      [FP_TOP_Z, FP_TOP_Y],   // B: front panel top (tilted)
+      [0, FP_TOP_Y],           // C: soffit front (= logo bottom)
+      [0, H_FRONT],            // D: logo top = roof front
+      [D, H_BACK],             // E: roof back
+      [D, 0],                  // F: back bottom
+    ];
+
+    // Transform to SVG coords
+    const tx = (z) => pad + z * S;
+    const ty = (y) => pad + (H_FRONT - y) * S;
+
+    const pathD = pts.map((p,i) => `${i===0?'M':'L'}${tx(p[0])},${ty(p[1])}`).join(' ') + ' Z';
+
+    let content = `<polygon points="${pts.map(p => `${tx(p[0])},${ty(p[1])}`).join(' ')}" class="panel-fill"/>`;
+
+    // Label corners
+    const labels = ['A','B','C','D','E','F'];
+    pts.forEach((p,i) => {
+      const ox = i===0||i===2||i===3 ? -10 : i===1 ? -5 : 10;
+      const oy = i===0||i===5 ? 12 : i===3||i===4 ? -8 : i===1 ? 5 : 0;
+      content += `<text x="${tx(p[0])+ox}" y="${ty(p[1])+oy}" class="point-label">${labels[i]} (${p[0].toFixed(1)}, ${p[1].toFixed(1)})</text>`;
+    });
+
+    // Dimension: front edge height (A→D via C)
+    content += svgDim(tx(0), ty(0), tx(0), ty(H_FRONT), `${H_FRONT}`, -18);
+    // Dimension: back edge height
+    content += svgDim(tx(D), ty(0), tx(D), ty(H_BACK), `${H_BACK}`, 18);
+    // Dimension: depth
+    content += svgDim(tx(0), ty(0), tx(D), ty(0), `${D}`, 18);
+    // Front panel surface length
+    content += svgDim(tx(0), ty(0), tx(FP_TOP_Z), ty(FP_TOP_Y), `${FP_SURF} (surface)`, 18);
+    // Logo height
+    content += svgDim(tx(0), ty(FP_TOP_Y), tx(0), ty(H_FRONT), `${LOGO_H.toFixed(1)} logo`, -30);
+    // Soffit area depth (open, no panel)
+    content += svgDim(tx(0), ty(FP_TOP_Y), tx(FP_TOP_Z), ty(FP_TOP_Y), `${SOFFIT_D.toFixed(1)} soffit (G)`, -12);
+
+    // 20° angle arc at bottom-front
+    const arcR = 25;
+    const arcEndX = tx(0) + arcR * Math.sin(TILT);
+    const arcEndY = ty(0) - arcR * Math.cos(TILT); // wait, need to be careful
+    // Vertical line up from A, then arc to the tilted line
+    content += `<line x1="${tx(0)}" y1="${ty(0)}" x2="${tx(0)}" y2="${ty(0)-arcR}" class="angle-arc" stroke-dasharray="2,2"/>`;
+    // Arc from vertical to tilted line
+    const ax = tx(0) + arcR * Math.sin(TILT);
+    const ay = ty(0) - arcR * Math.cos(TILT);
+    content += `<path d="M${tx(0)},${ty(0)-arcR} A${arcR},${arcR} 0 0,1 ${ax},${ay}" class="angle-arc"/>`;
+    content += `<text x="${tx(0)+15}" y="${ty(0)-arcR+5}" class="angle-text">20°</text>`;
+
+    // Slot markers on front edge
+    SLOT_HEIGHTS.forEach(sh => {
+      const sy = ty(sh);
+      content += `<line x1="${tx(0)-3}" y1="${sy}" x2="${tx(0)+5}" y2="${sy}" stroke="#ffd54f" stroke-width="1"/>`;
+      content += `<text x="${tx(0)-15}" y="${sy+3}" fill="#ffd54f" font-size="7" text-anchor="middle">↔${sh}</text>`;
+    });
+
+    // Monitor shelf line
+    const shelfZ = SHELF_Y * Math.tan(TILT);
+    content += `<line x1="${tx(shelfZ)}" y1="${ty(SHELF_Y)}" x2="${tx(shelfZ+SHELF_D)}" y2="${ty(SHELF_Y)}" stroke="#8B7355" stroke-width="2"/>`;
+    content += `<text x="${tx(shelfZ+SHELF_D/2)}" y="${ty(SHELF_Y)-5}" fill="#8B7355" font-size="8" text-anchor="middle">shelf @ Y=${SHELF_Y}</text>`;
+
+    svg.innerHTML = content;
+  }
+
+  // ---- FRONT PANEL ----
+  {
+    const svg = document.getElementById('front-panel-svg');
+    const pad = 35;
+    const pw = INNER_W, ph = FP_SURF;
+    const w = pw*S + pad*2, h = ph*S + pad*2;
+    svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
+    svg.setAttribute('width', w);
+    svg.setAttribute('height', h);
+
+    const tx = (x) => pad + x * S;
+    const ty = (y) => pad + (ph - y) * S;
+
+    let content = '';
+    // Panel outline
+    content += `<rect x="${tx(0)}" y="${ty(ph)}" width="${pw*S}" height="${ph*S}" class="panel-fill"/>`;
+    // Window cutout
+    const wcx = pw/2, wcy = WIN_CENTER_S;
+    content += `<rect x="${tx(wcx-WIN_W/2)}" y="${ty(wcy+WIN_H_S/2)}" width="${WIN_W*S}" height="${WIN_H_S*S}" class="cutout"/>`;
+    content += `<text x="${tx(wcx)}" y="${ty(wcy)}" class="panel-label" font-size="8">Screen window</text>`;
+    content += `<text x="${tx(wcx)}" y="${ty(wcy)+12}" class="panel-label" font-size="7" fill="#aaa">${WIN_W}×${WIN_H}</text>`;
+
+    // Dims
+    content += svgDim(tx(0), ty(0), tx(0), ty(ph), `${ph} (surface)`, -18);
+    content += svgDim(tx(0), ty(0), tx(pw), ty(0), `${INNER_W}`, 18);
+    // Window from bottom
+    content += svgDim(tx(pw), ty(0), tx(pw), ty(wcy-WIN_H_S/2), `${(wcy-WIN_H_S/2).toFixed(1)}`, 18);
+
+    svg.innerHTML = content;
+  }
+
+  // ---- LOGO PANEL ----
+  {
+    const svg = document.getElementById('logo-panel-svg');
+    const pad = 30;
+    const pw = INNER_W, ph = LOGO_H;
+    const w = pw*S + pad*2, h = Math.max(ph*S + pad*2, 100);
+    svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
+    svg.setAttribute('width', w);
+    svg.setAttribute('height', h);
+
+    const tx = (x) => pad + x * S;
+    const ty = (y) => pad + (ph - y) * S;
+
+    let content = '';
+    content += `<rect x="${tx(0)}" y="${ty(ph)}" width="${pw*S}" height="${ph*S}" class="panel-fill"/>`;
+    content += `<text x="${tx(pw/2)}" y="${ty(ph/2)+4}" class="panel-label">NAIA logo</text>`;
+    content += svgDim(tx(0), ty(0), tx(0), ty(ph), `${ph.toFixed(1)}`, -16);
+    content += svgDim(tx(0), ty(0), tx(pw), ty(0), `${INNER_W}`, 14);
+
+    svg.innerHTML = content;
+  }
+
+  // ---- LOGO PANEL DESIGN (visual mockup of the illuminated panel) ----
+  {
+    const svg = document.getElementById('logo-design-svg');
+    const pw = INNER_W, ph = LOGO_H;
+    const designScale = 5; // bigger scale for design preview
+    const dw = pw * designScale;
+    const dh = ph * designScale;
+    const pad = 4;
+    svg.setAttribute('viewBox', `0 0 ${dw + pad*2} ${dh + pad*2}`);
+    svg.setAttribute('width', dw + pad*2);
+    svg.setAttribute('height', dh + pad*2);
+
+    let d = '';
+    // Defs: gradients and filters
+    d += `<defs>
+      <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#1565C0"/>
+        <stop offset="30%" stop-color="#1976D2"/>
+        <stop offset="50%" stop-color="#9575CD"/>
+        <stop offset="70%" stop-color="#1976D2"/>
+        <stop offset="100%" stop-color="#1565C0"/>
+      </linearGradient>
+      <linearGradient id="waveGrad1" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" stop-color="#4FC3F7" stop-opacity="0.6"/>
+        <stop offset="40%" stop-color="#E1BEE7" stop-opacity="0.5"/>
+        <stop offset="60%" stop-color="#F8BBD0" stop-opacity="0.5"/>
+        <stop offset="100%" stop-color="#4FC3F7" stop-opacity="0.6"/>
+      </linearGradient>
+      <linearGradient id="waveGrad2" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" stop-color="#42A5F5" stop-opacity="0.4"/>
+        <stop offset="50%" stop-color="#CE93D8" stop-opacity="0.3"/>
+        <stop offset="100%" stop-color="#42A5F5" stop-opacity="0.4"/>
+      </linearGradient>
+      <radialGradient id="centerGlow" cx="50%" cy="50%" r="45%">
+        <stop offset="0%" stop-color="#E1BEE7" stop-opacity="0.4"/>
+        <stop offset="100%" stop-color="#1565C0" stop-opacity="0"/>
+      </radialGradient>
+      <filter id="glowDesign"><feGaussianBlur stdDeviation="3" result="blur"/>
+        <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <clipPath id="panelClip"><rect x="${pad}" y="${pad}" width="${dw}" height="${dh}" rx="3"/></clipPath>
+    </defs>`;
+
+    const ox = pad, oy = pad;
+    // Background
+    d += `<g clip-path="url(#panelClip)">`;
+    d += `<rect x="${ox}" y="${oy}" width="${dw}" height="${dh}" fill="url(#bgGrad)" rx="3"/>`;
+    // Center glow (pink/purple soft light)
+    d += `<rect x="${ox}" y="${oy}" width="${dw}" height="${dh}" fill="url(#centerGlow)"/>`;
+
+    // Flowing waves (inspired by the Naia hydro image)
+    const cy = dh / 2 + oy;
+    const w2 = dw;
+    // Upper wave band
+    d += `<path d="M${ox},${cy-10} C${ox+w2*0.15},${cy-25} ${ox+w2*0.3},${cy-5} ${ox+w2*0.5},${cy-15} C${ox+w2*0.7},${cy-25} ${ox+w2*0.85},${cy-5} ${ox+w2},${cy-12}" fill="none" stroke="url(#waveGrad1)" stroke-width="4" opacity="0.7"/>`;
+    d += `<path d="M${ox},${cy-5} C${ox+w2*0.15},${cy-18} ${ox+w2*0.3},${cy+2} ${ox+w2*0.5},${cy-8} C${ox+w2*0.7},${cy-18} ${ox+w2*0.85},${cy+2} ${ox+w2},${cy-5}" fill="none" stroke="url(#waveGrad1)" stroke-width="3" opacity="0.5"/>`;
+    // Lower wave band
+    d += `<path d="M${ox},${cy+12} C${ox+w2*0.2},${cy+3} ${ox+w2*0.4},${cy+22} ${ox+w2*0.5},${cy+14} C${ox+w2*0.65},${cy+5} ${ox+w2*0.8},${cy+20} ${ox+w2},${cy+10}" fill="none" stroke="url(#waveGrad2)" stroke-width="4" opacity="0.6"/>`;
+    d += `<path d="M${ox},${cy+18} C${ox+w2*0.2},${cy+8} ${ox+w2*0.4},${cy+28} ${ox+w2*0.5},${cy+20} C${ox+w2*0.65},${cy+10} ${ox+w2*0.8},${cy+26} ${ox+w2},${cy+16}" fill="none" stroke="url(#waveGrad2)" stroke-width="2.5" opacity="0.4"/>`;
+    // Fine accent waves
+    d += `<path d="M${ox},${cy+6} C${ox+w2*0.25},${cy-2} ${ox+w2*0.5},${cy+15} ${ox+w2*0.75},${cy+5} C${ox+w2*0.85},${cy} ${ox+w2*0.95},${cy+8} ${ox+w2},${cy+4}" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>`;
+
+    d += `</g>`;
+
+    // "naia" text - italic style matching the logo
+    const textCx = ox + dw/2;
+    const textCy = cy - 2;
+    d += `<text x="${textCx}" y="${textCy}" fill="white" font-size="32" font-weight="bold" font-style="italic" text-anchor="middle" dominant-baseline="middle" font-family="'Segoe UI', Arial, sans-serif" filter="url(#glowDesign)">naia</text>`;
+    // "hydro" text below
+    d += `<text x="${textCx+28}" y="${textCy+18}" fill="rgba(130,177,255,0.9)" font-size="12" text-anchor="middle" dominant-baseline="middle" font-family="'Segoe UI', Arial, sans-serif">hydro</text>`;
+
+    // Outer border with rounded corners
+    d += `<rect x="${ox}" y="${oy}" width="${dw}" height="${dh}" fill="none" stroke="#4fc3f7" stroke-width="1.5" rx="3"/>`;
+    // Label
+    d += `<text x="${textCx}" y="${oy+dh-4}" fill="rgba(79,195,247,0.5)" font-size="6" text-anchor="middle">Design mockup — actual vinyl decal on opal acrylic, backlit with LED</text>`;
+
+    svg.innerHTML = d;
+  }
+
+  // ---- ROOF PANEL ----
+  // Rectangular panel: width = INNER_W, length = ROOF_LEN (slope distance)
+  {
+    const svg = document.getElementById('roof-panel-svg');
+    const pad = 35;
+    const pw = INNER_W, ph = ROOF_LEN;
+    const w = pw*S + pad*2, h = ph*S + pad*2;
+    svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
+    svg.setAttribute('width', w);
+    svg.setAttribute('height', h);
+
+    const tx = (x) => pad + x * S;
+    const ty = (y) => pad + (ph - y) * S;
+
+    let content = '';
+    content += `<rect x="${tx(0)}" y="${ty(ph)}" width="${pw*S}" height="${ph*S}" class="panel-fill"/>`;
+    content += `<text x="${tx(pw/2)}" y="${ty(ph/2)+4}" class="panel-label">Roof</text>`;
+    content += `<text x="${tx(pw/2)}" y="${ty(ph/2)+16}" class="panel-label" font-size="8" fill="#aaa">angled ${ROOF_ANGLE.toFixed(1)}°</text>`;
+    content += svgDim(tx(0), ty(0), tx(0), ty(ph), `${ph.toFixed(1)}`, -18);
+    content += svgDim(tx(0), ty(0), tx(pw), ty(0), `${INNER_W}`, 16);
+
+    svg.innerHTML = content;
+  }
+
+  // ---- SOFFIT PANEL ----
+  // Rectangular panel: width = INNER_W, depth = SOFFIT_D
+  {
+    const svg = document.getElementById('soffit-panel-svg');
+    const pad = 35;
+    const pw = INNER_W, ph = SOFFIT_D;
+    const w = pw*S + pad*2, h = ph*S + pad*2;
+    svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
+    svg.setAttribute('width', w);
+    svg.setAttribute('height', h);
+
+    const tx = (x) => pad + x * S;
+    const ty = (y) => pad + (ph - y) * S;
+
+    let content = '';
+    content += `<rect x="${tx(0)}" y="${ty(ph)}" width="${pw*S}" height="${ph*S}" class="panel-fill"/>`;
+    content += `<text x="${tx(pw/2)}" y="${ty(ph/2)+4}" class="panel-label">Soffit</text>`;
+    content += `<text x="${tx(pw/2)}" y="${ty(ph/2)+14}" class="panel-label" font-size="7" fill="#aaa">supports lightbox + blocks light</text>`;
+    content += svgDim(tx(0), ty(0), tx(0), ty(ph), `${ph.toFixed(1)}`, -16);
+    content += svgDim(tx(0), ty(0), tx(pw), ty(0), `${INNER_W}`, 16);
+
+    svg.innerHTML = content;
+  }
+
+  // ---- MONITOR SHELF ----
+  // Rectangular panel: width = INNER_W, depth = SHELF_D
+  {
+    const svg = document.getElementById('shelf-panel-svg');
+    const pad = 35;
+    const pw = INNER_W, ph = SHELF_D;
+    const w = pw*S + pad*2, h = ph*S + pad*2;
+    svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
+    svg.setAttribute('width', w);
+    svg.setAttribute('height', h);
+
+    const tx = (x) => pad + x * S;
+    const ty = (y) => pad + (ph - y) * S;
+
+    let content = '';
+    content += `<rect x="${tx(0)}" y="${ty(ph)}" width="${pw*S}" height="${ph*S}" class="panel-fill"/>`;
+    content += `<text x="${tx(pw/2)}" y="${ty(ph/2)+4}" class="panel-label">Monitor shelf</text>`;
+    content += svgDim(tx(0), ty(0), tx(0), ty(ph), `${ph}`, -16);
+    content += svgDim(tx(0), ty(0), tx(pw), ty(0), `${INNER_W}`, 16);
+
+    svg.innerHTML = content;
+  }
+
+  // ---- MOUSE SHELF ----
+  {
+    const svg = document.getElementById('mouse-panel-svg');
+    const pad = 30;
+    const pw = MOUSE_TOTAL_W, ph = MOUSE_D;
+    const sw = pw*S + pad*2, sh = ph*S + pad*2;
+    svg.setAttribute('viewBox', `0 0 ${sw} ${sh}`);
+    svg.setAttribute('width', sw);
+    svg.setAttribute('height', sh);
+
+    const tx = (x) => pad + x * S;
+    const ty = (y) => pad + (ph - y) * S;
+
+    let content = '';
+    content += `<rect x="${tx(0)}" y="${ty(ph)}" width="${pw*S}" height="${ph*S}" class="panel-fill"/>`;
+
+    // Show left overhang, cabinet width, right overhang
+    const lo = MOUSE_OVERHANG;
+    content += `<line x1="${tx(lo)}" y1="${ty(0)}" x2="${tx(lo)}" y2="${ty(ph)}" stroke="#ff7043" stroke-width="0.5" stroke-dasharray="3,2"/>`;
+    content += `<line x1="${tx(lo+W)}" y1="${ty(0)}" x2="${tx(lo+W)}" y2="${ty(ph)}" stroke="#ff7043" stroke-width="0.5" stroke-dasharray="3,2"/>`;
+
+    content += `<text x="${tx(lo/2)}" y="${ty(ph/2)+4}" class="panel-label" font-size="8">mouse area</text>`;
+    content += `<text x="${tx(lo+W/2)}" y="${ty(ph/2)+4}" class="panel-label" font-size="8">through cabinet</text>`;
+    content += `<text x="${tx(lo+W+lo/2)}" y="${ty(ph/2)+4}" class="panel-label" font-size="8">mouse area</text>`;
+
+    content += svgDim(tx(0), ty(0), tx(pw), ty(0), `${MOUSE_TOTAL_W} total`, 16);
+    content += svgDim(tx(0), ty(0), tx(lo), ty(0), `${lo}`, 28);
+    content += svgDim(tx(lo), ty(0), tx(lo+W), ty(0), `${W}`, 28);
+    content += svgDim(tx(lo+W), ty(0), tx(pw), ty(0), `${lo}`, 28);
+    content += svgDim(tx(0), ty(0), tx(0), ty(ph), `${ph}`, -14);
+
+    svg.innerHTML = content;
+  }
+
+  // ---- SUMMARY TABLE WITH WEIGHTS ----
+  {
+    const tbody = document.getElementById('cut-list-body');
+    const KG_PER_M2 = 6.0; // poplar plywood 15mm ≈ 6 kg/m²
+
+    // Side panel area via shoelace formula for complex shape
+    const sidePts = [[0,0],[FP_TOP_Z,FP_TOP_Y],[0,FP_TOP_Y],[0,H_FRONT],[D,H_BACK],[D,0]];
+    let sideArea = 0;
+    for (let i=0; i<sidePts.length; i++) {
+      const j = (i+1) % sidePts.length;
+      sideArea += sidePts[i][0]*sidePts[j][1] - sidePts[j][0]*sidePts[i][1];
+    }
+    sideArea = Math.abs(sideArea) / 2 / 10000; // cm² to m²
+
+    const fpArea = (INNER_W * FP_SURF - WIN_W * WIN_H) / 10000; // minus window cutout
+    const roofArea = INNER_W * ROOF_LEN / 10000;
+    const logoArea = INNER_W * LOGO_H / 10000;
+    const shelfArea = INNER_W * SHELF_D / 10000;
+    const mouseArea = MOUSE_TOTAL_W * MOUSE_D / 10000;
+
+    // Logo panel lightbox: 3mm opal acrylic (front) + 3mm foamboard (back) + LED strip
+    const ACRYLIC_KG_M2 = 3.6;  // 3mm opal acrylic ≈ 3.6 kg/m²
+    const FOAM_KG_M2 = 0.8;     // 3mm foamboard ≈ 0.8 kg/m²
+    const LED_STRIP_KG = 0.15;  // LED strip + wiring for small panel ≈ 0.15 kg
+    const logoLightboxWeight = logoArea * ACRYLIC_KG_M2 + logoArea * FOAM_KG_M2 + LED_STRIP_KG;
+
+    const soffitArea = INNER_W * SOFFIT_D / 10000;
+
+    const panels = [
+      ['A','Side panel', 2, `Complex shape`, sideArea, KG_PER_M2, 'Poplar ply 15mm'],
+      ['D','Front panel', 1, `${INNER_W} × ${FP_SURF}`, fpArea, KG_PER_M2, `Poplar ply 15mm, window cutout`],
+      ['E','Roof panel', 1, `${INNER_W} × ${ROOF_LEN.toFixed(1)}`, roofArea, KG_PER_M2, `Angled ${ROOF_ANGLE.toFixed(1)}°`],
+      ['F','Logo panel (lightbox)', 1, `${INNER_W} × ${LOGO_H.toFixed(1)}`, logoArea, null, `Acrylic 3mm + foamboard + LED`],
+      ['G','Soffit panel', 1, `${INNER_W} × ${SOFFIT_D.toFixed(1)}`, soffitArea, KG_PER_M2, `Horizontal at Y=${FP_TOP_Y.toFixed(1)}cm, supports lightbox`],
+      ['H','Monitor shelf', 1, `${INNER_W} × ${SHELF_D}`, shelfArea, KG_PER_M2, `At Y=${SHELF_Y}cm`],
+      ['M','Mouse shelf', 1, `${MOUSE_TOTAL_W} × ${MOUSE_D}`, mouseArea, KG_PER_M2, `Slots at ${SLOT_HEIGHTS.join('/')}cm`],
+    ];
+
+    let totalWeight = 0;
+    panels.forEach(p => {
+      const qty = p[2];
+      const area = p[4];
+      let weight;
+      if (p[5] === null) {
+        // Lightbox panel — custom weight
+        weight = logoLightboxWeight * qty;
+      } else {
+        weight = area * p[5] * qty;
+      }
+      totalWeight += weight;
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${p[0]}</td><td>${p[1]}</td><td>${qty}</td><td>${p[3]}</td><td>${weight.toFixed(1)} kg</td><td>${p[6]}</td>`;
+      tbody.appendChild(tr);
+    });
+
+    // Total row
+    const totalTr = document.createElement('tr');
+    totalTr.style.fontWeight = 'bold';
+    totalTr.style.color = '#4fc3f7';
+    totalTr.innerHTML = `<td></td><td>Total cabinet</td><td>${panels.reduce((s,p)=>s+p[2],0)}</td><td></td><td>${totalWeight.toFixed(1)} kg</td><td></td>`;
+    tbody.appendChild(totalTr);
+
+    // Store for crate section
+    window._totalPanelWeight = totalWeight;
+  }
+
+  // ========================
+  // ASSEMBLED VIEWS
+  // ========================
+
+  // SVG glow filter for illuminated panels
+  const glowDef = `<defs><filter id="glow"><feGaussianBlur stdDeviation="4" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>`;
+
+  // ---- FRONT VIEW ----
+  {
+    const svg = document.getElementById('front-view-svg');
+    const pad = 40;
+    const sc = 3.5;
+    // Front view: we see the cabinet width (W=58) and height (H_FRONT=95)
+    // Plus mouse shelf overhang on each side (25cm)
+    const totalW = MOUSE_TOTAL_W; // 108
+    const viewW = totalW * sc + pad*2;
+    const viewH = H_FRONT * sc + pad*2 + 20;
+    svg.setAttribute('viewBox', `0 0 ${viewW} ${viewH}`);
+    svg.setAttribute('width', viewW);
+    svg.setAttribute('height', viewH);
+
+    const tx = (x) => pad + (totalW/2 + x) * sc; // x=0 is center
+    const ty = (y) => pad + (H_FRONT - y) * sc;
+
+    let c = '';
+    const hw = W/2; // half width = 29
+
+    // Side panels (visible as thickness strips on left & right)
+    c += `<rect x="${tx(-hw)}" y="${ty(H_FRONT)}" width="${T*sc}" height="${H_FRONT*sc}" fill="rgba(26,95,122,0.5)" stroke="#4fc3f7" stroke-width="1"/>`;
+    c += `<rect x="${tx(hw-T)}" y="${ty(H_FRONT)}" width="${T*sc}" height="${H_FRONT*sc}" fill="rgba(26,95,122,0.5)" stroke="#4fc3f7" stroke-width="1"/>`;
+
+    // Front panel (regular plywood, not lightbox)
+    const fpProjH = FP_TOP_Y; // 77.1
+    c += glowDef;
+    c += `<rect x="${tx(-hw+T)}" y="${ty(fpProjH)}" width="${INNER_W*sc}" height="${fpProjH*sc}" fill="rgba(26,95,122,0.3)" stroke="#4fc3f7" stroke-width="1.5"/>`;
+    c += `<text x="${tx(0)}" y="${ty(8)}" fill="rgba(255,255,255,0.3)" font-size="7" text-anchor="middle">front panel (plywood)</text>`;
+
+    // Screen window cutout (dark — screen visible through here)
+    const winCY = 57;
+    c += `<rect x="${tx(-WIN_W/2)}" y="${ty(winCY+WIN_H/2)}" width="${WIN_W*sc}" height="${WIN_H*sc}" fill="rgba(13,40,64,0.9)" stroke="#ff7043" stroke-width="1"/>`;
+    // Screen content
+    c += `<rect x="${tx(-WIN_W/2+1)}" y="${ty(winCY+WIN_H/2-1)}" width="${(WIN_W-2)*sc}" height="${(WIN_H-2)*sc}" fill="rgba(13,47,79,0.9)" stroke="none"/>`;
+    // Chart line
+    const chartPts = [[-20,8],[-15,6],[-10,7],[-5,3],[0,5],[5,12],[10,14],[15,5],[20,4]].map(
+      ([dx,dy]) => `${tx(dx)},${ty(winCY-WIN_H/4+dy)}`
+    ).join(' ');
+    c += `<polyline points="${chartPts}" fill="none" stroke="#4fc3f7" stroke-width="1.5"/>`;
+    c += `<text x="${tx(0)}" y="${ty(winCY+WIN_H/2-3)}" fill="#4fc3f7" font-size="8" text-anchor="middle">Production (kWh)</text>`;
+
+    // Soffit panel (visible as a thin horizontal strip between front panel and logo)
+    c += `<rect x="${tx(-hw+T)}" y="${ty(fpProjH+T)}" width="${INNER_W*sc}" height="${T*sc}" fill="rgba(26,95,122,0.6)" stroke="#4fc3f7" stroke-width="0.8"/>`;
+    c += `<text x="${tx(hw-T-2)}" y="${ty(fpProjH+T/2)+3}" fill="#aaa" font-size="5" text-anchor="end">soffit (G)</text>`;
+
+    // Logo panel LIGHTBOX (illuminated — glow effect)
+    // Glow background
+    c += `<rect x="${tx(-hw+T)}" y="${ty(H_FRONT)}" width="${INNER_W*sc}" height="${LOGO_H*sc}" fill="rgba(79,195,247,0.1)" stroke="none" filter="url(#glow)"/>`;
+    // Gradient fill for lightbox (blue to purple like the Naia branding)
+    c += `<defs><linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#2196F3" stop-opacity="0.25"/><stop offset="50%" stop-color="#9C27B0" stop-opacity="0.15"/><stop offset="100%" stop-color="#2196F3" stop-opacity="0.25"/></linearGradient></defs>`;
+    c += `<rect x="${tx(-hw+T)}" y="${ty(H_FRONT)}" width="${INNER_W*sc}" height="${LOGO_H*sc}" fill="url(#logoGrad)" stroke="#4fc3f7" stroke-width="1.5"/>`;
+    // Wave decoration (simplified flowing wave like Naia logo)
+    const logoMidY = ty(H_FRONT - LOGO_H/2);
+    const logoLeft = tx(-hw+T);
+    const logoRight = tx(-hw+T) + INNER_W*sc;
+    const logoW = INNER_W*sc;
+    c += `<path d="M${logoLeft},${logoMidY+8} Q${logoLeft+logoW*0.25},${logoMidY+2} ${logoLeft+logoW*0.5},${logoMidY+8} Q${logoLeft+logoW*0.75},${logoMidY+14} ${logoRight},${logoMidY+8}" fill="none" stroke="rgba(79,195,247,0.4)" stroke-width="1.5"/>`;
+    c += `<path d="M${logoLeft},${logoMidY+11} Q${logoLeft+logoW*0.25},${logoMidY+5} ${logoLeft+logoW*0.5},${logoMidY+11} Q${logoLeft+logoW*0.75},${logoMidY+17} ${logoRight},${logoMidY+11}" fill="none" stroke="rgba(156,39,176,0.3)" stroke-width="1"/>`;
+    // NAIA text
+    c += `<text x="${tx(0)}" y="${ty(H_FRONT-LOGO_H/2+3)}" fill="#fff" font-size="16" font-weight="bold" text-anchor="middle" font-style="italic">naia</text>`;
+    c += `<text x="${tx(0)}" y="${ty(H_FRONT-LOGO_H/2-4)}" fill="#4fc3f7" font-size="6" text-anchor="middle">hydro</text>`;
+    c += `<text x="${tx(0)}" y="${ty(H_FRONT-LOGO_H+1)}" fill="rgba(79,195,247,0.5)" font-size="5" text-anchor="middle">▸ illuminated lightbox ◂</text>`;
+
+    // Mouse shelf (full width 108, at Y=12)
+    // Hidden behind front panel — show center portion as dotted, overhangs solid
+    const msY = MOUSE_CURRENT;
+    // Left overhang (visible, solid)
+    c += `<rect x="${tx(-MOUSE_TOTAL_W/2)}" y="${ty(msY+MOUSE_T)}" width="${MOUSE_OVERHANG*sc}" height="${MOUSE_T*sc}" fill="rgba(26,109,138,0.5)" stroke="#4fc3f7" stroke-width="1"/>`;
+    // Right overhang (visible, solid)
+    c += `<rect x="${tx(hw)}" y="${ty(msY+MOUSE_T)}" width="${MOUSE_OVERHANG*sc}" height="${MOUSE_T*sc}" fill="rgba(26,109,138,0.5)" stroke="#4fc3f7" stroke-width="1"/>`;
+    // Center portion behind front panel (dotted)
+    c += `<rect x="${tx(-hw)}" y="${ty(msY+MOUSE_T)}" width="${W*sc}" height="${MOUSE_T*sc}" fill="none" stroke="#4fc3f7" stroke-width="1" stroke-dasharray="4,3" opacity="0.5"/>`;
+    // Mouse pads on overhangs
+    c += `<rect x="${tx(-MOUSE_TOTAL_W/2+1)}" y="${ty(msY+MOUSE_T-0.2)}" width="${(MOUSE_OVERHANG-2)*sc}" height="${0.3*sc}" fill="#1a1a1a" stroke="none"/>`;
+    c += `<rect x="${tx(hw+1)}" y="${ty(msY+MOUSE_T-0.2)}" width="${(MOUSE_OVERHANG-2)*sc}" height="${0.3*sc}" fill="#1a1a1a" stroke="none"/>`;
+
+    // Dimension lines
+    c += svgDim(tx(-hw), ty(0), tx(hw), ty(0), `${W}`, 16);
+    c += svgDim(tx(-MOUSE_TOTAL_W/2), ty(0), tx(MOUSE_TOTAL_W/2), ty(0), `${MOUSE_TOTAL_W}`, 28);
+    c += svgDim(tx(hw), ty(0), tx(hw), ty(H_FRONT), `${H_FRONT}`, 16);
+    c += svgDim(tx(-hw), ty(0), tx(-hw), ty(msY), `${msY}`, -20);
+
+    svg.innerHTML = c;
+  }
+
+  // ---- 45° PERSPECTIVE VIEW ----
+  {
+    const svg = document.getElementById('perspective-view-svg');
+    const pad = 40;
+    const sc = 3.2;
+    // Isometric-ish projection: front face + side face visible
+    // Side depth foreshortened at ~0.5 factor, angled 45°
+    const DF = 0.45; // depth foreshortening factor
+    const ANG = 35 * Math.PI / 180; // projection angle for depth
+    const dxPerD = Math.cos(ANG) * DF * sc; // x shift per cm depth
+    const dyPerD = -Math.sin(ANG) * DF * sc; // y shift per cm depth (goes up)
+
+    const viewW = W * sc + D * dxPerD / sc * sc + pad*2 + 40;
+    const viewH = H_FRONT * sc + D * Math.abs(dyPerD/sc) * sc + pad*2 + 20;
+    svg.setAttribute('viewBox', `0 0 ${viewW} ${viewH}`);
+    svg.setAttribute('width', viewW);
+    svg.setAttribute('height', viewH);
+
+    // Transform: (x_front, y_height, z_depth) → SVG coords
+    // x_front: 0=left edge of cabinet, W=right edge
+    // y_height: 0=bottom, H_FRONT=top
+    // z_depth: 0=front, D=back
+    const px = (x, z) => pad + x * sc + z * dxPerD;
+    const py = (y, z) => pad + 10 + (H_FRONT - y) * sc + z * dyPerD;
+
+    let c = '';
+
+    // Helper to draw a filled quadrilateral
+    const quad = (pts, fill, stroke, sw=1) => {
+      const d = pts.map((p,i) => `${i?'L':'M'}${p[0]},${p[1]}`).join(' ') + ' Z';
+      c += `<path d="${d}" fill="${fill}" stroke="${stroke}" stroke-width="${sw}"/>`;
+    };
+
+    // BACK EDGE (vertical line, partially visible)
+    // Right side panel - side face (the key profile)
+    // Side profile points in (depth, height): A(0,0) B(FP_TOP_Z,FP_TOP_Y) C(0,FP_TOP_Y) D(0,H_FRONT) E(D,H_BACK) F(D,0)
+    const sideProfile = [
+      [0, 0],
+      [FP_TOP_Z, FP_TOP_Y],
+      [0, FP_TOP_Y],
+      [0, H_FRONT],
+      [D, H_BACK],
+      [D, 0],
+    ];
+    const sidePts = sideProfile.map(([z,y]) => [px(W, z), py(y, z)]);
+    quad(sidePts, 'rgba(26,95,122,0.35)', '#4fc3f7', 1.2);
+
+    // Label side panel edges
+    c += `<text x="${px(W+2, D/2)}" y="${py(H_BACK/2, D/2)}" fill="#aaa" font-size="7" transform="rotate(-20,${px(W+2,D/2)},${py(H_BACK/2,D/2)})">Side panel</text>`;
+
+    // ROOF (top face - quadrilateral)
+    quad([
+      [px(0, 0), py(H_FRONT, 0)],
+      [px(W, 0), py(H_FRONT, 0)],
+      [px(W, D), py(H_BACK, D)],
+      [px(0, D), py(H_BACK, D)],
+    ], 'rgba(26,95,122,0.2)', '#4fc3f7', 1);
+    c += `<text x="${(px(0,D/2)+px(W,D/2))/2}" y="${(py(H_FRONT,0)+py(H_BACK,D))/2}" fill="#aaa" font-size="7" text-anchor="middle">Roof</text>`;
+
+    // FRONT FACE — Logo panel LIGHTBOX (vertical at z=0, from FP_TOP_Y to H_FRONT)
+    // Glow effect
+    c += `<defs><filter id="glow3"><feGaussianBlur stdDeviation="4" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>`;
+    const logoQuad = [
+      [px(0, 0), py(H_FRONT, 0)],
+      [px(W, 0), py(H_FRONT, 0)],
+      [px(W, 0), py(FP_TOP_Y, 0)],
+      [px(0, 0), py(FP_TOP_Y, 0)],
+    ];
+    // Glow background
+    const logoPath = logoQuad.map((p,i) => `${i?'L':'M'}${p[0]},${p[1]}`).join(' ') + ' Z';
+    c += `<path d="${logoPath}" fill="rgba(79,195,247,0.1)" stroke="none" filter="url(#glow3)"/>`;
+    // Gradient fill
+    c += `<defs><linearGradient id="logoGrad2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#2196F3" stop-opacity="0.3"/><stop offset="50%" stop-color="#9C27B0" stop-opacity="0.15"/><stop offset="100%" stop-color="#2196F3" stop-opacity="0.3"/></linearGradient></defs>`;
+    quad(logoQuad, 'url(#logoGrad2)', '#4fc3f7', 1.5);
+    // Wave line
+    const lgCx = (px(0,0)+px(W,0))/2;
+    const lgCy = (py(H_FRONT,0)+py(FP_TOP_Y,0))/2;
+    const lgHalfW = (px(W,0)-px(0,0))/2;
+    c += `<path d="M${lgCx-lgHalfW},${lgCy+6} Q${lgCx-lgHalfW*0.5},${lgCy+1} ${lgCx},${lgCy+6} Q${lgCx+lgHalfW*0.5},${lgCy+11} ${lgCx+lgHalfW},${lgCy+6}" fill="none" stroke="rgba(79,195,247,0.4)" stroke-width="1.2"/>`;
+    // NAIA text on logo
+    c += `<text x="${lgCx}" y="${lgCy+2}" fill="#fff" font-size="14" font-weight="bold" text-anchor="middle" font-style="italic">naia</text>`;
+    c += `<text x="${lgCx}" y="${lgCy+12}" fill="#4fc3f7" font-size="5" text-anchor="middle">hydro</text>`;
+
+    // SOFFIT PANEL (G) — horizontal at Y=FP_TOP_Y, from Z=0 to Z=FP_TOP_Z
+    quad([
+      [px(0, 0), py(FP_TOP_Y, 0)],
+      [px(W, 0), py(FP_TOP_Y, 0)],
+      [px(W, FP_TOP_Z), py(FP_TOP_Y, FP_TOP_Z)],
+      [px(0, FP_TOP_Z), py(FP_TOP_Y, FP_TOP_Z)],
+    ], 'rgba(26,95,122,0.25)', '#4fc3f7', 1);
+    c += `<text x="${(px(0,FP_TOP_Z/2)+px(W,FP_TOP_Z/2))/2}" y="${py(FP_TOP_Y, FP_TOP_Z/2)+3}" fill="#aaa" font-size="6" text-anchor="middle">Soffit (G)</text>`;
+
+    // SCREEN — drawn first, BEHIND the front panel
+    const winCenterZ = 57 * Math.tan(TILT);
+    const winTopZ = (57+WIN_H/2) * Math.tan(TILT);
+    const winBotZ = (57-WIN_H/2) * Math.tan(TILT);
+    const scrOff = 2; // 2cm behind panel surface
+    // Full screen area in lighter color (parts hidden behind front panel)
+    quad([
+      [px(W/2-WIN_W/2, winTopZ+scrOff), py(57+WIN_H/2, winTopZ+scrOff)],
+      [px(W/2+WIN_W/2, winTopZ+scrOff), py(57+WIN_H/2, winTopZ+scrOff)],
+      [px(W/2+WIN_W/2, winBotZ+scrOff), py(57-WIN_H/2, winBotZ+scrOff)],
+      [px(W/2-WIN_W/2, winBotZ+scrOff), py(57-WIN_H/2, winBotZ+scrOff)],
+    ], 'rgba(13,40,64,0.4)', '#4fc3f7', 0.5);
+    const scCx = (px(W/2, winTopZ+scrOff) + px(W/2, winBotZ+scrOff))/2;
+    const scCy = (py(57+WIN_H/2, winTopZ+scrOff) + py(57-WIN_H/2, winBotZ+scrOff))/2;
+    c += `<text x="${scCx}" y="${scCy}" fill="#4fc3f7" font-size="8" text-anchor="middle" opacity="0.6">Screen</text>`;
+
+    // FRONT PANEL (TILTED 20°) — regular plywood
+    // Bottom at z=0/Y=0, top at z=FP_TOP_Z/Y=FP_TOP_Y
+    const fpTL = [px(0, FP_TOP_Z), py(FP_TOP_Y, FP_TOP_Z)];
+    const fpTR = [px(W, FP_TOP_Z), py(FP_TOP_Y, FP_TOP_Z)];
+    const fpBR = [px(W, 0), py(0, 0)];
+    const fpBL = [px(0, 0), py(0, 0)];
+    // Window corners on tilted surface
+    const wTL = [px(W/2-WIN_W/2, winTopZ), py(57+WIN_H/2, winTopZ)];
+    const wTR = [px(W/2+WIN_W/2, winTopZ), py(57+WIN_H/2, winTopZ)];
+    const wBR = [px(W/2+WIN_W/2, winBotZ), py(57-WIN_H/2, winBotZ)];
+    const wBL = [px(W/2-WIN_W/2, winBotZ), py(57-WIN_H/2, winBotZ)];
+    // Front panel with window cutout — solid fill and solid stroke
+    c += `<path d="M${fpTL[0]},${fpTL[1]} L${fpTR[0]},${fpTR[1]} L${fpBR[0]},${fpBR[1]} L${fpBL[0]},${fpBL[1]} Z M${wTL[0]},${wTL[1]} L${wBL[0]},${wBL[1]} L${wBR[0]},${wBR[1]} L${wTR[0]},${wTR[1]} Z" fill="rgba(26,95,122,0.45)" stroke="#4fc3f7" stroke-width="1.5" fill-rule="evenodd"/>`;
+    // Window cutout edge in contrasting color
+    c += `<path d="M${wTL[0]},${wTL[1]} L${wTR[0]},${wTR[1]} L${wBR[0]},${wBR[1]} L${wBL[0]},${wBL[1]} Z" fill="none" stroke="#ff7043" stroke-width="1.2"/>`;
+
+    // Mouse shelf — overhangs visible, center behind front panel (dotted)
+    const msZ = 0; // mouse shelf at front edge
+    const msTop = py(MOUSE_CURRENT + MOUSE_T, msZ);
+    const msBot = py(MOUSE_CURRENT, msZ);
+    // Left overhang (solid)
+    const lox = px(0, 0) - MOUSE_OVERHANG * sc;
+    quad([
+      [lox, msTop], [px(0,0), msTop],
+      [px(0,0), msBot], [lox, msBot]
+    ], 'rgba(26,109,138,0.3)', '#4fc3f7', 0.8);
+    // Right overhang (solid)
+    const rox = px(W, 0) + MOUSE_OVERHANG * sc;
+    quad([
+      [px(W,0), msTop], [rox, msTop],
+      [rox, msBot], [px(W,0), msBot]
+    ], 'rgba(26,109,138,0.3)', '#4fc3f7', 0.8);
+    // Center (dotted — behind front panel)
+    c += `<rect x="${px(0,0)}" y="${msTop}" width="${(px(W,0)-px(0,0))}" height="${msBot-msTop}" fill="none" stroke="#4fc3f7" stroke-width="0.8" stroke-dasharray="4,3" opacity="0.4"/>`;
+    // Mouse pads
+    c += `<rect x="${lox+3}" y="${msTop-1}" width="${(MOUSE_OVERHANG-2)*sc}" height="2" fill="#1a1a1a"/>`;
+    c += `<rect x="${px(W,0)+3}" y="${msTop-1}" width="${(MOUSE_OVERHANG-2)*sc}" height="2" fill="#1a1a1a"/>`;
+
+    // Dimensions
+    c += svgDim(px(0,0), py(0,0), px(0,0), py(H_FRONT,0), `${H_FRONT}`, -22);
+    c += svgDim(px(0,0), py(0,0), px(W,0), py(0,0), `${W}`, 16);
+    // Depth dim along side
+    c += svgDim(px(W,0), py(0,0), px(W,D), py(0,D), `${D}`, 14);
+    // Back height
+    c += svgDim(px(W,D), py(0,D), px(W,D), py(H_BACK,D), `${H_BACK}`, 14);
+
+    svg.innerHTML = c;
+  }
+
+  // ========================
+  // CRATE PACKING
+  // ========================
+  {
+    const TEXTILE = 0.3;  // 3mm protective textile between panels
+    const CRATE_WALL = 1.5; // 15mm plywood crate walls
+
+    // ---- OPTIMIZED LAYER PACKING ----
+    // Combine smaller panels side by side to minimize stack height.
+    // Crate footprint: 108 × 55 cm (mouse shelf 108 wide; 25+30=55 deep for mouse+monitor combo)
+    const RL = Math.round(ROOF_LEN*10)/10;  // 52.2
+    const LH = Math.round(LOGO_H*10)/10;    // 17.9
+
+    // Each layer: [label, [[id, name, w, l, x, y], ...]]
+    // x,y = position within crate footprint
+    const crateInW = 108;
+    const crateInL = 54.4;
+    const SD = Math.round(SOFFIT_D*10)/10; // 28.0
+
+    const layers = [
+      { label:'Layer 1', panels:[
+        {id:'A1',name:'Side panel L', w:95, l:50, x:0, y:0}
+      ]},
+      { label:'Layer 2', panels:[
+        {id:'A2',name:'Side panel R', w:95, l:50, x:0, y:0}
+      ]},
+      { label:'Layer 3', panels:[
+        {id:'D',name:'Front panel', w:82, l:INNER_W, x:0, y:0},
+        {id:'F',name:'Logo panel', w:LH, l:INNER_W, x:82, y:0}
+      ]},
+      { label:'Layer 4', panels:[
+        {id:'E',name:'Roof panel', w:RL, l:INNER_W, x:0, y:0},
+        {id:'G',name:'Soffit panel', w:SD, l:INNER_W, x:RL, y:0}
+      ]},
+      { label:'Layer 5', panels:[
+        {id:'H',name:'Monitor shelf', w:INNER_W, l:SHELF_D, x:0, y:0},
+        {id:'M',name:'Mouse shelf', w:108, l:25, x:0, y:SHELF_D}
+      ]},
+    ];
+    const numLayers = layers.length;
+    const stackH = numLayers * T + (numLayers + 1) * TEXTILE;
+
+    const crateOutW = crateInW + 2*CRATE_WALL;
+    const crateOutL = crateInL + 2*CRATE_WALL;
+    const crateOutH = stackH + 2*CRATE_WALL;
+    const volume = (crateOutW * crateOutL * crateOutH) / 1000000;
+
+    const layerColors = ['#4fc3f7','#4fc3f7','#66bb6a','#ffd54f','#ff7043'];
+    const panelColors = ['#4fc3f7','#82b1ff','#66bb6a','#a5d6a7','#ffd54f','#ffe082','#ff7043','#ff8a65'];
+    let ci = 0;
+
+    // ---- TOP VIEWS: one per layer ----
+    {
+      const svg = document.getElementById('crate-top-svg');
+      const pad = 25;
+      const sc = 2.2;
+      const layerH = crateInL*sc + 45; // height per layer drawing
+      const totalH = layers.length * layerH + pad*2;
+      const w = crateInW*sc + pad*2 + 80;
+      svg.setAttribute('viewBox', `0 0 ${w} ${totalH}`);
+      svg.setAttribute('width', w);
+      svg.setAttribute('height', totalH);
+
+      const tx = (x) => pad + x * sc;
+
+      let content = '';
+      layers.forEach((layer, li) => {
+        const baseY = pad + li * layerH;
+        const ty = (y) => baseY + 20 + y * sc;
+
+        // Layer label
+        content += `<text x="${pad}" y="${baseY+12}" fill="#fff" font-size="10" font-weight="bold">${layer.label}</text>`;
+
+        // Crate outline
+        content += `<rect x="${tx(0)}" y="${ty(0)}" width="${crateInW*sc}" height="${crateInL*sc}" fill="none" stroke="#8B7355" stroke-width="1.5" stroke-dasharray="4,2"/>`;
+
+        // Panels
+        layer.panels.forEach((p, pi) => {
+          const col = panelColors[ci++ % panelColors.length];
+          content += `<rect x="${tx(p.x)}" y="${ty(p.y)}" width="${p.w*sc}" height="${p.l*sc}" fill="${col}" fill-opacity="0.2" stroke="${col}" stroke-width="1.2"/>`;
+          content += `<text x="${tx(p.x+p.w/2)}" y="${ty(p.y+p.l/2)+3}" fill="${col}" font-size="7" text-anchor="middle">${p.id}: ${p.name}</text>`;
+          content += `<text x="${tx(p.x+p.w/2)}" y="${ty(p.y+p.l/2)+13}" fill="${col}" font-size="7" text-anchor="middle" opacity="0.7">${p.w}×${p.l}</text>`;
+        });
+      });
+
+      // Overall dims
+      const lastBase = pad + (layers.length-1) * layerH;
+      content += svgDim(tx(0), lastBase+20+crateInL*sc+8, tx(crateInW), lastBase+20+crateInL*sc+8, `${crateInW}`, 12);
+
+      svg.innerHTML = content;
+    }
+
+    // ---- SIDE VIEW: show layers ----
+    {
+      const svg = document.getElementById('crate-side-svg');
+      const pad = 35;
+      const scX = 2.2, scY = 8;
+      const w = crateInW*scX + pad*2 + 50, h = stackH*scY + pad*2;
+      svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
+      svg.setAttribute('width', w);
+      svg.setAttribute('height', h);
+
+      const tx = (x) => pad + x * scX;
+      const ty = (y) => pad + (stackH - y) * scY;
+
+      let content = '';
+      content += `<rect x="${tx(0)}" y="${ty(stackH)}" width="${crateInW*scX}" height="${stackH*scY}" fill="none" stroke="#8B7355" stroke-width="2" stroke-dasharray="6,3"/>`;
+
+      let curY = TEXTILE;
+      ci = 0;
+      layers.forEach((layer, li) => {
+        // Textile
+        content += `<rect x="${tx(0)}" y="${ty(curY)}" width="${crateInW*scX}" height="${TEXTILE*scY}" fill="rgba(139,115,85,0.3)"/>`;
+        // Panels in this layer
+        layer.panels.forEach(p => {
+          const col = panelColors[ci++ % panelColors.length];
+          content += `<rect x="${tx(p.x)}" y="${ty(curY+T)}" width="${p.w*scX}" height="${T*scY}" fill="${col}" opacity="0.5" stroke="${col}" stroke-width="0.5"/>`;
+        });
+        content += `<text x="${tx(crateInW+2)}" y="${ty(curY+T/2)+3}" fill="#aaa" font-size="7" dominant-baseline="middle">L${li+1}: ${layer.panels.map(p=>p.id).join('+')}</text>`;
+        curY += T + TEXTILE;
+      });
+      // Top textile
+      content += `<rect x="${tx(0)}" y="${ty(curY)}" width="${crateInW*scX}" height="${TEXTILE*scY}" fill="rgba(139,115,85,0.3)"/>`;
+
+      content += svgDim(tx(0), ty(0), tx(0), ty(stackH), `${stackH.toFixed(1)}`, -18);
+      content += svgDim(tx(0), ty(0), tx(crateInW), ty(0), `${crateInW}`, 14);
+
+      svg.innerHTML = content;
+    }
+
+    // ---- Packing table ----
+    {
+      const tbody = document.getElementById('packing-body');
+      layers.forEach((layer, li) => {
+        const panelList = layer.panels.map(p => `${p.name} (${p.w}×${p.l})`).join(' + ');
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${li+1}</td><td>${panelList}</td><td>${layer.panels.length} panel${layer.panels.length>1?'s':''}</td><td>${T}</td>`;
+        tbody.appendChild(tr);
+      });
+      const tr = document.createElement('tr');
+      tr.style.color = '#8B7355';
+      tr.innerHTML = `<td></td><td colspan="3">+ protective textile (${TEXTILE}cm) between each layer and on top/bottom = ${numLayers+1} × ${TEXTILE}cm</td>`;
+      tbody.appendChild(tr);
+    }
+
+    // ---- Summary with weights ----
+    const CRATE_KG_M2 = 4.5; // pine plywood 9mm ≈ 4.5 kg/m²
+    // Crate surface area: top + bottom + 4 sides
+    const crateTopBot = 2 * (crateOutW * crateOutL) / 10000;  // m²
+    const crateFrontBack = 2 * (crateOutW * crateOutH) / 10000;
+    const crateLeftRight = 2 * (crateOutL * crateOutH) / 10000;
+    const crateSurface = crateTopBot + crateFrontBack + crateLeftRight;
+    const crateWeight = crateSurface * CRATE_KG_M2;
+    const textileWeight = 0.5; // estimated textile padding
+    const panelWeight = window._totalPanelWeight || 11;
+    const totalTransport = panelWeight + crateWeight + textileWeight;
+
+    document.getElementById('crate-dims').innerHTML = `
+      <strong>Crate interior:</strong> ${crateInW} × ${crateInL} × ${stackH.toFixed(1)} cm<br>
+      <strong>Crate exterior:</strong> ${crateOutW} × ${crateOutL} × ${crateOutH.toFixed(1)} cm<br>
+      <strong>Crate material:</strong> Pine plywood 9mm (${CRATE_WALL}cm walls, ${CRATE_KG_M2} kg/m²)<br>
+      <strong>Volume:</strong> ${(volume*1000).toFixed(1)} liters<br>
+      <strong>Layers:</strong> ${numLayers} (8 panels combined into ${numLayers} layers)<br>
+      <hr style="border-color:rgba(79,195,247,0.2); margin:8px 0">
+      <strong>Weight breakdown:</strong><br>
+      &nbsp;&nbsp;Cabinet panels: ${panelWeight.toFixed(1)} kg<br>
+      &nbsp;&nbsp;Crate (${crateSurface.toFixed(2)} m² pine 9mm): ${crateWeight.toFixed(1)} kg<br>
+      &nbsp;&nbsp;Textile padding: ~${textileWeight} kg<br>
+      <strong>Total transport weight: ${totalTransport.toFixed(1)} kg</strong>
+    `;
+  }
+});
+</script>
+
+<div class="panels">
+  <div class="panel-card" style="flex:1; min-width:280px">
+    <h3>Front View</h3>
+    <p class="qty">What the player sees.</p>
+    <svg id="front-view-svg"></svg>
+  </div>
+  <div class="panel-card" style="flex:1.3; min-width:380px">
+    <h3>45° Perspective View</h3>
+    <p class="qty">Front + side in perspective.</p>
+    <svg id="perspective-view-svg"></svg>
+  </div>
+</div>
+
+<div class="section">
+  <h2>Side Panel Profile (×2)</h2>
+  <p class="note">Complex shape with tilted front (20°), logo section, and angled roof. Cut 2 (mirror).</p>
+  <div class="panel-card">
+    <svg id="side-panel-svg"></svg>
+  </div>
+</div>
+
+<div class="panels">
+  <div class="panel-card">
+    <h3>D — Front Panel (×1)</h3>
+    <p class="qty">Tilted 20°. Poplar plywood 15mm with screen window cutout.</p>
+    <svg id="front-panel-svg"></svg>
+  </div>
+
+  <div class="panel-card" style="flex:1.3">
+    <h3>F — Logo Panel — Illuminated Lightbox (×1)</h3>
+    <p class="qty">Vertical at front. Backlit NAIA branding panel.</p>
+    <svg id="logo-panel-svg"></svg>
+    <svg id="logo-design-svg" style="margin-top:12px"></svg>
+  </div>
+</div>
+
+<div class="panels">
+  <div class="panel-card">
+    <h3>E — Roof Panel (×1)</h3>
+    <p class="qty">Angled: front edge at 95cm, back edge at 80cm.</p>
+    <svg id="roof-panel-svg"></svg>
+  </div>
+  <div class="panel-card">
+    <h3>G — Soffit Panel (×1)</h3>
+    <p class="qty">Horizontal at Y=77.1cm. Supports lightbox, blocks light downward.</p>
+    <svg id="soffit-panel-svg"></svg>
+  </div>
+</div>
+
+<div class="panels">
+  <div class="panel-card">
+    <h3>H — Monitor Shelf (×1)</h3>
+    <p class="qty">Internal shelf for monitor stand at 38cm height.</p>
+    <svg id="shelf-panel-svg"></svg>
+  </div>
+</div>
+
+<div class="section">
+  <h2>M — Mouse Shelf (×1)</h2>
+  <p class="note">Single wide panel, slides through slots in side panels. 3 height options: 8, 12, 16cm.</p>
+  <div class="panel-card">
+    <svg id="mouse-panel-svg"></svg>
+  </div>
+</div>
+
+<div class="section">
+  <h2>Cut List Summary</h2>
+  <table>
+    <thead><tr><th>ID</th><th>Panel</th><th>Qty</th><th>Dimensions</th><th>Weight</th><th>Notes</th></tr></thead>
+    <tbody id="cut-list-body"></tbody>
+  </table>
+</div>
+
+<div class="section">
+  <h2>Transport Crate — Packing Layout</h2>
+  <p class="note">All panels stacked flat with protective textile (felt/blanket, ~3mm) between each panel. Crate: pine plywood 9mm.</p>
+  <div class="panels">
+    <div class="panel-card" style="flex:1">
+      <h3>Crate — Top View (stacking order)</h3>
+      <svg id="crate-top-svg"></svg>
+    </div>
+    <div class="panel-card" style="flex:1">
+      <h3>Crate — Side View (stack height)</h3>
+      <svg id="crate-side-svg"></svg>
+    </div>
+  </div>
+  <div class="panel-card" style="max-width:700px">
+    <h3>Packing Summary</h3>
+    <table>
+      <thead><tr><th>#</th><th>Layer</th><th>Panel size</th><th>Thickness</th></tr></thead>
+      <tbody id="packing-body"></tbody>
+    </table>
+    <div id="crate-dims" style="margin-top:12px; color:#4fc3f7; font-size:14px;"></div>
+  </div>
+</div>
+
+</body>
+</html>
