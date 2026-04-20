@@ -189,7 +189,7 @@ No aluminum U-channel needed — the foamboard strip spacers (2cm wide, cut from
 
 #### Vinyl Decal Design
 
-![Logo panel design](logo-panel-design.png)
+![Logo panel design](naia-arcade-panel-2165x705-300dpi%20(2).png)
 
 Retro arcade-style design with the Naia logo centered on a dark background with radial glow. Key elements:
 - **Center**: Naia logo (blue-cyan-purple gradient) with bright radial glow behind it
