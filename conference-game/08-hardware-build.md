@@ -6,7 +6,7 @@ A custom tabletop arcade cabinet houses the game screen and provides a comfortab
 
 The cabinet is built from **poplar plywood 15mm** panels, with a slot for the Acer monitor, a flat mouse shelf, and a Naia-branded illuminated logo panel (lightbox).
 
-> **Interactive panel drawings**: See [`cabinet-panels.html`](cabinet-panels.html) ([open live preview](https://htmlpreview.github.io/?https://github.com/hydro-software/Designs-wireframes/blob/main/conference-game/cabinet-panels.html)) for detailed SVG diagrams of all panels with exact dimensions, assembled front/perspective views, cut list with weights, and transport crate packing layout.
+> **Interactive panel drawings**: See [`cabinet-panels.html`](cabinet-panels.html) ([open live preview](https://hydro-software.github.io/Designs-wireframes/conference-game/cabinet-panels.html)) for detailed SVG diagrams of all panels with exact dimensions, assembled front/perspective views, cut list with weights, and transport crate packing layout.
 
 ---
 
