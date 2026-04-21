@@ -327,24 +327,28 @@ This list covers **only the cabinet construction**. The full conference shopping
 
 ### Cabinet Build
 
-| Item | Cost | Notes |
-|------|------|-------|
-| Poplar plywood 15mm sheet (122×244 cm) | ~€30-40 | One sheet is enough |
-| Carpenter labor (cut + assemble) | ~€150-250 | Side panels most complex |
-| Paint (Naia Blue spray) | ~€15-20 | 2 cans |
-| Lightbox components (see §4 above) | ~€20-35 | Acrylic + LED + foamboard + vinyl (no U-channel) |
-| Vinyl side panels (printed) | ~€30-50 | Optional branding |
-| Mouse pads (×2) | ~€15 | For left + right overhangs |
-| **Total cabinet build** | **~€265-415** | |
+| Item | Cost | Supplier | Notes |
+|------|------|----------|-------|
+| Poplar plywood 15mm sheet (122×244 cm) | ~€30-40 | [Hubo](https://www.hubo.be), [Brico](https://www.brico.be), local timber yard | One sheet is enough |
+| Carpenter labor (cut + assemble) | ~€150-250 | Local carpenter | Side panels most complex |
+| Paint (Naia Blue spray) | ~€15-20 | [Brico](https://www.brico.be), [Hubo](https://www.hubo.be) | 2 cans |
+| Opal acrylic XT 3mm (55×17.9 cm) | ~€8-12 | [Kunststofplaten.be](https://kunststofplaten.be/product/plexiglas-opaalwit-xt-3-mm/) | Free custom cutting |
+| White foamboard 3mm (×2) | ~€6 | Action, [Pipoos](https://www.pipoos.com), [Ava](https://www.ava.be) | Back + spacer strips |
+| LED strip 24V 120 LEDs/m 4000K (~1.2m) | ~€8-12 | [Leds-store.be](https://leds-store.be/led-strip-120-leds-4000k-neutraal-wit-ip20) | Neutral white |
+| 24V 60W transformer | ~€15-20 | [Leds-store.be](https://leds-store.be/led-strip-transformators-24v-60w) | Plugs into cabinet power strip |
+| Vinyl decal (logo panel, 55×17.9 cm, qty 3) | ~€15-20 | [Drukland.be](https://www.drukland.be/ProductController/calc/groot-formaat-vinyl-stickers?product_id=996114&width=55&height=17.9&qty=3) | 1 + 2 spares |
+| Vinyl side panels (printed, optional branding) | ~€30-50 | [Drukland.be](https://www.drukland.be) | Optional |
+| Mouse pads (×2) | ~€15 | [Coolblue](https://www.coolblue.be), [MediaMarkt](https://www.mediamarkt.be) | For left + right overhangs |
+| **Total cabinet build** | **~€300-455** | | |
 
 ### Transport Crate
 
-| Item | Cost | Notes |
-|------|------|-------|
-| Pine plywood 9mm for crate | ~€15 | Cut to crate dimensions |
-| Protective felt/textile | ~€10 | Between panels |
-| Crate hinges + clasps | ~€15 | For reusable crate |
-| **Total transport crate** | **~€40** | |
+| Item | Cost | Supplier | Notes |
+|------|------|----------|-------|
+| Pine plywood 9mm for crate | ~€15 | [Hubo](https://www.hubo.be), [Brico](https://www.brico.be), local timber yard | Cut to crate dimensions |
+| Protective felt/textile | ~€10 | [Veritas](https://www.veritas.be), Action | Between panels |
+| Crate hinges + clasps | ~€15 | [Brico](https://www.brico.be), [Hubo](https://www.hubo.be) | For reusable crate |
+| **Total transport crate** | **~€40** | | |
 
 ---
 

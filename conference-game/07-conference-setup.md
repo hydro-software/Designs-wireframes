@@ -169,48 +169,40 @@ This is the **full shopping list for the conference** (excluding cabinet constru
 
 ### Game Station — Electronics & Cables
 
-| Item | Cost | Provided by | Notes |
-|------|------|-------------|-------|
-| Acer B226WL monitor (game) | — | Already owned | 22", 1920×1080, detachable stand (see hardware build spec) |
-| Mini-PC or laptop | — (or ~EUR 200-400) | Already owned / Buy | Runs the game locally. Intel NUC or similar if new |
-| Wired USB mouse (×2) | ~EUR 20 | Buy | One spare |
-| USB hub (4-port) | ~EUR 10 | Buy | Mouse + peripherals |
-| HDMI cable 5 m | ~EUR 15 | Buy | Long run from arcade cabinet to scoreboard TV |
-| HDMI adapter (USB-C → HDMI) | ~EUR 10 | Buy | If needed for mini-PC / laptop ports |
-| Power strip (4-outlet, short cable) | ~EUR 10 | Buy | Inside the cabinet: PC + monitor + lightbox transformer |
+| Item | Cost | Provided by | Supplier | Notes |
+|------|------|-------------|----------|-------|
+| Acer B226WL monitor (game) | — | Already owned | — | 22", 1920×1080, detachable stand (see hardware build spec) |
+| Mini-PC or laptop | — (or ~EUR 200-400) | Already owned / Buy | [Coolblue](https://www.coolblue.be), [MediaMarkt](https://www.mediamarkt.be), [Azerty](https://www.azerty.be) | Runs the game locally. Intel NUC or similar if new |
+| Wired USB mouse (×2) | ~EUR 20 | Buy | [Coolblue](https://www.coolblue.be), [MediaMarkt](https://www.mediamarkt.be) | One spare |
+| USB hub (4-port) | ~EUR 10 | Buy | [Coolblue](https://www.coolblue.be), [Amazon.be](https://www.amazon.com.be) | Mouse + peripherals |
+| HDMI cable 5 m | ~EUR 15 | Buy | [Coolblue](https://www.coolblue.be), [Krëfel](https://www.krefel.be) | Long run from arcade cabinet to scoreboard TV |
+| HDMI adapter (USB-C → HDMI) | ~EUR 10 | Buy | [Coolblue](https://www.coolblue.be), [MediaMarkt](https://www.mediamarkt.be) | If needed for mini-PC / laptop ports |
+| Power strip (4-outlet, short cable) | ~EUR 10 | Buy | [Brico](https://www.brico.be), [Hubo](https://www.hubo.be), [Coolblue](https://www.coolblue.be) | Inside the cabinet: PC + monitor + lightbox transformer |
 
 ### Scoreboard / Reel Display
 
-| Item | Cost | Provided by | Notes |
-|------|------|-------------|-------|
-| Large screen / TV | — | **Jan** | 40-55", HDMI input, used for Naia reel + Classement loop |
-| TV stand | ~EUR 50-100 | Buy | Foldable, adjustable |
-| Headphones | — | **Jan** | For intro video audio during gameplay |
+| Item | Cost | Provided by | Supplier | Notes |
+|------|------|-------------|----------|-------|
+| Large screen / TV | — | **Jan** | — | 40-55", HDMI input, used for Naia reel + Classement loop |
+| TV stand | ~EUR 50-100 | Buy | [Coolblue](https://www.coolblue.be), [MediaMarkt](https://www.mediamarkt.be) | Foldable, adjustable |
+| Headphones | — | **Jan** | — | For intro video audio during gameplay |
 
 ### Services
 
-| Item | Cost | Notes |
-|------|------|-------|
-| Infomaniak email (SMTP) | Included | Already in naia.energy hosting |
-| Google Sheets | Free | Part of Google Workspace |
+| Item | Cost | Supplier | Notes |
+|------|------|----------|-------|
+| Infomaniak email (SMTP) | Included | [Infomaniak](https://www.infomaniak.com) | Already in naia.energy hosting |
+| Google Sheets | Free | [Google Workspace](https://workspace.google.com) | Shared leaderboard backend |
 
 ### Branding & Giveaways
 
-| Item | Cost | Notes |
-|------|------|-------|
-| **Naia branded badges** | ~EUR 3-5 each | Retro-style analog badge with a gauge needle (as on old meters). Visitors who play the game get one. Strong keepsake + conversation starter at the booth |
-| **Naia logo stickers** | ~EUR 0.50 each | Die-cut vinyl stickers of the Naia logo. Given to all visitors. Low cost, high reach (laptops, notebooks) |
-| Printed staff reference cards | ~EUR 5 | See Staff Quick Reference section |
-| QR code prints (Naia signup CTA) | ~EUR 5 | Displayed on booth + given to players |
-| **Total branding (per 100 visitors)** | **~EUR 400-600** | Scale with expected attendance |
-
-### Suppliers (Belgium)
-
-| Category | Supplier | URL |
-|----------|----------|-----|
-| Badges (gauge-style) | [Pins Factory](https://www.pinsfactory.be) or [Epinglesbadges.be](https://www.epinglesbadges.be) | Custom metal badges with enamel fill |
-| Stickers | [Drukland.be](https://www.drukland.be) | Same supplier as lightbox vinyl |
-| TV stand | Coolblue, MediaMarkt | Local Belgian retailers |
+| Item | Cost | Supplier | Notes |
+|------|------|----------|-------|
+| **Naia branded badges** | ~EUR 3-5 each | [Pins Factory](https://www.pinsfactory.be) or [Epinglesbadges.be](https://www.epinglesbadges.be) | Retro-style analog badge with a gauge needle (as on old meters). Visitors who play the game get one. Strong keepsake + conversation starter at the booth |
+| **Naia logo stickers** | ~EUR 0.50 each | [Drukland.be](https://www.drukland.be) | Die-cut vinyl stickers of the Naia logo. Given to all visitors. Low cost, high reach (laptops, notebooks) |
+| Printed staff reference cards | ~EUR 5 | [Drukland.be](https://www.drukland.be), local print shop | See Staff Quick Reference section |
+| QR code prints (Naia signup CTA) | ~EUR 5 | [Drukland.be](https://www.drukland.be), local print shop | Displayed on booth + given to players |
+| **Total branding (per 100 visitors)** | **~EUR 400-600** | | Scale with expected attendance |
 
 ### Summary
 
@@ -219,9 +211,9 @@ This is the **full shopping list for the conference** (excluding cabinet constru
 | Game station electronics & cables | ~EUR 65 (+ ~EUR 200-400 if buying a mini-PC) |
 | Scoreboard / reel display stand | ~EUR 50-100 (screen + headphones provided by Jan) |
 | Branding & giveaways (100 visitors) | ~EUR 400-600 |
-| **Cabinet build** (in 08-hardware-build.md) | **~EUR 265-415** |
+| **Cabinet build** (in 08-hardware-build.md) | **~EUR 300-455** |
 | **Transport crate** (in 08-hardware-build.md) | **~EUR 40** |
-| **Grand total (per conference)** | **~EUR 820-1,560** |
+| **Grand total (per conference)** | **~EUR 855-1,600** |
 
 **Savings vs. previous spec**: No separate computer for scoreboard (saves ~EUR 100-200). No cloud hosting costs. No HDMI stick needed. Large screen + headphones provided by Jan.
 
