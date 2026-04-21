@@ -12,10 +12,11 @@ The cabinet is built from **poplar plywood 15mm** panels, with a slot for the Ac
 
 ## 1. Screen Specifications
 
-### Acer Monitor
+### Acer B226WL Monitor (Already Owned)
 
 | Property | Value |
 |----------|-------|
+| Model | Acer B226WL |
 | Display area | 47.7 cm wide × 30.0 cm high |
 | Bezel — left | 1.4 cm |
 | Bezel — right | 1.4 cm |
@@ -26,6 +27,13 @@ The cabinet is built from **poplar plywood 15mm** panels, with a slot for the Ac
 | Stand height range | 5 cm to 20 cm (from tabletop to bottom of screen) |
 | Inputs | HDMI, VGA, DVI |
 | Power | IEC C14 (standard PC power cable), EU plug |
+
+**Photos of the actual monitor used for this build**:
+
+![Acer B226WL front view](20260420_113506.jpg)
+![Acer B226WL side view](20260420_113519.jpg)
+
+Front and side views show the stand profile and how the cables (HDMI + power) route at the back. The stand base footprint and the panel depth inform the monitor shelf dimensions (30 cm deep × 55 cm wide).
 
 **For the cabinet**: The monitor **keeps its stand** (non-removable). It sits on an internal shelf inside the cabinet, with the screen visible through a window cutout. The stand's built-in height adjustment (5-20cm) and tilt (~20°) are used to position the screen correctly.
 
@@ -74,16 +82,24 @@ The cabinet's front panel has a **window opening** sized to the visible display 
 | Cabinet width | 58 cm |
 | Inner width (between side panels) | 55 cm (58 - 2×1.5) |
 | Height at front | 95 cm |
-| Height at back | 80 cm |
+| Height at back | 88 cm |
 | Depth | 50 cm |
 | Front panel tilt | 20° backward from vertical |
 | Front panel surface length | 82 cm |
+| Roof slope | ~8° (gentle, less dominant silhouette) |
 | Mouse shelf total width | 108 cm (58 + 2×25 overhang) |
 | Back | **Open** (no back panel) |
 
+### Design Note: Roof Slope Reduced
+
+The roof slope was reduced from the original 16.7° (15 cm drop over 50 cm) to **~8° (7 cm drop over 50 cm)**, following a design review:
+- **Problem**: A steeply inclined roof made the cabinet silhouette feel top-heavy and could block viewing angles for taller spectators standing behind the player
+- **Solution**: Flatten the slope while keeping the logo panel at the same front height (95 cm). Back height raised from 80 cm to 88 cm
+- **Impact**: Small increase in back-of-cabinet height (~8 cm), slightly longer roof panel (~51 cm vs. 52.2 cm), otherwise unchanged
+
 ### Key Geometry
 
-The front panel is tilted 20° backward — bottom at the front edge, top receding 28cm into the cabinet. A horizontal **soffit panel** (G) bridges the gap between the front panel top and the logo panel, blocking lightbox light from shining downward and supporting the lightbox assembly. Above the soffit, a vertical logo panel faces the player directly. The roof slopes from 95cm (front) to 80cm (back).
+The front panel is tilted 20° backward — bottom at the front edge, top receding 28cm into the cabinet. A horizontal **soffit panel** (G) bridges the gap between the front panel top and the logo panel, blocking lightbox light from shining downward and supporting the lightbox assembly. Above the soffit, a vertical logo panel faces the player directly. The roof slopes gently from 95cm (front) to 88cm (back).
 
 ```
 Side profile points (depth, height in cm):
@@ -91,7 +107,7 @@ A (0, 0)      — front bottom
 B (28.0, 77.1) — top of front panel (tilted)
 C (0, 77.1)    — logo panel bottom / front edge at that height
 D (0, 95)      — logo panel top / roof front
-E (50, 80)     — roof back / back top
+E (50, 88)     — roof back / back top  (gentle ~8° slope)
 F (50, 0)      — back bottom
 ```
 
@@ -116,8 +132,8 @@ Complex 6-point shape defining the cabinet profile.
 | Front bottom → Front panel top | A→B | 82 cm (along 20° tilt) |
 | Front panel top → Logo bottom | B→C | 28.0 cm (horizontal — soffit panel G sits here) |
 | Logo bottom → Logo top | C→D | 17.9 cm (vertical, front edge) |
-| Logo top → Roof back | D→E | 52.2 cm (roof slope) |
-| Back edge | E→F | 80 cm (vertical) |
+| Logo top → Roof back | D→E | 50.5 cm (gentle ~8° roof slope) |
+| Back edge | E→F | 88 cm (vertical) |
 | Bottom | F→A | 50 cm (horizontal) |
 
 Features:
@@ -143,8 +159,8 @@ Tilted 20° backward. The bottom edge sits at the front, the top edge recedes 28
 | Dimension | Value |
 |-----------|-------|
 | Width | 55 cm |
-| Length | 52.2 cm (slope: √(50² + 15²)) |
-| Angle | 16.7° from horizontal |
+| Length | 50.5 cm (slope: √(50² + 7²)) |
+| Angle | ~8° from horizontal |
 | Weight | ~1.7 kg |
 
 Angled panel spanning from front top (95cm) to back top (80cm).

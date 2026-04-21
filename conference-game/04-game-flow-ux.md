@@ -5,12 +5,20 @@
 ## Screen Flow
 
 ```
-[Bienvenue] → [Vidéo intro] → [GO!] → [Jeu] → [Résumé] → [Saisir email] → [Classement]
-     ↑                                                                            |
-     └──────────────────────── [Nouvelle partie] ←──────────────────────────────┘
+[Bienvenue] → [Alias] → [Vidéo intro] → [Pratique 30s] → [GO!] → [Jeu] → [Résumé]
+                                                                              │
+                                   ┌──────────────────────────────────────────┘
+                                   ▼
+                          [Saisir email] → [Écran score : reel Naia ↔ Classement en boucle]
+                                   ▲                                          │
+                                   └─── [Nouvelle partie] ←───────────────────┘
 ```
 
-**Key change vs. classic arcade flow**: Registration (email) happens **after** the game, not before. The player is hooked by the game first, then motivated to leave their email to receive detailed results by email. This increases conversion. Detailed results are **only sent by email** — they are not shown on screen (keeps the flow fast for the next player).
+**Key changes vs. classic arcade flow**:
+- **Alias first**: Player creates a pseudonym before the game for the leaderboard (privacy-friendly)
+- **30s practice**: Guided tutorial before the timed round — ensures fair competition and teaches the mechanics
+- **Registration (email) happens after the game**, not before — player is hooked first, then motivated to leave their email
+- **Score screen loops** between a Naia reel video and the Classement, driven by the conference app (TV display). Detailed results are only sent by email (not shown on screen), keeping the arcade flow fast for the next player
 
 ## Screen 1: Bienvenue (Welcome)
 
@@ -43,6 +51,40 @@
 - Auto-returns here after 60s of inactivity
 - Top 5 visible for competitive pull
 
+## Screen 1.5: Saisir un alias (Alias Entry)
+
+**Purpose**: Let the player choose a pseudonym for the leaderboard before playing.
+
+```
+┌──────────────────────────────────────────────┐
+│                                              │
+│   Choisissez votre pseudo                    │
+│                                              │
+│   ┌────────────────────────────────────┐     │
+│   │ HydroPro42                        │     │
+│   └────────────────────────────────────┘     │
+│                                              │
+│   3-20 caractères                            │
+│                                              │
+│   ┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┐ │
+│   │ A │ Z │ E │ R │ T │ Y │ U │ I │ O │ P │ │
+│   ├───┼───┼───┼───┼───┼───┼───┼───┼───┼───┤ │
+│   │ Q │ S │ D │ F │ G │ H │ J │ K │ L │ M │ │
+│   ├───┼───┼───┼───┼───┼───┼───┼───┼───┼───┤ │
+│   │ W │ X │ C │ V │ B │ N │ 0-9 │ ⌫ │     │ │
+│   └───────────────────────────────────────┘ │
+│                                              │
+│          [ CONTINUER → ]                     │
+│                                              │
+└──────────────────────────────────────────────┘
+```
+
+- AZERTY virtual keyboard
+- 3-20 characters, alphanumeric + `_` `-`
+- Shown on the leaderboard — no real name required at this stage
+- If alias already exists in today's session: append a number suffix
+- Real name + email captured AFTER the game (Screen 6)
+
 ## Screen 2: Vidéo d'introduction
 
 ```
@@ -70,13 +112,57 @@
 - Plant name, capacity, and river shown as overlay text on the video or below it
 - Purpose: Gives the player context about the plant they're about to analyze
 
+## Screen 2.5: Mode Pratique (30-second Guided Tutorial)
+
+**Purpose**: Teach the mechanics before the competitive round. Mandatory — the 5-minute timer does NOT start until practice ends.
+
+```
+┌──────────────────────────────────────────────────────────────────┐
+│ 🎓 MODE PRATIQUE — 0:22 restantes           [J'AI COMPRIS →]    │
+│──────────────────────────────────────────────────────────────────│
+│        │                                                         │
+│ PANEL  │  ZONE GRAPHIQUE (exemple guidé)                         │
+│        │                                                         │
+│ Indica-│  ▼▼  ▼▼▼  ▼    ▼▼▼▼  ▼▼   ▼▼  ▼▼▼   ← Pluie          │
+│ teurs  │  ─────────────────────────────────────                  │
+│        │                                                         │
+│        │  ██ ██ ██ ░░ ██ ██ ░▓ ██ ██ ██ ░░ ██  ← Production    │
+│        │            ↑                                            │
+│        │        ┌───────────────────────────┐                   │
+│        │        │ 💡 Ici, la production est │                   │
+│        │        │ anormalement basse.       │                   │
+│        │        │ Tracez la ligne attendue! │                   │
+│        │        └───────────────────────────┘                   │
+│        │                                                         │
+│        │  Étape 1/4 : Repérer la perte                          │
+│        │  Étape 2/4 : Tracer la ligne attendue                  │
+│        │  Étape 3/4 : Choisir la catégorie                      │
+│        │  Étape 4/4 : Choisir la sous-catégorie                 │
+│        │                                                         │
+└──────────────────────────────────────────────────────────────────┘
+```
+
+**Flow**:
+1. **30-second countdown** in top bar (not the game timer — this is practice time)
+2. **Animated tooltips** guide the player through each interaction
+3. **Pre-filled example**: a sample loss area is shown, the draw mechanic is demonstrated visually
+4. **Try it yourself prompts**: player practices drawing/classifying once before the real round
+5. **J'AI COMPRIS button**: skip the tutorial early if confident
+6. At end: "Prêt ? La vraie partie commence !" → Screen 3 (countdown)
+
+**Purpose**:
+- Fair competition: every player starts with the same baseline understanding
+- Reduces the "host has to explain the mechanic" burden
+- First-time players aren't disadvantaged vs. repeat players
+- Even non-hydro experts understand the UI before the timer starts
+
 ## Screen 3: Décompte (Countdown)
 
 ```
         3... 2... 1... C'EST PARTI !
 ```
 
-Full-screen, 3 seconds. Builds anticipation.
+Full-screen, 3 seconds. Builds anticipation. The real 5-minute timer starts when "C'EST PARTI !" disappears.
 
 ## Screen 4: Jeu (Gameplay — Core)
 
@@ -310,9 +396,35 @@ If player clicks "NON" → skip to Classement screen. If "OUI" → go to email i
 
 After submitting, the detailed results are **sent by email only** (not shown on screen). This keeps the flow fast — the screen transitions directly to the Classement. The email includes the full score breakdown, CTA to naia.energy/signup, and revenue impact figures.
 
-## Screen 7: Classement (Leaderboard — Second Browser Window, Same PC)
+## Screen 7: Écran Score (Conference App Display — Second Screen/TV)
 
-Displayed in a second browser window on a connected TV/monitor.
+The second screen / TV next to the arcade cabinet shows a **looping sequence driven by a separate conference app**, not the game itself. This keeps the game console free for the next player while the big screen continues to attract attention.
+
+### Display Loop
+
+```
+┌──────────────────────────────────┐        ┌──────────────────────────────────┐
+│                                  │        │                                  │
+│  🎬 REEL NAIA                   │  -->   │  🏆 CLASSEMENT                  │
+│  (branded video, 30-45s)         │        │  (top 10 + current game)         │
+│                                  │        │                                  │
+└──────────────────────────────────┘        └──────────────────────────────────┘
+         ▲                                                   │
+         └───────────────────────────────────────────────────┘
+```
+
+**Cycle**:
+1. **Naia reel video** (30-45s) — branded marketing clip showing the real Naia platform, customer testimonials, key features. Auto-plays, loops
+2. **Classement** (30-45s) — live leaderboard with top 10 and the current player (if any)
+3. Repeat
+
+**Driven by a separate conference app**:
+- The game console runs the game (foreground on the arcade monitor)
+- The **conference app** runs on the same PC but displays on the TV via the extended monitor. It fetches scoreboard data from the game's local API (`localhost:3000/api/scoreboard`) AND plays the reel video(s) in rotation
+- This separation means the game and the display can evolve independently
+- The conference app is also where reel videos, branding overlays, and cycle timing are configured
+
+### Classement View (part of the loop)
 
 ```
 ┌──────────────────────────────────────────────────────────┐
@@ -321,24 +433,33 @@ Displayed in a second browser window on a connected TV/monitor.
 │                                                          │
 │   🏆 CLASSEMENT                                         │
 │   ─────────────────────────────────────────────          │
-│   #1  Pierre M.     EDF Hydro             142           │
-│   #2  Sophie L.     CNR                   128           │
-│   #3  Marc D.       Hydrovolt             115           │
+│   #1  HydroPro42     EDF Hydro             142          │
+│   #2  SophieH2O      CNR                   128          │
+│   #3  TurbineMax     Hydrovolt             115          │
 │   ...                                                    │
-│   #10 Emma S.       Indépendant            72           │
+│   #10 Débutant77     Indépendant            72          │
 │   ─────────────────────────────────────────────          │
 │                                                          │
 │   Aujourd'hui : 47 joueurs | Moy. : 89 | Record : 142  │
 │                                                          │
-│   🎮 En jeu : Marie D. — 3:42 restantes                │
+│   🎮 En jeu : Marie42 — 3:42 restantes                 │
 │                                                          │
 └──────────────────────────────────────────────────────────┘
 ```
 
-- Both game and scoreboard served from `localhost:3000` (same Nuxt server)
+- Leaderboard shows **aliases** (from Screen 1.5), not real names (privacy)
 - Top 10 displayed
 - Updates automatically (polling `localhost` — no SSE needed since it's local)
-- Alternates with attract-mode animation when idle
+- Highlights new entries (animated push if a player just made the top 10)
+
+### Reel Video Configuration
+
+The conference app reads a list of videos from its config:
+- `/videos/naia-reel-01.mp4` — main product reel
+- `/videos/naia-reel-02.mp4` — customer testimonial
+- `/videos/naia-reel-03.mp4` — short teaser
+
+Admin can reorder or disable videos via the admin panel.
 
 ## Naia Signup Page (naia.energy/signup)
 

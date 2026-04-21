@@ -163,20 +163,41 @@ Redémarrer :      Fermer terminal, double-clic start.bat
 - [ ] Internal debrief
 - [ ] Delete participant data after 90 days
 
-## Budget
+## Budget & Shopping List
+
+### Hardware & Electronics
+
+| Item | Cost | Provided by | Notes |
+|------|------|-------------|-------|
+| Acer B226WL monitor (game) | — | Already owned | 22", 1920×1080, detachable stand (see hardware build spec) |
+| Large screen / TV for score display | — | **Jan** | 40-55", HDMI input, used for Naia reel + Classement loop |
+| TV stand | ~EUR 50-100 | Buy | Foldable, adjustable |
+| HDMI cable 5m + adapters | ~EUR 25 | Buy | Long run from arcade cabinet to TV |
+| Wired USB mouse (×2) | ~EUR 20 | Buy | One spare |
+| Headphones | — | **Jan** | For intro video audio during gameplay |
+| Infomaniak email | Included | — | Already in naia.energy hosting |
+| Google Sheets | Free | — | Part of Google Workspace |
+| **Total hardware to buy** | **~EUR 100-150** | | |
+
+### Branding & Giveaways
 
 | Item | Cost | Notes |
 |------|------|-------|
-| 27" monitor | ~EUR 200 | Or use existing |
-| TV for scoreboard | ~EUR 300 | Or rent from venue AV |
-| TV stand | ~EUR 50-100 | Foldable |
-| HDMI cable 5m + adapters | ~EUR 25 | Long run to TV |
-| Wired USB mouse (×2) | ~EUR 20 | One spare |
-| Infomaniak email | Included | Already in naia.energy hosting |
-| Google Sheets | Free | Part of Google Workspace |
-| **Total hardware** | **~EUR 300-650** | Depending on what's available |
+| **Naia branded badges** | ~EUR 3-5 each | Retro-style analog badge with a gauge needle (as on old meters). Visitors who play the game get one. Strong keepsake + conversation starter at the booth |
+| **Naia logo stickers** | ~EUR 0.50 each | Die-cut vinyl stickers of the Naia logo. Given to all visitors. Low cost, high reach (laptops, notebooks) |
+| Printed staff reference cards | ~EUR 5 | See Staff Quick Reference section |
+| QR code prints (Naia signup CTA) | ~EUR 5 | Displayed on booth + given to players |
+| **Total branding (per 100 visitors)** | **~EUR 400-600** | Scale with expected attendance |
 
-**Savings vs. previous spec**: No separate computer for scoreboard (saves ~EUR 100-200). No cloud hosting costs. No HDMI stick needed.
+### Suppliers (Belgium)
+
+| Category | Supplier | URL |
+|----------|----------|-----|
+| Badges (gauge-style) | [Pins Factory](https://www.pinsfactory.be) or [Epinglesbadges.be](https://www.epinglesbadges.be) | Custom metal badges with enamel fill |
+| Stickers | [Drukland.be](https://www.drukland.be) | Same supplier as lightbox vinyl |
+| TV stand | Coolblue, MediaMarkt | Local Belgian retailers |
+
+**Savings vs. previous spec**: No separate computer for scoreboard (saves ~EUR 100-200). No cloud hosting costs. No HDMI stick needed. Large screen + headphones provided by Jan.
 
 ## Metrics
 

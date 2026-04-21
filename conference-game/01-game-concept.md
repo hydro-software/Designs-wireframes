@@ -16,12 +16,35 @@
 ### Game Flow
 
 1. **START** — Player presses the start button on the welcome screen
-2. **Intro Video** — Short video showing the plant (configurable per scenario, stored locally). Gives the player context: location, river, capacity, typical operation
-3. **GO!** — Player presses "GO" when ready
-4. **Gameplay** — Draw loss areas, classify causes, estimate sizes (5 minutes)
-5. **Summary Result** — Quick score overview with rank
-6. **Add Email** — On-screen keyboard to enter email address for detailed results
-7. **Classement** — Live leaderboard + button to start a new game. Detailed results sent by email only
+2. **Alias** — Player creates an alias name (e.g., "HydroPro42") via on-screen keyboard. Used on the leaderboard and to identify the player during the session
+3. **Intro Video** — Short video showing the plant (configurable per scenario, stored locally). Gives the player context: location, river, capacity, typical operation
+4. **Practice Mode (30 seconds)** — Guided tutorial walking the player through the mechanics: how to draw a loss line, how to classify, how to read the indicators. Includes tooltips and highlights. This ensures fair competition — every player understands the game before the timer starts
+5. **GO!** — Player presses "GO" when ready to start the timed challenge
+6. **Gameplay** — Draw loss areas, classify causes, estimate sizes (5 minutes)
+7. **Summary Result** — Quick score overview with rank
+8. **Add Email** — On-screen keyboard to enter email address for detailed results
+9. **Score Screen Loop** — After submission, the display cycles through: Naia reel video → Classement → next player invitation. Driven by the conference app (not the game console itself)
+
+### Practice Mode (30 seconds)
+
+Before the competitive 5-minute round, every player gets a **30-second guided practice**. This is mandatory — the timer does not start on the real game until the practice is complete or skipped.
+
+The practice walks through:
+1. **Reading the chart** — "Voici la production journalière en kWh. La pluie est en haut, le débit en ligne."
+2. **Drawing a loss** — an example loss area is pre-filled; the player watches how the expected-production line is drawn
+3. **Classifying** — the example is classified step by step: category → subcategory → confirm
+4. **Using indicators** — brief demo of toggling an extra flow station or comparator
+
+At the end of the 30 seconds (or when the player clicks "J'AI COMPRIS"), the game transitions to the real countdown and the 5-minute timer starts fresh.
+
+### Alias Name
+
+Before playing, the player enters an alias (3-20 characters, alphanumeric + some symbols). This name:
+- Appears on the public leaderboard (privacy-friendly — no real name shown)
+- Persists if the same player returns (same alias → best score counts)
+- Is used in the "En jeu" indicator during play ("🎮 HydroPro42 — 3:42 restantes")
+
+The real name + email are captured AFTER the game (for results email + CRM).
 
 ### What the Player Sees
 
@@ -141,6 +164,33 @@ These map to the real Naia loss taxonomy (7 categories with 69 subtypes) but are
 | Standard | 5 min | 5-8 losses | Single mode. All players get the same time |
 
 **Fixed at 5 minutes.** No mode switching — keeps it simple and fair for the leaderboard.
+
+## Post-Conference Online Availability
+
+After the conference, the game remains **publicly accessible online** for anyone to play. This extends the reach of the brand-building exercise:
+- Conference attendees can share the game with colleagues
+- Prospects who didn't attend can experience the Naia value proposition
+- Content for marketing: "Try the Naia challenge yourself"
+
+Requirements for online mode:
+- Hosted on a public URL (e.g., `game.naia.energy`)
+- Same gameplay, same scoring
+- Online leaderboard (aggregated across conferences)
+- Email collection + CRM integration
+- Optional: a separate "online" conference_id to keep conference leaderboards distinct
+- No hardware dependency — runs in any browser, mouse or touchpad
+
+## Full Naia Dashboard Parity
+
+The gameplay screen must expose **all visible functionality of the real Naia app dashboard**. This is a design constraint, not just an aesthetic choice: the game doubles as a live product demo. If a feature is visible in Naia, it should be visible and (where relevant) interactive in the game:
+- Chart zoom / pan
+- Indicator toggling (left panel)
+- Hover tooltips on data points
+- Maintenance event popups
+- Chart legend, axis labels, time range
+- Any other dashboard affordance present in the current Naia UI
+
+Features that are purely administrative (settings, user management, billing) are excluded. The rule of thumb: **if an operator would see it while analyzing their plant, it should be in the game.**
 
 ## Why This Works for Operators
 
