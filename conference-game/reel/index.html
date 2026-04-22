@@ -21,7 +21,20 @@
   <div id="root"></div>
   <!-- Set Remotion's static base BEFORE any module loads, so staticFile()
        resolves relative to the current page path (e.g. /reel/ on GitHub Pages)
-       instead of the site root. -->
-  <script>window.remotion_staticBase = '.';</script>
+       instead of the site root.
+       We use an absolute path because window.remotion_staticBase is read at
+       render-time and must survive any internal reassignments by Remotion. -->
+  <script>
+    (function setStaticBase() {
+      // Compute absolute base from the current page URL, stripping the trailing
+      // filename if any. Works regardless of where the viewer is hosted.
+      var pathname = window.location.pathname;
+      var base = pathname.endsWith('/')
+        ? pathname.slice(0, -1)
+        : pathname.substring(0, pathname.lastIndexOf('/'));
+      window.remotion_staticBase = base;
+      console.log('[viewer] remotion_staticBase =', base);
+    })();
+  </script>
 </body>
 </html>
