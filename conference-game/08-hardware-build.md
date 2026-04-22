@@ -120,7 +120,7 @@ F (50, 0)      — back bottom
 
 ### Assembled Views
 
-See [`cabinet-panels.html`](cabinet-panels.html) for interactive SVG views:
+See [`cabinet-panels.html`](cabinet-panels.html) ([open live preview](https://hydro-software.github.io/Designs-wireframes/conference-game/cabinet-panels.html)) for interactive SVG views:
 - **Front view**: Shows the cabinet as the player sees it — logo lightbox panel at top, front panel with screen window, mouse shelf with overhangs
 - **45° perspective view**: Shows the tilted front panel receding backward, side panel profile, angled roof, and the screen visible through the window cutout
 
@@ -128,7 +128,7 @@ See [`cabinet-panels.html`](cabinet-panels.html) for interactive SVG views:
 
 ## 4. Panel Cut List
 
-All panels cut from **poplar plywood 15mm**. See [`cabinet-panels.html`](cabinet-panels.html) for detailed drawings with exact dimensions per panel.
+All panels cut from **poplar plywood 15mm**. See [`cabinet-panels.html`](cabinet-panels.html) ([open live preview](https://hydro-software.github.io/Designs-wireframes/conference-game/cabinet-panels.html)) for detailed drawings with exact dimensions per panel.
 
 ### Panel A: Side Panels (×2, mirrored)
 
@@ -324,7 +324,7 @@ All panels pack flat in a custom crate for transport. The crate is optimized for
 | Textile padding | ~0.5 kg |
 | **Total transport weight** | **~19 kg** |
 
-See [`cabinet-panels.html`](cabinet-panels.html) for detailed crate packing diagrams (top view per layer + side view of stack).
+See [`cabinet-panels.html`](cabinet-panels.html) ([open live preview](https://hydro-software.github.io/Designs-wireframes/conference-game/cabinet-panels.html)) for detailed crate packing diagrams (top view per layer + side view of stack).
 
 ---
 
