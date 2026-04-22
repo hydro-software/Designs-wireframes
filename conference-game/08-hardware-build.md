@@ -81,33 +81,40 @@ The cabinet's front panel has a **window opening** sized to the visible display 
 |-----------|-------|
 | Cabinet width | 58 cm |
 | Inner width (between side panels) | 55 cm (58 - 2×1.5) |
-| Height at front | 95 cm |
+| Height at front (top of logo panel) | 95 cm |
 | Height at back | 88 cm |
 | Depth | 50 cm |
 | Front panel tilt | 20° backward from vertical |
 | Front panel surface length | 82 cm |
-| Roof slope | ~8° (gentle, less dominant silhouette) |
+| **Logo panel recess from front face** | **10 cm** (Z = 10 cm) |
+| Soffit panel depth | 18 cm |
+| Roof slope | ~10° (run = 40 cm, rise = 7 cm) |
 | Mouse shelf total width | 108 cm (58 + 2×25 overhang) |
 | Back | **Open** (no back panel) |
 
-### Design Note: Roof Slope Reduced
+### Design Note: Top Shifted 10 cm Backward
 
-The roof slope was reduced from the original 16.7° (15 cm drop over 50 cm) to **~8° (7 cm drop over 50 cm)**, following a design review:
-- **Problem**: A steeply inclined roof made the cabinet silhouette feel top-heavy and could block viewing angles for taller spectators standing behind the player
-- **Solution**: Flatten the slope while keeping the logo panel at the same front height (95 cm). Back height raised from 80 cm to 88 cm
-- **Impact**: Small increase in back-of-cabinet height (~8 cm), slightly longer roof panel (~51 cm vs. 52.2 cm), otherwise unchanged
+Following a design review, the **logo panel + roof front edge were shifted 10 cm backward** (Z = 0 → Z = 10 cm) to improve screen visibility:
+- **Problem**: With the logo panel flush at the cabinet's front face, tall players or spectators close to the cabinet could have their overhead sight-line partially blocked by the roof overhang
+- **Solution**: Recess the logo panel 10 cm inward. The front face at Y = 77.1 cm and above is now open air — no panel overhang obstructs the head space
+- **Consequences** (all computed with Pythagoras):
+  - **Soffit panel (G)**: 28 cm → **18 cm** deep (-10 cm)
+  - **Roof panel (E)**: 50.5 cm → **40.6 cm** long (-9.9 cm) — `√(40² + 7²) = 40.61`
+  - **Side panel (A)**: points C and D move from (0, ·) to (10, ·), introducing an "inset" at the top-front
+  - **Roof angle**: ~8° → ~10° (slightly steeper, because the same 7 cm drop now happens over 40 cm instead of 50 cm)
+  - Weight savings: soffit -0.3 kg, roof -0.3 kg — negligible
 
 ### Key Geometry
 
-The front panel is tilted 20° backward — bottom at the front edge, top receding 28cm into the cabinet. A horizontal **soffit panel** (G) bridges the gap between the front panel top and the logo panel, blocking lightbox light from shining downward and supporting the lightbox assembly. Above the soffit, a vertical logo panel faces the player directly. The roof slopes gently from 95cm (front) to 88cm (back).
+The front panel is tilted 20° backward — bottom at the front edge, top receding 28 cm into the cabinet. The **logo panel is recessed 10 cm** from the cabinet front face (at Z = 10 cm instead of Z = 0 cm). A horizontal **soffit panel** (G, 18 cm deep) bridges the gap between the front panel top (Z = 28) and the logo panel bottom (Z = 10), blocking lightbox light from shining downward and supporting the lightbox assembly. The roof slopes gently from the logo top (Z = 10, Y = 95 cm) to the back edge (Z = 50, Y = 88 cm).
 
 ```
 Side profile points (depth, height in cm):
 A (0, 0)      — front bottom
 B (28.0, 77.1) — top of front panel (tilted)
-C (0, 77.1)    — logo panel bottom / front edge at that height
-D (0, 95)      — logo panel top / roof front
-E (50, 88)     — roof back / back top  (gentle ~8° slope)
+C (10, 77.1)   — logo panel bottom / soffit front edge  (shifted 10cm back)
+D (10, 95)     — logo panel top / roof front            (shifted 10cm back)
+E (50, 88)     — roof back / back top
 F (50, 0)      — back bottom
 ```
 
@@ -130,9 +137,9 @@ Complex 6-point shape defining the cabinet profile.
 | Edge | From → To | Length |
 |------|-----------|--------|
 | Front bottom → Front panel top | A→B | 82 cm (along 20° tilt) |
-| Front panel top → Logo bottom | B→C | 28.0 cm (horizontal — soffit panel G sits here) |
-| Logo bottom → Logo top | C→D | 17.9 cm (vertical, front edge) |
-| Logo top → Roof back | D→E | 50.5 cm (gentle ~8° roof slope) |
+| Front panel top → Soffit front | B→C | 18.0 cm (horizontal — soffit panel G sits here) |
+| Soffit front → Logo top | C→D | 17.9 cm (vertical, logo panel at Z = 10 cm) |
+| Logo top → Roof back | D→E | 40.6 cm (~10° roof slope, `√(40² + 7²)`) |
 | Back edge | E→F | 88 cm (vertical) |
 | Bottom | F→A | 50 cm (horizontal) |
 
@@ -159,9 +166,9 @@ Tilted 20° backward. The bottom edge sits at the front, the top edge recedes 28
 | Dimension | Value |
 |-----------|-------|
 | Width | 55 cm |
-| Length | 50.5 cm (slope: √(50² + 7²)) |
-| Angle | ~8° from horizontal |
-| Weight | ~1.7 kg |
+| Length | 40.6 cm (slope: √(40² + 7²) — run = 40 after the 10 cm recess) |
+| Angle | ~10° from horizontal |
+| Weight | ~1.3 kg |
 
 Angled panel spanning from front top (95cm) to back top (80cm).
 
@@ -224,13 +231,13 @@ The vinyl decal is applied on the *inside* of the opal acrylic (protected from s
 | Dimension | Value |
 |-----------|-------|
 | Width | 55 cm |
-| Depth | 28.0 cm |
-| Weight | ~0.9 kg |
+| Depth | 18.0 cm |
+| Weight | ~0.6 kg |
 
-Horizontal panel at Y=77.1cm (top of front panel / bottom of logo panel). Closes the gap between the vertical logo panel (front) and the top of the tilted front panel (rear). Functions:
+Horizontal panel at Y = 77.1 cm, spanning from the front panel top (Z = 28) forward to the (recessed) logo panel bottom (Z = 10). The 10 cm between Z = 0 (cabinet front face) and Z = 10 (soffit front edge) is open air — this is the recess that improves screen sight-line. Functions:
 - Supports the lightbox assembly (acrylic + foamboard rest on top)
 - Blocks LED light from shining downward into the cabinet / player's face
-- Adds structural connection between logo panel and front panel
+- Adds structural connection between logo panel and front panel top
 
 ### Panel H: Monitor Shelf (×1)
 
@@ -257,14 +264,14 @@ Single wide panel that slides through slots in both side panels. The center sect
 
 | ID | Panel | Qty | Dimensions | Weight | Material |
 |----|-------|-----|-----------|--------|----------|
-| A | Side panel | 2 | Complex 6-point shape | 2×2.2 = 4.4 kg | Poplar ply 15mm |
+| A | Side panel | 2 | Complex 6-point shape (with 10 cm top-front inset) | 2×2.1 = 4.2 kg | Poplar ply 15mm |
 | D | Front panel | 1 | 55 × 82 cm (window cutout) | 2.3 kg | Poplar ply 15mm |
-| E | Roof panel | 1 | 55 × 52.2 cm | 1.7 kg | Poplar ply 15mm |
+| E | Roof panel | 1 | 55 × 40.6 cm | 1.3 kg | Poplar ply 15mm |
 | F | Logo panel (lightbox) | 1 | 55 × 17.9 cm | 0.6 kg | Acrylic + foamboard + LED |
-| G | Soffit panel | 1 | 55 × 28.0 cm | 0.9 kg | Poplar ply 15mm |
+| G | Soffit panel | 1 | 55 × 18.0 cm | 0.6 kg | Poplar ply 15mm |
 | H | Monitor shelf | 1 | 55 × 30 cm | 1.0 kg | Poplar ply 15mm |
 | M | Mouse shelf | 1 | 108 × 25 cm | 1.6 kg | Poplar ply 15mm |
-| | **Total cabinet** | **8 panels** | | **~12 kg** | |
+| | **Total cabinet** | **8 panels** | | **~11 kg** | |
 
 No base panel — the structure is stable enough with the roof panel, soffit, monitor shelf, front panel, logo panel, and mouse shelf providing 6 connection points between the side panels.
 
@@ -305,17 +312,17 @@ All panels pack flat in a custom crate for transport. The crate is optimized for
 | 1 | Side panel L (95×50) | 1.5 cm |
 | 2 | Side panel R (95×50) | 1.5 cm |
 | 3 | Front panel (82×55) + Logo panel (17.9×55) | 1.5 cm |
-| 4 | Roof panel (52.2×55) + Soffit panel (28×55) | 1.5 cm |
+| 4 | Roof panel (40.6×55) + Soffit panel (18×55) | 1.5 cm |
 | 5 | Monitor shelf (55×30) + Mouse shelf (108×25) | 1.5 cm |
 
 ### Weight Breakdown
 
 | Item | Weight |
 |------|--------|
-| Cabinet panels | ~12 kg |
+| Cabinet panels | ~11 kg |
 | Crate (pine plywood 9mm) | ~7 kg |
 | Textile padding | ~0.5 kg |
-| **Total transport weight** | **~20 kg** |
+| **Total transport weight** | **~19 kg** |
 
 See [`cabinet-panels.html`](cabinet-panels.html) for detailed crate packing diagrams (top view per layer + side view of stack).
 
