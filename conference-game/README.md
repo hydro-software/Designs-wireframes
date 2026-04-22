@@ -12,6 +12,7 @@ A timed challenge where hydropower operators spot production losses on a Naia-st
 6. [Technical Implementation](06-technical-implementation.md) - Data model, drawing layer, scoring algorithm, API, frontend components
 7. [Conference Setup](07-conference-setup.md) - Hardware (single PC, no keyboard), local startup, staffing, fallback plans
 8. [Hardware Build: Tabletop Arcade](08-hardware-build.md) - Poplar plywood 15mm cabinet, lightbox logo panel, panel dimensions, transport crate
+9. [Conference Reel (Remotion)](09-conference-reel.md) - Branded 55-second reel for the second-screen TV. Problem → dashboard → loss detection → correlation → aggregate → victory → classement → CTA. [Live preview](https://hydro-software.github.io/Designs-wireframes/conference-game/reel/)
 
 ## Key Decisions
 
