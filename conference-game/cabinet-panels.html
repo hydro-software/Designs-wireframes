@@ -971,10 +971,10 @@ document.addEventListener('DOMContentLoaded', () => {
       tbody.appendChild(tr);
     });
 
-    // ---- Sheet layout SVG (250 × 125 cm) ----
+    // ---- Sheet layout SVG (242 × 120 cm) ----
     {
       const svg = document.getElementById('sheet-layout-svg');
-      const SHEET_W = 250, SHEET_H = 125;
+      const SHEET_W = 242, SHEET_H = 120;
       const sheetSc = 2.4;            // px per cm in this view
       const pad = 30;
       const w = SHEET_W * sheetSc + pad*2;
@@ -987,20 +987,26 @@ document.addEventListener('DOMContentLoaded', () => {
       const tx = (x) => pad + x * sheetSc;
       const ty = (y) => pad + (SHEET_H - y) * sheetSc;
 
-      // Nested layout — fits all cabinet panels on one 250 × 125 sheet.
-      // Two horizontal bands: tall panels (95 cm) on the bottom band,
-      // shelves (25–30 cm) on the top band. The kerf gap (~3 mm) between
-      // panels is below the SVG resolution, so we draw flush.
+      // Nested layout — fits all cabinet panels on one 242 × 120 sheet.
+      // The roof column doubles as the home for the soffit (sits flush on
+      // top of the roof) and monitor shelf (stacks above the soffit). That
+      // turns the previously empty 43 cm gap above the 52.2 cm roof into
+      // useful real estate. The mouse shelf slides over to the top band
+      // above the side panels — its 108 cm width clears them with room to
+      // spare. The kerf gap (~3 mm) between panels is below the SVG
+      // resolution, so we draw flush.
+      const ROOF_COL_X = 100 + INNER_W;
       const placements = [
-        // Bottom band: side panels + front + roof + (gap)
-        {id:'A1', name:'Side L', x:0,    y:0,  w:50,    h:95,   col:'#4fc3f7'},
-        {id:'A2', name:'Side R', x:50,   y:0,  w:50,    h:95,   col:'#4fc3f7'},
-        {id:'D',  name:'Front',  x:100,  y:0,  w:INNER_W, h:FP_SURF, col:'#82b1ff'},
-        {id:'E',  name:'Roof',   x:100+INNER_W, y:0, w:INNER_W, h:ROOF_LEN, col:'#66bb6a'},
-        // Top band: monitor shelf + soffit + mouse shelf
-        {id:'H',  name:'Monitor shelf', x:0,         y:95, w:INNER_W, h:SHELF_D, col:'#ffd54f'},
-        {id:'G',  name:'Soffit',        x:INNER_W,   y:95, w:INNER_W, h:SOFFIT_D, col:'#a5d6a7'},
-        {id:'M',  name:'Mouse shelf',   x:2*INNER_W, y:95, w:MOUSE_TOTAL_W, h:MOUSE_D, col:'#ff8a65'},
+        // Bottom band: side panels + front + roof
+        {id:'A1', name:'Side L', x:0,            y:0,                       w:50,           h:95,        col:'#4fc3f7'},
+        {id:'A2', name:'Side R', x:50,           y:0,                       w:50,           h:95,        col:'#4fc3f7'},
+        {id:'D',  name:'Front',  x:100,          y:0,                       w:INNER_W,      h:FP_SURF,   col:'#82b1ff'},
+        {id:'E',  name:'Roof',   x:ROOF_COL_X,   y:0,                       w:INNER_W,      h:ROOF_LEN,  col:'#66bb6a'},
+        // Roof column continues upward: soffit on top of the roof, monitor shelf above the soffit
+        {id:'G',  name:'Soffit',        x:ROOF_COL_X, y:ROOF_LEN,                          w:INNER_W, h:SOFFIT_D, col:'#a5d6a7'},
+        {id:'H',  name:'Monitor shelf', x:ROOF_COL_X, y:ROOF_LEN + SOFFIT_D,               w:INNER_W, h:SHELF_D,  col:'#ffd54f'},
+        // Top band over the side panels — mouse shelf at the front edge
+        {id:'M',  name:'Mouse shelf',   x:0,          y:95,                                w:MOUSE_TOTAL_W, h:MOUSE_D, col:'#ff8a65'},
       ];
 
       let c = '';
@@ -1198,8 +1204,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   <div class="panels" style="margin-top: 16px">
     <div class="panel-card" style="flex: 1.5">
-      <h3>Suggested sheet layout — 1 × poplar ply 250 × 125 cm</h3>
-      <p class="qty">All cabinet panels nested on a single 250 × 125 cm sheet (15 mm poplar). 250 × 125 is the standard metric panel — if your shop only stocks 244 × 122, two sheets give you plenty of room. The logo panel (acrylic) is sourced separately.</p>
+      <h3>Suggested sheet layout — 1 × poplar ply 242 × 120 cm</h3>
+      <p class="qty">All cabinet panels nested on a single 242 × 120 cm sheet (15 mm poplar). The soffit and monitor shelf stack in the column above the roof — that previously empty 43 cm gap above the 52.2 cm roof now carries two more panels. The mouse shelf takes the top band over the side panels. The logo panel (acrylic) is sourced separately.</p>
       <svg id="sheet-layout-svg"></svg>
     </div>
     <div class="panel-card" style="flex: 1">
