@@ -1108,6 +1108,155 @@ document.addEventListener('DOMContentLoaded', () => {
       svg.innerHTML = c;
     }
   }
+
+  // ========================
+  // CONFORMAT BOLT POSITIONS
+  // ========================
+  // Each bolt passes through the side panel face into the mating panel's
+  // edge (with a cross-dowel sitting in the edge to receive the threads).
+  // Positions chosen for ~5–8 cm end clearance and even spacing along
+  // each joint, which keeps the joint stiff without splitting the
+  // plywood near a free edge.
+  {
+    // ---- Compute bolt positions on the side panel ----
+    // Linear interpolation along an edge: returns N evenly spaced points
+    // with `pad` cm of clearance from each end.
+    function spaceAlong(p0, p1, n, pad) {
+      const dx = p1[0] - p0[0], dy = p1[1] - p0[1];
+      const len = Math.sqrt(dx*dx + dy*dy);
+      const ux = dx/len, uy = dy/len;
+      const usable = len - 2*pad;
+      const pts = [];
+      if (n === 1) {
+        pts.push([p0[0] + (len/2)*ux, p0[1] + (len/2)*uy]);
+      } else {
+        for (let i = 0; i < n; i++) {
+          const d = pad + (usable * i / (n - 1));
+          pts.push([p0[0] + d*ux, p0[1] + d*uy]);
+        }
+      }
+      return pts;
+    }
+
+    // Joint definitions on the side panel.
+    // Edge endpoints in (depth, height) — same coords as the side-panel SVG.
+    const A = [0, 0],
+          B = [FP_TOP_Z, FP_TOP_Y],
+          C = [0, FP_TOP_Y],
+          DD = [0, H_FRONT],
+          E = [D, H_BACK],
+          F = [D, 0];
+    const shelfZ = SHELF_Y * Math.tan(TILT);
+    const shelfFront = [shelfZ, SHELF_Y];
+    const shelfBack  = [shelfZ + SHELF_D, SHELF_Y];
+
+    const joints = [
+      { name:'Front (D)',          color:'#FF7043', edge:[A, B],          n:3, pad:7,
+        per:'3', total:'6' },
+      { name:'Roof (E)',           color:'#66BB6A', edge:[DD, E],         n:3, pad:6,
+        per:'3', total:'6' },
+      { name:'Soffit (G)',         color:'#FFD54F', edge:[B, C],          n:2, pad:6,
+        per:'2', total:'4' },
+      { name:'Monitor shelf (H)',  color:'#CE93D8', edge:[shelfFront, shelfBack], n:2, pad:6,
+        per:'2', total:'4' },
+    ];
+
+    // ---- Side-panel SVG ----
+    {
+      const svg = document.getElementById('conformat-side-svg');
+      const sc = 4.5;
+      const padPx = 30;
+      const w = D*sc + padPx*2 + 50;
+      const h = H_FRONT*sc + padPx*2 + 30;
+      svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
+      svg.setAttribute('width', w);
+      svg.setAttribute('height', h);
+
+      const tx = (x) => padPx + x * sc;
+      const ty = (y) => padPx + (H_FRONT - y) * sc;
+
+      let c = '';
+
+      // Side panel polygon (interior view — same outline as before)
+      const polyPts = [A, B, C, DD, E, F]
+        .map(p => `${tx(p[0])},${ty(p[1])}`).join(' ');
+      c += `<polygon points="${polyPts}" fill="rgba(26,95,122,0.2)" stroke="#4fc3f7" stroke-width="1.5"/>`;
+
+      // Shelf line at Y=38 (where the monitor shelf lands)
+      c += `<line x1="${tx(shelfFront[0])}" y1="${ty(shelfFront[1])}" x2="${tx(shelfBack[0])}" y2="${ty(shelfBack[1])}" stroke="#8B7355" stroke-width="1.5" stroke-dasharray="3,2"/>`;
+      c += `<text x="${tx(shelfFront[0]+SHELF_D/2)}" y="${ty(SHELF_Y)+12}" fill="#8B7355" font-size="8" text-anchor="middle">monitor shelf line · Y=${SHELF_Y}</text>`;
+
+      // Bolt-position dots — one per joint, color by joint type
+      let boltCount = 0;
+      joints.forEach(j => {
+        const positions = spaceAlong(j.edge[0], j.edge[1], j.n, j.pad);
+        positions.forEach((p, i) => {
+          boltCount++;
+          // Slight outward perpendicular offset of the label so it doesn't
+          // sit on top of the edge line.
+          const dx = j.edge[1][0] - j.edge[0][0];
+          const dy = j.edge[1][1] - j.edge[0][1];
+          const len = Math.sqrt(dx*dx + dy*dy);
+          // Perpendicular pointing INTO the panel interior (rough heuristic)
+          const px_off =  dy/len * 4;   // depth offset (cm)
+          const py_off = -dx/len * 4;
+          // Label coordinates (slightly inside the panel)
+          const lx = p[0] + px_off;
+          const ly = p[1] + py_off;
+          c += `<circle cx="${tx(p[0])}" cy="${ty(p[1])}" r="5" fill="${j.color}" stroke="#fff" stroke-width="1.2"/>`;
+          c += `<circle cx="${tx(p[0])}" cy="${ty(p[1])}" r="1.6" fill="#0a0a18"/>`;
+          c += `<text x="${tx(lx)}" y="${ty(ly)+3}" fill="${j.color}" font-size="8" text-anchor="middle" font-weight="bold">${boltCount}</text>`;
+        });
+      });
+
+      // Edge-thickness indicator: tiny notes near each joint name with bolt count
+      // Front edge label
+      const fmid = [(A[0]+B[0])/2, (A[1]+B[1])/2];
+      c += `<text x="${tx(fmid[0])-22}" y="${ty(fmid[1])-8}" fill="#FF7043" font-size="9" font-weight="bold">Front: 3</text>`;
+      // Roof edge
+      const rmid = [(DD[0]+E[0])/2, (DD[1]+E[1])/2];
+      c += `<text x="${tx(rmid[0])}" y="${ty(rmid[1])-8}" fill="#66BB6A" font-size="9" font-weight="bold" text-anchor="middle">Roof: 3</text>`;
+      // Soffit
+      c += `<text x="${tx((B[0]+C[0])/2)}" y="${ty(B[1])-7}" fill="#FFD54F" font-size="9" font-weight="bold" text-anchor="middle">Soffit: 2</text>`;
+      // Monitor shelf
+      c += `<text x="${tx(shelfBack[0])+8}" y="${ty(SHELF_Y)+3}" fill="#CE93D8" font-size="9" font-weight="bold">Monitor: 2</text>`;
+
+      // Legend at bottom
+      const legX = padPx, legY = h - 16;
+      const legendItems = [
+        { label:'Front', color:'#FF7043' },
+        { label:'Roof', color:'#66BB6A' },
+        { label:'Soffit', color:'#FFD54F' },
+        { label:'Monitor shelf', color:'#CE93D8' },
+      ];
+      let lx = legX;
+      legendItems.forEach(it => {
+        c += `<circle cx="${lx+5}" cy="${legY}" r="4" fill="${it.color}" stroke="#fff" stroke-width="1"/>`;
+        c += `<text x="${lx+13}" y="${legY+3}" fill="#aaa" font-size="9">${it.label}</text>`;
+        lx += 13 + it.label.length*6 + 12;
+      });
+
+      svg.innerHTML = c;
+    }
+
+    // ---- Count table ----
+    {
+      const tbody = document.getElementById('conformat-count-body');
+      let perTotal = 0, allTotal = 0;
+      joints.forEach(j => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td><span style="display:inline-block; width:10px; height:10px; background:${j.color}; border-radius:50%; margin-right:6px"></span>${j.name}</td><td>${j.per}</td><td>${j.total}</td>`;
+        tbody.appendChild(tr);
+        perTotal += parseInt(j.per, 10);
+        allTotal += parseInt(j.total, 10);
+      });
+      const tr = document.createElement('tr');
+      tr.style.color = '#4fc3f7';
+      tr.style.fontWeight = 'bold';
+      tr.innerHTML = `<td>Total per side</td><td>${perTotal}</td><td>${allTotal}</td>`;
+      tbody.appendChild(tr);
+    }
+  }
 });
 </script>
 
@@ -1229,6 +1378,58 @@ document.addEventListener('DOMContentLoaded', () => {
     <thead><tr><th>ID</th><th>Panel</th><th>Qty</th><th>Dimensions</th><th>Weight</th><th>Notes</th></tr></thead>
     <tbody id="cut-list-body"></tbody>
   </table>
+</div>
+
+<div class="section">
+  <h2>Knock-Down Assembly — Conformat Bolts</h2>
+  <p class="note">
+    The cabinet is held together with <strong>conformat bolts</strong> (also
+    called cross-dowel + machine-screw, or barrel-nut bolts — the same
+    fastener every IKEA cabinet uses). One Allen key, no glue, hundreds of
+    assembly cycles. Each joint shows up as a single hole drilled through
+    the side panel face into the mating panel's edge.
+  </p>
+
+  <div class="panels">
+    <div class="panel-card" style="flex:1.4">
+      <h3>Side panel — conformat positions (×2, mirror)</h3>
+      <p class="qty">Drill these from the inside face of each side panel.
+        Mirror the second side. Counter-bore the bolt-side face slightly so
+        the bolt heads sit flush.</p>
+      <svg id="conformat-side-svg"></svg>
+    </div>
+
+    <div class="panel-card" style="flex:1">
+      <h3>Hardware shopping list</h3>
+      <table>
+        <thead>
+          <tr><th>Joint</th><th>Per side</th><th>Total</th></tr>
+        </thead>
+        <tbody id="conformat-count-body"></tbody>
+      </table>
+      <p class="note" style="margin-top:8px">
+        <strong>Buy 24 conformat sets</strong> (20 needed + 4 spares).<br>
+        M6 × 50 mm machine bolt + barrel nut, sold in packs of 4–10 at
+        any hardware shop or online (search "vis conformat" / "cross-dowel
+        bolt"). One 6 mm Allen key handles all of them.
+      </p>
+      <p class="note" style="margin-top:8px; color:#aaa">
+        <strong>Drilling guide:</strong> bolt hole 7 mm ⌀ through the side
+        panel face. Cross-dowel hole 10 mm ⌀ × ~25 mm deep, drilled
+        perpendicular into the mating panel's edge, so the bolt threads
+        engage the cross-dowel sitting inside.
+      </p>
+    </div>
+  </div>
+
+  <p class="note" style="margin-top:12px">
+    <strong>Shelf-on-side joints (G, H) also get a shallow dado:</strong>
+    a 1.5 cm × 0.5 cm groove cut across the inside face of the side panel
+    where each shelf lands. The shelf slides into the groove for shear
+    strength (carries the weight without depending on the bolts), and the
+    conformats clamp it from pulling out. No glue needed — the dado is a
+    dry friction fit. Standard router bit, one pass per groove.
+  </p>
 </div>
 
 <div class="section">
