@@ -1304,16 +1304,37 @@ document.addEventListener('DOMContentLoaded', () => {
     const CLEAT_H = 4;        // cleat depth (cm) — height of the bevelled strip
     const CLEAT_T = 1.5;      // cleat thickness (cm) — same as plywood
 
-    // ---- Folded transport view (Side R + Roof + 2 beams folded) ----
+    // Side panel polygon shared by both sub-assembly diagrams.
+    const POLY_A  = [0, 0];
+    const POLY_B  = [FP_TOP_Z, FP_TOP_Y];
+    const POLY_C  = [0, FP_TOP_Y];
+    const POLY_D  = [0, H_FRONT];
+    const POLY_E  = [50, H_BACK];
+    const POLY_F  = [50, 0];
+    const POLY = [POLY_A, POLY_B, POLY_C, POLY_D, POLY_E, POLY_F];
+    const POLY_LABELS = ['A','B','C','D','E','F'];
+
+    function drawSidePolygon(c, tx, ty) {
+      const polyPts = POLY.map(p => `${tx(p[0])},${ty(p[1])}`).join(' ');
+      c.s += `<polygon points="${polyPts}" fill="rgba(0,0,0,0.04)" stroke="#000" stroke-width="1.2"/>`;
+      POLY_LABELS.forEach((lab, i) => {
+        const p = POLY[i];
+        const ox = (i===0||i===2||i===3) ? -10 : (i===1 ? 4 : 8);
+        const oy = (i===0||i===5) ? 12 : (i===3||i===4) ? -6 : 0;
+        c.s += `<circle cx="${tx(p[0])}" cy="${ty(p[1])}" r="2" fill="#000"/>`;
+        c.s += `<text x="${tx(p[0])+ox}" y="${ty(p[1])+oy}" fill="#000" font-size="9" font-weight="700">${lab}</text>`;
+      });
+    }
+
+    // ---- Sub-assembly 1: Side R with Roof folded ----
     {
-      const svg = document.getElementById('kd2-folded-svg');
-      const sc = 4;
+      const svg = document.getElementById('kd2-folded-r-svg');
+      const sc = 3.6;
       const padPx = 30;
-      // Roof, when folded, projects 54.4 cm in the (-0.29, -0.96) direction
-      // from the D→E edge — partially outside Side R's polygon. Pad the
-      // viewBox left by ~20 cm to fit it.
-      const padLeft = 22;
-      const w = (D + padLeft) * sc + padPx*2 + 30;
+      // Folded roof projects ~16 cm to the left of Side R's outline. Pad the
+      // viewBox left to make room.
+      const padLeft = 18;
+      const w = (D + padLeft) * sc + padPx*2 + 20;
       const h = H_FRONT * sc + padPx*2 + 30;
       svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
       svg.setAttribute('width', w);
@@ -1322,91 +1343,107 @@ document.addEventListener('DOMContentLoaded', () => {
       const tx = (x) => padPx + (x + padLeft) * sc;
       const ty = (y) => padPx + 16 + (H_FRONT - y) * sc;
 
-      let c = '';
+      const c = { s: '' };
+      drawSidePolygon(c, tx, ty);
 
-      // Side R polygon
-      const A = [0, 0],
-            B = [FP_TOP_Z, FP_TOP_Y],
-            Cp = [0, FP_TOP_Y],
-            DD = [0, H_FRONT],
-            E = [50, H_BACK],
-            F = [50, 0];
-      const polyPts = [A, B, Cp, DD, E, F]
-        .map(p => `${tx(p[0])},${ty(p[1])}`).join(' ');
-      c += `<polygon points="${polyPts}" fill="rgba(0,0,0,0.04)" stroke="#000" stroke-width="1.2"/>`;
-
-      // Vertex markers + labels
-      ['A','B','C','D','E','F'].forEach((lab, i) => {
-        const p = [A,B,Cp,DD,E,F][i];
-        const ox = (i===0||i===2||i===3) ? -10 : (i===1 ? 4 : 8);
-        const oy = (i===0||i===5) ? 12 : (i===3||i===4) ? -6 : 0;
-        c += `<circle cx="${tx(p[0])}" cy="${ty(p[1])}" r="2" fill="#000"/>`;
-        c += `<text x="${tx(p[0])+ox}" y="${ty(p[1])+oy}" fill="#000" font-size="9" font-weight="700">${lab}</text>`;
-      });
-
-      // Folded Roof — projects perpendicular into the (-0.29, -0.96) direction
-      // from the D→E edge for 54.4 cm (the panel width INNER_W). Drawn dashed
-      // because it sits "behind" Side R when folded; partially outside the
-      // polygon footprint — that's expected and OK.
-      const dxDE = E[0] - DD[0], dyDE = E[1] - DD[1];
+      // Folded Roof — projects 54.4 cm into the (-0.29, -0.96) direction
+      // from the D→E edge. Partially outside Side R's polygon — that's
+      // expected (the roof is "behind" Side R in 3D when folded).
+      const dxDE = POLY_E[0] - POLY_D[0], dyDE = POLY_E[1] - POLY_D[1];
       const lenDE = Math.sqrt(dxDE*dxDE + dyDE*dyDE);
       const ux = dxDE/lenDE, uy = dyDE/lenDE;
-      // Perpendicular pointing INTO the polygon (clockwise rotation from D→E)
-      const pdx = uy, pdy = -ux;
-      const r1 = DD;
-      const r2 = E;
-      const r3 = [E[0] + INNER_W*pdx, E[1] + INNER_W*pdy];
-      const r4 = [DD[0] + INNER_W*pdx, DD[1] + INNER_W*pdy];
+      const pdx = uy, pdy = -ux;     // perpendicular pointing INTO the polygon
+      const r1 = POLY_D;
+      const r2 = POLY_E;
+      const r3 = [POLY_E[0] + INNER_W*pdx, POLY_E[1] + INNER_W*pdy];
+      const r4 = [POLY_D[0] + INNER_W*pdx, POLY_D[1] + INNER_W*pdy];
       const roofPts = [r1, r2, r3, r4].map(p => `${tx(p[0])},${ty(p[1])}`).join(' ');
-      c += `<polygon points="${roofPts}" fill="rgba(0,0,0,0.06)" stroke="#000" stroke-width="0.8" stroke-dasharray="4,3"/>`;
+      c.s += `<polygon points="${roofPts}" fill="rgba(0,0,0,0.06)" stroke="#000" stroke-width="0.8" stroke-dasharray="4,3"/>`;
       const roofCx = (r1[0]+r2[0]+r3[0]+r4[0])/4;
       const roofCy = (r1[1]+r2[1]+r3[1]+r4[1])/4;
-      c += `<text x="${tx(roofCx)}" y="${ty(roofCy)}" fill="#000" font-size="9" text-anchor="middle">Roof (folded)</text>`;
-      c += `<text x="${tx(roofCx)}" y="${ty(roofCy)+11}" fill="#555" font-size="7" text-anchor="middle">piano hinge along D→E</text>`;
+      c.s += `<text x="${tx(roofCx)}" y="${ty(roofCy)}" fill="#000" font-size="9" text-anchor="middle">Roof (folded)</text>`;
+      c.s += `<text x="${tx(roofCx)}" y="${ty(roofCy)+11}" fill="#555" font-size="7" text-anchor="middle">piano hinge D→E</text>`;
 
-      // Beam 1 folded — vertical strip at depth 0, from y=0 up to y=BEAM_LEN.
-      // Hinge at corner A. Beam visually shown as a slim rectangle.
-      c += `<rect x="${tx(0)}" y="${ty(BEAM_LEN)}" width="${BEAM_X*sc}" height="${BEAM_LEN*sc}" fill="rgba(0,0,0,0.12)" stroke="#000" stroke-width="0.8"/>`;
-      c += `<text x="${tx(BEAM_X/2)}" y="${ty(BEAM_LEN/2)+3}" fill="#000" font-size="8" text-anchor="middle" transform="rotate(-90 ${tx(BEAM_X/2)} ${ty(BEAM_LEN/2)})">Beam 1 (folded)</text>`;
+      // Hinge marks at the two ends of D→E.
+      [POLY_D, POLY_E].forEach(p => {
+        c.s += `<circle cx="${tx(p[0])}" cy="${ty(p[1])}" r="3.5" fill="#fff" stroke="#000" stroke-width="1.2"/>`;
+      });
 
-      // Beam 2 folded — vertical strip at depth 28 (FP_TOP_Z), from y=77.1 down
-      // to y=77.1-BEAM_LEN. Hinge at corner B.
-      c += `<rect x="${tx(FP_TOP_Z - BEAM_X/2)}" y="${ty(FP_TOP_Y)}" width="${BEAM_X*sc}" height="${BEAM_LEN*sc}" fill="rgba(0,0,0,0.12)" stroke="#000" stroke-width="0.8"/>`;
-      c += `<text x="${tx(FP_TOP_Z)}" y="${ty(FP_TOP_Y - BEAM_LEN/2)+3}" fill="#000" font-size="8" text-anchor="middle" transform="rotate(-90 ${tx(FP_TOP_Z)} ${ty(FP_TOP_Y - BEAM_LEN/2)})">Beam 2 (folded)</text>`;
+      c.s += `<text x="${tx(20)}" y="${padPx + 6}" fill="#000" font-size="10" text-anchor="middle" font-weight="700">Sub-assembly 1 — Side R + Roof</text>`;
+      svg.innerHTML = c.s;
+    }
 
-      // Hinge marks — small white circles with black border at the joint points.
-      // Drawn last so they sit on top of the beam rectangles.
+    // ---- Sub-assembly 2: Side L with 2 cross-rails folded ----
+    // Side L is the mirror of Side R but the polygon shape (interior view)
+    // matches; the beams hinge at the analogous A and B corners and fold
+    // entirely within Side L's footprint.
+    {
+      const svg = document.getElementById('kd2-folded-l-svg');
+      const sc = 3.6;
+      const padPx = 30;
+      const w = D * sc + padPx*2 + 60;
+      const h = H_FRONT * sc + padPx*2 + 30;
+      svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
+      svg.setAttribute('width', w);
+      svg.setAttribute('height', h);
+
+      const tx = (x) => padPx + x * sc;
+      const ty = (y) => padPx + 16 + (H_FRONT - y) * sc;
+
+      const c = { s: '' };
+      drawSidePolygon(c, tx, ty);
+
+      // Beam 1 folded — vertical strip at depth 0, y=0 up to y=BEAM_LEN.
+      c.s += `<rect x="${tx(0)}" y="${ty(BEAM_LEN)}" width="${BEAM_X*sc}" height="${BEAM_LEN*sc}" fill="rgba(0,0,0,0.12)" stroke="#000" stroke-width="0.8"/>`;
+      c.s += `<text x="${tx(BEAM_X/2)}" y="${ty(BEAM_LEN/2)+3}" fill="#000" font-size="8" text-anchor="middle" transform="rotate(-90 ${tx(BEAM_X/2)} ${ty(BEAM_LEN/2)})">Beam 1 (folded)</text>`;
+
+      // Beam 2 folded — vertical strip at depth 28, y=77.1 down to y=77.1-BEAM_LEN.
+      c.s += `<rect x="${tx(FP_TOP_Z - BEAM_X/2)}" y="${ty(FP_TOP_Y)}" width="${BEAM_X*sc}" height="${BEAM_LEN*sc}" fill="rgba(0,0,0,0.12)" stroke="#000" stroke-width="0.8"/>`;
+      c.s += `<text x="${tx(FP_TOP_Z)}" y="${ty(FP_TOP_Y - BEAM_LEN/2)+3}" fill="#000" font-size="8" text-anchor="middle" transform="rotate(-90 ${tx(FP_TOP_Z)} ${ty(FP_TOP_Y - BEAM_LEN/2)})">Beam 2 (folded)</text>`;
+
+      // Hinge marks at A and B.
       function hingeMark(p, label, ox, oy) {
-        c += `<circle cx="${tx(p[0])}" cy="${ty(p[1])}" r="3.5" fill="#fff" stroke="#000" stroke-width="1.2"/>`;
-        c += `<text x="${tx(p[0])+ox}" y="${ty(p[1])+oy}" fill="#555" font-size="7">${label}</text>`;
+        c.s += `<circle cx="${tx(p[0])}" cy="${ty(p[1])}" r="3.5" fill="#fff" stroke="#000" stroke-width="1.2"/>`;
+        c.s += `<text x="${tx(p[0])+ox}" y="${ty(p[1])+oy}" fill="#555" font-size="7">${label}</text>`;
       }
-      hingeMark(A, 'hinge', -28, 16);
-      hingeMark(B, 'hinge', 8, 4);
+      hingeMark(POLY_A, 'butt hinge', -8, 18);
+      hingeMark(POLY_B, 'butt hinge', 8, 4);
 
-      // Caption
-      c += `<text x="${tx(20)}" y="${padPx + 6}" fill="#000" font-size="11" text-anchor="middle" font-weight="700">Side R — interior, transport state</text>`;
+      // Deploy-direction arrows — small annotations showing which way each
+      // beam swings out when assembling. Drawn outside the polygon so they
+      // don't clutter the folded view.
+      c.s += `<text x="${tx(45)}" y="${ty(60)}" fill="#555" font-size="7">deploy:</text>`;
+      c.s += `<text x="${tx(45)}" y="${ty(60)-9}" fill="#555" font-size="7">B1 swings down,</text>`;
+      c.s += `<text x="${tx(45)}" y="${ty(60)-18}" fill="#555" font-size="7">B2 swings up</text>`;
+      c.s += `<text x="${tx(45)}" y="${ty(60)-27}" fill="#555" font-size="7">to horizontal</text>`;
 
-      // Legend box bottom-right
-      const legY = h - 22;
+      c.s += `<text x="${tx(25)}" y="${padPx + 6}" fill="#000" font-size="10" text-anchor="middle" font-weight="700">Sub-assembly 2 — Side L + cross-rails</text>`;
+
+      // Legend
+      const legY = h - 18;
       let legX = padPx;
-      c += `<rect x="${legX}" y="${legY-9}" width="10" height="9" fill="rgba(0,0,0,0.04)" stroke="#000" stroke-width="0.8"/>`;
-      c += `<text x="${legX+14}" y="${legY-1}" fill="#333" font-size="8">Side R polygon</text>`;
-      legX += 100;
-      c += `<rect x="${legX}" y="${legY-9}" width="10" height="9" fill="rgba(0,0,0,0.06)" stroke="#000" stroke-width="0.8" stroke-dasharray="3,2"/>`;
-      c += `<text x="${legX+14}" y="${legY-1}" fill="#333" font-size="8">Roof folded</text>`;
-      legX += 95;
-      c += `<rect x="${legX}" y="${legY-9}" width="10" height="9" fill="rgba(0,0,0,0.12)" stroke="#000" stroke-width="0.8"/>`;
-      c += `<text x="${legX+14}" y="${legY-1}" fill="#333" font-size="8">Beam (folded)</text>`;
+      c.s += `<rect x="${legX}" y="${legY-9}" width="10" height="9" fill="rgba(0,0,0,0.04)" stroke="#000" stroke-width="0.8"/>`;
+      c.s += `<text x="${legX+14}" y="${legY-1}" fill="#333" font-size="8">Side L polygon</text>`;
+      legX += 105;
+      c.s += `<rect x="${legX}" y="${legY-9}" width="10" height="9" fill="rgba(0,0,0,0.12)" stroke="#000" stroke-width="0.8"/>`;
+      c.s += `<text x="${legX+14}" y="${legY-1}" fill="#333" font-size="8">Beam (folded)</text>`;
 
-      svg.innerHTML = c;
+      svg.innerHTML = c.s;
     }
 
     // ---- French cleat detail ----
+    // Standard French-cleat geometry: wall cleat (on Beam 2) is the
+    // BOTTOM-RIGHT triangle of the cleat square — vertical leg glued to
+    // the beam, horizontal leg at the bottom, hypotenuse running from
+    // top-near-beam DOWN-AND-OUT to bottom-far. Cabinet cleat (on Front D)
+    // is the mirror: TOP-LEFT triangle of the same square — vertical leg
+    // glued to Front D, horizontal leg at the top, hypotenuse running
+    // from top-far DOWN-AND-IN to bottom-near-Front-D. Both hypotenuses
+    // lie on the same diagonal line; the cleats interlock face-to-face.
     {
       const svg = document.getElementById('kd2-cleat-svg');
-      const sc = 14;             // bigger scale — this is a zoomed detail
+      const sc = 14;
       const padPx = 30;
-      // Drawing space ~14 cm wide × 18 cm tall
       const drawW = 14, drawH = 18;
       const w = drawW*sc + padPx*2 + 60;
       const h = drawH*sc + padPx*2 + 30;
@@ -1414,80 +1451,72 @@ document.addEventListener('DOMContentLoaded', () => {
       svg.setAttribute('width', w);
       svg.setAttribute('height', h);
 
-      // Origin: depth-axis = horizontal, height-axis = vertical (Y up = lower screen Y).
-      // Center the drawing horizontally; keep room for labels on the right.
-      const tx = (depth) => padPx + (depth + 2) * sc;
+      const tx = (depth)  => padPx + (depth + 2) * sc;
       const ty = (height) => padPx + 16 + (drawH - height) * sc;
 
       let c = '';
 
-      // Beam 2 cross-section: 4 cm × 3 cm rectangle.
-      // Place it so its FRONT face (toward player, lower depth) is at depth=4
-      // and its top is at height=12.
+      // Beam 2 cross-section: BEAM_T × BEAM_X rectangle.
+      // Front face (toward player) at depth=4; top at height=12.
       const beamFront = 4;
-      const beamBack  = beamFront + BEAM_T;     // 7
+      const beamBack  = beamFront + BEAM_T;
       const beamTop   = 12;
-      const beamBot   = beamTop - BEAM_X;        // 8
+      const beamBot   = beamTop - BEAM_X;
       c += `<rect x="${tx(beamFront)}" y="${ty(beamTop)}" width="${BEAM_T*sc}" height="${BEAM_X*sc}" fill="rgba(0,0,0,0.10)" stroke="#000" stroke-width="1.2"/>`;
       c += `<text x="${tx((beamFront+beamBack)/2)}" y="${ty((beamTop+beamBot)/2)+3}" fill="#000" font-size="9" text-anchor="middle">Beam 2</text>`;
       c += `<text x="${tx((beamFront+beamBack)/2)}" y="${ty((beamTop+beamBot)/2)-9}" fill="#555" font-size="7" text-anchor="middle">${BEAM_T} × ${BEAM_X} cm</text>`;
 
-      // Wall cleat (mounted on beam 2's front face) — right-triangle cross
-      // section. Vertical leg glued to beam (at depth=beamFront), top at
-      // height=beamTop, hypotenuse goes diagonally down-and-toward-player to
-      // (beamFront - CLEAT_H, beamTop - CLEAT_H).
-      const wcVerticalX = beamFront;
-      const wcTopY = beamTop;
-      const wcBotY = beamTop - CLEAT_H;
+      // Wall cleat (cleat A) — bottom-right triangle of the cleat square.
+      // Vertices: top-near-beam, bottom-near-beam, bottom-far. Right angle
+      // at bottom-near-beam. Hypotenuse goes DOWN-AND-OUT from top of beam
+      // to bottom-far corner — matching the standard wall-cleat bevel.
       const wcOuterX = beamFront - CLEAT_H;
+      const wcBotY   = beamTop - CLEAT_H;
       const wallCleat = [
-        [wcVerticalX, wcTopY],
-        [wcVerticalX, wcBotY],
-        [wcOuterX,    wcTopY],
+        [beamFront, beamTop],     // top-near-beam (top of cleat at beam face)
+        [beamFront, wcBotY],      // bottom-near-beam (right angle here)
+        [wcOuterX,  wcBotY],      // bottom-far (away from beam)
       ];
       c += `<polygon points="${wallCleat.map(p => `${tx(p[0])},${ty(p[1])}`).join(' ')}" fill="rgba(0,0,0,0.18)" stroke="#000" stroke-width="1"/>`;
-      c += `<text x="${tx(beamFront - 0.6)}" y="${ty(beamTop - 0.4)}" fill="#000" font-size="7" text-anchor="end" font-weight="700">cleat A</text>`;
+      c += `<text x="${tx(beamFront - 0.7)}" y="${ty(wcBotY + 1)}" fill="#000" font-size="8" text-anchor="end" font-weight="700">cleat A</text>`;
+      c += `<text x="${tx(beamFront - 0.7)}" y="${ty(wcBotY + 1)+10}" fill="#555" font-size="6" text-anchor="end">on Beam 2 front face</text>`;
 
-      // Front-D panel cross-section, drawn TILTED 20° from vertical.
-      // We approximate by showing a thin parallelogram in the depth-height plane.
-      // Front D's back face starts a hair OUTBOARD of the wall cleat (toward player)
-      // and runs diagonally down-and-out. Simplification: draw it vertical-ish for
-      // legibility and call out the 20° tilt in the annotation.
-      const fdBack  = wcOuterX - 0.2;          // sits a hair forward of cleat tip
-      const fdFront = fdBack - CLEAT_T;         // panel thickness
-      const fdTop   = beamTop + 5;
-      const fdBot   = beamTop - CLEAT_H - 4;    // extends below the cleat
+      // Front D panel — drawn at z = wcOuterX (so its back face sits flush
+      // against the cleat A's bottom-far edge in this LOCKED-position view).
+      // Real panel tilts 20°; we draw vertical here for legibility and call
+      // out the tilt in the panel-card copy.
+      const fdBack  = wcOuterX;
+      const fdFront = fdBack - CLEAT_T;
+      const fdTop   = beamTop + 4;
+      const fdBot   = wcBotY - 5;
       c += `<rect x="${tx(fdFront)}" y="${ty(fdTop)}" width="${CLEAT_T*sc}" height="${(fdTop-fdBot)*sc}" fill="rgba(0,0,0,0.06)" stroke="#000" stroke-width="1.2"/>`;
       c += `<text x="${tx(fdFront - 0.3)}" y="${ty((fdTop+fdBot)/2)}" fill="#000" font-size="9" text-anchor="end">Front D</text>`;
-      c += `<text x="${tx(fdFront - 0.3)}" y="${ty((fdTop+fdBot)/2)-10}" fill="#555" font-size="6" text-anchor="end">(tilted 20°, simplified)</text>`;
+      c += `<text x="${tx(fdFront - 0.3)}" y="${ty((fdTop+fdBot)/2)-10}" fill="#555" font-size="6" text-anchor="end">(tilts 20°, drawn vertical)</text>`;
 
-      // Cabinet cleat (on Front D's back face) — mirror of the wall cleat, hooked
-      // over wall cleat. Vertices: top-back-corner (= back of Front D, top), down
-      // along Front D's back face, then the hypotenuse meeting the wall cleat's
-      // hypotenuse.
-      const ccVerticalX = fdBack;
-      const ccTopY = beamTop + 0.6;            // sits a hair above the wall cleat top
-      const ccBotY = ccTopY - CLEAT_H;
-      const ccOuterX = fdBack + CLEAT_H;
+      // Cabinet cleat (cleat B) — top-left triangle of the cleat square.
+      // Vertices: top-far, top-near-Front-D, bottom-near-Front-D. Right
+      // angle at top-near-Front-D. Hypotenuse coincides with cleat A's
+      // hypotenuse. In this drawing the cleats are shown LOCKED — cleat
+      // B sitting on cleat A.
       const cabCleat = [
-        [ccVerticalX, ccTopY],
-        [ccVerticalX, ccBotY],
-        [ccOuterX,    ccBotY],
+        [beamFront, beamTop],     // top-far (touching cleat A's apex)
+        [fdBack,    beamTop],     // top-near-Front-D (right angle)
+        [fdBack,    wcBotY],      // bottom-near-Front-D
       ];
       c += `<polygon points="${cabCleat.map(p => `${tx(p[0])},${ty(p[1])}`).join(' ')}" fill="rgba(0,0,0,0.14)" stroke="#000" stroke-width="1"/>`;
-      c += `<text x="${tx(fdBack + 0.2)}" y="${ty(ccBotY + 0.5)+3}" fill="#000" font-size="7" font-weight="700">cleat B</text>`;
+      c += `<text x="${tx((fdBack + beamFront)/2)}" y="${ty(beamTop)-3}" fill="#000" font-size="8" text-anchor="middle" font-weight="700">cleat B</text>`;
+      c += `<text x="${tx(fdBack)+3}" y="${ty(beamTop)-12}" fill="#555" font-size="6">on Front D back</text>`;
 
-      // Annotation arrow: drop direction
+      // Drop-direction arrow showing how Front D engages the cleat.
+      const arrX = fdFront - 1.2;
       const arrTopY = fdTop + 1.5;
-      const arrBotY = beamTop + 1.5;
-      const arrX = fdFront + CLEAT_T + 0.3;
+      const arrBotY = beamTop;
       c += `<line x1="${tx(arrX)}" y1="${ty(arrTopY)}" x2="${tx(arrX)}" y2="${ty(arrBotY)}" stroke="#000" stroke-width="1.2"/>`;
-      // arrowhead
-      c += `<polygon points="${tx(arrX)-4},${ty(arrBotY)-6} ${tx(arrX)+4},${ty(arrBotY)-6} ${tx(arrX)},${ty(arrBotY)}" fill="#000"/>`;
-      c += `<text x="${tx(arrX) + 6}" y="${ty((arrTopY+arrBotY)/2) + 3}" fill="#000" font-size="8">drop Front D in</text>`;
+      c += `<polygon points="${tx(arrX)-4},${ty(arrBotY)+6} ${tx(arrX)+4},${ty(arrBotY)+6} ${tx(arrX)},${ty(arrBotY)}" fill="#000"/>`;
+      c += `<text x="${tx(arrX) - 4}" y="${ty((arrTopY+arrBotY)/2) + 3}" fill="#000" font-size="8" text-anchor="end">drop Front D</text>`;
 
-      // Caption + axis
-      c += `<text x="${tx(7)}" y="${padPx + 6}" fill="#000" font-size="11" text-anchor="middle" font-weight="700">Cross-section · French cleat</text>`;
+      // Captions
+      c += `<text x="${tx(7)}" y="${padPx + 6}" fill="#000" font-size="11" text-anchor="middle" font-weight="700">Cross-section · French cleat (locked)</text>`;
       c += `<text x="${tx(0)}" y="${ty(0) + 16}" fill="#555" font-size="7">← player side  ·  cabinet interior →</text>`;
 
       svg.innerHTML = c;
@@ -1497,9 +1526,9 @@ document.addEventListener('DOMContentLoaded', () => {
     {
       const tbody = document.getElementById('kd2-hardware-body');
       const rows = [
-        ['Piano hinge 50 cm (Side R ↔ Roof)', '1', 'D→E edge'],
-        ['Butt hinge 40 mm', '4', '2 per beam-to-Side-R joint'],
-        ['Corner bracket 40 × 40 mm (4 holes)', '8', '2 per beam-end at Side L; rest for shelves'],
+        ['Piano hinge 50 cm (Side R ↔ Roof)', '1', 'D→E edge of Side R'],
+        ['Butt hinge 40 mm (beams ↔ Side L)', '4', '2 per beam, both at Side L'],
+        ['Corner bracket 40 × 40 mm (4 holes)', '8', '2 at the free beam ends (Side R); rest for shelves'],
         ['Wing-nut bolt M6 × 30 mm (incl. nut)', '16', '2 per bracket'],
         ['Cross-dowel barrel nut M6', '16', 'embedded in side panels for the wing-nut threads'],
         ['Hardwood 4 × 3 cm × 1.5 m', '1', 'rip into 2 × 54 cm beams'],
@@ -1519,8 +1548,8 @@ document.addEventListener('DOMContentLoaded', () => {
       const LH = Math.round(LOGO_H*10)/10;
       const SD = Math.round(SOFFIT_D*10)/10;
       const rows = [
-        ['Sub-assembly 1 (Side R + Roof + 2 beams folded)', '50 × 95 × ~5'],
-        ['Side L', `50 × 95 × ${T}`],
+        ['Sub-assembly 1 (Side R + Roof folded)', '50 × 95 × 3'],
+        ['Sub-assembly 2 (Side L + 2 beams folded)', `50 × 95 × ~5`],
         ['Front D', `${INNER_W} × ${FP_SURF} × ${T}`],
         ['Soffit G', `${INNER_W} × ${SD} × ${T}`],
         ['Logo F (acrylic + foam + LED)', `${INNER_W} × ${LH} × ~1`],
@@ -1715,36 +1744,54 @@ document.addEventListener('DOMContentLoaded', () => {
     <strong>Chosen build approach.</strong> The conformat scheme above
     works but is slow at the booth. v2 trades a small amount of hardware
     complexity for a tool-free 3-minute assembly that survives many
-    transport cycles. <strong>Side R + Roof</strong> are hinged into one
-    folding sub-assembly. <strong>Two horizontal cross-rails</strong>
-    (~54 cm long, 4 × 3 cm cross-section) are also hinged to Side R and
-    fold flat against it for transport; when deployed they span the
-    cabinet width and bolt to Side L with wing nuts. The
+    transport cycles. The hinges are split across BOTH side panels so
+    nothing competes for stack-height with anything else:
+    <strong>Side R + Roof</strong> are hinged together (Roof folds flat
+    against Side R via a long piano hinge along D→E).
+    <strong>Side L + two horizontal cross-rails</strong> form the second
+    sub-assembly — the rails (~54 cm long, 4 × 3 cm cross-section) hinge
+    to Side L's interior face at corners A and B and fold up/down so
+    they sit entirely within Side L's polygon. When deployed, the rails
+    bridge across to Side R and bolt with wing nuts. The
     <strong>Front panel</strong> hangs from a <strong>French cleat</strong>
     on the upper rail — no fasteners, no tools, slides on under its own
     weight.
   </p>
 
   <div class="panels">
-    <div class="panel-card" style="flex: 1.1">
-      <h3>Side R — folded transport state (interior view)</h3>
+    <div class="panel-card" style="flex: 1">
+      <h3>Sub-assembly 1 · Side R + Roof — folded</h3>
       <p class="qty">
-        Roof folds down along the D→E hinge (long piano hinge). Beam 1
-        and Beam 2 fold up/down against the inside face of Side R via
-        small butt hinges at corners A and B. Everything stays inside
-        the polygon footprint — sub-assembly bounding box ≈ 50 × 95 cm,
-        same as Side R alone.
+        Roof folds down along the D→E piano hinge. The folded roof's
+        projection extends past Side R's polygon to the upper-left
+        (dashed area outside the panel outline) — that's expected and
+        OK; the folded sub-assembly is still flatter than the un-hinged
+        crate version.
       </p>
-      <svg id="kd2-folded-svg"></svg>
+      <svg id="kd2-folded-r-svg"></svg>
     </div>
     <div class="panel-card" style="flex: 1">
-      <h3>French-cleat detail — Beam 2 ↔ Front D</h3>
+      <h3>Sub-assembly 2 · Side L + 2 cross-rails — folded</h3>
+      <p class="qty">
+        Beam 1 hinges at corner A (front-bottom) and folds up along
+        Side L's front edge. Beam 2 hinges at corner B (top of the
+        tilted-front cut) and folds down. Both rails sit entirely
+        within Side L's polygon — no overhang, sub-assembly bounding
+        box ≈ 50 × 95 cm.
+      </p>
+      <svg id="kd2-folded-l-svg"></svg>
+    </div>
+    <div class="panel-card" style="flex: 1.05">
+      <h3>French-cleat detail · Beam 2 ↔ Front D</h3>
       <p class="qty">
         Cross-section in the depth-height plane at the top of the front
-        panel. 45° bevel on Beam 2 points up-and-toward-the-player; the
-        matching bevel on Front D's back points down-and-toward-the-back.
-        Drop Front D in: cleats interlock under gravity. To remove, lift
-        straight up.
+        panel. The wall cleat (on Beam 2's front face) has its 45° bevel
+        going DOWN-AND-OUT from the top of the beam to the lower-far
+        corner. The cabinet cleat on Front D's back is the mirror —
+        bevel UP-AND-IN. Cabinet cleat drops vertically onto wall cleat;
+        the diagonal faces mate and gravity locks them.
+        Front panel still sits at its normal 20° tilt — the cleat
+        carries that tilt at the joint.
       </p>
       <svg id="kd2-cleat-svg"></svg>
     </div>
@@ -1765,7 +1812,7 @@ document.addEventListener('DOMContentLoaded', () => {
       </p>
     </div>
     <div class="panel-card" style="flex: 1">
-      <h3>Transport packing — 7 flat pieces</h3>
+      <h3>Transport packing — 7 pieces (2 sub-assemblies + 5 loose panels)</h3>
       <table>
         <thead><tr><th>Item</th><th>Size (cm)</th></tr></thead>
         <tbody id="kd2-transport-body"></tbody>
@@ -1781,8 +1828,8 @@ document.addEventListener('DOMContentLoaded', () => {
   <div class="panel-card" style="margin-top: 16px">
     <h3>Assembly sequence</h3>
     <ol style="padding-left: 20px; font-size: 12px; line-height: 1.7;">
-      <li><strong>Open Sub-assembly 1.</strong> Unfold Roof from Side R (swings up around the D→E piano hinge). Unfold Beam 1 (swings down to horizontal at corner A) and Beam 2 (swings up to horizontal at corner B). ~15 sec.</li>
-      <li><strong>Stand Side L facing Side R.</strong> The free ends of Beam 1 and Beam 2 reach across to Side L. Bolt each beam end to Side L with a corner bracket + 2 wing nuts. ~1 min.</li>
+      <li><strong>Open both sub-assemblies.</strong> Sub-assembly 1: unfold Roof from Side R around the D→E piano hinge. Sub-assembly 2: unfold Beam 1 (rotates down from Side L's front-bottom corner A) and Beam 2 (rotates up from Side L's tilt-top corner B), both to horizontal. ~15 sec.</li>
+      <li><strong>Stand the two side panels facing each other.</strong> The free ends of Beam 1 and Beam 2 (on Side L) reach across to Side R's interior face at the matching corners. Bolt each beam end to Side R with a corner bracket + 2 wing nuts. ~1 min.</li>
       <li><strong>Drop Soffit (G)</strong> into the dadoes between the two side panels at Y = 77 cm. Tighten 4 wing nuts at the bracket corners. ~30 sec.</li>
       <li><strong>Drop Monitor shelf (H)</strong> into its dadoes at Y = 38 cm. 4 more wing nuts. ~30 sec.</li>
       <li><strong>Slide Mouse shelf (M)</strong> through the front-edge slots in both side panels. Friction-fit — no fasteners. ~10 sec.</li>
