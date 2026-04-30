@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Administration · Programme communauté — Naia</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="css/style.css" rel="stylesheet"><script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body data-page="admin-programme" data-section="admin">
+<div class="app-shell">
+  <aside class="sidebar"></aside>
+  <main class="main-area">
+    <header class="topbar"><div><div class="page-eyebrow">Administration · Programme communauté</div><div style="font-size:18px; font-weight:600">Catalogue d'activités</div></div><button class="btn btn-primary"><i data-lucide="plus"></i> Nouvelle activité</button></header>
+
+    <div class="page-content">
+      <div class="card" style="margin-bottom:14px">
+        <div class="card-head"><div class="card-head-title">Activités productrices de points</div><div style="display:flex; gap:8px"><select class="select" style="max-width:200px"><option>Toutes les catégories</option><option>Onboarding</option><option>Feature usage</option><option>Communauté</option><option>Apprentissage</option><option>Parrainage</option></select></div></div>
+        <table class="data-table">
+          <thead><tr><th>Activité</th><th>Catégorie</th><th>Trigger</th><th class="num" style="text-align:right">Pts</th><th>Cap</th><th>Statut</th><th></th></tr></thead>
+          <tbody>
+            <tr><td>Onboarding · étape complétée</td><td><span class="badge badge-cyan">Onboarding</span></td><td class="muted">In-process event</td><td class="num" style="text-align:right">+50</td><td class="muted">Par étape</td><td><span class="badge badge-green">Active</span></td><td><a href="#" class="link"><i data-lucide="edit-3" style="width:13px;height:13px"></i></a></td></tr>
+            <tr><td>Comparateur · première utilisation</td><td><span class="badge badge-blue">Feature usage</span></td><td class="muted">In-process · feature_code</td><td class="num" style="text-align:right">+50</td><td class="muted">1×/org</td><td><span class="badge badge-green">Active</span></td><td><a href="#" class="link"><i data-lucide="edit-3" style="width:13px;height:13px"></i></a></td></tr>
+            <tr><td>Simulation BTM · lancement</td><td><span class="badge badge-blue">Feature usage</span></td><td class="muted">In-process · feature_code</td><td class="num" style="text-align:right">+150</td><td class="muted">Max 2 / mois</td><td><span class="badge badge-amber">Beta</span></td><td><a href="#" class="link"><i data-lucide="edit-3" style="width:13px;height:13px"></i></a></td></tr>
+            <tr><td>Analyse de pertes générée</td><td><span class="badge badge-blue">Feature usage</span></td><td class="muted">In-process · feature_code</td><td class="num" style="text-align:right">+100</td><td class="muted">Max 1 / sem.</td><td><span class="badge badge-green">Active</span></td><td><a href="#" class="link"><i data-lucide="edit-3" style="width:13px;height:13px"></i></a></td></tr>
+            <tr><td>Réponse à une enquête</td><td><span class="badge badge-purple">Communauté</span></td><td class="muted">FR-SURVEY · auto</td><td class="num" style="text-align:right">+25</td><td class="muted">1× / enquête / user</td><td><span class="badge badge-green">Active</span></td><td><a href="#" class="link"><i data-lucide="edit-3" style="width:13px;height:13px"></i></a></td></tr>
+            <tr><td>Article · publication approuvée</td><td><span class="badge badge-purple">Communauté</span></td><td class="muted">Admin-verified</td><td class="num" style="text-align:right">+150</td><td class="muted">Par article</td><td><span class="badge badge-green">Active</span></td><td><a href="#" class="link"><i data-lucide="edit-3" style="width:13px;height:13px"></i></a></td></tr>
+            <tr><td>Commentaire approuvé</td><td><span class="badge badge-purple">Communauté</span></td><td class="muted">Admin-verified</td><td class="num" style="text-align:right">+25</td><td class="muted">4 / mois / user</td><td><span class="badge badge-green">Active</span></td><td><a href="#" class="link"><i data-lucide="edit-3" style="width:13px;height:13px"></i></a></td></tr>
+            <tr><td>Webinaire Naia · présence</td><td><span class="badge badge-purple">Apprentissage</span></td><td class="muted">Admin-verified</td><td class="num" style="text-align:right">+100</td><td class="muted">Par webinaire</td><td><span class="badge badge-green">Active</span></td><td><a href="#" class="link"><i data-lucide="edit-3" style="width:13px;height:13px"></i></a></td></tr>
+            <tr><td>Post LinkedIn · validé</td><td><span class="badge badge-cyan">Communauté</span></td><td class="muted">Self-report + admin</td><td class="num" style="text-align:right">+50</td><td class="muted">2× / mois / org</td><td><span class="badge badge-green">Active</span></td><td><a href="#" class="link"><i data-lucide="edit-3" style="width:13px;height:13px"></i></a></td></tr>
+            <tr><td>Jeu Naia · partie complétée</td><td><span class="badge badge-amber">Jeu</span></td><td class="muted">FR-GAME bridge</td><td class="num" style="text-align:right">jusqu'à +200</td><td class="muted">3 / campagne / email</td><td><span class="badge badge-green">Active</span></td><td><a href="#" class="link"><i data-lucide="edit-3" style="width:13px;height:13px"></i></a></td></tr>
+            <tr><td>Parrainage · filleul activé</td><td><span class="badge" style="background:rgba(236,72,153,0.18); color:#fbcfe8">Parrainage</span></td><td class="muted">Auto · org-to-org</td><td class="num" style="text-align:right">+100 / +100</td><td class="muted">Par filleul</td><td><span class="badge badge-green">Active</span></td><td><a href="#" class="link"><i data-lucide="edit-3" style="width:13px;height:13px"></i></a></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><div class="card-head-title">File d'attente · approbations</div><span class="badge badge-amber">12 en attente</span></div>
+        <table class="data-table">
+          <thead><tr><th>Type</th><th>Soumis par</th><th>Org.</th><th>Date</th><th>Détails</th><th></th></tr></thead>
+          <tbody>
+            <tr><td><span class="badge badge-cyan">Post LinkedIn</span></td><td>Sophie Legrand</td><td>Centrale de la Semois</td><td class="muted">il y a 2 h</td><td><a href="#" class="link" style="font-size:12px">Voir le post →</a></td><td><div style="display:flex; gap:6px"><button class="btn btn-sm btn-primary" style="padding:3px 8px">✓</button><button class="btn btn-sm btn-secondary" style="padding:3px 8px">✗</button></div></td></tr>
+            <tr><td><span class="badge badge-purple">Article</span></td><td>Pierre Renard</td><td>Centrale du Hérou</td><td class="muted">hier</td><td><a href="#" class="link" style="font-size:12px">« Optimiser un nettoyage de grille » · 1 240 mots</a></td><td><div style="display:flex; gap:6px"><button class="btn btn-sm btn-primary" style="padding:3px 8px">✓</button><button class="btn btn-sm btn-secondary" style="padding:3px 8px">✗</button></div></td></tr>
+            <tr><td><span class="badge badge-purple">Commentaire</span></td><td>Marc Dupont</td><td>Moulin du Bocq</td><td class="muted">hier</td><td class="muted" style="font-size:12px">Sur « Tendances pertes Q1 »</td><td><div style="display:flex; gap:6px"><button class="btn btn-sm btn-primary" style="padding:3px 8px">✓</button><button class="btn btn-sm btn-secondary" style="padding:3px 8px">✗</button></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="js/app.js"></script>
+</body></html>

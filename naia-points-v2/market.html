@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Communauté · Mises à jour marché — Naia</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="css/style.css" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body data-page="market">
+
+<div class="flex min-h-screen">
+  <aside class="sidebar w-60 flex-shrink-0 flex flex-col"></aside>
+
+  <main class="flex-1 min-w-0">
+
+    <div class="page-header">
+      <div class="page-title-row">
+        <div>
+          <div class="text-xs muted" style="font-weight:600; letter-spacing:0.06em; text-transform:uppercase">Communauté</div>
+          <h1 class="font-display page-title">Mises à jour marché</h1>
+          <p class="page-sub">Données automatisées — adaptées à votre région.</p>
+        </div>
+        <div class="flex items-center gap-3">
+          <select class="select" style="max-width:240px">
+            <option>Belgique · Province de Namur</option>
+            <option>France · Aude (11)</option>
+            <option>France · Ariège (09)</option>
+            <option>Suisse · Valais</option>
+          </select>
+          <span class="org-pill"><span class="avatar">MB</span>Moulin du Bocq</span>
+          <div id="v2-toggle"></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="community-tabs" class="community-tabs"></div>
+
+    <div class="page-content">
+
+      <!-- KPIs -->
+      <div class="grid gap-4 mb-6" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr))">
+        <div class="kpi-card">
+          <div class="kpi-label">Belpex base load (j-1)</div>
+          <div class="kpi-value tabular">92,40 €</div>
+          <div class="text-xs muted mt-1">+4,5 % vs sem. dernière</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">aFRR activation (j-1)</div>
+          <div class="kpi-value tabular">138 €</div>
+          <div class="text-xs muted mt-1">moyenne 24 h</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Pluviométrie (Namur, 7 j)</div>
+          <div class="kpi-value tabular">42 mm</div>
+          <div class="text-xs muted mt-1">au-dessus de la normale</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Indice EDF tarif</div>
+          <div class="kpi-value tabular">+2,3 %</div>
+          <div class="text-xs muted mt-1">vs même mois 2025</div>
+        </div>
+      </div>
+
+      <!-- Belpex chart -->
+      <div class="card mb-4">
+        <div class="card-head">
+          <div>
+            <div class="card-head-title">Prix spot — Belpex (€/MWh)</div>
+            <div class="text-xs muted mt-1">14 derniers jours · base + pointe</div>
+          </div>
+          <select class="select" style="max-width:140px"><option>14 jours</option><option>30 jours</option><option>90 jours</option></select>
+        </div>
+        <div class="card-body" style="height:300px"><div class="chart-container" style="height:100%"><canvas id="belpex-chart"></canvas></div></div>
+      </div>
+
+      <!-- Two-column: Rain & Mix -->
+      <div class="grid gap-4 mb-4" style="grid-template-columns: 1.4fr 1fr">
+        <div class="card">
+          <div class="card-head">
+            <div>
+              <div class="card-head-title">Pluviométrie quotidienne — Namur</div>
+              <div class="text-xs muted mt-1">30 derniers jours · source IRM</div>
+            </div>
+          </div>
+          <div class="card-body" style="height:260px"><div class="chart-container" style="height:100%"><canvas id="rain-chart"></canvas></div></div>
+        </div>
+        <div class="card">
+          <div class="card-head">
+            <div>
+              <div class="card-head-title">Mix de production — France (j-1)</div>
+              <div class="text-xs muted mt-1">Source : Datahub Enedis</div>
+            </div>
+          </div>
+          <div class="card-body" style="height:260px"><div class="chart-container" style="height:100%"><canvas id="mix-chart"></canvas></div></div>
+        </div>
+      </div>
+
+      <!-- Capacity over time -->
+      <div class="card mb-4">
+        <div class="card-head">
+          <div>
+            <div class="card-head-title">Capacité installée par filière — France</div>
+            <div class="text-xs muted mt-1">12 derniers mois · GW · données mensuelles</div>
+          </div>
+          <span class="badge badge-cyan"><i data-lucide="trending-up"></i> Mise à jour 23 avr.</span>
+        </div>
+        <div class="card-body" style="height:260px"><div class="chart-container" style="height:100%"><canvas id="capacity-chart"></canvas></div></div>
+      </div>
+
+      <!-- Source health -->
+      <div class="card">
+        <div class="card-head">
+          <div class="card-head-title">État des sources de données</div>
+          <span class="badge badge-green"><i data-lucide="check-circle-2"></i> Toutes opérationnelles</span>
+        </div>
+        <table class="data-table">
+          <thead>
+            <tr><th>Source</th><th>Type</th><th>Dernière mise à jour</th><th>Fréquence</th><th>Statut</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Belpex (EPEX SPOT BE)</td><td>Prix spot</td><td>il y a 12 min</td><td>horaire</td><td><span class="badge badge-green">OK</span></td></tr>
+            <tr><td>aFRR Elia</td><td>Capacité + activation</td><td>il y a 14 min</td><td>quart-horaire</td><td><span class="badge badge-green">OK</span></td></tr>
+            <tr><td>Datahub Enedis</td><td>Production mix FR</td><td>hier</td><td>quotidien</td><td><span class="badge badge-green">OK</span></td></tr>
+            <tr><td>IRM Belgique</td><td>Pluviométrie</td><td>il y a 35 min</td><td>quotidien</td><td><span class="badge badge-green">OK</span></td></tr>
+            <tr><td>EDF tarifs régulés</td><td>Indice prix</td><td>1 avr. 2026</td><td>mensuel</td><td><span class="badge badge-green">OK</span></td></tr>
+            <tr><td>RTE éCO2mix</td><td>Capacité installée</td><td>1 avr. 2026</td><td>mensuel</td><td><span class="badge badge-green">OK</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

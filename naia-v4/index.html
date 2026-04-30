@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tableau de bord — Naia</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="css/style.css" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body data-page="home" data-section="">
+
+<div class="app-shell">
+  <aside class="sidebar"></aside>
+
+  <main class="main-area">
+    <header class="topbar">
+      <div>
+        <div class="page-eyebrow">Aperçu global</div>
+        <div style="font-size:18px; font-weight:600">Tableau de bord</div>
+      </div>
+      <div class="topbar-meta">
+        <div class="plant">Toutes les centrales · 1.76 MW</div>
+        <div>2026 — année en cours</div>
+      </div>
+    </header>
+
+    <div class="page-content">
+
+      <!-- KPIs per #261: production this month / YTD / vs last year, facteur de charge -->
+      <div style="display:grid; gap:14px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); margin-bottom:18px">
+        <div class="kpi-card feature">
+          <div class="kpi-label"><i data-lucide="zap" style="width:13px;height:13px"></i> Production · ce mois</div>
+          <div class="kpi-value tabular">196 <span style="font-size:14px; color:var(--text-muted)">MWh</span></div>
+          <div class="kpi-delta up"><i data-lucide="trending-up"></i> +18 % vs avr. 2025</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label"><i data-lucide="calendar" style="width:13px;height:13px"></i> Production · YTD</div>
+          <div class="kpi-value tabular">854 <span style="font-size:14px; color:var(--text-muted)">MWh</span></div>
+          <div class="kpi-delta up"><i data-lucide="trending-up"></i> +9 % vs YTD 2025</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label"><i data-lucide="activity" style="width:13px;height:13px"></i> Facteur de charge · MTD</div>
+          <div class="kpi-value tabular">61 %</div>
+          <div class="kpi-delta muted">vs 58 % avr. 2025</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label"><i data-lucide="euro" style="width:13px;height:13px"></i> Revenus · YTD</div>
+          <div class="kpi-value tabular">78 240 €</div>
+          <div class="kpi-delta up"><i data-lucide="trending-up"></i> +14 %</div>
+        </div>
+      </div>
+
+      <!-- Main monthly chart with cumulative line -->
+      <div class="card" style="margin-bottom:18px">
+        <div class="card-head">
+          <div>
+            <div class="card-head-title">Production mensuelle &amp; cumul</div>
+            <div class="card-head-sub">12 derniers mois · barres : MWh / mois — ligne : cumul YTD</div>
+          </div>
+          <div style="display:flex; gap:8px">
+            <select class="select" style="max-width:200px"><option>12 derniers mois</option><option>2025</option><option>2024</option></select>
+            <button class="btn btn-secondary btn-sm" onclick="alert('Comparer à une autre période — wizard à venir')"><i data-lucide="git-compare"></i> Comparer</button>
+          </div>
+        </div>
+        <div class="card-body" style="height:340px"><div class="chart-container" style="height:100%"><canvas id="home-chart"></canvas></div></div>
+      </div>
+
+      <!-- Two columns: per-centrale snapshot + report wizard CTA -->
+      <div style="display:grid; gap:14px; grid-template-columns: 2fr 1fr">
+        <div class="card">
+          <div class="card-head">
+            <div class="card-head-title">Par centrale · ce mois</div>
+            <a href="production.html" class="link" style="font-size:12px">Voir Production →</a>
+          </div>
+          <table class="data-table">
+            <thead><tr><th>Centrale</th><th>Capacité</th><th class="num" style="text-align:right">MWh ce mois</th><th class="num" style="text-align:right">vs avr. 2025</th><th class="num" style="text-align:right">FdC</th></tr></thead>
+            <tbody>
+              <tr><td>Centrale des Moulins</td><td class="muted">450 kW</td><td class="num" style="text-align:right">82</td><td class="num" style="text-align:right; color:var(--accent-green)">+12 %</td><td class="num" style="text-align:right">63 %</td></tr>
+              <tr><td>Centrale d'Ariège</td><td class="muted">780 kW</td><td class="num" style="text-align:right">68</td><td class="num" style="text-align:right; color:var(--accent-green)">+22 %</td><td class="num" style="text-align:right">59 %</td></tr>
+              <tr><td>Moulin de la Lesse</td><td class="muted">320 kW</td><td class="num" style="text-align:right">28</td><td class="num" style="text-align:right; color:var(--accent-amber)">+4 %</td><td class="num" style="text-align:right">61 %</td></tr>
+              <tr><td>Moulin du Bocq</td><td class="muted">210 kW</td><td class="num" style="text-align:right">18</td><td class="num" style="text-align:right; color:var(--accent-red)">−8 %</td><td class="num" style="text-align:right">53 %</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><div class="card-head-title">Rapport mensuel</div></div>
+          <div class="card-body">
+            <p class="muted" style="font-size:13px; line-height:1.5; margin:0 0 14px">Générez un rapport PDF prêt-à-partager pour avril 2026 — production, pertes, comparaisons, contexte météo.</p>
+            <button class="btn btn-primary btn-block" onclick="alert('Wizard rapport mensuel — à définir : sélection centrales / période / sections / format')"><i data-lucide="file-plus"></i> Générer un rapport</button>
+            <a href="reports.html" class="btn btn-secondary btn-block" style="margin-top:8px"><i data-lucide="folder-open"></i> Voir les rapports précédents</a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Communauté · Gagner des points — Naia</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="css/style.css" rel="stylesheet"><script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body data-page="earn" data-section="community">
+<div class="app-shell">
+  <aside class="sidebar"></aside>
+  <main class="main-area">
+    <header class="topbar">
+      <div><div class="page-eyebrow">Communauté</div><div style="font-size:18px; font-weight:600">Gagner des points</div></div>
+      <div style="display:flex; gap:10px; align-items:center">
+        <span class="org-pill"><span class="avatar">MB</span>Moulin du Bocq</span>
+        <span class="points-pill"><i data-lucide="sparkles"></i><span class="tabular">3 450 pts</span></span>
+        <span class="tier-pill tier-silver"><i data-lucide="award" style="width:12px; height:12px"></i> Argent</span>
+      </div>
+    </header>
+
+    <div class="page-content">
+
+      <!-- KPIs at org-level -->
+      <div style="display:grid; gap:14px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); margin-bottom:18px">
+        <div class="kpi-card feature"><div class="kpi-label">Solde organisation</div><div class="kpi-value tabular">3 450</div><div style="font-size:12px; color:#bef264; margin-top:4px">+380 cette semaine</div></div>
+        <div class="kpi-card"><div class="kpi-label">Points gagnés (30 j)</div><div class="kpi-value tabular">+560</div><div class="kpi-delta muted">Marc 320 · Sophie 240</div></div>
+        <div class="kpi-card"><div class="kpi-label">Convertis en jetons</div><div class="kpi-value tabular">240</div><div class="kpi-delta muted">→ 24 jetons disponibles</div></div>
+        <div class="kpi-card"><div class="kpi-label">Vers le niveau Or</div><div class="kpi-value tabular" style="font-size:20px">550 pts</div><div style="height:6px; background:var(--bg-input); border-radius:999px; overflow:hidden; margin-top:8px"><div style="width:86%; height:100%; background:linear-gradient(90deg,#38bdf8,#84cc16); border-radius:999px"></div></div></div>
+      </div>
+
+      <!-- Game promo -->
+      <div class="card" style="margin-bottom:18px; background:linear-gradient(135deg, #1e293b, #0f1a32); border-color:rgba(56,189,248,0.3)">
+        <div style="display:flex; gap:16px; align-items:center; padding:18px 22px">
+          <div style="width:60px; height:60px; background:rgba(56,189,248,0.16); border:1px solid rgba(56,189,248,0.3); border-radius:14px; display:flex; align-items:center; justify-content:center; flex-shrink:0; color:#7dd3fc"><i data-lucide="gamepad-2" style="width:26px; height:26px"></i></div>
+          <div style="flex:1">
+            <div style="font-weight:600; font-size:16px">Le jeu Naia est de retour à <i>Hydro 2026</i> — Lyon, du 12 au 14 mai</div>
+            <div class="muted" style="font-size:13px; margin-top:4px">Repérez les pertes sur un tableau de bord Naia, gagnez jusqu'à 200 points par partie. En ligne en juin.</div>
+          </div>
+          <a class="btn btn-cyan" href="community-agenda.html"><i data-lucide="calendar"></i> Voir l'agenda</a>
+        </div>
+      </div>
+
+      <!-- Chart -->
+      <div class="card" style="margin-bottom:18px">
+        <div class="card-head"><div><div class="card-head-title">Évolution des points · 12 dernières semaines</div><div class="card-head-sub">Partagé entre tous les utilisateurs de Moulin du Bocq</div></div></div>
+        <div class="card-body" style="height:300px"><div class="chart-container" style="height:100%"><canvas id="points-chart"></canvas></div></div>
+      </div>
+
+      <!-- Activities -->
+      <h3 style="font-size:13px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em; font-weight:600; margin: 0 0 10px">Découverte fonctionnalités · gagnez en testant</h3>
+      <div style="display:grid; gap:12px; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); margin-bottom:18px">
+        <div class="tile"><div class="tile-head"><span class="badge badge-blue">Plateforme · Nouveau</span><span class="tile-points">+50</span></div><div class="tile-title">Tester le Comparateur</div><div class="tile-desc">Comparez votre production à des références régionales similaires.</div><div class="tile-foot"><a href="production.html" class="btn btn-sm btn-primary">Essayer</a></div></div>
+        <div class="tile"><div class="tile-head"><span class="badge badge-blue">Plateforme · Beta</span><span class="tile-points">+150</span></div><div class="tile-title">Simulation BTM (preview)</div><div class="tile-desc">Évaluez un investissement batterie ou borne EV.</div><div class="tile-foot"><button class="btn btn-sm btn-primary">Tester</button></div></div>
+        <div class="tile"><div class="tile-head"><span class="badge badge-blue">Plateforme</span><span class="tile-points">+100</span></div><div class="tile-title">Lancer une analyse de pertes</div><div class="tile-desc">Identifiez vos gisements de performance.</div><div class="tile-foot"><span class="muted" style="font-size:11px">Max 1/sem.</span><button class="btn btn-sm btn-secondary">Lancer</button></div></div>
+      </div>
+
+      <h3 style="font-size:13px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em; font-weight:600; margin: 0 0 10px">Communauté</h3>
+      <div style="display:grid; gap:12px; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr))">
+        <div class="tile"><div class="tile-head"><span class="badge badge-purple">Enquête</span><span class="tile-points">+25</span></div><div class="tile-title">Combien payez-vous votre comptable ?</div><div class="tile-desc">Résultats publiés en mai · clôture le 30 avr.</div><div class="tile-foot"><a href="community-intelligence.html" class="btn btn-sm btn-primary">Répondre</a></div></div>
+        <div class="tile"><div class="tile-head"><span class="badge badge-cyan">LinkedIn</span><span class="tile-points">+50</span></div><div class="tile-title">Publier un post sur LinkedIn</div><div class="tile-desc">Mention de Naia + lien public · validation manuelle · 2×/mois max.</div><div class="tile-foot"><button class="btn btn-sm btn-secondary">Soumettre</button></div></div>
+        <div class="tile"><div class="tile-head"><span class="badge badge-amber">Jeu</span><span class="tile-points">jusqu'à +200</span></div><div class="tile-title">Jouer au jeu Naia</div><div class="tile-desc">Conférences ou en ligne · 3 parties par campagne.</div><div class="tile-foot"><a href="community-agenda.html" class="btn btn-sm btn-secondary">Agenda</a></div></div>
+        <div class="tile"><div class="tile-head"><span class="badge badge-pink" style="background:rgba(236,72,153,0.18); color:#fbcfe8">Parrainage</span><span class="tile-points">+100/+100</span></div><div class="tile-title">Inviter un opérateur</div><div class="tile-desc">Code MB-2026 · vous et le filleul recevez 100 pts à l'activation.</div><div class="tile-foot"><button class="btn btn-sm btn-primary">Inviter</button></div></div>
+      </div>
+
+    </div>
+  </main>
+</div>
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="js/app.js"></script>
+</body></html>

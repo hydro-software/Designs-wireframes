@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Communauté · Intelligence — Naia</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="css/style.css" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body data-page="intelligence">
+
+<div class="flex min-h-screen">
+  <aside class="sidebar w-60 flex-shrink-0 flex flex-col"></aside>
+
+  <main class="flex-1 min-w-0">
+
+    <div class="page-header">
+      <div class="page-title-row">
+        <div>
+          <div class="text-xs muted" style="font-weight:600; letter-spacing:0.06em; text-transform:uppercase">Communauté</div>
+          <h1 class="font-display page-title">Intelligence</h1>
+          <p class="page-sub">Articles, enquêtes et webinaires de la communauté Naia.</p>
+        </div>
+        <div class="flex items-center gap-3">
+          <span class="org-pill"><span class="avatar">MB</span>Moulin du Bocq</span>
+          <span class="points-pill"><i data-lucide="sparkles"></i><span class="tabular">3 450 pts</span></span>
+          <div id="v2-toggle"></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="community-tabs" class="community-tabs"></div>
+
+    <div class="page-content">
+
+      <!-- Survey in progress -->
+      <h2 class="font-display mb-3" style="font-size:18px">Enquête en cours</h2>
+      <div class="survey-card mb-6" style="background:linear-gradient(135deg,#f0f9ff,#e0f2fe); border-color:#bae6fd">
+        <div class="survey-icon" style="background:white; color:#0e7490"><i data-lucide="lightbulb" style="width:22px; height:22px"></i></div>
+        <div class="survey-body">
+          <div style="font-weight:600; font-size:16px">Combien payez-vous votre comptable annuellement ?</div>
+          <div class="survey-desc">5 questions, 3 minutes. Résultats publiés dans la newsletter de mai.</div>
+          <div class="survey-foot">
+            <div class="progress"><div class="progress-fill" style="width:62%"></div></div>
+            <span>62 % de la communauté a répondu</span>
+            <span style="margin-left:auto; font-weight:600; color:#16a34a">+25 pts à la réponse</span>
+            <button class="btn btn-primary btn-sm">Répondre</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Articles -->
+      <div class="flex justify-between items-center mb-3">
+        <h2 class="font-display" style="font-size:18px">Articles récents</h2>
+        <select class="select" style="max-width:240px">
+          <option>Toutes les rubriques</option>
+          <option>Marché électricité (Julien)</option>
+          <option>Nouveautés administratives</option>
+          <option>Effets climatologiques</option>
+          <option>Risques & assurance</option>
+          <option>Tendances Naia</option>
+          <option>Résultats d'enquête</option>
+        </select>
+      </div>
+
+      <div class="grid gap-4 mb-6" style="grid-template-columns: repeat(auto-fill, minmax(280px, 1fr))">
+        <a href="#" class="article-card" onclick="event.preventDefault(); alert('Article ouvert — +25 points à la première lecture')">
+          <div class="article-cover">
+            <div class="article-program-tag">Marché électricité</div>
+            <div style="font-size:36px; font-weight:700; color:rgba(255,255,255,0.85)">€/MWh</div>
+          </div>
+          <div class="article-body">
+            <div class="article-title">Q1 2026 — comment les prix spot ont évolué pour les petites centrales hydro</div>
+            <div class="article-excerpt">Décrochage prix de base / pointe, tendances aFRR, et ce que ça signifie pour la valorisation de votre flexibilité.</div>
+            <div class="article-meta"><span><i data-lucide="user"></i> Julien</span><span><i data-lucide="calendar"></i> 18 avr.</span><span><i data-lucide="message-square"></i> 12</span></div>
+          </div>
+        </a>
+
+        <a href="#" class="article-card" onclick="event.preventDefault(); alert('Article ouvert')">
+          <div class="article-cover v-amber">
+            <div class="article-program-tag">Nouveautés admin.</div>
+            <div style="font-size:36px; font-weight:700; color:rgba(255,255,255,0.85)">📋</div>
+          </div>
+          <div class="article-body">
+            <div class="article-title">Crédit d'impôt CIMR 2026 — ce qui change pour les petites centrales</div>
+            <div class="article-excerpt">Notre comptable partenaire détaille les évolutions et les pièges à éviter dans la déclaration.</div>
+            <div class="article-meta"><span><i data-lucide="user"></i> Cabinet Moreau</span><span><i data-lucide="calendar"></i> 12 avr.</span><span><i data-lucide="message-square"></i> 8</span></div>
+          </div>
+        </a>
+
+        <a href="#" class="article-card" onclick="event.preventDefault(); alert('Article ouvert')">
+          <div class="article-cover v-green">
+            <div class="article-program-tag">Effets climatologiques</div>
+            <div style="font-size:36px; font-weight:700; color:rgba(255,255,255,0.85)">🌧</div>
+          </div>
+          <div class="article-body">
+            <div class="article-title">Pluviométrie 2025 — bilan et perspectives 2026</div>
+            <div class="article-excerpt">Le Prof. Vandenberg (Liège) analyse les tendances pluvio sur les bassins versants des centrales Naia.</div>
+            <div class="article-meta"><span><i data-lucide="user"></i> Prof. Vandenberg</span><span><i data-lucide="calendar"></i> 5 avr.</span><span><i data-lucide="message-square"></i> 21</span></div>
+          </div>
+        </a>
+
+        <a href="#" class="article-card" onclick="event.preventDefault(); alert('Article ouvert')">
+          <div class="article-cover v-purple">
+            <div class="article-program-tag">Tendances Naia</div>
+            <div style="font-size:36px; font-weight:700; color:rgba(255,255,255,0.85)">📊</div>
+          </div>
+          <div class="article-body">
+            <div class="article-title">Top 5 des causes de pertes 2025 — extrait de la base Naia</div>
+            <div class="article-excerpt">Sur 95 centrales suivies, voici la répartition des pertes diagnostiquées et leurs durées moyennes.</div>
+            <div class="article-meta"><span><i data-lucide="user"></i> Équipe Naia</span><span><i data-lucide="calendar"></i> 28 mars</span><span><i data-lucide="message-square"></i> 17</span></div>
+          </div>
+        </a>
+
+        <a href="#" class="article-card" onclick="event.preventDefault(); alert('Article ouvert')">
+          <div class="article-cover v-rose">
+            <div class="article-program-tag">Risques & assurance</div>
+            <div style="font-size:36px; font-weight:700; color:rgba(255,255,255,0.85)">🛡</div>
+          </div>
+          <div class="article-body">
+            <div class="article-title">Assurer une centrale en zone inondable — état des lieux 2026</div>
+            <div class="article-excerpt">Notre courtier partenaire fait le tour des polices disponibles et des nouvelles exigences post-2024.</div>
+            <div class="article-meta"><span><i data-lucide="user"></i> Bureau Lambert</span><span><i data-lucide="calendar"></i> 22 mars</span><span><i data-lucide="message-square"></i> 5</span></div>
+          </div>
+        </a>
+
+        <a href="#" class="article-card" onclick="event.preventDefault(); alert('Article ouvert')">
+          <div class="article-cover">
+            <div class="article-program-tag">Résultats d'enquête</div>
+            <div style="font-size:36px; font-weight:700; color:rgba(255,255,255,0.85)">📈</div>
+          </div>
+          <div class="article-body">
+            <div class="article-title">Combien d'heures par semaine consacrez-vous à votre centrale ?</div>
+            <div class="article-excerpt">Synthèse de l'enquête de mars (62 répondants). Médiane : 4 h / semaine. Détails et nuances par tranche de capacité.</div>
+            <div class="article-meta"><span><i data-lucide="users"></i> 62 répondants</span><span><i data-lucide="calendar"></i> 15 mars</span><span><i data-lucide="message-square"></i> 9</span></div>
+          </div>
+        </a>
+      </div>
+
+      <!-- Survey results preview -->
+      <div class="card mb-6">
+        <div class="card-head">
+          <div>
+            <div class="card-head-title">Aperçu des résultats — enquête « Combien d'heures par semaine »</div>
+            <div class="text-xs muted mt-1">Mars 2026 · 62 répondants · les graphiques s'intègrent dans les articles via Tiptap (FR-RICHTEXT)</div>
+          </div>
+          <span class="badge badge-purple">Charts intégrables Tiptap</span>
+        </div>
+        <div class="card-body" style="height:280px"><div class="chart-container" style="height:100%"><canvas id="survey-chart"></canvas></div></div>
+      </div>
+
+      <!-- Webinars -->
+      <h2 class="font-display mb-3" style="font-size:18px">Webinaires & événements en ligne</h2>
+      <div class="grid gap-3" style="grid-template-columns: repeat(auto-fill, minmax(280px, 1fr))">
+        <div class="tile">
+          <div class="tile-head">
+            <span class="badge badge-blue"><i data-lucide="video"></i> Webinaire</span>
+            <span class="tile-points">+100 pts à la participation</span>
+          </div>
+          <div class="tile-title">Optimiser le programme de maintenance d'une Kaplan</div>
+          <div class="tile-desc">Le 7 mai 2026 à 14:00. Avec un opérateur du Tarn et l'équipe Naia.</div>
+          <div class="tile-foot"><span class="text-xs muted">42 inscrits</span><button class="btn btn-sm btn-primary">S'inscrire</button></div>
+        </div>
+        <div class="tile">
+          <div class="tile-head">
+            <span class="badge badge-blue"><i data-lucide="video"></i> Webinaire</span>
+            <span class="text-xs muted">Replay disponible</span>
+          </div>
+          <div class="tile-title">Lecture des écarts de production — masterclass Naia</div>
+          <div class="tile-desc">Enregistré le 12 mars. 47 minutes. Résumé des questions/réponses inclus.</div>
+          <div class="tile-foot"><span class="text-xs muted">128 vues</span><button class="btn btn-sm btn-secondary">Regarder</button></div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

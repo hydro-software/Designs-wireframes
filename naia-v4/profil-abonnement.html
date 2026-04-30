@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mon abonnement — Naia</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="css/style.css" rel="stylesheet"><script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body data-page="profil-abonnement" data-section="profil">
+<div class="app-shell">
+  <aside class="sidebar"></aside>
+  <main class="main-area">
+    <header class="topbar"><div><div class="page-eyebrow">Profil</div><div style="font-size:18px; font-weight:600">Mon abonnement</div></div><div class="topbar-meta"><div class="plant">PayPlug · pricing schedule v01</div><div>Renouvellement : 1 mai 2026</div></div></header>
+    <div class="centrale-tabs">
+      <a class="centrale-tab" href="profil.html"><span>Identité</span></a>
+      <a class="centrale-tab active" href="profil-abonnement.html"><span>Mon abonnement</span></a>
+      <a class="centrale-tab" href="profil-factures.html"><span>Mes factures</span></a>
+      <a class="centrale-tab" href="profil-jetons.html"><span>Mes jetons</span></a>
+    </div>
+
+    <div class="page-content">
+
+      <div style="display:grid; gap:14px; grid-template-columns: 2fr 1fr; margin-bottom:18px">
+
+        <div class="card">
+          <div class="card-head"><div><div class="card-head-title">Plan actuel</div><div class="card-head-sub">Mode tarification : per-plant · pricing v01</div></div><span class="badge badge-green"><i data-lucide="check-circle-2"></i> Actif</span></div>
+          <div class="card-body">
+            <div style="display:flex; align-items:baseline; gap:6px; padding-bottom:14px; border-bottom:1px solid var(--border-subtle); margin-bottom:14px">
+              <span style="font-size:34px; font-weight:600" class="tabular">50,00 €</span>
+              <span class="muted">/ mois (HT)</span>
+              <span style="margin-left:auto; font-size:12px" class="muted">Prochain prélèvement le 1 mai</span>
+            </div>
+
+            <h4 style="font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em; font-weight:600; margin:0 0 8px">Détail des lignes</h4>
+            <div style="border:1px solid var(--border-subtle); border-radius:8px; overflow:hidden">
+              <div style="display:grid; grid-template-columns: 2fr 1fr 1fr; gap:0; padding:12px 14px; border-bottom:1px solid var(--border-subtle); font-size:13px">
+                <div><b>Licence Naia tool</b><br><span class="muted" style="font-size:12px">Moulin du Bocq · 210 kW · bracket 250 kW–1 MW</span></div>
+                <div class="muted">Per-plant</div>
+                <div class="tabular" style="text-align:right">50,00 € / mois</div>
+              </div>
+              <div style="display:grid; grid-template-columns: 2fr 1fr 1fr; gap:0; padding:12px 14px; font-size:13px; opacity:0.55">
+                <div><b>Box hardware</b><br><span class="muted" style="font-size:12px">Aucune unité — disponible à 500 € + 10 €/mois</span></div>
+                <div class="muted">—</div>
+                <div class="muted" style="text-align:right">0,00 €</div>
+              </div>
+            </div>
+
+            <div style="display:flex; gap:8px; margin-top:14px">
+              <button class="btn btn-primary"><i data-lucide="zap"></i> Changer de mode (entreprise)</button>
+              <button class="btn btn-secondary"><i data-lucide="credit-card"></i> Changer le moyen de paiement</button>
+              <button class="btn btn-ghost" style="margin-left:auto" onclick="alert('Annulation de l\\'abonnement — flux PayPlug Customer Portal')">Annuler</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><div class="card-head-title">Comparaison entreprise vs per-plant</div></div>
+          <div class="card-body">
+            <p class="muted" style="font-size:13px; line-height:1.5; margin:0 0 14px">À votre échelle (1 centrale, 210 kW), le mode <b>per-plant</b> est moins cher.</p>
+            <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--border-subtle)"><span>Per-plant (actuel)</span><span class="tabular" style="font-weight:600; color:var(--accent-green)">50 €/m</span></div>
+            <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--border-subtle)"><span class="muted">Enterprise &lt; 10 MW</span><span class="muted tabular">510 €/m</span></div>
+            <div style="display:flex; justify-content:space-between; padding:8px 0"><span class="muted">Économie</span><span class="muted tabular">−460 €/m</span></div>
+            <p class="muted" style="font-size:12px; line-height:1.5; margin:14px 0 0">À partir de ~10 MW de capacité totale ou 8+ centrales, le mode entreprise devient avantageux. Vous serez prévenu (cf. FR-EXC-15).</p>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="card">
+        <div class="card-head"><div><div class="card-head-title">Pricing schedule v01</div><div class="card-head-sub">Vous êtes pinné sur cette version. Tout changement de tarif futur (v02, v03…) ne s'appliquera pas automatiquement à votre organisation.</div></div><span class="badge badge-cyan">v01 · 1 jan. 2026</span></div>
+        <div class="card-body">
+          <h4 style="font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em; font-weight:600; margin:0 0 8px">Brackets per-plant</h4>
+          <table class="data-table" style="font-size:12px">
+            <thead><tr><th>Capacité</th><th class="num" style="text-align:right">€/plant/mois</th></tr></thead>
+            <tbody>
+              <tr><td>&lt; 250 kW</td><td class="num" style="text-align:right">25 €</td></tr>
+              <tr style="background:var(--bg-card-hover)"><td><b>250 kW – 1 MW</b> ← votre bracket</td><td class="num" style="text-align:right; font-weight:600">50 €</td></tr>
+              <tr><td>1 – 5 MW</td><td class="num" style="text-align:right">100 €</td></tr>
+              <tr><td>5 – 10 MW</td><td class="num" style="text-align:right">250 €</td></tr>
+              <tr><td>&gt; 10 MW</td><td class="num" style="text-align:right">400 €</td></tr>
+            </tbody>
+          </table>
+          <p class="muted" style="font-size:12px; line-height:1.5; margin:12px 0 0">Conversion points → jetons : 10 points = 1 jeton, minimum 50 points. Ces taux font partie de la pricing schedule et bougent uniquement avec une nouvelle version (v02, v03…) approuvée par l'admin.</p>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="js/app.js"></script>
+</body></html>

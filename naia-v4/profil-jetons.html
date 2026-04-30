@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mes jetons — Naia</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="css/style.css" rel="stylesheet"><script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body data-page="profil-jetons" data-section="profil">
+<div class="app-shell">
+  <aside class="sidebar"></aside>
+  <main class="main-area">
+    <header class="topbar"><div><div class="page-eyebrow">Profil</div><div style="font-size:18px; font-weight:600">Mes jetons</div></div><div class="topbar-meta"><div>Solde organisation</div><div class="plant tabular" style="font-size:18px">24 jetons</div></div></header>
+    <div class="centrale-tabs">
+      <a class="centrale-tab" href="profil.html"><span>Identité</span></a>
+      <a class="centrale-tab" href="profil-abonnement.html"><span>Mon abonnement</span></a>
+      <a class="centrale-tab" href="profil-factures.html"><span>Mes factures</span></a>
+      <a class="centrale-tab active" href="profil-jetons.html"><span>Mes jetons</span></a>
+    </div>
+
+    <div class="page-content">
+
+      <div style="display:grid; gap:14px; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); margin-bottom:18px">
+        <div class="kpi-card feature">
+          <div class="kpi-label">Solde actuel</div>
+          <div class="kpi-value tabular">24 <span style="font-size:14px; color:var(--text-muted)">jetons</span></div>
+          <div style="font-size:12px; color:var(--text-muted); margin-top:6px">Org · partagé entre Marc et Sophie</div>
+        </div>
+        <div class="kpi-card"><div class="kpi-label">Acquis · achat direct</div><div class="kpi-value tabular">0</div><div class="kpi-delta muted">Pas d'achat sur cette org.</div></div>
+        <div class="kpi-card"><div class="kpi-label">Inclus dans l'abonnement</div><div class="kpi-value tabular">0</div><div class="kpi-delta muted">Plan per-plant : non inclus</div></div>
+        <div class="kpi-card"><div class="kpi-label">Issus de conversion points</div><div class="kpi-value tabular">24</div><div class="kpi-delta up">240 pts → 24 jetons (18 avr.)</div></div>
+      </div>
+
+      <div class="card" style="background:linear-gradient(135deg, rgba(132,204,22,0.10), rgba(56,189,248,0.10)); border-color: rgba(56,189,248,0.3); margin-bottom:14px">
+        <div class="card-body" style="display:flex; gap:14px; align-items:center">
+          <div style="width:44px; height:44px; background:rgba(56,189,248,0.18); border-radius:12px; display:flex; align-items:center; justify-content:center; color:#7dd3fc; flex-shrink:0"><i data-lucide="arrow-right-left"></i></div>
+          <div style="flex:1">
+            <div style="font-weight:600">Convertir des points Naia en jetons</div>
+            <div class="muted" style="font-size:13px; margin-top:2px">Solde points : <b>3 450 pts</b> · taux 10 points = 1 jeton · minimum 50 points</div>
+          </div>
+          <a class="btn btn-cyan" href="community-rewards.html"><i data-lucide="arrow-right-left"></i> Aller à Récompenses</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><div class="card-head-title">Historique d'utilisation et d'acquisition</div></div>
+        <table class="data-table">
+          <thead><tr><th>Date</th><th>Action</th><th>Source / utilisation</th><th>Utilisateur</th><th class="num" style="text-align:right">Δ jetons</th><th class="num" style="text-align:right">Solde</th></tr></thead>
+          <tbody>
+            <tr><td class="tabular">22 avr.</td><td><span class="badge badge-amber"><i data-lucide="cpu"></i> Consommé</span></td><td>Simulation BTM · Centrale d'Ariège</td><td>Sophie</td><td class="num" style="text-align:right; color:var(--accent-red); font-weight:600">−1</td><td class="num" style="text-align:right">24</td></tr>
+            <tr><td class="tabular">18 avr.</td><td><span class="badge badge-green"><i data-lucide="arrow-right-left"></i> Conversion</span></td><td>240 points → 24 jetons</td><td>Marc</td><td class="num" style="text-align:right; color:var(--accent-green); font-weight:600">+24</td><td class="num" style="text-align:right">25</td></tr>
+            <tr><td class="tabular">15 avr.</td><td><span class="badge badge-amber"><i data-lucide="file-text"></i> Consommé</span></td><td>Export rapport scénario · Moulins</td><td>Marc</td><td class="num" style="text-align:right; color:var(--accent-red); font-weight:600">−1</td><td class="num" style="text-align:right">1</td></tr>
+            <tr><td class="tabular">10 avr.</td><td><span class="badge badge-amber"><i data-lucide="cpu"></i> Consommé</span></td><td>Simulation BTM · Bocq</td><td>Marc</td><td class="num" style="text-align:right; color:var(--accent-red); font-weight:600">−1</td><td class="num" style="text-align:right">2</td></tr>
+            <tr><td class="tabular">2 avr.</td><td><span class="badge badge-blue"><i data-lucide="gift"></i> Promo</span></td><td>Bonus de bienvenue (compte créé en mars 2024)</td><td class="muted">Système</td><td class="num" style="text-align:right; color:var(--accent-green); font-weight:600">+3</td><td class="num" style="text-align:right">3</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </main>
+</div>
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="js/app.js"></script>
+</body></html>

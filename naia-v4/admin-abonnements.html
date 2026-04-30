@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin · Abonnements — Naia</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="css/style.css" rel="stylesheet"><script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body data-page="admin-abonnements" data-section="admin">
+<div class="app-shell">
+  <aside class="sidebar"></aside>
+  <main class="main-area">
+    <header class="topbar"><div><div class="page-eyebrow">Administration · Abonnements</div><div style="font-size:18px; font-weight:600">Clients</div></div><button class="btn btn-secondary btn-sm"><i data-lucide="download"></i> Export</button></header>
+
+    <div class="page-content">
+
+      <div style="display:grid; gap:14px; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); margin-bottom:18px">
+        <div class="kpi-card"><div class="kpi-label">Clients actifs</div><div class="kpi-value tabular">87</div><div class="kpi-delta up">+11 vs mois dernier</div></div>
+        <div class="kpi-card"><div class="kpi-label">MRR</div><div class="kpi-value tabular">8 240 €</div><div class="kpi-delta up">+12 %</div></div>
+        <div class="kpi-card"><div class="kpi-label">Health · à risque</div><div class="kpi-value tabular">7</div><div class="kpi-delta down">drill-down →</div></div>
+        <div class="kpi-card"><div class="kpi-label">Past-due</div><div class="kpi-value tabular">2</div><div class="kpi-delta down">350 € à recouvrer</div></div>
+        <div class="kpi-card"><div class="kpi-label">Sur schedule v01</div><div class="kpi-value tabular">87 / 87</div><div class="kpi-delta muted">100 %</div></div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <div style="display:flex; gap:8px">
+            <select class="select" style="max-width:140px"><option>Tous statuts</option><option>Trial</option><option>Active</option><option>Past-due</option><option>Lapsed</option></select>
+            <select class="select" style="max-width:140px"><option>Toutes pricing v.</option><option>v01</option></select>
+            <select class="select" style="max-width:160px"><option>Risk · tous</option><option>Healthy</option><option>Watch</option><option>At-risk</option><option>Critical</option></select>
+            <label style="font-size:12px; color:var(--text-muted); display:flex; gap:6px; align-items:center"><input type="checkbox"> Test subscribers</label>
+          </div>
+          <div style="display:flex; gap:8px"><input class="input" placeholder="Recherche…" style="max-width:200px"></div>
+        </div>
+        <table class="data-table">
+          <thead><tr><th>Client</th><th>Plan</th><th>Statut</th><th>Renouvel.</th><th class="num" style="text-align:right">MRR</th><th>Health</th><th>Dernier login</th><th>30/90 j</th><th></th></tr></thead>
+          <tbody>
+            <tr><td><b>Centrale de la Semois</b><br><span class="muted" style="font-size:11px">BE · Sophie Legrand</span></td><td><span class="badge badge-blue">Per-plant</span> 1 plant · 540 kW</td><td><span class="badge badge-green">Active</span></td><td class="muted">1 mai</td><td class="num" style="text-align:right">100 €</td><td><span class="badge badge-green">Healthy</span></td><td class="muted">il y a 2 h</td><td class="muted">28 / 76</td><td><a href="#" class="link" style="font-size:11px">Détails</a></td></tr>
+            <tr><td><b>Centrale d'Ariège</b><br><span class="muted" style="font-size:11px">FR · Claire Rousseau</span></td><td><span class="badge badge-blue">Per-plant</span> 1 plant · 780 kW</td><td><span class="badge badge-green">Active</span></td><td class="muted">8 mai</td><td class="num" style="text-align:right">100 €</td><td><span class="badge badge-green">Healthy</span></td><td class="muted">hier</td><td class="muted">22 / 64</td><td><a href="#" class="link" style="font-size:11px">Détails</a></td></tr>
+            <tr><td><b>Moulin de Hohenberg</b><br><span class="muted" style="font-size:11px">DE · Thomas Müller</span></td><td><span class="badge badge-blue">Per-plant</span> 2 plants · 850 kW total</td><td><span class="badge badge-green">Active</span></td><td class="muted">15 mai</td><td class="num" style="text-align:right">150 €</td><td><span class="badge badge-amber">Watch</span></td><td class="muted">il y a 3 j</td><td class="muted">12 / 48</td><td><a href="#" class="link" style="font-size:11px">Détails</a></td></tr>
+            <tr><td><b>Convert FMG</b><br><span class="muted" style="font-size:11px">FR · 9 plants</span></td><td><span class="badge badge-purple">Enterprise</span> 11 MW · 9 plants</td><td><span class="badge badge-green">Active</span></td><td class="muted">22 mai</td><td class="num" style="text-align:right">740 €</td><td><span class="badge badge-green">Healthy</span></td><td class="muted">aujourd'hui</td><td class="muted">29 / 88</td><td><a href="#" class="link" style="font-size:11px">Détails</a></td></tr>
+            <tr><td><b>Serengeti</b><br><span class="muted" style="font-size:11px">FR · 12 plants</span></td><td><span class="badge badge-purple">Enterprise</span> 78,9 MW · 12 plants</td><td><span class="badge badge-green">Active</span></td><td class="muted">5 juin</td><td class="num" style="text-align:right">1 100 €</td><td><span class="badge badge-green">Healthy</span></td><td class="muted">il y a 6 h</td><td class="muted">30 / 90</td><td><a href="#" class="link" style="font-size:11px">Détails</a></td></tr>
+            <tr><td><b>Moulin du Bocq</b><br><span class="muted" style="font-size:11px">BE · Marc Dupont</span></td><td><span class="badge badge-blue">Per-plant</span> 1 plant · 210 kW</td><td><span class="badge badge-green">Active</span></td><td class="muted">1 mai</td><td class="num" style="text-align:right">50 €</td><td><span class="badge badge-green">Healthy</span></td><td class="muted">aujourd'hui</td><td class="muted">26 / 78</td><td><a href="#" class="link" style="font-size:11px">Détails</a></td></tr>
+            <tr><td><b>Centrale d'Anjou</b><br><span class="muted" style="font-size:11px">FR · Pierre Lefebvre</span></td><td><span class="badge badge-blue">Per-plant</span> 1 plant · 320 kW</td><td><span class="badge badge-amber">Past-due</span></td><td class="muted">3 jours en retard</td><td class="num" style="text-align:right">50 €</td><td><span class="badge badge-red">At-risk</span></td><td class="muted">il y a 12 j</td><td class="muted">3 / 18</td><td><a href="#" class="link" style="font-size:11px">Détails</a></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </main>
+</div>
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="js/app.js"></script>
+</body></html>

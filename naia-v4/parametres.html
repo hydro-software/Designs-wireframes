@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Paramètres — Naia</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="css/style.css" rel="stylesheet"><script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body data-page="parametres" data-section="parametres" data-centrale="all">
+<div class="app-shell">
+  <aside class="sidebar"></aside>
+  <main class="main-area">
+    <header class="topbar">
+      <div><div class="page-eyebrow">Paramètres</div><div style="font-size:18px; font-weight:600">Configuration · vue d'ensemble</div></div>
+      <div class="topbar-meta"><div class="plant">4 centrales · 3 utilisateurs</div></div>
+    </header>
+
+    <div class="page-content">
+
+      <div class="v2-banner">
+        <i data-lucide="sparkles"></i>
+        <div><b>Évolution prévue (#261) :</b> tabs centrales en haut, "ALL" agrégé, premier indicateur sélectionné par défaut, ingestion intégrée 1-click, gestion des utilisateurs et rôles. Cette page représente l'état actuel — la refonte suit la replication.</div>
+      </div>
+
+      <!-- 3 sections per current state -->
+      <div style="display:grid; gap:14px; grid-template-columns: 1fr 1fr 1fr">
+        <div class="card">
+          <div class="card-head"><div class="card-head-title"><i data-lucide="user" style="width:14px; height:14px; display:inline; vertical-align:-2px"></i> Utilisateur</div></div>
+          <div class="card-body">
+            <p style="font-size:13px; line-height:1.5; margin:0 0 12px" class="muted">Profil personnel, langue, thème, sécurité, MFA.</p>
+            <div style="display:flex; flex-direction:column; gap:6px">
+              <a class="link" href="profil.html">→ Mon profil</a>
+              <a class="link" href="profil-abonnement.html">→ Mon abonnement</a>
+              <a class="link" href="profil-factures.html">→ Mes factures</a>
+              <a class="link" href="profil-jetons.html">→ Mes jetons</a>
+              <a class="link" href="#" onclick="event.preventDefault(); alert('Sécurité : mot de passe, 2FA, sessions actives. Bouge sous le profil avec #315.')">→ Sécurité &amp; MFA</a>
+              <a class="link" href="#" onclick="event.preventDefault(); alert('Définition d\'utilisateurs additionnels &amp; rôles — proposé en #261')">→ Utilisateurs &amp; rôles <span class="badge badge-amber" style="font-size:9px">à venir #261</span></a>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><div class="card-head-title"><i data-lucide="zap" style="width:14px; height:14px; display:inline; vertical-align:-2px"></i> Centrales</div></div>
+          <div class="card-body">
+            <p style="font-size:13px; line-height:1.5; margin:0 0 12px" class="muted">Infos centrales, sources de données, indicateurs &amp; comparateurs (création annuelle).</p>
+            <div style="display:flex; flex-direction:column; gap:8px; font-size:13px">
+              <a class="link" href="#">→ Centrale des Moulins · 450 kW</a>
+              <a class="link" href="#">→ Moulin du Bocq · 210 kW</a>
+              <a class="link" href="#">→ Centrale d'Ariège · 780 kW</a>
+              <a class="link" href="#">→ Moulin de la Lesse · 320 kW</a>
+              <a class="link" href="#" style="padding-top:6px"><i data-lucide="plus" style="width:12px;height:12px; display:inline; vertical-align:-2px"></i> Ajouter une centrale</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><div class="card-head-title"><i data-lucide="eye" style="width:14px; height:14px; display:inline; vertical-align:-2px"></i> Vue</div></div>
+          <div class="card-body">
+            <p style="font-size:13px; line-height:1.5; margin:0 0 12px" class="muted">Préférences d'affichage par défaut sur Production / Revenus / Données.</p>
+            <div style="display:flex; flex-direction:column; gap:6px">
+              <a class="link" href="#">→ Indicateurs préférés</a>
+              <a class="link" href="#">→ Comparateurs préférés</a>
+              <a class="link" href="#">→ Plages de dates par défaut</a>
+              <a class="link" href="#">→ Légende personnalisée</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <h3 style="font-size:13px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em; font-weight:600; margin: 22px 0 8px">Configuration par centrale (rare — 1× par an)</h3>
+      <div class="card">
+        <div class="card-body">
+          <p class="muted" style="font-size:13px; line-height:1.5; margin:0 0 14px">La création d'indicateurs ou de comparateurs concerne typiquement la mise en service ou un changement annuel de référence. L'upload quotidien des données se fait depuis <a href="data.html" class="link">Données</a>.</p>
+          <div style="display:flex; gap:8px; flex-wrap:wrap">
+            <button class="btn btn-secondary"><i data-lucide="plus"></i> Créer un indicateur</button>
+            <button class="btn btn-secondary"><i data-lucide="plus"></i> Créer un comparateur</button>
+            <button class="btn btn-secondary"><i data-lucide="upload"></i> Configurer une source SCADA</button>
+            <button class="btn btn-secondary"><i data-lucide="key"></i> Tokens API · ingestion automatique</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="js/app.js"></script>
+</body></html>

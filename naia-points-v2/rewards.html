@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Communauté · Récompenses — Naia</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="css/style.css" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body data-page="rewards">
+
+<div class="flex min-h-screen">
+  <aside class="sidebar w-60 flex-shrink-0 flex flex-col"></aside>
+
+  <main class="flex-1 min-w-0">
+    <div class="page-header">
+      <div class="page-title-row">
+        <div>
+          <div class="text-xs muted" style="font-weight:600; letter-spacing:0.06em; text-transform:uppercase">Communauté</div>
+          <h1 class="font-display page-title">Récompenses</h1>
+          <p class="page-sub">Échangez les points de votre organisation contre des avantages exclusifs.</p>
+        </div>
+        <div class="flex items-center gap-3">
+          <span class="org-pill"><span class="avatar">MB</span>Moulin du Bocq</span>
+          <span class="points-pill"><i data-lucide="sparkles"></i><span class="tabular">3 450 pts</span></span>
+          <div id="v2-toggle"></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="community-tabs" class="community-tabs"></div>
+
+    <div class="page-content">
+
+      <!-- Points-to-tokens conversion box -->
+      <div class="exchange-box mb-6">
+        <div class="flex items-start gap-4">
+          <div style="width:48px; height:48px; background:white; border-radius:12px; display:flex; align-items:center; justify-content:center; color:#92400e; flex-shrink:0; border:1px solid #fbbf24"><i data-lucide="arrow-right-left"></i></div>
+          <div style="flex:1">
+            <div style="font-weight:600; color:var(--naia-navy); font-size:15px">Convertir vos points en jetons Naia</div>
+            <div style="font-size:13px; color:#78350f; margin-top:4px; line-height:1.5">Les jetons Naia débloquent des fonctionnalités payantes de la plateforme — simulations BTM, exports avancés, scénarios marché personnalisés.</div>
+            <div class="exchange-rate-row mt-4">
+              <span class="pts">10 pts</span>
+              <i data-lucide="arrow-right" style="width:14px; height:14px"></i>
+              <span class="pts">1 jeton</span>
+              <span style="margin-left:14px; font-size:12px">Minimum : 50 points par conversion</span>
+            </div>
+            <div class="text-xs mt-2" style="color:#78350f">Taux d'échange défini par le module Subscription dans le pricing schedule v01 — il s'applique à votre organisation tant qu'elle reste sur ce schedule.</div>
+          </div>
+          <button class="btn btn-primary" onclick="openOverlay('convert-modal')" style="background:var(--naia-amber); align-self:start; flex-shrink:0">
+            <i data-lucide="arrow-right-left"></i> Convertir maintenant
+          </button>
+        </div>
+      </div>
+
+      <!-- Tabs -->
+      <div style="display:flex; gap:0; border-bottom:1px solid var(--naia-border); margin-bottom:20px">
+        <a class="community-tab active" style="border-bottom-color:var(--naia-blue); color:var(--naia-blue)">Catalogue</a>
+        <a class="community-tab">Mes échanges</a>
+      </div>
+
+      <!-- Access & experiences -->
+      <h3 style="font-size:13px; font-weight:600; color:var(--naia-text-muted); text-transform:uppercase; letter-spacing:0.06em; margin: 0 0 10px">Accès & expériences</h3>
+      <div class="grid gap-3 mb-6" style="grid-template-columns: repeat(auto-fill, minmax(260px, 1fr))">
+        <div class="tile">
+          <div class="tile-head"><span class="badge badge-cyan"><i data-lucide="message-circle"></i> Accès</span><span class="badge badge-green">Disponible</span></div>
+          <div class="tile-title">Session 1:1 expert marché</div>
+          <div class="tile-desc">30 min avec les analystes marché Naia.</div>
+          <div class="tile-foot"><span class="tile-cost"><i data-lucide="sparkles"></i>500 pts</span><button class="btn btn-sm btn-primary">Échanger</button></div>
+        </div>
+        <div class="tile">
+          <div class="tile-head"><span class="badge badge-cyan"><i data-lucide="rocket"></i> Accès</span><span class="badge badge-green">Disponible</span></div>
+          <div class="tile-title">Accès anticipé aux nouveautés</div>
+          <div class="tile-desc">Beta des futures fonctionnalités Naia pour votre organisation.</div>
+          <div class="tile-foot"><span class="tile-cost"><i data-lucide="sparkles"></i>400 pts</span><button class="btn btn-sm btn-primary">Échanger</button></div>
+        </div>
+        <div class="tile">
+          <div class="tile-head"><span class="badge badge-cyan"><i data-lucide="users"></i> Accès</span><span class="badge badge-amber">Premium</span></div>
+          <div class="tile-title">Siège conseil consultatif (trimestre)</div>
+          <div class="tile-desc">Participer au Naia Community Advisory Board.</div>
+          <div class="tile-foot"><span class="tile-cost"><i data-lucide="sparkles"></i>2 000 pts</span><button class="btn btn-sm btn-secondary" disabled>Insuffisant</button></div>
+        </div>
+        <div class="tile" style="opacity:0.55">
+          <div class="tile-head"><span class="badge badge-cyan"><i data-lucide="map-pin"></i> Accès</span><span class="badge badge-v2">V2</span></div>
+          <div class="tile-title">Visite de centrale prioritaire</div>
+          <div class="tile-desc">Premier accès aux prochaines visites avant ouverture publique.</div>
+          <div class="tile-foot"><span class="tile-cost"><i data-lucide="sparkles"></i>300 pts</span><button class="btn btn-sm btn-secondary" disabled>Disponible en V2</button></div>
+        </div>
+      </div>
+
+      <!-- Product (cross-layer) -->
+      <h3 style="font-size:13px; font-weight:600; color:var(--naia-text-muted); text-transform:uppercase; letter-spacing:0.06em; margin: 0 0 10px">Contenu & produit</h3>
+      <div class="grid gap-3 mb-6" style="grid-template-columns: repeat(auto-fill, minmax(260px, 1fr))">
+        <div class="tile">
+          <div class="tile-head"><span class="badge badge-blue"><i data-lucide="newspaper"></i> Contenu</span><span class="badge badge-green">Disponible</span></div>
+          <div class="tile-title">Article premium « Tendances pertes Q1 »</div>
+          <div class="tile-desc">Analyse approfondie des tendances de pertes sur la base Naia.</div>
+          <div class="tile-foot"><span class="tile-cost"><i data-lucide="sparkles"></i>150 pts</span><button class="btn btn-sm btn-primary">Échanger</button></div>
+        </div>
+        <div class="tile">
+          <div class="tile-head"><span class="badge badge-blue"><i data-lucide="cpu"></i> Plateforme</span><span class="badge badge-green">Disponible</span></div>
+          <div class="tile-title">10 jetons Naia (offre packagée)</div>
+          <div class="tile-desc">Pack équivalent à une simulation BTM ou plusieurs exports avancés.</div>
+          <div class="tile-foot"><span class="tile-cost"><i data-lucide="sparkles"></i>100 pts</span><button class="btn btn-sm btn-primary" onclick="openOverlay('convert-modal')">Convertir</button></div>
+        </div>
+        <div class="tile">
+          <div class="tile-head"><span class="badge badge-blue"><i data-lucide="layers"></i> Insight</span><span class="badge badge-green">Disponible</span></div>
+          <div class="tile-title">Analyse pertes multi-centrales</div>
+          <div class="tile-desc">Rapport comparatif sur l'ensemble de vos actifs.</div>
+          <div class="tile-foot"><span class="tile-cost"><i data-lucide="sparkles"></i>500 pts</span><button class="btn btn-sm btn-primary">Échanger</button></div>
+        </div>
+      </div>
+
+      <!-- Recognition (badges per user) -->
+      <h3 style="font-size:13px; font-weight:600; color:var(--naia-text-muted); text-transform:uppercase; letter-spacing:0.06em; margin: 0 0 10px">Reconnaissance — badges <span style="text-transform:none; letter-spacing:0; font-weight:500; color:var(--naia-text-subtle); margin-left:8px">attribués à un utilisateur particulier (Marc ou Sophie)</span></h3>
+      <div class="grid gap-3 mb-6" style="grid-template-columns: repeat(auto-fill, minmax(260px, 1fr))">
+        <div class="tile">
+          <div class="tile-head"><span class="badge badge-purple"><i data-lucide="shield"></i> Badge utilisateur</span><span class="badge badge-green">Disponible</span></div>
+          <div class="tile-title">Badge « Pionnier hydro »</div>
+          <div class="tile-desc">Visible sur votre profil personnel (vos collaborateurs ne le reçoivent pas automatiquement).</div>
+          <div class="tile-foot">
+            <span class="tile-cost"><i data-lucide="sparkles"></i>100 pts</span>
+            <select class="select" style="max-width:120px; padding:4px 24px 4px 8px; font-size:12px"><option>Pour Marc</option><option>Pour Sophie</option></select>
+          </div>
+        </div>
+        <div class="tile">
+          <div class="tile-head"><span class="badge badge-purple"><i data-lucide="book"></i> Badge utilisateur</span><span class="badge badge-green">Disponible</span></div>
+          <div class="tile-title">Badge « Contributeur savoir »</div>
+          <div class="tile-desc">5 articles ou commentaires approuvés. À choisir : Marc ou Sophie.</div>
+          <div class="tile-foot">
+            <span class="tile-cost"><i data-lucide="sparkles"></i>200 pts</span>
+            <button class="btn btn-sm btn-primary">Choisir</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- V2 — visits / co-investment -->
+      <h3 style="font-size:13px; font-weight:600; color:var(--naia-text-muted); text-transform:uppercase; letter-spacing:0.06em; margin: 0 0 10px">Disponible en V2</h3>
+      <div class="grid gap-3" style="grid-template-columns: repeat(auto-fill, minmax(260px, 1fr))">
+        <div class="tile" style="opacity:0.55">
+          <div class="tile-head"><span class="badge badge-slate"><i data-lucide="map-pin"></i> Visite</span><span class="badge badge-v2">V2</span></div>
+          <div class="tile-title">Visite de centrale partenaire</div>
+          <div class="tile-desc">Découvrez comment d'autres opérateurs gèrent leur centrale.</div>
+          <div class="tile-foot"><span class="tile-cost"><i data-lucide="sparkles"></i>300 pts</span><span class="text-xs muted">Phase ultérieure</span></div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<!-- Convert points to tokens modal -->
+<div id="convert-modal" class="overlay" onclick="if(event.target===this)closeOverlay('convert-modal')">
+  <div class="modal modal-lg">
+    <div class="flex justify-between items-start mb-4">
+      <div>
+        <div class="modal-title">Convertir des points en jetons</div>
+        <div class="modal-subtitle">Pricing schedule v01 — taux 10 points = 1 jeton — minimum 50 points</div>
+      </div>
+      <button class="btn btn-ghost" onclick="closeOverlay('convert-modal')"><i data-lucide="x"></i></button>
+    </div>
+
+    <div style="padding:14px 16px; background:#f8fafc; border-radius:10px; margin-bottom:16px">
+      <div style="display:flex; justify-content:space-between; align-items:center">
+        <div>
+          <div style="font-size:11px; color:var(--naia-text-muted); text-transform:uppercase; letter-spacing:0.04em; font-weight:600">Solde actuel — Moulin du Bocq</div>
+          <div style="font-size:22px; font-weight:600; margin-top:4px" class="tabular">3 450 pts</div>
+        </div>
+        <div style="font-size:13px; color:var(--naia-text-muted); text-align:right">Solde jetons actuel<br><b style="color:var(--naia-text); font-size:18px">24 jetons</b></div>
+      </div>
+    </div>
+
+    <label style="display:block; font-size:13px; font-weight:500; margin-bottom:6px">Combien de points convertir ?</label>
+    <input class="input" type="number" value="500" step="10" min="50" max="3450" id="convert-input" style="font-size:18px" oninput="document.getElementById('convert-tokens').textContent = Math.floor(this.value / 10) + ' jetons'">
+    <div style="font-size:13px; color:var(--naia-text-muted); margin-top:6px">→ <span id="convert-tokens" style="color:var(--naia-blue); font-weight:600">50 jetons</span></div>
+
+    <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:6px; margin-top:14px">
+      <button class="btn btn-secondary btn-sm" onclick="document.getElementById('convert-input').value=100; document.getElementById('convert-tokens').textContent='10 jetons'">100 pts</button>
+      <button class="btn btn-secondary btn-sm" onclick="document.getElementById('convert-input').value=500; document.getElementById('convert-tokens').textContent='50 jetons'">500 pts</button>
+      <button class="btn btn-secondary btn-sm" onclick="document.getElementById('convert-input').value=1000; document.getElementById('convert-tokens').textContent='100 jetons'">1 000 pts</button>
+      <button class="btn btn-secondary btn-sm" onclick="document.getElementById('convert-input').value=3450; document.getElementById('convert-tokens').textContent='345 jetons'">Tout</button>
+    </div>
+
+    <div style="padding:12px 14px; background:#fef3c7; border-radius:10px; font-size:12px; color:#78350f; margin-top:16px">
+      <b>Conversion irréversible.</b> Les points convertis disparaissent du solde communautaire. Les jetons restent disponibles sur votre compte Naia tant que votre abonnement est actif.
+    </div>
+
+    <div class="flex justify-end gap-2 mt-5">
+      <button class="btn btn-secondary" onclick="closeOverlay('convert-modal')">Annuler</button>
+      <button class="btn btn-primary" style="background:var(--naia-amber)" onclick="alert('Conversion confirmée — 500 pts → 50 jetons. Cette action a déclenché un appel in-process à services/subscription/tokens.convert_points_to_tokens(...) (ADR-001)'); closeOverlay('convert-modal')"><i data-lucide="check"></i> Confirmer la conversion</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Revenus — Naia</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="css/style.css" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body data-page="revenue" data-section="revenue" data-centrale="all">
+
+<div class="app-shell">
+  <aside class="sidebar"></aside>
+  <main class="main-area">
+    <header class="topbar">
+      <div>
+        <div class="page-eyebrow">Revenus</div>
+        <div style="font-size:18px; font-weight:600">Vue agrégée · 4 centrales</div>
+      </div>
+      <div class="topbar-meta"><div class="plant">YTD · 78 240 €</div><div>2026 — année en cours</div></div>
+    </header>
+    <div id="centrale-tabs" class="centrale-tabs"></div>
+
+    <div class="page-content">
+      <div style="display:grid; gap:14px; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); margin-bottom:18px">
+        <div class="kpi-card"><div class="kpi-label">Revenus · ce mois</div><div class="kpi-value tabular">17 840 €</div><div class="kpi-delta up"><i data-lucide="trending-up"></i> +18 %</div></div>
+        <div class="kpi-card"><div class="kpi-label">Revenus · YTD</div><div class="kpi-value tabular">78 240 €</div><div class="kpi-delta up"><i data-lucide="trending-up"></i> +14 %</div></div>
+        <div class="kpi-card"><div class="kpi-label">Prix moyen vendu · YTD</div><div class="kpi-value tabular">91,6 €/MWh</div><div class="kpi-delta muted">vs 88,4 € en 2025</div></div>
+        <div class="kpi-card"><div class="kpi-label">Manque à gagner (pertes)</div><div class="kpi-value tabular">3 410 €</div><div class="kpi-delta down">YTD</div></div>
+      </div>
+
+      <div class="card v2-banner" style="margin-bottom:14px">
+        <i data-lucide="rocket"></i>
+        <div><b>V2 :</b> module de simulation Valorise (BTM, batterie, digital twin) — visible dans le mockup pour validation, non livré en V1.</div>
+      </div>
+
+      <div class="card" style="margin-bottom:14px">
+        <div class="card-head">
+          <div class="card-head-title">Revenus quotidiens · 60 derniers jours</div>
+          <div style="display:flex; gap:8px"><button class="btn btn-secondary btn-sm"><i data-lucide="git-compare"></i> Comparateur</button><button class="btn btn-secondary btn-sm"><i data-lucide="download"></i> Export</button></div>
+        </div>
+        <div class="card-body" style="height:380px; padding:14px"><div class="chart-container" style="height:100%"><canvas id="production-chart"></canvas></div></div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><div class="card-head-title">Décomposition par centrale · YTD</div></div>
+        <table class="data-table">
+          <thead><tr><th>Centrale</th><th class="num" style="text-align:right">MWh produits</th><th class="num" style="text-align:right">Prix moyen</th><th class="num" style="text-align:right">Revenus</th><th class="num" style="text-align:right">Manque à gagner</th></tr></thead>
+          <tbody>
+            <tr><td>Centrale des Moulins</td><td class="num" style="text-align:right">232</td><td class="num" style="text-align:right">93,2 €</td><td class="num" style="text-align:right">21 620 €</td><td class="num" style="text-align:right; color:var(--accent-amber)">1 280 €</td></tr>
+            <tr><td>Centrale d'Ariège</td><td class="num" style="text-align:right">348</td><td class="num" style="text-align:right">91,8 €</td><td class="num" style="text-align:right">31 950 €</td><td class="num" style="text-align:right; color:var(--accent-amber)">880 €</td></tr>
+            <tr><td>Moulin de la Lesse</td><td class="num" style="text-align:right">142</td><td class="num" style="text-align:right">90,1 €</td><td class="num" style="text-align:right">12 790 €</td><td class="num" style="text-align:right; color:var(--accent-amber)">560 €</td></tr>
+            <tr><td>Moulin du Bocq</td><td class="num" style="text-align:right">132</td><td class="num" style="text-align:right">89,4 €</td><td class="num" style="text-align:right">11 880 €</td><td class="num" style="text-align:right; color:var(--accent-amber)">690 €</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

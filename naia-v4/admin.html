@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Administration — Naia</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="css/style.css" rel="stylesheet"><script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body data-page="admin-dashboard" data-section="admin">
+<div class="app-shell">
+  <aside class="sidebar"></aside>
+  <main class="main-area">
+    <header class="topbar"><div><div class="page-eyebrow">Administration</div><div style="font-size:18px; font-weight:600">Tableau de bord</div></div><div class="topbar-meta"><div>Vue cross-modules</div><div class="plant">112 clients · 87 actifs</div></div></header>
+
+    <div class="page-content">
+
+      <div class="v2-banner" style="margin-bottom:18px">
+        <i data-lucide="info"></i>
+        <div>L'admin couvre <b>les deux modules</b> : programme communauté (activités, récompenses, articles…) et abonnements (clients, factures, churn risk). La séparation interne reste stricte (rôles DB <code>community_app</code> et <code>subscription_app</code> par ADR-001).</div>
+      </div>
+
+      <h3 style="font-size:11px; color:var(--brand-cyan); text-transform:uppercase; letter-spacing:0.06em; font-weight:600; margin: 0 0 10px">Revenus &amp; abonnements</h3>
+      <div style="display:grid; gap:14px; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); margin-bottom:18px">
+        <div class="kpi-card"><div class="kpi-label">MRR</div><div class="kpi-value tabular">8 240 €</div><div class="kpi-delta up">+12 %</div></div>
+        <div class="kpi-card"><div class="kpi-label">Nouveau MRR · ce mois</div><div class="kpi-value tabular">+820 €</div><div class="kpi-delta up">3 nouveaux clients</div></div>
+        <div class="kpi-card"><div class="kpi-label">Churn MRR</div><div class="kpi-value tabular">−210 €</div><div class="kpi-delta down">1 résiliation</div></div>
+        <div class="kpi-card"><div class="kpi-label">Clients à risque</div><div class="kpi-value tabular">7</div><div class="kpi-delta down">drill-down →</div></div>
+      </div>
+
+      <h3 style="font-size:11px; color:var(--brand-cyan); text-transform:uppercase; letter-spacing:0.06em; font-weight:600; margin: 0 0 10px">Communauté · engagement</h3>
+      <div style="display:grid; gap:14px; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); margin-bottom:18px">
+        <div class="kpi-card"><div class="kpi-label">Membres actifs · 30 j</div><div class="kpi-value tabular">87</div><div class="kpi-delta up">+11 vs mois dernier</div></div>
+        <div class="kpi-card"><div class="kpi-label">Points émis · 30 j</div><div class="kpi-value tabular">14 280</div><div class="kpi-delta up">+24 %</div></div>
+        <div class="kpi-card"><div class="kpi-label">Points → jetons (30 j)</div><div class="kpi-value tabular">4 120 → 412</div><div class="kpi-delta muted">28 conversions</div></div>
+        <div class="kpi-card"><div class="kpi-label">Approbations en attente</div><div class="kpi-value tabular">12</div><div class="kpi-delta down">articles, posts LI…</div></div>
+      </div>
+
+      <div style="display:grid; gap:14px; grid-template-columns: 1fr 1fr">
+        <div class="card">
+          <div class="card-head"><div class="card-head-title">Raccourcis · programme communauté</div></div>
+          <div class="card-body" style="display:flex; flex-direction:column; gap:8px">
+            <a href="admin-programme.html" class="btn btn-secondary btn-block" style="justify-content:flex-start"><i data-lucide="zap"></i> Catalogue d'activités</a>
+            <a href="#" class="btn btn-secondary btn-block" style="justify-content:flex-start"><i data-lucide="gift"></i> Catalogue de récompenses</a>
+            <a href="#" class="btn btn-secondary btn-block" style="justify-content:flex-start"><i data-lucide="newspaper"></i> Articles &amp; newsletter (Tiptap)</a>
+            <a href="#" class="btn btn-secondary btn-block" style="justify-content:flex-start"><i data-lucide="lightbulb"></i> Enquêtes</a>
+            <a href="#" class="btn btn-secondary btn-block" style="justify-content:flex-start"><i data-lucide="calendar"></i> Agenda</a>
+            <a href="admin-membres.html" class="btn btn-secondary btn-block" style="justify-content:flex-start"><i data-lucide="users"></i> Membres communauté (vue light)</a>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><div class="card-head-title">Raccourcis · abonnements &amp; facturation</div></div>
+          <div class="card-body" style="display:flex; flex-direction:column; gap:8px">
+            <a href="admin-abonnements.html" class="btn btn-secondary btn-block" style="justify-content:flex-start"><i data-lucide="credit-card"></i> Clients (table complète)</a>
+            <a href="#" class="btn btn-secondary btn-block" style="justify-content:flex-start"><i data-lucide="alert-circle"></i> Queue de relances (dunning)</a>
+            <a href="#" class="btn btn-secondary btn-block" style="justify-content:flex-start"><i data-lucide="file-text"></i> Factures</a>
+            <a href="admin-pricing.html" class="btn btn-secondary btn-block" style="justify-content:flex-start"><i data-lucide="list-ordered"></i> Pricing schedules</a>
+            <a href="#" class="btn btn-secondary btn-block" style="justify-content:flex-start"><i data-lucide="settings"></i> PayPlug · paramètres</a>
+            <a href="#" class="btn btn-secondary btn-block" style="justify-content:flex-start"><i data-lucide="shield"></i> Audit log global</a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="js/app.js"></script>
+</body></html>

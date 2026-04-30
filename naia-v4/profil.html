@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mon profil — Naia</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="css/style.css" rel="stylesheet"><script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body data-page="profil" data-section="profil">
+<div class="app-shell">
+  <aside class="sidebar"></aside>
+  <main class="main-area">
+    <header class="topbar"><div><div class="page-eyebrow">Profil</div><div style="font-size:18px; font-weight:600">Mon profil</div></div></header>
+
+    <!-- Profile sub-tabs -->
+    <div class="centrale-tabs">
+      <a class="centrale-tab active" href="profil.html"><span>Identité</span></a>
+      <a class="centrale-tab" href="profil-abonnement.html"><span>Mon abonnement</span></a>
+      <a class="centrale-tab" href="profil-factures.html"><span>Mes factures</span></a>
+      <a class="centrale-tab" href="profil-jetons.html"><span>Mes jetons</span></a>
+      <a class="centrale-tab" href="#" onclick="event.preventDefault(); alert('Mes badges (Marc) — par utilisateur (Sophie a sa propre collection)')"><span>Mes badges</span></a>
+      <a class="centrale-tab" href="#" onclick="event.preventDefault(); alert('Sécurité &amp; MFA — couvert par #315')"><span>Sécurité</span></a>
+    </div>
+
+    <div class="page-content">
+
+      <div style="display:grid; gap:14px; grid-template-columns: 1.5fr 1fr">
+
+        <div class="card">
+          <div class="card-head"><div class="card-head-title">Identité</div><button class="btn btn-secondary btn-sm"><i data-lucide="edit-3"></i> Modifier</button></div>
+          <div class="card-body">
+            <div style="display:flex; gap:14px; align-items:center; padding-bottom:14px; border-bottom:1px solid var(--border-subtle); margin-bottom:14px">
+              <div class="avatar" style="width:54px; height:54px; font-size:18px">MD</div>
+              <div>
+                <div style="font-weight:600; font-size:18px">Marc Dupont</div>
+                <div class="muted" style="font-size:13px">marc.dupont@moulin.be</div>
+                <div style="margin-top:6px; display:flex; gap:6px"><span class="badge badge-purple"><i data-lucide="shield"></i> Pionnier hydro</span><span class="badge badge-green"><i data-lucide="flame"></i> Série 30 j</span></div>
+              </div>
+            </div>
+
+            <div style="display:flex; flex-direction:column; gap:0">
+              <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--border-subtle)"><span class="muted">Organisation</span><span>Moulin du Bocq</span></div>
+              <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--border-subtle)"><span class="muted">Pays</span><span>Belgique</span></div>
+              <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--border-subtle)"><span class="muted">Rôle organisation</span><span>Owner-operator</span></div>
+              <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--border-subtle)"><span class="muted">Membre depuis</span><span>mars 2024</span></div>
+              <div style="display:flex; justify-content:space-between; padding:8px 0"><span class="muted">Code parrainage org.</span><span style="font-family: monospace">MB-2026</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><div class="card-head-title">Mon organisation</div></div>
+          <div class="card-body">
+            <div style="display:flex; gap:14px; align-items:center; padding-bottom:14px; border-bottom:1px solid var(--border-subtle); margin-bottom:14px">
+              <div class="avatar" style="width:48px; height:48px; font-size:16px">MB</div>
+              <div><div style="font-weight:600">Moulin du Bocq</div><div class="muted" style="font-size:12px">2 utilisateurs · 1 centrale</div></div>
+            </div>
+            <div style="display:flex; justify-content:space-between; padding:6px 0"><span class="muted">Naia points (org.)</span><span class="points-pill"><i data-lucide="sparkles"></i><span class="tabular">3 450</span></span></div>
+            <div style="display:flex; justify-content:space-between; padding:6px 0"><span class="muted">Tier</span><span class="tier-pill tier-silver">Argent</span></div>
+            <div style="display:flex; justify-content:space-between; padding:6px 0"><span class="muted">Plan d'abonnement</span><span>Per-plant · 210 kW</span></div>
+            <div style="display:flex; justify-content:space-between; padding:6px 0"><span class="muted">Jetons disponibles</span><span class="tabular">24</span></div>
+            <a href="profil-abonnement.html" class="btn btn-secondary btn-block" style="margin-top:14px">Gérer l'abonnement</a>
+          </div>
+        </div>
+
+      </div>
+
+      <h3 style="font-size:13px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em; font-weight:600; margin: 22px 0 10px">Mes badges (Marc)</h3>
+      <div style="display:grid; gap:14px; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr))">
+        <div class="card" style="text-align:center; padding:18px">
+          <div style="width:56px; height:56px; margin:0 auto 10px; background:linear-gradient(135deg,#8b5cf6,#6d28d9); border-radius:50%; display:flex; align-items:center; justify-content:center; color:white; box-shadow:0 6px 16px -4px rgba(139,92,246,0.4)"><i data-lucide="shield" style="width:24px; height:24px"></i></div>
+          <div style="font-weight:600; font-size:13px">Pionnier hydro</div>
+          <div class="muted" style="font-size:11px; margin-top:4px">100 premiers membres</div>
+        </div>
+        <div class="card" style="text-align:center; padding:18px">
+          <div style="width:56px; height:56px; margin:0 auto 10px; background:linear-gradient(135deg,#f59e0b,#d97706); border-radius:50%; display:flex; align-items:center; justify-content:center; color:white"><i data-lucide="flame" style="width:24px; height:24px"></i></div>
+          <div style="font-weight:600; font-size:13px">Série de 30 jours</div>
+          <div class="muted" style="font-size:11px; margin-top:4px">Connexion quotidienne</div>
+        </div>
+        <div class="card" style="text-align:center; padding:18px; opacity:0.5">
+          <div style="width:56px; height:56px; margin:0 auto 10px; background:rgba(255,255,255,0.06); border-radius:50%; display:flex; align-items:center; justify-content:center"><i data-lucide="lock" style="width:22px; height:22px; color: var(--text-subtle)"></i></div>
+          <div style="font-weight:600; font-size:13px">Game Master</div>
+          <div class="muted" style="font-size:11px; margin-top:4px">Top 10 % au jeu Naia</div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="js/app.js"></script>
+</body></html>

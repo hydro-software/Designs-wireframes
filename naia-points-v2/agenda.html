@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Communauté · Agenda — Naia</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="css/style.css" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body data-page="agenda">
+
+<div class="flex min-h-screen">
+  <aside class="sidebar w-60 flex-shrink-0 flex flex-col"></aside>
+
+  <main class="flex-1 min-w-0">
+
+    <div class="page-header">
+      <div class="page-title-row">
+        <div>
+          <div class="text-xs muted" style="font-weight:600; letter-spacing:0.06em; text-transform:uppercase">Communauté</div>
+          <h1 class="font-display page-title">Agenda</h1>
+          <p class="page-sub">Conférences, webinaires et apparitions du jeu Naia.</p>
+        </div>
+        <div class="flex items-center gap-3">
+          <span class="org-pill"><span class="avatar">MB</span>Moulin du Bocq</span>
+          <div id="v2-toggle"></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="community-tabs" class="community-tabs"></div>
+
+    <div class="page-content">
+
+      <h2 class="font-display mb-3" style="font-size:18px">À venir</h2>
+
+      <div class="agenda-row">
+        <div class="agenda-date">
+          <div class="day">07</div>
+          <div class="month">Mai</div>
+        </div>
+        <div class="agenda-body">
+          <div class="agenda-title">Webinaire — Optimiser le programme de maintenance d'une Kaplan</div>
+          <div class="agenda-meta">
+            <span><i data-lucide="video"></i> En ligne · Zoom</span>
+            <span><i data-lucide="clock"></i> 14:00 – 15:00</span>
+            <span><i data-lucide="users"></i> 42 inscrits</span>
+          </div>
+        </div>
+        <span class="badge badge-blue"><i data-lucide="video"></i> Webinaire</span>
+        <button class="btn btn-primary btn-sm">S'inscrire</button>
+      </div>
+
+      <div class="agenda-row">
+        <div class="agenda-date">
+          <div class="day">12</div>
+          <div class="month">Mai</div>
+        </div>
+        <div class="agenda-body">
+          <div class="agenda-title">Hydro 2026 — Lyon · Le jeu Naia est sur place</div>
+          <div class="agenda-meta">
+            <span><i data-lucide="map-pin"></i> Lyon, FR · Cité Internationale</span>
+            <span><i data-lucide="calendar"></i> 12 – 14 mai</span>
+            <span><i data-lucide="gamepad-2"></i> Cabinet arcade — venez jouer</span>
+          </div>
+        </div>
+        <span class="badge badge-amber"><i data-lucide="gamepad-2"></i> Conférence + jeu</span>
+        <a href="#" class="btn btn-secondary btn-sm">Détails</a>
+      </div>
+
+      <div class="agenda-row">
+        <div class="agenda-date">
+          <div class="day">28</div>
+          <div class="month">Mai</div>
+        </div>
+        <div class="agenda-body">
+          <div class="agenda-title">Webinaire — Lecture des résultats de l'enquête comptable</div>
+          <div class="agenda-meta">
+            <span><i data-lucide="video"></i> En ligne · Zoom</span>
+            <span><i data-lucide="clock"></i> 11:00 – 12:00</span>
+            <span><i data-lucide="users"></i> 18 inscrits</span>
+          </div>
+        </div>
+        <span class="badge badge-blue"><i data-lucide="video"></i> Webinaire</span>
+        <button class="btn btn-primary btn-sm">S'inscrire</button>
+      </div>
+
+      <div class="agenda-row">
+        <div class="agenda-date">
+          <div class="day">15</div>
+          <div class="month">Juin</div>
+        </div>
+        <div class="agenda-body">
+          <div class="agenda-title">Le jeu Naia en ligne — campagne du printemps</div>
+          <div class="agenda-meta">
+            <span><i data-lucide="globe"></i> Web — version en ligne</span>
+            <span><i data-lucide="calendar"></i> 15 – 30 juin</span>
+            <span><i data-lucide="gamepad-2"></i> 3 parties par compte</span>
+          </div>
+        </div>
+        <span class="badge badge-amber"><i data-lucide="gamepad-2"></i> Jeu</span>
+        <a href="#" class="btn btn-secondary btn-sm">Détails</a>
+      </div>
+
+      <div class="agenda-row">
+        <div class="agenda-date">
+          <div class="day">02</div>
+          <div class="month">Juil</div>
+        </div>
+        <div class="agenda-body">
+          <div class="agenda-title">Rencontre opérateurs petite hydro — Genève</div>
+          <div class="agenda-meta">
+            <span><i data-lucide="map-pin"></i> Genève, CH · CICG</span>
+            <span><i data-lucide="calendar"></i> 2 – 3 juillet</span>
+            <span><i data-lucide="users"></i> Stand Naia + jeu</span>
+          </div>
+        </div>
+        <span class="badge badge-amber"><i data-lucide="gamepad-2"></i> Conférence + jeu</span>
+        <a href="#" class="btn btn-secondary btn-sm">Détails</a>
+      </div>
+
+      <h2 class="font-display mb-3 mt-6" style="font-size:18px">Passés</h2>
+
+      <div class="agenda-row" style="opacity:0.7">
+        <div class="agenda-date" style="opacity:0.6">
+          <div class="day">12</div>
+          <div class="month">Mars</div>
+        </div>
+        <div class="agenda-body">
+          <div class="agenda-title">Webinaire — Lecture des écarts de production (replay disponible)</div>
+          <div class="agenda-meta">
+            <span><i data-lucide="video"></i> En ligne</span>
+            <span><i data-lucide="users"></i> 128 vues replay</span>
+          </div>
+        </div>
+        <a href="intelligence.html" class="btn btn-secondary btn-sm">Voir le replay</a>
+      </div>
+
+      <div class="agenda-row" style="opacity:0.7">
+        <div class="agenda-date" style="opacity:0.6">
+          <div class="day">06</div>
+          <div class="month">Mars</div>
+        </div>
+        <div class="agenda-body">
+          <div class="agenda-title">Salon des Énergies Renouvelables — Bruxelles</div>
+          <div class="agenda-meta">
+            <span><i data-lucide="map-pin"></i> Bruxelles, BE</span>
+            <span><i data-lucide="gamepad-2"></i> 47 parties jouées au stand</span>
+          </div>
+        </div>
+        <a href="#" class="btn btn-ghost btn-sm">Bilan</a>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

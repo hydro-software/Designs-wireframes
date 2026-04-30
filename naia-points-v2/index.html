@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Communauté · Gagner des points — Naia</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="css/style.css" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body data-page="earn">
+
+<div style="background:linear-gradient(90deg,#fef3c7,#fde68a); border-bottom:1px solid #fbbf24; padding:12px 24px; display:flex; gap:14px; align-items:center; font-family:Inter,sans-serif">
+  <div style="font-size:18px">⚠</div>
+  <div style="font-size:13px; color:#78350f; line-height:1.4">
+    <b>Mockup intermédiaire — remplacé par <a href="../naia-v4/" style="color:#78350f; text-decoration:underline; font-weight:600">naia-v4</a>.</b> Conservé pour référence visuelle des patterns Community ; le mockup canonique de l'app intégrée (thème sombre, sidebar par centrale, Naia + Community + Subscription en un seul prototype) vit dans naia-v4.
+  </div>
+</div>
+
+<div class="flex min-h-screen">
+  <aside class="sidebar w-60 flex-shrink-0 flex flex-col"></aside>
+
+  <main class="flex-1 min-w-0">
+
+    <div class="page-header">
+      <div class="page-title-row">
+        <div>
+          <div class="text-xs muted" style="font-weight:600; letter-spacing:0.06em; text-transform:uppercase">Communauté</div>
+          <h1 class="font-display page-title">Gagner des points</h1>
+          <p class="page-sub">Votre organisation — <b>Moulin du Bocq</b> — accumule les points partagés entre tous ses utilisateurs.</p>
+        </div>
+        <div class="flex items-center gap-3">
+          <span class="org-pill">
+            <span class="avatar">MB</span>
+            Moulin du Bocq
+          </span>
+          <span class="points-pill">
+            <i data-lucide="sparkles"></i>
+            <span class="tabular">3 450 pts</span>
+          </span>
+          <span class="tier-pill tier-silver"><i data-lucide="award" style="width:12px; height:12px"></i> Argent</span>
+          <div id="v2-toggle"></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="community-tabs" class="community-tabs"></div>
+
+    <div class="page-content">
+
+      <!-- Game promo banner -->
+      <div class="game-card mb-6">
+        <div class="game-icon"><i data-lucide="gamepad-2"></i></div>
+        <div class="game-card-body">
+          <h3>Le jeu Naia est de retour à <i>Hydro 2026</i> — Lyon, du 12 au 14 mai</h3>
+          <p>Repérez les pertes sur un tableau de bord Naia, classez les causes, gagnez jusqu'à 200 points par partie. Apparaît également en ligne en juin.</p>
+        </div>
+        <a class="btn btn-primary" style="position:relative; background:#3b82f6" href="agenda.html">
+          <i data-lucide="calendar"></i> Voir l'agenda
+        </a>
+      </div>
+
+      <!-- Stats KPI -->
+      <div class="grid gap-4 mb-6" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr))">
+        <div class="kpi-card feature">
+          <div class="kpi-label">Solde organisation</div>
+          <div class="kpi-value tabular">3 450 <span style="font-size:13px; font-weight:500; color:rgba(255,255,255,0.6)">pts</span></div>
+          <div style="font-size:13px; color:#86efac; margin-top:6px">+380 cette semaine</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Points gagnés (30 j)</div>
+          <div class="kpi-value tabular">+560</div>
+          <div class="text-xs muted mt-1">Marc 320 · Sophie 240</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Points convertis en jetons</div>
+          <div class="kpi-value tabular">240</div>
+          <div class="text-xs muted mt-1">→ 24 jetons disponibles</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Vers le niveau Or</div>
+          <div class="kpi-value tabular" style="font-size:22px">550 pts</div>
+          <div style="height:8px; background:#e4e8ee; border-radius:999px; overflow:hidden; margin-top:10px">
+            <div style="width:86%; height:100%; background:linear-gradient(90deg,#06b6d4,#16a34a); border-radius:999px"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Points evolution + Activity feed -->
+      <div class="grid gap-4 mb-6" style="grid-template-columns: 2fr 1fr">
+        <div class="card">
+          <div class="card-head">
+            <div>
+              <div class="card-head-title">Évolution des points de l'organisation</div>
+              <div class="text-xs muted mt-1">12 dernières semaines · partagé entre Marc et Sophie</div>
+            </div>
+            <div class="flex gap-3 text-xs muted">
+              <span class="flex items-center gap-1"><span style="width:9px; height:9px; background:#16a34a; border-radius:50%; display:inline-block"></span> Gagnés</span>
+              <span class="flex items-center gap-1"><span style="width:9px; height:9px; background:#d97706; border-radius:50%; display:inline-block"></span> Dépensés</span>
+              <span class="flex items-center gap-1"><span style="width:9px; height:9px; background:#2563eb; border-radius:50%; display:inline-block"></span> Solde</span>
+            </div>
+          </div>
+          <div class="card-body" style="height: 320px">
+            <div class="chart-container" style="height:100%"><canvas id="points-chart"></canvas></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head">
+            <div class="card-head-title">Activité récente — organisation</div>
+          </div>
+          <div class="card-body" style="padding-top:6px; padding-bottom:6px">
+            <div class="activity-row">
+              <div class="activity-icon" style="background:#dbeafe; color:#1e40af"><i data-lucide="bar-chart-3"></i></div>
+              <div class="activity-main">
+                <div class="activity-title">Analyse des pertes générée — Bocq</div>
+                <div class="activity-meta">par Marc · aujourd'hui 14:23</div>
+              </div>
+              <div class="activity-points">+100</div>
+            </div>
+            <div class="activity-row">
+              <div class="activity-icon" style="background:#fef3c7; color:#92400e"><i data-lucide="gamepad-2"></i></div>
+              <div class="activity-main">
+                <div class="activity-title">Sophie a joué au jeu Naia (score 187)</div>
+                <div class="activity-meta">par Sophie · hier 18:45</div>
+              </div>
+              <div class="activity-points">+187</div>
+            </div>
+            <div class="activity-row">
+              <div class="activity-icon" style="background:#dcfce7; color:#15803d"><i data-lucide="message-square"></i></div>
+              <div class="activity-main">
+                <div class="activity-title">Réponse forum approuvée</div>
+                <div class="activity-meta">par Marc · 22 avr.</div>
+              </div>
+              <div class="activity-points">+50</div>
+            </div>
+            <div class="activity-row">
+              <div class="activity-icon" style="background:#ede9fe; color:#5b21b6"><i data-lucide="lightbulb"></i></div>
+              <div class="activity-main">
+                <div class="activity-title">Réponse à l'enquête « comptable »</div>
+                <div class="activity-meta">par Marc · 20 avr.</div>
+              </div>
+              <div class="activity-points">+25</div>
+            </div>
+            <div class="activity-row">
+              <div class="activity-icon" style="background:#fef3c7; color:#92400e"><i data-lucide="gift"></i></div>
+              <div class="activity-main">
+                <div class="activity-title">Conversion en jetons</div>
+                <div class="activity-meta">par Marc · 18 avr. · 240 pts → 24 jetons</div>
+              </div>
+              <div class="activity-points minus">−240</div>
+            </div>
+            <div class="activity-row">
+              <div class="activity-icon" style="background:#cffafe; color:#0e7490"><i data-lucide="zap"></i></div>
+              <div class="activity-main">
+                <div class="activity-title">Test du nouveau module « Comparateur »</div>
+                <div class="activity-meta">par Sophie · 15 avr.</div>
+              </div>
+              <div class="activity-points">+50</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Activity catalogue -->
+      <div class="flex justify-between items-end mb-3">
+        <h2 class="font-display" style="font-size:18px">Comment gagner des points</h2>
+        <span class="text-xs muted">Les points reviennent à votre organisation. Tout utilisateur de Moulin du Bocq peut les déclencher.</span>
+      </div>
+
+      <h3 style="font-size:13px; font-weight:600; color:var(--naia-text-muted); text-transform:uppercase; letter-spacing:0.06em; margin: 18px 0 10px">Onboarding & parrainage</h3>
+      <div class="grid gap-3" style="grid-template-columns: repeat(auto-fill, minmax(280px, 1fr))">
+        <div class="tile">
+          <div class="tile-head">
+            <span class="badge badge-cyan"><i data-lucide="user-plus"></i> Onboarding</span>
+            <span class="tile-points">+50 / étape</span>
+          </div>
+          <div class="tile-title">Compléter votre profil de centrale</div>
+          <div class="tile-desc">Ajoutez vos centrales, leur capacité, et connectez les premières données.</div>
+          <div class="tile-foot"><span class="text-xs muted">3/5 étapes</span><button class="btn btn-sm btn-primary">Continuer</button></div>
+        </div>
+        <div class="tile">
+          <div class="tile-head">
+            <span class="badge badge-pink"><i data-lucide="users"></i> Parrainage</span>
+            <span class="tile-points">+100 / +100</span>
+          </div>
+          <div class="tile-title">Inviter un autre opérateur</div>
+          <div class="tile-desc">Vous gagnez 100 points quand un nouvel abonné Naia s'active grâce à votre invitation. Lui aussi reçoit 100 points.</div>
+          <div class="tile-foot"><span class="text-xs muted">Code MB-2026</span><button class="btn btn-sm btn-primary">Inviter</button></div>
+        </div>
+      </div>
+
+      <h3 style="font-size:13px; font-weight:600; color:var(--naia-text-muted); text-transform:uppercase; letter-spacing:0.06em; margin: 22px 0 10px">Découverte des fonctionnalités Naia <span style="text-transform:none; letter-spacing:0; font-weight:500; color:var(--naia-text-subtle); margin-left:8px">— testez les nouveautés, gagnez des points, échangez-les contre des jetons</span></h3>
+      <div class="grid gap-3" style="grid-template-columns: repeat(auto-fill, minmax(280px, 1fr))">
+        <div class="tile">
+          <div class="tile-head">
+            <span class="badge badge-blue"><i data-lucide="zap"></i> Plateforme</span>
+            <span class="tile-points">+50</span>
+          </div>
+          <div class="tile-title">Tester le nouveau Comparateur</div>
+          <div class="tile-desc">Comparez la production de votre centrale à des références régionales similaires.</div>
+          <div class="tile-foot"><span class="badge badge-green">Nouveau</span><button class="btn btn-sm btn-primary">Essayer</button></div>
+        </div>
+        <div class="tile">
+          <div class="tile-head">
+            <span class="badge badge-blue"><i data-lucide="zap"></i> Plateforme</span>
+            <span class="tile-points">+100</span>
+          </div>
+          <div class="tile-title">Lancer une analyse des pertes</div>
+          <div class="tile-desc">Identifiez vos gisements de performance sur les 30 derniers jours.</div>
+          <div class="tile-foot"><span class="text-xs muted">Max 1 / sem.</span><button class="btn btn-sm btn-secondary">Lancer</button></div>
+        </div>
+        <div class="tile">
+          <div class="tile-head">
+            <span class="badge badge-blue"><i data-lucide="zap"></i> Plateforme</span>
+            <span class="tile-points">+150</span>
+          </div>
+          <div class="tile-title">Simulation BTM (preview)</div>
+          <div class="tile-desc">Une simulation behind-the-meter pour évaluer un investissement batterie ou borne EV.</div>
+          <div class="tile-foot"><span class="badge badge-amber">Beta</span><button class="btn btn-sm btn-primary">Tester</button></div>
+        </div>
+      </div>
+
+      <h3 style="font-size:13px; font-weight:600; color:var(--naia-text-muted); text-transform:uppercase; letter-spacing:0.06em; margin: 22px 0 10px">Communauté & contenu</h3>
+      <div class="grid gap-3" style="grid-template-columns: repeat(auto-fill, minmax(280px, 1fr))">
+        <div class="tile">
+          <div class="tile-head">
+            <span class="badge badge-purple"><i data-lucide="lightbulb"></i> Enquête</span>
+            <span class="tile-points">+25</span>
+          </div>
+          <div class="tile-title">Répondre à l'enquête en cours</div>
+          <div class="tile-desc">« Combien payez-vous votre comptable annuellement ? » — résultats publiés en mai.</div>
+          <div class="tile-foot"><span class="text-xs muted">Clôture le 30 avr.</span><a href="intelligence.html" class="btn btn-sm btn-primary">Répondre</a></div>
+        </div>
+        <div class="tile">
+          <div class="tile-head">
+            <span class="badge badge-purple"><i data-lucide="message-circle"></i> Article</span>
+            <span class="tile-points">+25</span>
+          </div>
+          <div class="tile-title">Commenter un article</div>
+          <div class="tile-desc">Un commentaire approuvé par la rédaction. Plafonné à 4 / mois et par utilisateur.</div>
+          <div class="tile-foot"><a href="intelligence.html" class="btn btn-sm btn-secondary">Voir les articles</a></div>
+        </div>
+        <div class="tile">
+          <div class="tile-head">
+            <span class="badge badge-cyan"><i data-lucide="linkedin"></i> LinkedIn</span>
+            <span class="tile-points">+50</span>
+          </div>
+          <div class="tile-title">Publier un post sur LinkedIn</div>
+          <div class="tile-desc">Mention de Naia avec un lien public. Validation manuelle par l'équipe Naia. 2× / mois max.</div>
+          <div class="tile-foot"><button class="btn btn-sm btn-secondary" onclick="alert('Soumettre le lien d\'un post LinkedIn pour validation')">Soumettre</button></div>
+        </div>
+        <div class="tile">
+          <div class="tile-head">
+            <span class="badge badge-amber"><i data-lucide="gamepad-2"></i> Jeu</span>
+            <span class="tile-points">jusqu'à +200</span>
+          </div>
+          <div class="tile-title">Jouer au jeu Naia</div>
+          <div class="tile-desc">Repérez les pertes en moins de 5 minutes. Conférences, en ligne. 3 parties max par campagne.</div>
+          <div class="tile-foot"><span class="text-xs muted">Prochain : Hydro 2026</span><a href="agenda.html" class="btn btn-sm btn-secondary">Agenda</a></div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

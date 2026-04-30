@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin · Pricing schedules — Naia</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="css/style.css" rel="stylesheet"><script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body data-page="admin-pricing" data-section="admin">
+<div class="app-shell">
+  <aside class="sidebar"></aside>
+  <main class="main-area">
+    <header class="topbar"><div><div class="page-eyebrow">Administration · Abonnements</div><div style="font-size:18px; font-weight:600">Pricing schedules</div></div><button class="btn btn-primary"><i data-lucide="copy-plus"></i> Cloner et créer v02</button></header>
+
+    <div class="page-content">
+
+      <div class="card" style="margin-bottom:14px">
+        <div class="card-head"><div><div class="card-head-title">Schedule v01 · Active</div><div class="card-head-sub">Effective depuis le 1 janvier 2026 · 87 / 87 clients pinnés</div></div><span class="badge badge-green">Active</span></div>
+        <div class="card-body">
+          <h4 style="font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em; font-weight:600; margin:0 0 8px">Per-plant · brackets</h4>
+          <table class="data-table" style="font-size:13px; margin-bottom:18px">
+            <thead><tr><th>Capacité</th><th class="num" style="text-align:right">€/plant/mois</th></tr></thead>
+            <tbody>
+              <tr><td>&lt; 250 kW</td><td class="num" style="text-align:right">25 €</td></tr>
+              <tr><td>250 kW – 1 MW</td><td class="num" style="text-align:right">50 €</td></tr>
+              <tr><td>1 – 5 MW</td><td class="num" style="text-align:right">100 €</td></tr>
+              <tr><td>5 – 10 MW</td><td class="num" style="text-align:right">250 €</td></tr>
+              <tr><td>&gt; 10 MW</td><td class="num" style="text-align:right">400 €</td></tr>
+            </tbody>
+          </table>
+          <h4 style="font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em; font-weight:600; margin:0 0 8px">Enterprise · capacity tiers (+ 10 €/plant add-on)</h4>
+          <table class="data-table" style="font-size:13px; margin-bottom:18px">
+            <thead><tr><th>Capacité totale</th><th class="num" style="text-align:right">€/mois</th></tr></thead>
+            <tbody>
+              <tr><td>&lt; 10 MW</td><td class="num" style="text-align:right">500 €</td></tr>
+              <tr><td>10 – 25 MW</td><td class="num" style="text-align:right">650 €</td></tr>
+              <tr><td>26 – 50 MW</td><td class="num" style="text-align:right">800 €</td></tr>
+              <tr><td>51 – 100 MW</td><td class="num" style="text-align:right">1 000 €</td></tr>
+              <tr><td>&gt; 100 MW</td><td class="num" style="text-align:right">1 500 €</td></tr>
+            </tbody>
+          </table>
+          <h4 style="font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em; font-weight:600; margin:0 0 8px">Hardware · Box</h4>
+          <p style="font-size:13px; margin:0 0 18px">500 € one-off + 10 € / mois / box</p>
+          <h4 style="font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em; font-weight:600; margin:0 0 8px">Conversion points → jetons</h4>
+          <p style="font-size:13px; margin:0">Taux : <b>10 points = 1 jeton</b> · Minimum : <b>50 points</b> par conversion</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><div class="card-head-title">Historique des schedules</div></div>
+        <table class="data-table">
+          <thead><tr><th>Version</th><th>Statut</th><th>Effective</th><th>Clients pinnés</th><th>Notes</th></tr></thead>
+          <tbody>
+            <tr><td><b>v01</b></td><td><span class="badge badge-green">Active</span></td><td class="muted">1 jan. 2026 → ∞</td><td class="num">87</td><td class="muted">Schedule initial · seedé depuis naia-pricing-v01.pdf</td></tr>
+            <tr style="opacity:0.55"><td>v02</td><td><span class="badge badge-slate">Draft</span></td><td class="muted">à activer</td><td class="num">0</td><td class="muted">Cloné de v01 · prix bracket 250-1 MW augmenté à 55 €</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </main>
+</div>
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="js/app.js"></script>
+</body></html>
