@@ -11,74 +11,116 @@
   <aside class="sidebar"></aside>
   <main class="main-area">
     <header class="topbar">
-      <div><div class="page-eyebrow">Paramètres</div><div style="font-size:18px; font-weight:600">Configuration · vue d'ensemble</div></div>
-      <div class="topbar-meta"><div class="plant">4 centrales · 3 utilisateurs</div></div>
+      <div>
+        <div class="page-eyebrow">Paramètres</div>
+        <div style="font-size:18px; font-weight:600">Mes centrales</div>
+      </div>
+      <button class="btn btn-primary"><i data-lucide="plus"></i> Ajouter une centrale</button>
     </header>
 
     <div class="page-content">
 
-      <div class="v2-banner">
-        <i data-lucide="sparkles"></i>
-        <div><b>Évolution prévue (#261) :</b> tabs centrales en haut, "ALL" agrégé, premier indicateur sélectionné par défaut, ingestion intégrée 1-click, gestion des utilisateurs et rôles. Cette page représente l'état actuel — la refonte suit la replication.</div>
+      <p class="muted" style="font-size:13px; max-width:760px; margin:0 0 18px">
+        Chaque centrale rassemble ses informations, ses compteurs, ses catégories de pertes,
+        sa tarification et ses indicateurs / comparateurs. Les paramètres utilisateur (profil,
+        abonnement, jetons, badges) sont accessibles depuis le menu profil en bas à gauche.
+      </p>
+
+      <!-- Plant cards — pattern from naia-v3/settings.html, adapted to dark theme + #261 v3 -->
+      <div style="display:flex; flex-direction:column; gap:10px; max-width:980px">
+
+        <a href="plant-detail.html?slug=moulins" class="card" style="text-decoration:none; color:inherit; transition:border-color 0.15s">
+          <div style="padding:18px 22px; display:flex; align-items:center; gap:18px">
+            <div style="flex:1">
+              <div style="display:flex; align-items:center; gap:10px">
+                <h3 style="font-weight:600; font-size:16px; color:var(--text-primary)">Centrale des Moulins</h3>
+                <span class="badge badge-green"><span style="width:6px; height:6px; background:#84cc16; border-radius:50%; display:inline-block"></span>Active</span>
+              </div>
+              <div style="display:flex; gap:18px; font-size:12px; color:var(--text-muted); margin-top:6px">
+                <span style="display:inline-flex; gap:5px; align-items:center"><i data-lucide="map-pin" style="width:13px;height:13px"></i>Bergerac, Dordogne · FR</span>
+                <span style="display:inline-flex; gap:5px; align-items:center"><i data-lucide="activity" style="width:13px;height:13px"></i>2 compteurs</span>
+                <span style="display:inline-flex; gap:5px; align-items:center"><i data-lucide="layers" style="width:13px;height:13px"></i>3 indicateurs · 1 comparateur</span>
+              </div>
+            </div>
+            <div style="text-align:right">
+              <div class="font-display tabular" style="font-size:18px; color:var(--text-primary)">450 kW</div>
+              <div style="font-size:11px; color:var(--text-muted)">Puissance max</div>
+            </div>
+            <i data-lucide="chevron-right" style="color:var(--text-subtle)"></i>
+          </div>
+        </a>
+
+        <a href="plant-detail.html?slug=bocq" class="card" style="text-decoration:none; color:inherit">
+          <div style="padding:18px 22px; display:flex; align-items:center; gap:18px">
+            <div style="flex:1">
+              <div style="display:flex; align-items:center; gap:10px">
+                <h3 style="font-weight:600; font-size:16px; color:var(--text-primary)">Moulin du Bocq</h3>
+                <span class="badge badge-green"><span style="width:6px; height:6px; background:#84cc16; border-radius:50%; display:inline-block"></span>Active</span>
+              </div>
+              <div style="display:flex; gap:18px; font-size:12px; color:var(--text-muted); margin-top:6px">
+                <span style="display:inline-flex; gap:5px; align-items:center"><i data-lucide="map-pin" style="width:13px;height:13px"></i>Spontin, Namur · BE</span>
+                <span style="display:inline-flex; gap:5px; align-items:center"><i data-lucide="activity" style="width:13px;height:13px"></i>1 compteur</span>
+                <span style="display:inline-flex; gap:5px; align-items:center"><i data-lucide="layers" style="width:13px;height:13px"></i>2 indicateurs</span>
+              </div>
+            </div>
+            <div style="text-align:right">
+              <div class="font-display tabular" style="font-size:18px; color:var(--text-primary)">210 kW</div>
+              <div style="font-size:11px; color:var(--text-muted)">Puissance max</div>
+            </div>
+            <i data-lucide="chevron-right" style="color:var(--text-subtle)"></i>
+          </div>
+        </a>
+
+        <a href="plant-detail.html?slug=ariege" class="card" style="text-decoration:none; color:inherit">
+          <div style="padding:18px 22px; display:flex; align-items:center; gap:18px">
+            <div style="flex:1">
+              <div style="display:flex; align-items:center; gap:10px">
+                <h3 style="font-weight:600; font-size:16px; color:var(--text-primary)">Centrale d'Ariège</h3>
+                <span class="badge badge-green"><span style="width:6px; height:6px; background:#84cc16; border-radius:50%; display:inline-block"></span>Active</span>
+              </div>
+              <div style="display:flex; gap:18px; font-size:12px; color:var(--text-muted); margin-top:6px">
+                <span style="display:inline-flex; gap:5px; align-items:center"><i data-lucide="map-pin" style="width:13px;height:13px"></i>Foix, Ariège · FR</span>
+                <span style="display:inline-flex; gap:5px; align-items:center"><i data-lucide="activity" style="width:13px;height:13px"></i>3 compteurs</span>
+                <span style="display:inline-flex; gap:5px; align-items:center"><i data-lucide="layers" style="width:13px;height:13px"></i>4 indicateurs · 2 comparateurs</span>
+              </div>
+            </div>
+            <div style="text-align:right">
+              <div class="font-display tabular" style="font-size:18px; color:var(--text-primary)">780 kW</div>
+              <div style="font-size:11px; color:var(--text-muted)">Puissance max</div>
+            </div>
+            <i data-lucide="chevron-right" style="color:var(--text-subtle)"></i>
+          </div>
+        </a>
+
+        <a href="plant-detail.html?slug=lesse" class="card" style="text-decoration:none; color:inherit">
+          <div style="padding:18px 22px; display:flex; align-items:center; gap:18px">
+            <div style="flex:1">
+              <div style="display:flex; align-items:center; gap:10px">
+                <h3 style="font-weight:600; font-size:16px; color:var(--text-primary)">Moulin de la Lesse</h3>
+                <span class="badge badge-amber"><span style="width:6px; height:6px; background:#fbbf24; border-radius:50%; display:inline-block"></span>Données partielles</span>
+              </div>
+              <div style="display:flex; gap:18px; font-size:12px; color:var(--text-muted); margin-top:6px">
+                <span style="display:inline-flex; gap:5px; align-items:center"><i data-lucide="map-pin" style="width:13px;height:13px"></i>Houyet, Namur · BE</span>
+                <span style="display:inline-flex; gap:5px; align-items:center"><i data-lucide="activity" style="width:13px;height:13px"></i>1 compteur</span>
+                <span style="display:inline-flex; gap:5px; align-items:center"><i data-lucide="layers" style="width:13px;height:13px"></i>2 indicateurs</span>
+              </div>
+            </div>
+            <div style="text-align:right">
+              <div class="font-display tabular" style="font-size:18px; color:var(--text-primary)">320 kW</div>
+              <div style="font-size:11px; color:var(--text-muted)">Puissance max</div>
+            </div>
+            <i data-lucide="chevron-right" style="color:var(--text-subtle)"></i>
+          </div>
+        </a>
+
       </div>
 
-      <!-- 3 sections per current state -->
-      <div style="display:grid; gap:14px; grid-template-columns: 1fr 1fr 1fr">
-        <div class="card">
-          <div class="card-head"><div class="card-head-title"><i data-lucide="user" style="width:14px; height:14px; display:inline; vertical-align:-2px"></i> Utilisateur</div></div>
-          <div class="card-body">
-            <p style="font-size:13px; line-height:1.5; margin:0 0 12px" class="muted">Profil personnel, langue, thème, sécurité, MFA.</p>
-            <div style="display:flex; flex-direction:column; gap:6px">
-              <a class="link" href="profil.html">→ Mon profil</a>
-              <a class="link" href="profil-abonnement.html">→ Mon abonnement</a>
-              <a class="link" href="profil-factures.html">→ Mes factures</a>
-              <a class="link" href="profil-jetons.html">→ Mes jetons</a>
-              <a class="link" href="#" onclick="event.preventDefault(); alert('Sécurité : mot de passe, 2FA, sessions actives. Bouge sous le profil avec #315.')">→ Sécurité &amp; MFA</a>
-              <a class="link" href="#" onclick="event.preventDefault(); alert('Définition d\'utilisateurs additionnels &amp; rôles — proposé en #261')">→ Utilisateurs &amp; rôles <span class="badge badge-amber" style="font-size:9px">à venir #261</span></a>
-            </div>
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="card-head"><div class="card-head-title"><i data-lucide="zap" style="width:14px; height:14px; display:inline; vertical-align:-2px"></i> Centrales</div></div>
-          <div class="card-body">
-            <p style="font-size:13px; line-height:1.5; margin:0 0 12px" class="muted">Infos centrales, sources de données, indicateurs &amp; comparateurs (création annuelle).</p>
-            <div style="display:flex; flex-direction:column; gap:8px; font-size:13px">
-              <a class="link" href="#">→ Centrale des Moulins · 450 kW</a>
-              <a class="link" href="#">→ Moulin du Bocq · 210 kW</a>
-              <a class="link" href="#">→ Centrale d'Ariège · 780 kW</a>
-              <a class="link" href="#">→ Moulin de la Lesse · 320 kW</a>
-              <a class="link" href="#" style="padding-top:6px"><i data-lucide="plus" style="width:12px;height:12px; display:inline; vertical-align:-2px"></i> Ajouter une centrale</a>
-            </div>
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="card-head"><div class="card-head-title"><i data-lucide="eye" style="width:14px; height:14px; display:inline; vertical-align:-2px"></i> Vue</div></div>
-          <div class="card-body">
-            <p style="font-size:13px; line-height:1.5; margin:0 0 12px" class="muted">Préférences d'affichage par défaut sur Production / Revenus / Données.</p>
-            <div style="display:flex; flex-direction:column; gap:6px">
-              <a class="link" href="#">→ Indicateurs préférés</a>
-              <a class="link" href="#">→ Comparateurs préférés</a>
-              <a class="link" href="#">→ Plages de dates par défaut</a>
-              <a class="link" href="#">→ Légende personnalisée</a>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <h3 style="font-size:13px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em; font-weight:600; margin: 22px 0 8px">Configuration par centrale (rare — 1× par an)</h3>
-      <div class="card">
-        <div class="card-body">
-          <p class="muted" style="font-size:13px; line-height:1.5; margin:0 0 14px">La création d'indicateurs ou de comparateurs concerne typiquement la mise en service ou un changement annuel de référence. L'upload quotidien des données se fait depuis <a href="data.html" class="link">Données</a>.</p>
-          <div style="display:flex; gap:8px; flex-wrap:wrap">
-            <button class="btn btn-secondary"><i data-lucide="plus"></i> Créer un indicateur</button>
-            <button class="btn btn-secondary"><i data-lucide="plus"></i> Créer un comparateur</button>
-            <button class="btn btn-secondary"><i data-lucide="upload"></i> Configurer une source SCADA</button>
-            <button class="btn btn-secondary"><i data-lucide="key"></i> Tokens API · ingestion automatique</button>
-          </div>
-        </div>
-      </div>
+      <p class="muted" style="font-size:12px; margin-top:18px; max-width:760px; line-height:1.6">
+        <b>Note (#261)</b> — Pas d'onglets « Indicateurs » et « Comparateurs » au niveau de cette page :
+        ils sont gérés dans la page de détail de chaque centrale (section <i>Indicateurs contextuels</i>,
+        avec sous-catégories Météo / Hydro / Prix / Comparateur). L'ingestion de données se fait depuis
+        <a href="data.html" class="link">Données</a> (sidebar), accessible en un clic.
+      </p>
 
     </div>
   </main>

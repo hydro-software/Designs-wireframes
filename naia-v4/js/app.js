@@ -108,21 +108,21 @@ function buildSidebar() {
 
       <div class="sidebar-section-title">Pilotage</div>
 
-      <div class="sidebar-item ${section === 'production' ? 'active' : ''}" onclick="toggleFold(this)" aria-expanded="${open.production}">
+      <a href="production.html" class="sidebar-item ${section === 'production' ? 'active' : ''}" aria-expanded="${open.production}">
         <i data-lucide="zap"></i>
         <span>Production</span>
-        <i data-lucide="chevron-right" class="chev"></i>
-      </div>
+        <i data-lucide="chevron-right" class="chev" onclick="event.preventDefault(); event.stopPropagation(); toggleFoldByLink(this)"></i>
+      </a>
       <div class="subnav" data-open="${open.production}">
         ${allItem('production')}
         ${centraleItems('production')}
       </div>
 
-      <div class="sidebar-item ${section === 'revenue' ? 'active' : ''}" onclick="toggleFold(this)" aria-expanded="${open.revenue}">
+      <a href="revenue.html" class="sidebar-item ${section === 'revenue' ? 'active' : ''}" aria-expanded="${open.revenue}">
         <i data-lucide="euro"></i>
         <span>Revenus</span>
-        <i data-lucide="chevron-right" class="chev"></i>
-      </div>
+        <i data-lucide="chevron-right" class="chev" onclick="event.preventDefault(); event.stopPropagation(); toggleFoldByLink(this)"></i>
+      </a>
       <div class="subnav" data-open="${open.revenue}">
         ${allItem('revenue')}
         ${centraleItems('revenue')}
@@ -146,34 +146,31 @@ function buildSidebar() {
 
       <div class="sidebar-section-title">Communauté</div>
 
-      <div class="sidebar-item ${section === 'community' ? 'active' : ''}" onclick="toggleFold(this)" aria-expanded="${open.community}">
+      <a href="community-earn.html" class="sidebar-item ${section === 'community' ? 'active' : ''}" aria-expanded="${open.community}">
         <i data-lucide="users"></i>
         <span>Communauté</span>
-        <i data-lucide="chevron-right" class="chev"></i>
-      </div>
+        <i data-lucide="chevron-right" class="chev" onclick="event.preventDefault(); event.stopPropagation(); toggleFoldByLink(this)"></i>
+      </a>
       <div class="subnav" data-open="${open.community}">
         ${communityItems}
       </div>
 
       <div class="sidebar-section-title">Configuration</div>
 
-      <div class="sidebar-item ${section === 'parametres' ? 'active' : ''}" onclick="toggleFold(this)" aria-expanded="${open.parametres}">
+      <a href="parametres.html" class="sidebar-item ${section === 'parametres' ? 'active' : ''}" aria-expanded="${open.parametres}">
         <i data-lucide="settings"></i>
         <span>Paramètres</span>
-        <i data-lucide="chevron-right" class="chev"></i>
-      </div>
+        <i data-lucide="chevron-right" class="chev" onclick="event.preventDefault(); event.stopPropagation(); toggleFoldByLink(this)"></i>
+      </a>
       <div class="subnav" data-open="${open.parametres}">
-        <a href="parametres.html" class="subnav-item ${centrale === 'all' && section === 'parametres' ? 'active' : ''}" style="font-weight:600">
-          <span>Vue d'ensemble</span>
-        </a>
         ${centraleItems('parametres')}
       </div>
 
-      <div class="sidebar-item ${section === 'admin' ? 'active' : ''}" onclick="toggleFold(this)" aria-expanded="${open.admin}">
+      <a href="admin.html" class="sidebar-item ${section === 'admin' ? 'active' : ''}" aria-expanded="${open.admin}">
         <i data-lucide="shield"></i>
         <span>Administration</span>
-        <i data-lucide="chevron-right" class="chev"></i>
-      </div>
+        <i data-lucide="chevron-right" class="chev" onclick="event.preventDefault(); event.stopPropagation(); toggleFoldByLink(this)"></i>
+      </a>
       <div class="subnav" data-open="${open.admin}">
         ${adminItems}
       </div>
@@ -196,13 +193,16 @@ function sectionLabel(slug) {
   return ({production: "Production", revenue: "Revenus", parametres: "Paramètres"})[slug] || slug;
 }
 
-// Toggle fold state for a sidebar parent item
-function toggleFold(el) {
-  const subnav = el.nextElementSibling;
+// Toggle fold state when clicking the chevron on a sidebar parent <a>
+// (the <a> itself navigates; chevron just expands without navigating)
+function toggleFoldByLink(chevEl) {
+  const link = chevEl.closest(".sidebar-item");
+  if (!link) return;
+  const subnav = link.nextElementSibling;
   if (!subnav || !subnav.classList.contains("subnav")) return;
   const open = subnav.dataset.open === "true";
   subnav.dataset.open = open ? "false" : "true";
-  el.setAttribute("aria-expanded", open ? "false" : "true");
+  link.setAttribute("aria-expanded", open ? "false" : "true");
 }
 
 // ---- PROFILE DROPDOWN ----
@@ -265,11 +265,14 @@ document.addEventListener("click", (e) => {
 });
 
 // ---- CENTRALE TABS (top of page when applicable) ----
+// Tabs use URL hash (#all, #moulins, #bocq, ...). Clicking a tab updates
+// the hash, the active tab, and the page contents that depend on the
+// selected centrale (title, KPIs, chart). One page handles all centrales.
 function buildCentraleTabs() {
   const host = document.getElementById("centrale-tabs");
   if (!host) return;
   const section = document.body.dataset.section || "";
-  const active = document.body.dataset.centrale || "all";
+  const active = currentCentrale();
 
   const items = [
     { slug: "all", label: "Tous", capacity: "1.76 MW · 4 centrales" },
@@ -279,15 +282,38 @@ function buildCentraleTabs() {
   host.innerHTML = items.map(c => {
     const activeClass = active === c.slug ? "active" : "";
     const allClass = c.slug === "all" ? "all" : "";
-    const href = c.slug === "all" ? `${section}.html` : `${section}-${c.slug}.html`;
-    return `<a href="${href}" class="centrale-tab ${activeClass} ${allClass}"
-              onclick="${href.includes('-') && c.slug !== 'all' ? `if(!confirmReal(this)) { event.preventDefault(); alert('${c.label} — page de détail à venir dans le mockup. Le tab change l\\'URL et l\\'état actif comme prévu.'); }` : ''}">
+    return `<a href="#${c.slug}" data-centrale="${c.slug}" class="centrale-tab ${activeClass} ${allClass}" onclick="onCentraleTabClick(event, '${c.slug}')">
       <span>${c.label}</span>
       <span class="cap">${c.capacity}</span>
     </a>`;
   }).join("");
 }
-function confirmReal() { return false; } // placeholder; per-centrale pages aren't built individually
+function currentCentrale() {
+  const hash = (window.location.hash || "").replace("#", "").trim();
+  if (!hash) return document.body.dataset.centrale || "all";
+  return hash;
+}
+function onCentraleTabClick(e, slug) {
+  e.preventDefault();
+  window.location.hash = "#" + slug;
+  applyCentrale(slug);
+}
+function applyCentrale(slug) {
+  document.body.dataset.centrale = slug;
+  // Update active class on tabs
+  document.querySelectorAll(".centrale-tab").forEach(t => t.classList.toggle("active", t.dataset.centrale === slug));
+  // Update centrale-aware texts in the page
+  const c = CENTRALES.find(x => x.slug === slug);
+  document.querySelectorAll("[data-centrale-name]").forEach(el => {
+    el.textContent = slug === "all" ? "Vue agrégée · 4 centrales" : (c ? c.label : "—");
+  });
+  document.querySelectorAll("[data-centrale-capacity]").forEach(el => {
+    el.textContent = slug === "all" ? "Total · 1 760 kW" : (c ? c.capacity : "—");
+  });
+  // Refresh chart with the right scaling factor
+  if (typeof rebuildProductionChart === "function") rebuildProductionChart();
+}
+window.addEventListener("hashchange", () => applyCentrale(currentCentrale()));
 
 // ---- MODAL ----
 function openOverlay(id) { const el = document.getElementById(id); if (el) { el.classList.add("open"); document.body.style.overflow = "hidden"; } }
@@ -345,47 +371,133 @@ function buildHomeChart() {
   });
 }
 
-// ---- PRODUCTION CHART (Naia-style daily bars + flow line) ----
+// ---- PRODUCTION CHART (Naia platform style: rain bars hanging from top, production
+// bars from bottom with optional MDA comparator overlay, flow line in the middle)
+// Inspired by hydro-software/game/.screenshots/a4-chart.png + indicateurs.png.
+let _productionChartInstance = null;
+
+function rebuildProductionChart() {
+  if (_productionChartInstance) {
+    _productionChartInstance.destroy();
+    _productionChartInstance = null;
+  }
+  buildProductionChart();
+}
+
+function centraleScale() {
+  const slug = currentCentrale();
+  // Roughly proportional to the centrale's installed capacity (kW)
+  const scale = ({ all: 1.0, moulins: 0.26, bocq: 0.12, ariege: 0.44, lesse: 0.18 })[slug] || 1.0;
+  return scale;
+}
+
 function buildProductionChart() {
   const c = document.getElementById("production-chart");
   if (!c || !window.Chart) return;
   const colors = chartColors();
-  const days = Array.from({ length: 60 }, (_, i) => {
-    const d = new Date(2026, 1, 1); d.setDate(d.getDate() + i);
-    return d.toLocaleDateString("fr-FR", { day: "numeric", month: "short" });
-  });
+  const scale = centraleScale();
+
+  const days = Array.from({ length: 31 }, (_, i) => `${i + 1}`);
+  // Production (dark blue bars, primary value, kWh/day)
   const production = days.map((_, i) => {
-    const seasonal = 8500 + Math.sin(i / 8) * 2000;
-    const noise = (Math.sin(i * 0.7) + Math.cos(i * 0.3)) * 400;
+    const seasonal = 1100 + Math.sin(i / 6) * 300;
+    const noise = (Math.sin(i * 0.7) + Math.cos(i * 0.3)) * 80;
     let v = seasonal + noise;
-    if (i === 30 || i === 31 || i === 32) v = 100;
-    if (i === 11 || i === 12 || i === 13) v = 50;
-    return Math.max(0, Math.round(v));
+    if (i === 12 || i === 13) v *= 0.55;
+    return Math.round(Math.max(80, v) * scale);
   });
-  const flow = days.map((_, i) => 4 + Math.sin(i / 9) * 1.4 + (Math.cos(i * 0.5) * 0.3));
-  return new Chart(c.getContext("2d"), {
+  // Comparator AGG DAILY MDA (lighter blue overlay on top of production)
+  const compMda = production.map(v => Math.round(v * 0.85 + 60));
+  // Flow / débit (m³/s) — green line, middle
+  const flow = days.map((_, i) => 3.2 + Math.sin(i / 9) * 1.0 + (Math.cos(i * 0.4) * 0.25) + (i === 12 ? 1.6 : 0) + (i === 13 ? 1.4 : 0));
+  // Rain (mm/day) — bars hanging from top: render as negative on a rain-only axis
+  const rain = days.map((_, i) => {
+    let r = 0;
+    if (i === 9 || i === 10) r = 12 + Math.random() * 4;
+    if (i === 11) r = 28 + Math.random() * 4;
+    if ([21, 24, 25, 26, 28, 29, 30].includes(i)) r = 6 + Math.random() * 6;
+    return r;
+  });
+
+  _productionChartInstance = new Chart(c.getContext("2d"), {
     type: "bar",
     data: {
       labels: days,
       datasets: [
-        { label: "Production (kWh/jour)", data: production, backgroundColor: colors.bar, borderRadius: 2, categoryPercentage: 0.85, barPercentage: 0.95 },
-        { label: "Débit (m³/s)", type: "line", data: flow, borderColor: colors.line, borderWidth: 2, tension: 0.35, pointRadius: 0, pointHoverRadius: 4, yAxisID: "y2", fill: false }
+        // Comparator overlay (rendered behind / on top of production)
+        { label: "AGG DAILY MDA", data: compMda, backgroundColor: "#7dd3fc", borderRadius: 2, categoryPercentage: 0.85, barPercentage: 0.92, stack: "prod", order: 4 },
+        // Production (primary)
+        { label: "Production (kWh)", data: production, backgroundColor: "#1d4ed8", borderRadius: 2, categoryPercentage: 0.85, barPercentage: 0.46, order: 3 },
+        // Flow line
+        { label: "Débit (m³/s)", type: "line", data: flow, borderColor: colors.line, borderWidth: 2, tension: 0.35, pointRadius: 0, pointHoverRadius: 4, yAxisID: "yFlow", fill: false, order: 1 },
+        // Rain bars hanging from top — negative values on rain axis (axis is reversed so they appear at top)
+        { label: "Météo · pluie (mm)", data: rain.map(v => -v), backgroundColor: "#60a5fa", borderRadius: 2, categoryPercentage: 0.85, barPercentage: 0.55, yAxisID: "yRain", order: 2 }
       ]
     },
     options: {
       responsive: true, maintainAspectRatio: false,
       interaction: { intersect: false, mode: "index" },
       scales: {
-        x: { grid: { display: false }, ticks: { color: colors.axis, font: { size: 10 }, maxTicksLimit: 14 } },
-        y: { grid: { color: colors.grid }, ticks: { color: colors.axis, font: { size: 11 } }, title: { display: true, text: "kWh", color: colors.axis } },
-        y2: { position: "right", grid: { display: false }, ticks: { color: colors.axis, font: { size: 11 } }, title: { display: true, text: "Débit m³/s", color: colors.axis } }
+        x: { grid: { display: false }, ticks: { color: colors.axis, font: { size: 10 }, maxTicksLimit: 31 }, stacked: false },
+        // Production axis (left). Range extends well above the bars to leave room
+        // for rain at the top and the flow line through the middle.
+        y: {
+          position: "left",
+          beginAtZero: true,
+          // Max ≈ 3× peak production so bars occupy lower third of the canvas
+          suggestedMax: Math.max(...compMda, ...production) * 3,
+          grid: { color: colors.grid, drawTicks: false },
+          ticks: {
+            color: colors.axis, font: { size: 11 },
+            // Hide ticks above the typical production range — keep the axis label clean
+            callback: function(v) { const peak = this.chart.data.datasets[1].data; const m = Math.max(...peak) * 1.1; return v <= m ? v : ""; }
+          },
+          title: { display: true, text: "kWh", color: colors.axis }
+        },
+        // Flow axis (right). Same vertical extent — same chart canvas.
+        yFlow: {
+          position: "right",
+          beginAtZero: true,
+          suggestedMax: 18, // wide range so the flow line sits in the middle band
+          grid: { display: false },
+          ticks: {
+            color: colors.axis, font: { size: 11 },
+            callback: function(v) { return v <= 7 ? v : ""; }
+          },
+          title: { display: true, text: "Débit m³/s", color: colors.axis }
+        },
+        // Rain axis (right, reversed). Range goes negative so rain bars appear at the
+        // top of the chart canvas. Visually labeled 0 → 50 mm increasing downward.
+        yRain: {
+          position: "right",
+          min: -50, max: 100,
+          reverse: false,
+          grid: { display: false },
+          ticks: {
+            color: "#60a5fa", font: { size: 10 },
+            callback: function(v) { return v < 0 ? Math.abs(v) : ""; }
+          },
+          title: { display: true, text: "mm", color: "#60a5fa" }
+        }
       },
       plugins: {
         legend: { display: false },
-        tooltip: { backgroundColor: colors.tooltipBg, titleColor: colors.tooltipFg, bodyColor: colors.tooltipFg, padding: 10, cornerRadius: 8 }
+        tooltip: {
+          backgroundColor: colors.tooltipBg, titleColor: colors.tooltipFg, bodyColor: colors.tooltipFg, padding: 10, cornerRadius: 8,
+          callbacks: {
+            label: function(ctx) {
+              const ds = ctx.dataset.label;
+              if (ds === "Météo · pluie (mm)") return `Pluie : ${Math.abs(ctx.parsed.y).toFixed(1)} mm`;
+              if (ds === "Débit (m³/s)") return `Débit : ${ctx.parsed.y.toFixed(2)} m³/s`;
+              if (ds === "AGG DAILY MDA") return `MDA : ${ctx.parsed.y} kWh`;
+              return `${ds} : ${ctx.parsed.y} kWh`;
+            }
+          }
+        }
       }
     }
   });
+  return _productionChartInstance;
 }
 
 // ---- POINTS CHART (community) ----
@@ -460,6 +572,8 @@ document.addEventListener("DOMContentLoaded", () => {
   setShowV2(getShowV2());
   buildSidebar();
   buildCentraleTabs();
+  // Apply current centrale (from hash if present) on first paint so titles + chart match
+  applyCentrale(currentCentrale());
   initIcons();
   setTimeout(() => {
     buildHomeChart();

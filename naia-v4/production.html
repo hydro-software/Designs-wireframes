@@ -16,37 +16,97 @@
     <header class="topbar">
       <div>
         <div class="page-eyebrow">Production</div>
-        <div style="font-size:18px; font-weight:600">Vue agrégée · 4 centrales</div>
+        <div style="font-size:18px; font-weight:600" data-centrale-name>Vue agrégée · 4 centrales</div>
       </div>
       <div class="topbar-meta">
-        <div class="plant">Total · 1 760 kW</div>
-        <div>1 jan. 2026 → 1 mars 2026</div>
+        <div class="plant" data-centrale-capacity>Total · 1 760 kW</div>
+        <div>1 mars 2026 → 31 mars 2026</div>
       </div>
     </header>
     <div id="centrale-tabs" class="centrale-tabs"></div>
 
     <div class="page-content">
       <div style="display:grid; gap:14px; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); margin-bottom:18px">
-        <div class="kpi-card"><div class="kpi-label">Production · 60 j</div><div class="kpi-value tabular">412 MWh</div><div class="kpi-delta up"><i data-lucide="trending-up"></i> +14 % vs 2025</div></div>
-        <div class="kpi-card"><div class="kpi-label">Pertes identifiées</div><div class="kpi-value tabular">38 MWh</div><div class="kpi-delta down"><i data-lucide="trending-down"></i> 9 % de la prod théorique</div></div>
-        <div class="kpi-card"><div class="kpi-label">Disponibilité</div><div class="kpi-value tabular">94 %</div><div class="kpi-delta muted">moyenne 4 centrales</div></div>
+        <div class="kpi-card"><div class="kpi-label">Production · 30 j</div><div class="kpi-value tabular">196 MWh</div><div class="kpi-delta up"><i data-lucide="trending-up"></i> +14 % vs 2025</div></div>
+        <div class="kpi-card"><div class="kpi-label">Pertes identifiées</div><div class="kpi-value tabular">18 MWh</div><div class="kpi-delta down"><i data-lucide="trending-down"></i> 9 % de la prod théorique</div></div>
+        <div class="kpi-card"><div class="kpi-label">Disponibilité</div><div class="kpi-value tabular">94 %</div><div class="kpi-delta muted">moyenne période</div></div>
         <div class="kpi-card"><div class="kpi-label">Débit moyen</div><div class="kpi-value tabular">3,4 m³/s</div><div class="kpi-delta muted">tous bassins</div></div>
       </div>
 
-      <!-- Main chart, dark, Naia-style -->
-      <div class="card" style="margin-bottom:14px">
-        <div class="card-head">
-          <div>
-            <div class="card-head-title">Production quotidienne · agrégée</div>
-            <div class="card-head-sub">Barres bleues = kWh — ligne verte = débit moyen — points hauts = données minute</div>
+      <!-- Main chart with Indicateurs panel on the left (per indicateurs.png from game/UI) -->
+      <div class="card-head" style="background:var(--bg-card); border:1px solid var(--border-subtle); border-radius:12px 12px 0 0; border-bottom:0">
+        <div>
+          <div class="card-head-title">Production quotidienne</div>
+          <div class="card-head-sub">Barres bleu foncé = kWh produits · barres bleu clair = comparateur AGG DAILY MDA · ligne verte = débit · barres bleu pâle en haut = pluie</div>
+        </div>
+        <div style="display:flex; gap:8px">
+          <button class="btn btn-secondary btn-sm"><i data-lucide="git-compare"></i> Comparer</button>
+          <button class="btn btn-secondary btn-sm"><i data-lucide="download"></i> Export</button>
+          <button class="btn btn-secondary btn-sm"><i data-lucide="settings"></i> Configuration</button>
+        </div>
+      </div>
+      <div class="chart-with-panel" style="border-top:0; border-radius:0 0 12px 12px; margin-bottom:14px">
+
+        <!-- Indicateurs panel (left) — single button covering Indicateurs + Comparateurs per #261 -->
+        <div class="indicateurs-panel">
+          <div class="indicateurs-panel-title">
+            <span>Indicateurs contextuels</span>
+            <span class="collapse" onclick="this.closest('.chart-with-panel').classList.toggle('collapsed'); this.closest('.indicateurs-panel').classList.toggle('collapsed')">«</span>
           </div>
-          <div style="display:flex; gap:8px">
-            <button class="btn btn-secondary btn-sm"><i data-lucide="layers"></i> Indicateurs (3)</button>
-            <button class="btn btn-secondary btn-sm"><i data-lucide="git-compare"></i> Comparateur</button>
-            <button class="btn btn-secondary btn-sm"><i data-lucide="download"></i> Export</button>
+
+          <div class="ind-headers">
+            <span></span><span>Int.</span><span>30j</span><span>12m</span><span>Ann.</span>
+          </div>
+
+          <div class="ind-section">
+            <div class="ind-section-title">Indicateurs inversés</div>
+            <div class="ind-row">
+              <label><span class="swatch" style="background:#60a5fa"></span>Météo</label>
+              <span class="ind-cell"><input type="checkbox" checked></span>
+              <span class="ind-cell"><input type="checkbox" checked></span>
+              <span class="ind-cell"><input type="checkbox" checked></span>
+              <span class="ind-cell"><input type="checkbox" checked></span>
+            </div>
+          </div>
+
+          <div class="ind-section">
+            <div class="ind-section-title">Indicateurs courbes</div>
+            <div class="ind-row">
+              <label><span class="swatch" style="background:#a3e635"></span>Débit</label>
+              <span class="ind-cell"><input type="checkbox" checked></span>
+              <span class="ind-cell"><input type="checkbox" checked></span>
+              <span class="ind-cell"><input type="checkbox" checked></span>
+              <span class="ind-cell"><input type="checkbox" checked></span>
+            </div>
+          </div>
+
+          <div class="ind-section">
+            <div class="ind-section-title">Comparateurs</div>
+            <div class="ind-row">
+              <label><span class="swatch" style="background:#7dd3fc"></span>AGG DAILY MDA</label>
+              <span class="ind-cell"><input type="checkbox" checked></span>
+              <span class="ind-cell"><input type="checkbox" checked></span>
+              <span class="ind-cell"><input type="checkbox" checked></span>
+              <span class="ind-cell"><input type="checkbox" checked></span>
+            </div>
+            <div class="ind-row">
+              <label><span class="swatch" style="background:#c4b5fd"></span>Centrale ref.</label>
+              <span class="ind-cell"><input type="checkbox"></span>
+              <span class="ind-cell"><input type="checkbox"></span>
+              <span class="ind-cell"><input type="checkbox"></span>
+              <span class="ind-cell"><input type="checkbox"></span>
+            </div>
+          </div>
+
+          <!-- Bottom timeframe / view tabs (per indicateurs.png MDA / Hydro... pills) -->
+          <div class="indicateurs-panel-foot">
+            <button class="pf-tab active">MDA</button>
+            <button class="pf-tab">Hydro</button>
           </div>
         </div>
-        <div class="card-body" style="height:420px; padding:14px"><div class="chart-container" style="height:100%"><canvas id="production-chart"></canvas></div></div>
+
+        <!-- Chart -->
+        <div style="height:480px; padding:14px"><div class="chart-container" style="height:100%"><canvas id="production-chart"></canvas></div></div>
       </div>
 
       <div class="card">
