@@ -273,37 +273,99 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ---- LOGO PANEL ----
+  // Three-piece lightbox assembly:
+  //   • Housing (outer opaque face): 57.5 × 15.3 cm
+  //   • Window cutout in housing:    53.0 × 10.0 cm (centred)
+  //   • Acrylic (transparent panel): 54.5 × 11.5 cm (centred, sits BEHIND
+  //     the housing; bigger than the window so it overlaps the housing
+  //     by 0.75 cm on each side of the cutout for glue/clip retention)
+  //   • Mounting holes: 4 × 0.7 cm from each border, one at each corner.
   {
     const svg = document.getElementById('logo-panel-svg');
-    const pad = 30;
-    const pw = INNER_W, ph = LOGO_H;
-    const w = pw*S + pad*2, h = Math.max(ph*S + pad*2, 100);
+    const sc = 4;            // 4 px/cm — bigger scale; this is a small detail panel
+    const pad = 35;
+
+    const LP_W = 57.5, LP_H = 15.3;     // outer housing
+    const WIN_W = 53,   WIN_H = 10;      // window cutout
+    const ACR_W = 54.5, ACR_H = 11.5;    // acrylic
+    const DRILL_OFFSET = 0.7;             // hole offset from each edge
+    const DRILL_R = 0.3;                  // visual radius (~6 mm hole)
+
+    const w = LP_W*sc + pad*2 + 60;
+    const h = LP_H*sc + pad*2 + 30;
     svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
     svg.setAttribute('width', w);
     svg.setAttribute('height', h);
 
-    const tx = (x) => pad + x * S;
-    const ty = (y) => pad + (ph - y) * S;
+    const tx = (x) => pad + x * sc;
+    const ty = (y) => pad + 16 + (LP_H - y) * sc;
 
     let content = '';
-    content += `<rect x="${tx(0)}" y="${ty(ph)}" width="${pw*S}" height="${ph*S}" class="panel-fill"/>`;
-    content += `<text x="${tx(pw/2)}" y="${ty(ph/2)+4}" class="panel-label">NAIA logo</text>`;
-    content += svgDim(tx(0), ty(0), tx(0), ty(ph), `${ph.toFixed(1)}`, -16);
-    content += svgDim(tx(0), ty(0), tx(pw), ty(0), `${INNER_W}`, 14);
+
+    // Caption
+    content += `<text x="${tx(LP_W/2)}" y="${pad + 6}" fill="#000" font-size="11" text-anchor="middle" font-weight="700">F · Logo lightbox — housing + acrylic</text>`;
+
+    // Acrylic (drawn first, behind the housing — dashed because it's hidden
+    // edge in technical-drafting convention). Slightly bigger than the window
+    // on all sides so it has a 0.75 cm flange to glue to the housing from
+    // behind.
+    const aOx = (LP_W - ACR_W) / 2;   // 1.5 cm
+    const aOy = (LP_H - ACR_H) / 2;   // 1.9 cm
+    content += `<rect x="${tx(aOx)}" y="${ty(aOy + ACR_H)}" width="${ACR_W*sc}" height="${ACR_H*sc}" fill="rgba(0,0,0,0.04)" stroke="#000" stroke-width="0.8" stroke-dasharray="4,2"/>`;
+
+    // Housing (opaque frame, solid outline)
+    content += `<rect x="${tx(0)}" y="${ty(LP_H)}" width="${LP_W*sc}" height="${LP_H*sc}" fill="rgba(0,0,0,0.08)" stroke="#000" stroke-width="1.4"/>`;
+
+    // Window cutout in the housing (drawn as a hole — lighter fill +
+    // dashed border per drafting convention for an opening)
+    const wOx = (LP_W - WIN_W) / 2;   // 2.25 cm
+    const wOy = (LP_H - WIN_H) / 2;   // 2.65 cm
+    content += `<rect x="${tx(wOx)}" y="${ty(wOy + WIN_H)}" width="${WIN_W*sc}" height="${WIN_H*sc}" fill="#fff" stroke="#000" stroke-width="1" stroke-dasharray="3,2"/>`;
+    content += `<text x="${tx(wOx + WIN_W/2)}" y="${ty(wOy + WIN_H/2)+3}" fill="#000" font-size="10" text-anchor="middle" font-weight="700">window cutout</text>`;
+    content += `<text x="${tx(wOx + WIN_W/2)}" y="${ty(wOy + WIN_H/2)+15}" fill="#555" font-size="8" text-anchor="middle">${WIN_W} × ${WIN_H} cm</text>`;
+
+    // Drill holes — one at each corner, DRILL_OFFSET cm from both adjacent edges.
+    const holes = [
+      [DRILL_OFFSET, DRILL_OFFSET],
+      [LP_W - DRILL_OFFSET, DRILL_OFFSET],
+      [LP_W - DRILL_OFFSET, LP_H - DRILL_OFFSET],
+      [DRILL_OFFSET, LP_H - DRILL_OFFSET],
+    ];
+    holes.forEach((p) => {
+      content += `<circle cx="${tx(p[0])}" cy="${ty(p[1])}" r="${DRILL_R*sc}" fill="#000"/>`;
+    });
+
+    // Drill-hole annotation (one only, to avoid clutter)
+    content += `<line x1="${tx(DRILL_OFFSET)+4}" y1="${ty(DRILL_OFFSET)-4}" x2="${tx(DRILL_OFFSET)+22}" y2="${ty(DRILL_OFFSET)-22}" stroke="#555" stroke-width="0.5"/>`;
+    content += `<text x="${tx(DRILL_OFFSET)+24}" y="${ty(DRILL_OFFSET)-22}" fill="#555" font-size="8">drill ⌀6 mm · 0.7 cm from each border (×4)</text>`;
+
+    // Acrylic dimension callout
+    content += `<line x1="${tx(aOx + ACR_W)}" y1="${ty(aOy + ACR_H/2)}" x2="${tx(LP_W) + 28}" y2="${ty(aOy + ACR_H/2)}" stroke="#555" stroke-width="0.5" stroke-dasharray="2,2"/>`;
+    content += `<text x="${tx(LP_W) + 30}" y="${ty(aOy + ACR_H/2) - 1}" fill="#555" font-size="8">acrylic 3 mm</text>`;
+    content += `<text x="${tx(LP_W) + 30}" y="${ty(aOy + ACR_H/2) + 9}" fill="#555" font-size="8">${ACR_W} × ${ACR_H} cm</text>`;
+    content += `<text x="${tx(LP_W) + 30}" y="${ty(aOy + ACR_H/2) + 19}" fill="#888" font-size="7">(behind housing,</text>`;
+    content += `<text x="${tx(LP_W) + 30}" y="${ty(aOy + ACR_H/2) + 27}" fill="#888" font-size="7">overlaps window 0.75 cm)</text>`;
+
+    // Outer dimensions
+    content += svgDim(tx(0), ty(0)+12, tx(LP_W), ty(0)+12, `${LP_W} cm`, 14);
+    content += svgDim(tx(0)-12, ty(0), tx(0)-12, ty(LP_H), `${LP_H} cm`, -14);
 
     svg.innerHTML = content;
   }
 
-  // ---- LOGO PANEL — face mockup, B&W simplified ----
-  // The screen version of this doc had a glowy gradient mockup; for the
-  // print-friendly build doc we just outline the panel and label it.
-  // The actual graphic is supplied as a vinyl decal on opal acrylic.
+  // ---- LOGO PANEL — face mockup (assembled view) ----
+  // Visual representation of the assembled lightbox: opaque housing
+  // (57.5 × 15.3) with a 53 × 10 window in the centre, the lit-up "naia
+  // hydro" graphic visible through the window. Drill holes shown at the
+  // four corners.
   {
     const svg = document.getElementById('logo-design-svg');
-    const pw = INNER_W, ph = LOGO_H;
     const designScale = 5;
-    const dw = pw * designScale;
-    const dh = ph * designScale;
+    const LP_W = 57.5, LP_H = 15.3;
+    const WIN_W = 53,   WIN_H = 10;
+    const DRILL_OFFSET = 0.7;
+    const dw = LP_W * designScale;
+    const dh = LP_H * designScale;
     const pad = 4;
     svg.setAttribute('viewBox', `0 0 ${dw + pad*2} ${dh + pad*2}`);
     svg.setAttribute('width', dw + pad*2);
@@ -311,13 +373,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let d = '';
     const ox = pad, oy = pad;
-    // Plain bordered rectangle
-    d += `<rect x="${ox}" y="${oy}" width="${dw}" height="${dh}" fill="rgba(0,0,0,0.04)" stroke="#000" stroke-width="1.2"/>`;
-    const cx = ox + dw/2;
-    const cy = oy + dh/2;
-    d += `<text x="${cx}" y="${cy-2}" fill="#000" font-size="22" font-weight="700" font-style="italic" text-anchor="middle" dominant-baseline="middle" font-family="'Inter', Arial, sans-serif">naia</text>`;
-    d += `<text x="${cx}" y="${cy+18}" fill="#444" font-size="10" text-anchor="middle" dominant-baseline="middle" font-family="'Inter', Arial, sans-serif">hydro</text>`;
-    d += `<text x="${cx}" y="${oy+dh-4}" fill="#555" font-size="6" text-anchor="middle">Vinyl decal on opal acrylic 3 mm, backlit with LED strip</text>`;
+    // Housing (darker fill — opaque material)
+    d += `<rect x="${ox}" y="${oy}" width="${dw}" height="${dh}" fill="rgba(0,0,0,0.10)" stroke="#000" stroke-width="1.2"/>`;
+    // Window cutout (lighter fill — the visible lit area)
+    const wox = ox + ((LP_W - WIN_W) / 2) * designScale;
+    const woy = oy + ((LP_H - WIN_H) / 2) * designScale;
+    const wdw = WIN_W * designScale;
+    const wdh = WIN_H * designScale;
+    d += `<rect x="${wox}" y="${woy}" width="${wdw}" height="${wdh}" fill="rgba(0,0,0,0.02)" stroke="#000" stroke-width="0.8"/>`;
+    // Naia text inside the window
+    const cx = wox + wdw/2;
+    const cy = woy + wdh/2;
+    d += `<text x="${cx}" y="${cy-2}" fill="#000" font-size="20" font-weight="700" font-style="italic" text-anchor="middle" dominant-baseline="middle" font-family="'Inter', Arial, sans-serif">naia</text>`;
+    d += `<text x="${cx}" y="${cy+15}" fill="#444" font-size="9" text-anchor="middle" dominant-baseline="middle" font-family="'Inter', Arial, sans-serif">hydro</text>`;
+    // Drill holes (4 corners)
+    const drillR = 0.3 * designScale;
+    [[DRILL_OFFSET, DRILL_OFFSET], [LP_W-DRILL_OFFSET, DRILL_OFFSET],
+     [LP_W-DRILL_OFFSET, LP_H-DRILL_OFFSET], [DRILL_OFFSET, LP_H-DRILL_OFFSET]].forEach(p => {
+      d += `<circle cx="${ox + p[0]*designScale}" cy="${oy + p[1]*designScale}" r="${drillR}" fill="#000"/>`;
+    });
+    // Caption
+    d += `<text x="${ox + dw/2}" y="${oy+dh-4}" fill="#555" font-size="6" text-anchor="middle">Vinyl decal on opal acrylic 3 mm, backlit with LED strip · housing ${LP_W} × ${LP_H} cm</text>`;
     svg.innerHTML = d;
   }
 
@@ -458,7 +534,7 @@ document.addEventListener('DOMContentLoaded', () => {
       ['A','Side panel', 2, `Complex shape`, sideArea, KG_PER_M2, 'Poplar ply 15mm'],
       ['D','Front panel', 1, `${INNER_W} × ${FP_SURF}`, fpArea, KG_PER_M2, `Poplar ply 15mm, window cutout`],
       ['E','Roof panel', 1, `${INNER_W} × ${ROOF_LEN.toFixed(1)}`, roofArea, KG_PER_M2, `Angled ${ROOF_ANGLE.toFixed(1)}°`],
-      ['F','Logo panel (lightbox)', 1, `${INNER_W} × ${LOGO_H.toFixed(1)}`, logoArea, null, `Acrylic 3mm + foamboard + LED`],
+      ['F','Logo panel (lightbox)', 1, '57.5 × 15.3 (housing) · 54.5 × 11.5 (acrylic)', logoArea, null, 'Housing with 53×10 window cutout + 4 × ⌀6mm holes 0.7cm from each border. Acrylic 3mm opal + foamboard + LED.'],
       ['G','Soffit panel', 1, `${INNER_W} × ${SOFFIT_D.toFixed(1)}`, soffitArea, KG_PER_M2, `Horizontal at Y=${FP_TOP_Y.toFixed(1)}cm, supports lightbox`],
       ['H','Monitor shelf', 1, `${INNER_W} × ${SHELF_D}`, shelfArea, KG_PER_M2, `At Y=${SHELF_Y}cm`],
       ['M','Mouse shelf', 1, `${MOUSE_TOTAL_W} × ${MOUSE_D}`, mouseArea, KG_PER_M2, `Slots at ${SLOT_HEIGHTS.join('/')}cm`],
@@ -972,9 +1048,9 @@ document.addEventListener('DOMContentLoaded', () => {
       ['M','Mouse shelf', 1, `${MOUSE_TOTAL_W} × ${MOUSE_D}`,
        'Poplar ply 15 mm',
        'No home cuts (slides through the slots in the side panels).'],
-      ['F','Logo panel — front face', 1, `${INNER_W} × ${LH}`,
-       'Opal acrylic 3 mm (sourced separately)',
-       'Backed by 3 mm foamboard + LED strip — not part of the wood-shop order.'],
+      ['F','Logo panel — front face', 1, '57.5 × 15.3 housing · 54.5 × 11.5 acrylic',
+       'Opaque housing + opal acrylic 3 mm + foam + LED (sourced separately)',
+       'Housing has a 53 × 10 cm window cutout and 4 mounting holes ⌀6 mm at 0.7 cm from each border. Acrylic glued behind, overlaps window by 0.75 cm on each side.'],
     ];
 
     rows.forEach(r => {
@@ -1853,7 +1929,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
   <div class="panel-card" style="flex:1.3">
     <h3>F — Logo Panel — Illuminated Lightbox (×1)</h3>
-    <p class="qty">Vertical at front. Backlit NAIA branding panel.</p>
+    <p class="qty">
+      Vertical at front. Three-piece backlit lightbox:
+      <strong>opaque housing</strong> 57.5 × 15.3 cm with a 53 × 10
+      cm window cutout and four 0.7 cm-from-edge mounting holes;
+      <strong>opal acrylic 3 mm</strong> 54.5 × 11.5 cm sized to
+      overlap the window by 0.75 cm on each side, glued behind the
+      housing; <strong>foamboard backing + LED strip</strong> behind
+      the acrylic.
+    </p>
     <svg id="logo-panel-svg"></svg>
     <svg id="logo-design-svg" style="margin-top:12px"></svg>
   </div>
