@@ -436,36 +436,41 @@ function buildProductionChart() {
   });
 
   // Visual contract per game/.claude/skills/uplot-multi-scale-axes/SKILL.md:
-  //   - Production bars   → bottom ~33% of canvas
-  //   - Flow line + Rain  → top ~25%, sharing the upper band
+  //   - Production bars   → bottom ~33% of canvas (left axis, normal)
+  //   - Rain bars + Flow line → top ~25%, SHARING ONE INVERTED axis (right side)
   //   - Middle band       → breathing room (loss-segment overlays land here in the game)
   //
-  // Axis math (Chart.js port of the uPlot pattern):
-  //   - kwh axis  (left, NORMAL)   → max = peak × 3, rounded to 500 kWh ticks
-  //   - mm  axis  (right, REVERSED via min/max swap) → range [peak × 4, 0]
-  //                                                     → bars hang from TOP, peak at 1/4 height
-  //   - m3s axis  (right, REVERSED via reverse:true) → max = peak × 4
-  //                                                     → line sits in upper 25%, alongside rain
+  // We use the SKILL's intraday-chart pattern (rain + flow share one reversed scale)
+  // rather than the 30-day pattern (three separate scales). Reason: Chart.js's
+  // `reverse: true` doesn't reliably stack with another reversed axis on the same
+  // side — the m³/s line was rendering on a normal-direction axis and ended up
+  // riding through the production bars. Sharing one inverted scale sidesteps this.
   //
-  // Both peaks are CLOSED OVER (computed once before chart options) — never derived from
-  // Chart.js's runtime dMax. This protects against an indicator on the same scale silently
-  // pulling the axis up and shrinking the production bars (skill's gotcha #1).
+  // The unit mismatch (mm vs m³/s) is fine because typical rain peaks (~30 mm/day)
+  // and flow values (~5 m³/s) both fit cleanly inside a 0..30 numeric range, with
+  // flow occupying the top tenth and rain the top quarter — no visual collision.
+  //
+  // Both peaks are CLOSED OVER (computed once before chart options) — never derived
+  // from Chart.js's runtime dMax. Skill's gotcha #1.
 
   const productionPeak = Math.max(1, ...compMda, ...production);
   const rainPeak = Math.max(1, ...rain);
   const flowPeak = Math.max(1, ...flow);
 
   const kwhMax = Math.ceil((productionPeak * 3) / 500) * 500;
+  // Shared upper-band scale: max chosen so rain peak occupies ~25% and flow peak
+  // ~10% of canvas height (after the reverse flips them to the top).
+  const upperMax = Math.max(rainPeak * 4, flowPeak * 6, 25);
 
   _productionChartInstance = new Chart(c.getContext("2d"), {
     type: "bar",
     data: {
       labels: days,
       datasets: [
-        { label: "AGG DAILY MDA",     data: compMda,   backgroundColor: "#7dd3fc", borderRadius: 2, categoryPercentage: 0.85, barPercentage: 0.92, order: 4, yAxisID: "y" },
-        { label: "Production (kWh)",  data: production, backgroundColor: "#1d4ed8", borderRadius: 2, categoryPercentage: 0.85, barPercentage: 0.46, order: 3, yAxisID: "y" },
-        { label: "Débit (m³/s)",      data: flow,      type: "line", borderColor: colors.line, borderWidth: 2, tension: 0.35, pointRadius: 0, pointHoverRadius: 4, yAxisID: "yFlow", fill: false, order: 1 },
-        { label: "Météo · pluie (mm)", data: rain,     backgroundColor: "#60a5fa", borderRadius: 2, categoryPercentage: 0.85, barPercentage: 0.55, yAxisID: "yRain", order: 2 }
+        { label: "AGG DAILY MDA",      data: compMda,    backgroundColor: "#7dd3fc", borderRadius: 2, categoryPercentage: 0.85, barPercentage: 0.92, order: 4, yAxisID: "y" },
+        { label: "Production (kWh)",   data: production, backgroundColor: "#1d4ed8", borderRadius: 2, categoryPercentage: 0.85, barPercentage: 0.46, order: 3, yAxisID: "y" },
+        { label: "Débit (m³/s)",       data: flow,       type: "line", borderColor: colors.line, borderWidth: 2, tension: 0.35, pointRadius: 0, pointHoverRadius: 4, yAxisID: "yUpper", fill: false, order: 1 },
+        { label: "Météo · pluie (mm)", data: rain,       backgroundColor: "#60a5fa", borderRadius: 2, categoryPercentage: 0.85, barPercentage: 0.55, yAxisID: "yUpper", order: 2 }
       ]
     },
     options: {
@@ -474,7 +479,7 @@ function buildProductionChart() {
       scales: {
         x: { grid: { display: false }, ticks: { color: colors.axis, font: { size: 10 }, maxTicksLimit: 31 } },
 
-        // Production axis (left, normal). Max = peak × 3 → bars fill bottom 1/3.
+        // Production axis (left, normal). Max = peak × 3 → bars fill bottom ~33%.
         y: {
           position: "left",
           min: 0,
@@ -482,45 +487,30 @@ function buildProductionChart() {
           grid: { color: colors.grid, drawTicks: false },
           ticks: {
             color: colors.axis, font: { size: 11 },
-            // Only show ticks up to the production range — keep the axis tidy
             callback: function(v) { return v <= productionPeak * 1.05 ? v : ""; }
           },
           title: { display: true, text: "kWh", color: colors.axis }
         },
 
-        // Flow axis (right, REVERSED via reverse:true). Max = peak × 4 → line in upper 25%.
-        // reverse:true is Chart.js's equivalent of uPlot's dir:-1 — flips the axis on canvas
-        // without changing the data. Result: flow values rise visually toward the TOP.
-        yFlow: {
+        // Shared inverted upper-band axis (right). Carries BOTH flow (m³/s) and rain (mm).
+        // reverse:true → 0 at top of canvas, max at bottom → values render in upper portion.
+        // Rain bars peak ~25% from top; flow line peaks ~17% from top (well above production).
+        yUpper: {
           position: "right",
           reverse: true,
           min: 0,
-          max: flowPeak * 4,
+          max: upperMax,
           grid: { display: false },
           ticks: {
-            color: colors.axis, font: { size: 11 },
-            callback: function(v) { return v <= flowPeak * 1.1 ? v : ""; }
+            color: colors.axis, font: { size: 10 },
+            // Show ticks for both rain and flow magnitudes
+            callback: function(v) {
+              if (v === 0) return "0";
+              if (v <= rainPeak * 1.1) return v + " mm";
+              return "";
+            }
           },
-          title: { display: true, text: "Débit m³/s", color: colors.axis }
-        },
-
-        // Rain axis (right, REVERSED via min/max swap). Max = peak × 4, range = [hi×4, 0].
-        // 0 at the top, peak at 1/4 of the canvas height → bars hang from the top edge,
-        // matching game/UI/rain axis.png. (5% × 4 = ~peak ÷ 4 of canvas height for the
-        // tallest rain bar.)
-        yRain: {
-          position: "right",
-          // Trick: with min > max, Chart.js draws as if reverse:true. We use the explicit
-          // `reverse:true` for clarity and keep the [lo, hi] reading natural.
-          reverse: true,
-          min: 0,
-          max: rainPeak * 4,
-          grid: { display: false },
-          ticks: {
-            color: "#60a5fa", font: { size: 10 },
-            callback: function(v) { return v <= rainPeak * 1.1 ? v : ""; }
-          },
-          title: { display: true, text: "mm", color: "#60a5fa" }
+          title: { display: true, text: "mm   ·   m³/s", color: colors.axis }
         }
       },
       plugins: {
