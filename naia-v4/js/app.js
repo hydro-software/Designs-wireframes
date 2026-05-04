@@ -107,13 +107,9 @@ function buildSidebar() {
   }).join("");
 
   aside.innerHTML = `
-    <div class="sidebar-brand">
-      <div class="sidebar-brand-logo"><i data-lucide="waves"></i></div>
-      <div>
-        <div class="sidebar-brand-name">Naia</div>
-        <div class="sidebar-brand-sub">Hydroélectricité</div>
-      </div>
-    </div>
+    <a href="index.html" class="sidebar-brand" style="text-decoration:none">
+      <img src="img/logo.png" alt="Naia hydro" style="width:100%; max-width:184px; height:auto; display:block">
+    </a>
 
     <nav class="sidebar-nav">
       <a href="index.html" class="sidebar-item ${section === '' && page === 'home' ? 'active' : ''}">
@@ -197,6 +193,13 @@ function buildSidebar() {
         ${adminItems}
       </div>
     </nav>
+
+    <div class="sidebar-foot">
+      <a class="sidebar-item" href="#" onclick="event.preventDefault(); openHelp()">
+        <i data-lucide="life-buoy"></i>
+        <span>Aide &amp; support</span>
+      </a>
+    </div>
 
     <div id="profile-container" style="position:relative">
       <button id="profile-trigger" class="profile-trigger" onclick="toggleProfileDropdown()" data-open="false">
@@ -618,34 +621,13 @@ function buildBelpexChart() {
   });
 }
 
-// ---- HELP BUTTON & PANEL (#8) ----
-// Floating "?" icon at bottom-right of every page; clicking opens a help drawer
-// with manuals + "Send message to support" CTA. Also reachable from the profile dropdown.
-function injectHelpButton() {
-  if (document.getElementById("help-fab")) return;
-  const fab = document.createElement("button");
-  fab.id = "help-fab";
-  fab.title = "Aide & support";
-  fab.setAttribute("aria-label", "Aide & support");
-  fab.innerHTML = `<i data-lucide="life-buoy"></i>`;
-  fab.style.cssText = `
-    position: fixed; bottom: 22px; right: 22px;
-    width: 44px; height: 44px;
-    border-radius: 50%;
-    background: var(--brand-blue-strong);
-    color: white;
-    border: 1px solid rgba(255,255,255,0.18);
-    box-shadow: 0 8px 24px -6px rgba(0,0,0,0.5);
-    cursor: pointer;
-    z-index: 40;
-    display: flex; align-items: center; justify-content: center;
-    transition: transform 0.18s, background 0.18s;
-  `;
-  fab.onmouseenter = () => { fab.style.transform = "translateY(-2px)"; fab.style.background = "var(--brand-blue)"; };
-  fab.onmouseleave = () => { fab.style.transform = "none"; fab.style.background = "var(--brand-blue-strong)"; };
-  fab.onclick = openHelp;
-  document.body.appendChild(fab);
-
+// ---- HELP PANEL (#8) ----
+// Reachable from two places (no floating button — Jan rejected that):
+//   1. Sidebar item "Aide & support" just above the profile area
+//   2. Profile dropdown entry "Aide & support"
+// Both call openHelp() which shows the help modal.
+function injectHelpModal() {
+  if (document.getElementById("help-overlay")) return;
   const overlay = document.createElement("div");
   overlay.id = "help-overlay";
   overlay.className = "overlay";
@@ -693,7 +675,7 @@ document.addEventListener("DOMContentLoaded", () => {
   buildCentraleTabs();
   // Apply current centrale (from hash if present) on first paint so titles + chart match
   applyCentrale(currentCentrale());
-  injectHelpButton();
+  injectHelpModal();
   initIcons();
   setTimeout(() => {
     buildHomeChart();
