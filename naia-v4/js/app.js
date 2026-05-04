@@ -61,29 +61,29 @@ function buildSidebar() {
     admin:      section === "admin",
   };
 
-  // Centrale sub-items per section:
-  // - production / revenue: stay on the section page, switch via URL hash (one page handles all centrales)
-  // - parametres: navigate into plant-detail.html?slug=... (each centrale has its own detail surface)
+  // All sections — production / revenue / parametres — now use hash-based tabs on
+  // a single page per section. Sidebar centrale items deep-link to those hashes.
   const centraleItems = (sectionSlug) => {
-    const buildHref = (slug) => {
-      if (sectionSlug === "parametres") return `plant-detail.html?slug=${slug}`;
-      // production / revenue: same page, hash drives the active centrale
-      return `${sectionSlug}.html#${slug}`;
-    };
     return CENTRALES.map(c => {
-      const isActive =
-        (sectionSlug === section && centrale === c.slug) ||
-        (sectionSlug === "parametres" && section === "parametres-detail" && centrale === c.slug);
-      return `<a href="${buildHref(c.slug)}" class="subnav-item ${isActive ? 'active' : ''}">
+      const isActive = sectionSlug === section && centrale === c.slug;
+      return `<a href="${sectionSlug}.html#${c.slug}" class="subnav-item ${isActive ? 'active' : ''}">
         <span>${c.label}</span>
       </a>`;
     }).join("");
   };
 
+  // "All" / "General" first item per section.
+  // - production / revenue: aggregated view across centrales (Tous · agrégé)
+  // - parametres: organisation-wide settings (Général)
   const allItem = (sectionSlug) => {
-    const href = sectionSlug === "parametres" ? "parametres.html" : `${sectionSlug}.html#all`;
-    const isActive = section === sectionSlug && centrale === "all" && section !== "parametres-detail";
-    return `<a href="${href}" class="subnav-item ${isActive ? 'active' : ''}" style="font-weight:600">
+    if (sectionSlug === "parametres") {
+      const isActive = section === "parametres" && centrale === "all";
+      return `<a href="parametres.html#general" class="subnav-item ${isActive ? 'active' : ''}" style="font-weight:600">
+        <span>Général · org.</span>
+      </a>`;
+    }
+    const isActive = section === sectionSlug && centrale === "all";
+    return `<a href="${sectionSlug}.html#all" class="subnav-item ${isActive ? 'active' : ''}" style="font-weight:600">
       <span>Tous · agrégé</span>
     </a>`;
   };
@@ -151,6 +151,12 @@ function buildSidebar() {
       <a href="reports.html" class="sidebar-item ${section === 'reports' ? 'active' : ''}">
         <i data-lucide="file-text"></i>
         <span>Rapports</span>
+      </a>
+
+      <a href="simulateur.html" class="sidebar-item ${section === 'simulateur' ? 'active' : ''}">
+        <i data-lucide="cpu"></i>
+        <span>Simulateur</span>
+        <span class="badge-mini" style="background:rgba(217,119,6,0.3); color:#fcd34d; border:1px solid rgba(251,191,36,0.4)">V2</span>
       </a>
 
       <a href="inbox.html" class="sidebar-item ${section === 'inbox' ? 'active' : ''}">
@@ -235,6 +241,7 @@ function toggleProfileDropdown() {
       <a href="profil-factures.html"><i data-lucide="file-text" style="width:14px;height:14px"></i> Mes factures</a>
       <a href="profil-jetons.html"><i data-lucide="coins" style="width:14px;height:14px"></i> Mes jetons</a>
       <button onclick="alert('Mes badges — par utilisateur (Marc et Sophie ont chacun les leurs).')"><i data-lucide="award" style="width:14px;height:14px"></i> Mes badges</button>
+      <button onclick="openHelp()"><i data-lucide="life-buoy" style="width:14px;height:14px"></i> Aide &amp; support</button>
       <div class="divider"></div>
       <div class="theme-row">
         <span style="display:inline-flex; align-items:center; gap:8px"><i data-lucide="palette" style="width:14px;height:14px"></i> Thème</span>
@@ -611,6 +618,73 @@ function buildBelpexChart() {
   });
 }
 
+// ---- HELP BUTTON & PANEL (#8) ----
+// Floating "?" icon at bottom-right of every page; clicking opens a help drawer
+// with manuals + "Send message to support" CTA. Also reachable from the profile dropdown.
+function injectHelpButton() {
+  if (document.getElementById("help-fab")) return;
+  const fab = document.createElement("button");
+  fab.id = "help-fab";
+  fab.title = "Aide & support";
+  fab.setAttribute("aria-label", "Aide & support");
+  fab.innerHTML = `<i data-lucide="life-buoy"></i>`;
+  fab.style.cssText = `
+    position: fixed; bottom: 22px; right: 22px;
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    background: var(--brand-blue-strong);
+    color: white;
+    border: 1px solid rgba(255,255,255,0.18);
+    box-shadow: 0 8px 24px -6px rgba(0,0,0,0.5);
+    cursor: pointer;
+    z-index: 40;
+    display: flex; align-items: center; justify-content: center;
+    transition: transform 0.18s, background 0.18s;
+  `;
+  fab.onmouseenter = () => { fab.style.transform = "translateY(-2px)"; fab.style.background = "var(--brand-blue)"; };
+  fab.onmouseleave = () => { fab.style.transform = "none"; fab.style.background = "var(--brand-blue-strong)"; };
+  fab.onclick = openHelp;
+  document.body.appendChild(fab);
+
+  const overlay = document.createElement("div");
+  overlay.id = "help-overlay";
+  overlay.className = "overlay";
+  overlay.onclick = (e) => { if (e.target === overlay) closeOverlay("help-overlay"); };
+  overlay.innerHTML = `
+    <div class="modal modal-lg">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px">
+        <div>
+          <div class="modal-title">Aide &amp; support</div>
+          <div class="modal-subtitle">Documentation, raccourcis et contact direct avec l'équipe Naia.</div>
+        </div>
+        <button class="btn btn-ghost" onclick="closeOverlay('help-overlay')"><i data-lucide="x"></i></button>
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px">
+        <a class="tile" href="#" onclick="event.preventDefault(); alert('Manuels Naia — à lier (PDF / wiki interne)')"><div class="tile-head"><span class="badge badge-blue"><i data-lucide="book-open"></i> Documentation</span></div><div class="tile-title">Manuels &amp; guides</div><div class="tile-desc">Premiers pas, ingestion, indicateurs, comparateurs, pertes, rapports.</div></a>
+        <a class="tile" href="#" onclick="event.preventDefault(); alert('Lien vers la formation vidéo — à venir')"><div class="tile-head"><span class="badge badge-purple"><i data-lucide="video"></i> Formation</span></div><div class="tile-title">Vidéos &amp; webinaires</div><div class="tile-desc">Capsules courtes pour découvrir une fonctionnalité.</div></a>
+        <a class="tile" href="#" onclick="event.preventDefault(); alert('Mailto support@naia.energy avec contexte préempli (page courante, version, organisation)')"><div class="tile-head"><span class="badge badge-green"><i data-lucide="message-circle"></i> Contact</span></div><div class="tile-title">Envoyer un message</div><div class="tile-desc">Direct à l'équipe Naia. Réponse sous 24 h ouvrées.</div></a>
+        <a class="tile" href="#" onclick="event.preventDefault(); alert('Raccourcis clavier — à documenter')"><div class="tile-head"><span class="badge badge-slate"><i data-lucide="keyboard"></i> Raccourcis</span></div><div class="tile-title">Raccourcis clavier</div><div class="tile-desc">Naviguer plus vite : ?, /, g d, g p, g r…</div></a>
+      </div>
+      <div class="muted" style="font-size:11px; margin-top:14px; padding-top:12px; border-top:1px solid var(--border-subtle)">
+        Naia v0.9 · build 2026-05-03 · <a href="#" class="link">notes de version</a> · <a href="#" class="link">statut de la plateforme</a>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+}
+
+function openHelp() {
+  // Close profile dropdown if open
+  const dd = document.getElementById("profile-dropdown");
+  if (dd && dd.classList.contains("open")) {
+    dd.classList.remove("open");
+    const trigger = document.getElementById("profile-trigger");
+    if (trigger) trigger.setAttribute("data-open", "false");
+  }
+  openOverlay("help-overlay");
+  initIcons();
+}
+
 // ---- INIT ----
 document.addEventListener("DOMContentLoaded", () => {
   document.documentElement.setAttribute("data-theme", getTheme());
@@ -619,6 +693,7 @@ document.addEventListener("DOMContentLoaded", () => {
   buildCentraleTabs();
   // Apply current centrale (from hash if present) on first paint so titles + chart match
   applyCentrale(currentCentrale());
+  injectHelpButton();
   initIcons();
   setTimeout(() => {
     buildHomeChart();

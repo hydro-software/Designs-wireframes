@@ -5,126 +5,371 @@
 <title>Paramètres — Naia</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link href="css/style.css" rel="stylesheet"><script src="https://cdn.tailwindcss.com"></script>
+<style>
+  /* Plant-detail collapsible sections (per #261 — folded by default) */
+  .pd-section { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 12px; margin-bottom: 12px; overflow: hidden; }
+  .pd-section-head { padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none; }
+  .pd-section-head:hover { background: var(--bg-card-hover); }
+  .pd-section-title { font-size: 15px; font-weight: 600; display: flex; align-items: center; gap: 10px; }
+  .pd-section-body { padding: 0 20px 20px; border-top: 1px solid var(--border-subtle); padding-top: 18px; }
+  .pd-section[data-open="false"] .pd-section-body { display: none; }
+  .pd-section[data-open="false"] .pd-chev { transform: rotate(-90deg); }
+  .pd-chev { transition: transform 0.18s; color: var(--text-muted); }
+  .pd-info-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border-subtle); font-size: 13px; }
+  .pd-info-row:last-child { border-bottom: 0; }
+  .pd-info-row .lbl { color: var(--text-muted); }
+  /* Indicator catalog (per #225) */
+  .ind-cat { background: var(--bg-base); border: 1px solid var(--border-subtle); border-radius: 10px; padding: 14px 16px; }
+  .ind-cat-title { font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-primary); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+  .ind-cat-title .swatch { width: 10px; height: 10px; border-radius: 50%; }
+  .ind-cat-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; font-size: 13px; border-bottom: 1px dashed var(--border-subtle); }
+  .ind-cat-row:last-child { border-bottom: 0; }
+  .ind-cat-row .name { color: var(--text-primary); }
+  .ind-cat-row .src { color: var(--text-muted); font-size: 11px; }
+  .ind-cat-row input[type="checkbox"] { width: 14px; height: 14px; accent-color: var(--brand-blue); }
+</style>
 </head>
-<body data-page="parametres" data-section="parametres" data-centrale="all">
+<body data-page="parametres" data-section="parametres" data-centrale="moulins">
 <div class="app-shell">
   <aside class="sidebar"></aside>
   <main class="main-area">
+
     <header class="topbar">
       <div>
         <div class="page-eyebrow">Paramètres</div>
-        <div style="font-size:18px; font-weight:600">Mes centrales</div>
+        <div style="font-size:18px; font-weight:600" id="parametres-title">Centrale des Moulins</div>
       </div>
-      <button class="btn btn-primary"><i data-lucide="plus"></i> Ajouter une centrale</button>
+      <div style="display:flex; gap:8px" id="parametres-actions">
+        <button class="btn btn-secondary btn-sm"><i data-lucide="share-2"></i> Partager l'accès</button>
+        <button class="btn btn-secondary btn-sm" style="color:var(--accent-red)"><i data-lucide="trash-2"></i> Supprimer</button>
+      </div>
     </header>
 
-    <div class="page-content">
+    <!-- Centrale tabs at top (#1 — Général + per-centrale; first centrale active by default) -->
+    <div id="parametres-tabs" class="centrale-tabs">
+      <a href="#general" data-tab="general" onclick="switchParametresTab(event, 'general')" class="centrale-tab"><span>Général</span><span class="cap">org.</span></a>
+      <a href="#moulins" data-tab="moulins" onclick="switchParametresTab(event, 'moulins')" class="centrale-tab active"><span>Centrale des Moulins</span><span class="cap">450 kW</span></a>
+      <a href="#bocq"    data-tab="bocq"    onclick="switchParametresTab(event, 'bocq')"    class="centrale-tab"><span>Moulin du Bocq</span><span class="cap">210 kW</span></a>
+      <a href="#ariege"  data-tab="ariege"  onclick="switchParametresTab(event, 'ariege')"  class="centrale-tab"><span>Centrale d'Ariège</span><span class="cap">780 kW</span></a>
+      <a href="#lesse"   data-tab="lesse"   onclick="switchParametresTab(event, 'lesse')"   class="centrale-tab"><span>Moulin de la Lesse</span><span class="cap">320 kW</span></a>
+      <a href="#" onclick="event.preventDefault(); alert('Wizard d\\'ajout — 4 étapes : Info → Compteurs+données → Indicateurs → Récap (#261, sub-issue #271)')" class="centrale-tab" style="margin-left:auto; color:var(--brand-cyan)"><i data-lucide="plus" style="width:13px; height:13px"></i> Ajouter</a>
+    </div>
 
-      <p class="muted" style="font-size:13px; max-width:760px; margin:0 0 18px">
-        Chaque centrale rassemble ses informations, ses compteurs, ses catégories de pertes,
-        sa tarification et ses indicateurs / comparateurs. Les paramètres utilisateur (profil,
-        abonnement, jetons, badges) sont accessibles depuis le menu profil en bas à gauche.
-      </p>
+    <!-- ============================== GÉNÉRAL TAB (org-wide) ============================== -->
+    <div class="page-content" data-tab-content="general" hidden style="max-width:980px">
 
-      <!-- Plant cards — pattern from naia-v3/settings.html, adapted to dark theme + #261 v3 -->
-      <div style="display:flex; flex-direction:column; gap:10px; max-width:980px">
-
-        <a href="plant-detail.html?slug=moulins" class="card" style="text-decoration:none; color:inherit; transition:border-color 0.15s">
-          <div style="padding:18px 22px; display:flex; align-items:center; gap:18px">
-            <div style="flex:1">
-              <div style="display:flex; align-items:center; gap:10px">
-                <h3 style="font-weight:600; font-size:16px; color:var(--text-primary)">Centrale des Moulins</h3>
-                <span class="badge badge-green"><span style="width:6px; height:6px; background:#84cc16; border-radius:50%; display:inline-block"></span>Active</span>
-              </div>
-              <div style="display:flex; gap:18px; font-size:12px; color:var(--text-muted); margin-top:6px">
-                <span style="display:inline-flex; gap:5px; align-items:center"><i data-lucide="map-pin" style="width:13px;height:13px"></i>Bergerac, Dordogne · FR</span>
-                <span style="display:inline-flex; gap:5px; align-items:center"><i data-lucide="activity" style="width:13px;height:13px"></i>2 compteurs</span>
-                <span style="display:inline-flex; gap:5px; align-items:center"><i data-lucide="layers" style="width:13px;height:13px"></i>3 indicateurs · 1 comparateur</span>
-              </div>
-            </div>
-            <div style="text-align:right">
-              <div class="font-display tabular" style="font-size:18px; color:var(--text-primary)">450 kW</div>
-              <div style="font-size:11px; color:var(--text-muted)">Puissance max</div>
-            </div>
-            <i data-lucide="chevron-right" style="color:var(--text-subtle)"></i>
+      <!-- Section: Utilisateurs & rôles (#12) -->
+      <div class="pd-section" data-open="true">
+        <div class="pd-section-head" onclick="this.parentElement.dataset.open = this.parentElement.dataset.open === 'true' ? 'false' : 'true'">
+          <div class="pd-section-title"><i data-lucide="users" style="width:16px; height:16px; color:var(--brand-cyan)"></i> Utilisateurs &amp; rôles <span class="muted" style="font-size:12px; font-weight:400">2 utilisateurs · 3 rôles définis</span></div>
+          <i data-lucide="chevron-down" class="pd-chev"></i>
+        </div>
+        <div class="pd-section-body">
+          <p class="muted" style="font-size:13px; margin:0 0 14px">Toute personne avec un compte rattaché à votre organisation accède à toutes vos centrales selon son rôle. Un utilisateur ne peut pas être ajouté à plusieurs organisations.</p>
+          <table class="data-table">
+            <thead><tr><th>Nom</th><th>Email</th><th>Rôle</th><th>Dernière connexion</th><th>2FA</th><th></th></tr></thead>
+            <tbody>
+              <tr><td><b>Marc Dupont</b><br><span class="muted" style="font-size:11px">vous</span></td><td>marc.dupont@moulin.be</td><td><span class="badge badge-purple">Admin</span></td><td class="muted">aujourd'hui</td><td><span class="badge badge-green">✓</span></td><td><a class="link" style="font-size:12px">Modifier</a></td></tr>
+              <tr><td><b>Sophie Legrand</b></td><td>sophie@moulin.be</td><td><span class="badge badge-blue">Opérateur</span></td><td class="muted">il y a 3 j</td><td><span class="badge badge-amber">à activer</span></td><td><a class="link" style="font-size:12px">Modifier</a></td></tr>
+            </tbody>
+          </table>
+          <div style="display:flex; gap:8px; margin-top:14px">
+            <button class="btn btn-primary btn-sm"><i data-lucide="user-plus"></i> Inviter un utilisateur</button>
+            <button class="btn btn-secondary btn-sm"><i data-lucide="shield"></i> Gérer les rôles</button>
           </div>
-        </a>
 
-        <a href="plant-detail.html?slug=bocq" class="card" style="text-decoration:none; color:inherit">
-          <div style="padding:18px 22px; display:flex; align-items:center; gap:18px">
-            <div style="flex:1">
-              <div style="display:flex; align-items:center; gap:10px">
-                <h3 style="font-weight:600; font-size:16px; color:var(--text-primary)">Moulin du Bocq</h3>
-                <span class="badge badge-green"><span style="width:6px; height:6px; background:#84cc16; border-radius:50%; display:inline-block"></span>Active</span>
-              </div>
-              <div style="display:flex; gap:18px; font-size:12px; color:var(--text-muted); margin-top:6px">
-                <span style="display:inline-flex; gap:5px; align-items:center"><i data-lucide="map-pin" style="width:13px;height:13px"></i>Spontin, Namur · BE</span>
-                <span style="display:inline-flex; gap:5px; align-items:center"><i data-lucide="activity" style="width:13px;height:13px"></i>1 compteur</span>
-                <span style="display:inline-flex; gap:5px; align-items:center"><i data-lucide="layers" style="width:13px;height:13px"></i>2 indicateurs</span>
-              </div>
-            </div>
-            <div style="text-align:right">
-              <div class="font-display tabular" style="font-size:18px; color:var(--text-primary)">210 kW</div>
-              <div style="font-size:11px; color:var(--text-muted)">Puissance max</div>
-            </div>
-            <i data-lucide="chevron-right" style="color:var(--text-subtle)"></i>
-          </div>
-        </a>
-
-        <a href="plant-detail.html?slug=ariege" class="card" style="text-decoration:none; color:inherit">
-          <div style="padding:18px 22px; display:flex; align-items:center; gap:18px">
-            <div style="flex:1">
-              <div style="display:flex; align-items:center; gap:10px">
-                <h3 style="font-weight:600; font-size:16px; color:var(--text-primary)">Centrale d'Ariège</h3>
-                <span class="badge badge-green"><span style="width:6px; height:6px; background:#84cc16; border-radius:50%; display:inline-block"></span>Active</span>
-              </div>
-              <div style="display:flex; gap:18px; font-size:12px; color:var(--text-muted); margin-top:6px">
-                <span style="display:inline-flex; gap:5px; align-items:center"><i data-lucide="map-pin" style="width:13px;height:13px"></i>Foix, Ariège · FR</span>
-                <span style="display:inline-flex; gap:5px; align-items:center"><i data-lucide="activity" style="width:13px;height:13px"></i>3 compteurs</span>
-                <span style="display:inline-flex; gap:5px; align-items:center"><i data-lucide="layers" style="width:13px;height:13px"></i>4 indicateurs · 2 comparateurs</span>
-              </div>
-            </div>
-            <div style="text-align:right">
-              <div class="font-display tabular" style="font-size:18px; color:var(--text-primary)">780 kW</div>
-              <div style="font-size:11px; color:var(--text-muted)">Puissance max</div>
-            </div>
-            <i data-lucide="chevron-right" style="color:var(--text-subtle)"></i>
-          </div>
-        </a>
-
-        <a href="plant-detail.html?slug=lesse" class="card" style="text-decoration:none; color:inherit">
-          <div style="padding:18px 22px; display:flex; align-items:center; gap:18px">
-            <div style="flex:1">
-              <div style="display:flex; align-items:center; gap:10px">
-                <h3 style="font-weight:600; font-size:16px; color:var(--text-primary)">Moulin de la Lesse</h3>
-                <span class="badge badge-amber"><span style="width:6px; height:6px; background:#fbbf24; border-radius:50%; display:inline-block"></span>Données partielles</span>
-              </div>
-              <div style="display:flex; gap:18px; font-size:12px; color:var(--text-muted); margin-top:6px">
-                <span style="display:inline-flex; gap:5px; align-items:center"><i data-lucide="map-pin" style="width:13px;height:13px"></i>Houyet, Namur · BE</span>
-                <span style="display:inline-flex; gap:5px; align-items:center"><i data-lucide="activity" style="width:13px;height:13px"></i>1 compteur</span>
-                <span style="display:inline-flex; gap:5px; align-items:center"><i data-lucide="layers" style="width:13px;height:13px"></i>2 indicateurs</span>
-              </div>
-            </div>
-            <div style="text-align:right">
-              <div class="font-display tabular" style="font-size:18px; color:var(--text-primary)">320 kW</div>
-              <div style="font-size:11px; color:var(--text-muted)">Puissance max</div>
-            </div>
-            <i data-lucide="chevron-right" style="color:var(--text-subtle)"></i>
-          </div>
-        </a>
-
+          <h4 style="font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em; font-weight:600; margin: 22px 0 10px">Rôles disponibles</h4>
+          <table class="data-table" style="font-size:12px">
+            <thead><tr><th>Rôle</th><th>Voir prod / pertes</th><th>Charger données</th><th>Modifier centrale</th><th>Inviter / gérer rôles</th><th>Facturation / abonnement</th></tr></thead>
+            <tbody>
+              <tr><td><b>Admin</b><br><span class="muted">propriétaire / direction</span></td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td></tr>
+              <tr><td><b>Opérateur</b><br><span class="muted">technicien terrain</span></td><td>✓</td><td>✓</td><td>—</td><td>—</td><td>—</td></tr>
+              <tr><td><b>Lecture seule</b><br><span class="muted">comptable / banque</span></td><td>✓ (rapports)</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+            </tbody>
+          </table>
+        </div>
       </div>
 
-      <p class="muted" style="font-size:12px; margin-top:18px; max-width:760px; line-height:1.6">
-        <b>Note (#261)</b> — Pas d'onglets « Indicateurs » et « Comparateurs » au niveau de cette page :
-        ils sont gérés dans la page de détail de chaque centrale (section <i>Indicateurs contextuels</i>,
-        avec sous-catégories Météo / Hydro / Prix / Comparateur). L'ingestion de données se fait depuis
-        <a href="data.html" class="link">Données</a> (sidebar), accessible en un clic.
-      </p>
+      <!-- Section: Préférences générales -->
+      <div class="pd-section" data-open="false">
+        <div class="pd-section-head" onclick="this.parentElement.dataset.open = this.parentElement.dataset.open === 'true' ? 'false' : 'true'">
+          <div class="pd-section-title"><i data-lucide="globe" style="width:16px; height:16px; color:var(--brand-cyan)"></i> Préférences générales</div>
+          <i data-lucide="chevron-down" class="pd-chev"></i>
+        </div>
+        <div class="pd-section-body">
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px">
+            <div>
+              <div class="pd-info-row"><span class="lbl">Langue par défaut</span><span>Français</span></div>
+              <div class="pd-info-row"><span class="lbl">Devise</span><span>EUR (€)</span></div>
+              <div class="pd-info-row"><span class="lbl">Format de date</span><span>JJ/MM/AAAA</span></div>
+            </div>
+            <div>
+              <div class="pd-info-row"><span class="lbl">Thème par défaut</span><span>Sombre</span></div>
+              <div class="pd-info-row"><span class="lbl">Décimale</span><span>Virgule (1 234,56)</span></div>
+              <div class="pd-info-row"><span class="lbl">Fuseau horaire</span><span>Auto (par centrale)</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section: Catalogue d'indicateurs et comparateurs (#225) — global library -->
+      <div class="pd-section" data-open="false">
+        <div class="pd-section-head" onclick="this.parentElement.dataset.open = this.parentElement.dataset.open === 'true' ? 'false' : 'true'">
+          <div class="pd-section-title"><i data-lucide="layers" style="width:16px; height:16px; color:var(--brand-cyan)"></i> Catalogue d'indicateurs &amp; comparateurs <span class="badge badge-slate">global</span></div>
+          <i data-lucide="chevron-down" class="pd-chev"></i>
+        </div>
+        <div class="pd-section-body">
+          <p class="muted" style="font-size:13px; margin:0 0 14px">Définition globale (rare — ~1× par an, cf. #261). Chaque centrale active ensuite ce qu'elle veut afficher (cf. son onglet → section "Indicateurs contextuels" — #225).</p>
+          <div style="display:flex; gap:8px"><button class="btn btn-primary btn-sm"><i data-lucide="plus"></i> Créer un indicateur</button><button class="btn btn-secondary btn-sm"><i data-lucide="git-compare"></i> Créer un comparateur</button></div>
+        </div>
+      </div>
+
+      <!-- Section: Sources de données par défaut -->
+      <div class="pd-section" data-open="false">
+        <div class="pd-section-head" onclick="this.parentElement.dataset.open = this.parentElement.dataset.open === 'true' ? 'false' : 'true'">
+          <div class="pd-section-title"><i data-lucide="cable" style="width:16px; height:16px; color:var(--brand-cyan)"></i> Sources de données &amp; intégrations</div>
+          <i data-lucide="chevron-down" class="pd-chev"></i>
+        </div>
+        <div class="pd-section-body">
+          <table class="data-table" style="font-size:13px">
+            <thead><tr><th>Source</th><th>Type</th><th>Statut</th></tr></thead>
+            <tbody>
+              <tr><td>SCADA</td><td>Production</td><td><span class="badge badge-green">Connecté</span></td></tr>
+              <tr><td>Enedis · automation R63 (#230)</td><td>Production · backup</td><td><span class="badge badge-green">Connecté</span></td></tr>
+              <tr><td>Météo France / IRM</td><td>Indicateur · pluie</td><td><span class="badge badge-green">Connecté</span></td></tr>
+              <tr><td>SCHAPI / VMM</td><td>Indicateur · débit</td><td><span class="badge badge-green">Connecté</span></td></tr>
+              <tr><td>EPEX SPOT</td><td>Indicateur · prix</td><td><span class="badge badge-green">Connecté</span></td></tr>
+            </tbody>
+          </table>
+          <div style="margin-top:14px"><button class="btn btn-secondary btn-sm"><i data-lucide="key"></i> Tokens API</button></div>
+        </div>
+      </div>
 
     </div>
+
+    <!-- ========================= CENTRALE TAB (per-centrale, swappable) ========================= -->
+    <div class="page-content" data-tab-content="centrale" style="max-width:980px">
+
+      <!-- Section 1 — Informations générales (closed by default) -->
+      <div class="pd-section" data-open="false">
+        <div class="pd-section-head" onclick="this.parentElement.dataset.open = this.parentElement.dataset.open === 'true' ? 'false' : 'true'">
+          <div class="pd-section-title"><i data-lucide="info" style="width:16px; height:16px; color:var(--brand-cyan)"></i> Informations générales</div>
+          <i data-lucide="chevron-down" class="pd-chev"></i>
+        </div>
+        <div class="pd-section-body">
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px">
+            <div>
+              <div class="pd-info-row"><span class="lbl">Nom</span><span data-pd-name>Centrale des Moulins</span></div>
+              <div class="pd-info-row"><span class="lbl">Alias court</span><span data-pd-alias>MOU</span></div>
+              <div class="pd-info-row"><span class="lbl">Pays / région</span><span data-pd-country>Bergerac, Dordogne · FR</span></div>
+              <div class="pd-info-row"><span class="lbl">Bassin versant</span><span>Dordogne</span></div>
+            </div>
+            <div>
+              <div class="pd-info-row"><span class="lbl">Puissance max</span><span class="tabular" data-pd-capacity>450 kW</span></div>
+              <div class="pd-info-row"><span class="lbl">Type de turbine</span><span>Kaplan</span></div>
+              <div class="pd-info-row"><span class="lbl">Mise en service</span><span>1968 (rénovée 2018)</span></div>
+              <div class="pd-info-row"><span class="lbl">Fuseau horaire</span><span data-pd-tz>Europe/Paris</span></div>
+            </div>
+          </div>
+          <div style="margin-top:14px"><button class="btn btn-secondary btn-sm"><i data-lucide="edit-3"></i> Modifier</button></div>
+        </div>
+      </div>
+
+      <!-- Section 2 — Compteurs (closed) -->
+      <div class="pd-section" data-open="false">
+        <div class="pd-section-head" onclick="this.parentElement.dataset.open = this.parentElement.dataset.open === 'true' ? 'false' : 'true'">
+          <div class="pd-section-title"><i data-lucide="cpu" style="width:16px; height:16px; color:var(--brand-cyan)"></i> Compteurs &amp; ingestion de données</div>
+          <i data-lucide="chevron-down" class="pd-chev"></i>
+        </div>
+        <div class="pd-section-body">
+          <table class="data-table">
+            <thead><tr><th>Compteur</th><th>Type</th><th>PRM Enedis</th><th>Source</th><th>Couverture 30j</th></tr></thead>
+            <tbody>
+              <tr><td><b><span data-pd-alias>MOU</span>-PRINC</b><br><span class="muted" style="font-size:11px">Production principale</span></td><td><span class="badge badge-cyan">Physique</span></td><td class="tabular">25130200000123</td><td>Enedis R63</td><td class="tabular">98 %</td></tr>
+              <tr><td><b><span data-pd-alias>MOU</span>-AUX</b><br><span class="muted" style="font-size:11px">Auxiliaires</span></td><td><span class="badge badge-cyan">Physique</span></td><td class="tabular">25130200000124</td><td>SCADA</td><td class="tabular">99 %</td></tr>
+            </tbody>
+          </table>
+          <div style="display:flex; gap:8px; margin-top:14px">
+            <button class="btn btn-primary btn-sm"><i data-lucide="upload"></i> Charger des données</button>
+            <button class="btn btn-secondary btn-sm"><i data-lucide="plus"></i> Ajouter un compteur</button>
+            <a href="data.html" class="btn btn-ghost btn-sm" style="margin-left:auto">Voir l'historique d'imports →</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 3 — Indicateurs contextuels (#225 — categorized) -->
+      <div class="pd-section" data-open="false">
+        <div class="pd-section-head" onclick="this.parentElement.dataset.open = this.parentElement.dataset.open === 'true' ? 'false' : 'true'">
+          <div class="pd-section-title"><i data-lucide="layers" style="width:16px; height:16px; color:var(--brand-cyan)"></i> Indicateurs contextuels &amp; comparateurs <span class="muted" style="font-size:12px; font-weight:400; margin-left:6px">(#225 · catégories)</span></div>
+          <i data-lucide="chevron-down" class="pd-chev"></i>
+        </div>
+        <div class="pd-section-body">
+          <p class="muted" style="font-size:13px; margin:0 0 14px">
+            Indicateurs disponibles pour <b data-pd-name>Centrale des Moulins</b>, organisés par catégorie. Cochez ceux à afficher à côté de la production.
+          </p>
+
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:12px">
+
+            <!-- Pluie (Rain) -->
+            <div class="ind-cat">
+              <div class="ind-cat-title"><span class="swatch" style="background:#60a5fa"></span> Pluie</div>
+              <div class="ind-cat-row"><label style="display:flex; align-items:center; gap:8px"><input type="checkbox" checked><span><span class="name">Pluie · <span data-pd-locality>Bergerac</span></span><br><span class="src">Météo France · stat. proche</span></span></label></div>
+              <div class="ind-cat-row"><label style="display:flex; align-items:center; gap:8px"><input type="checkbox"><span><span class="name">Pluie · station amont</span><br><span class="src">SCHAPI · 12 km amont</span></span></label></div>
+              <div class="ind-cat-row" style="text-align:center; padding-top:8px"><a href="#" class="link" style="font-size:12px">+ Ajouter une source pluie</a></div>
+            </div>
+
+            <!-- Hydro / River -->
+            <div class="ind-cat">
+              <div class="ind-cat-title"><span class="swatch" style="background:#a3e635"></span> Hydro · débit</div>
+              <div class="ind-cat-row"><label style="display:flex; align-items:center; gap:8px"><input type="checkbox" checked><span><span class="name">Débit · <span data-pd-river>Dordogne</span></span><br><span class="src">SCHAPI · station Bergerac</span></span></label></div>
+              <div class="ind-cat-row"><label style="display:flex; align-items:center; gap:8px"><input type="checkbox"><span><span class="name">Débit · affluent</span><br><span class="src">SCHAPI · station amont</span></span></label></div>
+              <div class="ind-cat-row" style="text-align:center; padding-top:8px"><a href="#" class="link" style="font-size:12px">+ Ajouter un capteur débit</a></div>
+            </div>
+
+            <!-- Prix -->
+            <div class="ind-cat">
+              <div class="ind-cat-title"><span class="swatch" style="background:#fbbf24"></span> Prix</div>
+              <div class="ind-cat-row"><label style="display:flex; align-items:center; gap:8px"><input type="checkbox"><span><span class="name">Spot Belpex</span><br><span class="src">EPEX SPOT BE · base load</span></span></label></div>
+              <div class="ind-cat-row"><label style="display:flex; align-items:center; gap:8px"><input type="checkbox"><span><span class="name">Spot EPEX FR</span><br><span class="src">EPEX SPOT FR · base load</span></span></label></div>
+              <div class="ind-cat-row"><label style="display:flex; align-items:center; gap:8px"><input type="checkbox"><span><span class="name">aFRR</span><br><span class="src">Elia · capacité + activation</span></span></label></div>
+            </div>
+
+            <!-- Comparateurs -->
+            <div class="ind-cat">
+              <div class="ind-cat-title"><span class="swatch" style="background:#7dd3fc"></span> Comparateurs</div>
+              <div class="ind-cat-row"><label style="display:flex; align-items:center; gap:8px"><input type="checkbox" checked><span><span class="name">AGG DAILY MDA</span><br><span class="src">Centrale ref. ×1,38</span></span></label></div>
+              <div class="ind-cat-row"><label style="display:flex; align-items:center; gap:8px"><input type="checkbox"><span><span class="name">Production N-1</span><br><span class="src">Cette centrale · même mois 2025</span></span></label></div>
+              <div class="ind-cat-row" style="text-align:center; padding-top:8px"><a href="#" class="link" style="font-size:12px">+ Ajouter un comparateur</a></div>
+            </div>
+
+          </div>
+
+          <p class="muted" style="font-size:12px; line-height:1.5; margin:14px 0 0">
+            Les indicateurs cochés apparaissent comme options sélectionnables dans le panel <i>Indicateurs contextuels</i> à côté du graphique de production.
+          </p>
+        </div>
+      </div>
+
+      <!-- Section 4 — Catégories de pertes (closed) -->
+      <div class="pd-section" data-open="false">
+        <div class="pd-section-head" onclick="this.parentElement.dataset.open = this.parentElement.dataset.open === 'true' ? 'false' : 'true'">
+          <div class="pd-section-title"><i data-lucide="alert-triangle" style="width:16px; height:16px; color:var(--brand-cyan)"></i> Catégories de pertes <span class="badge badge-slate">6 actives</span></div>
+          <i data-lucide="chevron-down" class="pd-chev"></i>
+        </div>
+        <div class="pd-section-body">
+          <p class="muted" style="font-size:13px; margin:0 0 12px">Catégories utilisées pour classifier les pertes de production sur cette centrale.</p>
+          <div style="display:flex; flex-wrap:wrap; gap:8px">
+            <span class="badge badge-amber">Maintenance</span>
+            <span class="badge badge-red">Panne</span>
+            <span class="badge badge-cyan">Environnement</span>
+            <span class="badge badge-blue">Opérationnel</span>
+            <span class="badge badge-purple">Réseau / Contrainte</span>
+            <span class="badge badge-slate">Données</span>
+          </div>
+          <div style="margin-top:14px"><button class="btn btn-secondary btn-sm"><i data-lucide="edit-3"></i> Configurer</button></div>
+        </div>
+      </div>
+
+      <!-- Section 5 — Tarification (closed) -->
+      <div class="pd-section" data-open="false">
+        <div class="pd-section-head" onclick="this.parentElement.dataset.open = this.parentElement.dataset.open === 'true' ? 'false' : 'true'">
+          <div class="pd-section-title"><i data-lucide="euro" style="width:16px; height:16px; color:var(--brand-cyan)"></i> Tarification <span class="badge badge-slate">#221</span></div>
+          <i data-lucide="chevron-down" class="pd-chev"></i>
+        </div>
+        <div class="pd-section-body">
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px">
+            <div>
+              <div class="pd-info-row"><span class="lbl">Tarif d'achat</span><span>Marché spot Belpex (FR)</span></div>
+              <div class="pd-info-row"><span class="lbl">Contrat</span><span>OA + complément</span></div>
+              <div class="pd-info-row"><span class="lbl">Durée restante</span><span>11 ans</span></div>
+            </div>
+            <div>
+              <div class="pd-info-row"><span class="lbl">Prix moyen 2025</span><span class="tabular">93,2 €/MWh</span></div>
+              <div class="pd-info-row"><span class="lbl">Prix moyen YTD 2026</span><span class="tabular">91,8 €/MWh</span></div>
+              <div class="pd-info-row"><span class="lbl">Indice révision</span><span>EDF tarif régulé</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 6 — Partage d'accès (closed) -->
+      <div class="pd-section" data-open="false">
+        <div class="pd-section-head" onclick="this.parentElement.dataset.open = this.parentElement.dataset.open === 'true' ? 'false' : 'true'">
+          <div class="pd-section-title"><i data-lucide="share-2" style="width:16px; height:16px; color:var(--brand-cyan)"></i> Partage d'accès <span class="badge badge-slate">#218</span></div>
+          <i data-lucide="chevron-down" class="pd-chev"></i>
+        </div>
+        <div class="pd-section-body">
+          <p class="muted" style="font-size:13px; margin:0 0 12px">Inviter un autre opérateur (comparateur), une banque (lecture seule), un assureur, etc. — sans les ajouter à votre organisation.</p>
+          <table class="data-table">
+            <thead><tr><th>Personne / org.</th><th>Rôle</th><th>Type</th><th>Depuis</th></tr></thead>
+            <tbody>
+              <tr><td>Sophie Legrand · Centrale de la Semois</td><td><span class="badge badge-cyan">Comparateur</span></td><td>Lecture agrégée</td><td class="muted">12 mars</td></tr>
+              <tr><td>Crédit Agricole Sud-Ouest</td><td><span class="badge badge-blue">Banque</span></td><td>Rapport mensuel</td><td class="muted">8 mars</td></tr>
+            </tbody>
+          </table>
+          <div style="margin-top:14px"><button class="btn btn-secondary btn-sm"><i data-lucide="user-plus"></i> Inviter</button></div>
+        </div>
+      </div>
+
+    </div>
+
   </main>
 </div>
+
 <script src="https://unpkg.com/lucide@latest"></script>
 <script src="js/app.js"></script>
+<script>
+  // Per-centrale data table
+  const CENTRALES_PARAM = {
+    moulins: { name: "Centrale des Moulins", capacity: "450 kW", country: "Bergerac, Dordogne · FR", alias: "MOU", tz: "Europe/Paris",   river: "Dordogne", locality: "Bergerac" },
+    bocq:    { name: "Moulin du Bocq",       capacity: "210 kW", country: "Spontin, Namur · BE",     alias: "BOC", tz: "Europe/Brussels", river: "Bocq",     locality: "Spontin" },
+    ariege:  { name: "Centrale d'Ariège",    capacity: "780 kW", country: "Foix, Ariège · FR",       alias: "ARI", tz: "Europe/Paris",   river: "Ariège",   locality: "Foix" },
+    lesse:   { name: "Moulin de la Lesse",   capacity: "320 kW", country: "Houyet, Namur · BE",      alias: "LES", tz: "Europe/Brussels", river: "Lesse",    locality: "Houyet" },
+  };
+
+  function applyCentraleParametres(slug) {
+    const c = CENTRALES_PARAM[slug] || CENTRALES_PARAM.moulins;
+    document.querySelectorAll("[data-pd-name]").forEach(el => el.textContent = c.name);
+    document.querySelectorAll("[data-pd-capacity]").forEach(el => el.textContent = c.capacity);
+    document.querySelectorAll("[data-pd-country]").forEach(el => el.textContent = c.country);
+    document.querySelectorAll("[data-pd-alias]").forEach(el => el.textContent = c.alias);
+    document.querySelectorAll("[data-pd-tz]").forEach(el => el.textContent = c.tz);
+    document.querySelectorAll("[data-pd-river]").forEach(el => el.textContent = c.river);
+    document.querySelectorAll("[data-pd-locality]").forEach(el => el.textContent = c.locality);
+    document.getElementById("parametres-title").textContent = c.name;
+    document.body.dataset.centrale = slug;
+  }
+
+  function switchParametresTab(e, tab) {
+    if (e) e.preventDefault();
+    if (location.hash !== "#" + tab) history.replaceState(null, "", "#" + tab);
+    document.querySelectorAll(".centrale-tab").forEach(t => t.classList.toggle("active", t.dataset.tab === tab));
+    const generalView = document.querySelector('[data-tab-content="general"]');
+    const centraleView = document.querySelector('[data-tab-content="centrale"]');
+    const actions = document.getElementById("parametres-actions");
+    if (tab === "general") {
+      generalView.hidden = false;
+      centraleView.hidden = true;
+      document.getElementById("parametres-title").textContent = "Configuration de l'organisation";
+      actions.style.display = "none";
+      document.body.dataset.centrale = "all";
+    } else {
+      generalView.hidden = true;
+      centraleView.hidden = false;
+      actions.style.display = "flex";
+      applyCentraleParametres(tab);
+    }
+    if (typeof initIcons === "function") initIcons();
+  }
+
+  // Initial load: read hash, default to first centrale (moulins)
+  document.addEventListener("DOMContentLoaded", () => {
+    const tab = (location.hash || "#moulins").replace("#", "");
+    switchParametresTab(null, tab);
+  });
+  window.addEventListener("hashchange", () => {
+    const tab = (location.hash || "#moulins").replace("#", "");
+    switchParametresTab(null, tab);
+  });
+</script>
 </body></html>
