@@ -41,14 +41,17 @@
         </div>
       </div>
 
+      <!-- Points evolution + recent activity, side by side -->
+      <div style="display:grid; gap:18px; grid-template-columns:2fr 1fr; margin-bottom:18px">
+
       <!-- Chart -->
-      <div class="card" style="margin-bottom:18px">
+      <div class="card">
         <div class="card-head"><div><div class="card-head-title">Évolution des points · 12 dernières semaines</div><div class="card-head-sub">Partagé entre tous les utilisateurs de Moulin du Bocq</div></div></div>
-        <div class="card-body" style="height:300px"><div class="chart-container" style="height:100%"><canvas id="points-chart"></canvas></div></div>
+        <div class="card-body" style="height:380px"><div class="chart-container" style="height:100%"><canvas id="points-chart"></canvas></div></div>
       </div>
 
       <!-- Recent activity — org points ledger (FR-POINTS-4) -->
-      <div class="card" style="margin-bottom:18px">
+      <div class="card">
         <div class="card-head"><div><div class="card-head-title">Activité récente — organisation</div></div></div>
         <div class="card-body" style="padding-top:6px; padding-bottom:6px">
           <div class="activity-row">
@@ -84,6 +87,8 @@
           <div style="text-align:center; padding:12px 0 2px"><button class="btn btn-sm btn-secondary">Charger plus</button></div>
         </div>
       </div>
+
+      </div><!-- /points + activity grid -->
 
       <!-- Activities -->
       <h3 style="font-size:13px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em; font-weight:600; margin: 0 0 10px">Découverte fonctionnalités · gagnez en testant</h3>
