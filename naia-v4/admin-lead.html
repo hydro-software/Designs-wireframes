@@ -22,6 +22,16 @@
   .funnel-main { flex: 1; }
   .funnel-title { font-size: 13px; font-weight: 500; }
   .funnel-meta { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+  .plq-empty { text-align: center; padding: 22px 16px; border: 1px dashed var(--border-default); border-radius: 10px; }
+  .plq-link-box { display: flex; align-items: center; gap: 8px; margin-top: 12px; padding: 9px 12px; background: var(--bg-input); border: 1px solid var(--border-subtle); border-radius: 9px; }
+  .plq-link-box code { flex: 1; font-size: 12px; color: var(--brand-cyan); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .btn-xs { padding: 4px 9px !important; font-size: 11px !important; }
+  .plq-sub-title { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-subtle); margin-bottom: 6px; }
+  .plq-event { display: flex; gap: 9px; align-items: center; font-size: 12px; padding: 5px 0; border-bottom: 1px solid var(--border-subtle); }
+  .plq-event:last-child { border-bottom: 0; }
+  .plq-event .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--brand-cyan); flex-shrink: 0; }
+  .plq-event .ev-when { color: var(--text-muted); margin-left: auto; }
+  .plq-sync { font-size: 11px; color: var(--text-subtle); margin-top: 10px; display: flex; align-items: center; gap: 6px; }
 </style>
 </head>
 <body data-page="admin-leads" data-section="admin">
@@ -38,7 +48,7 @@
       </div>
       <div style="display:flex; gap:8px">
         <button class="btn btn-secondary btn-sm"><i data-lucide="mail"></i> Contacter</button>
-        <button class="btn btn-secondary btn-sm"><i data-lucide="external-link"></i> Brevo</button>
+        <button class="btn btn-secondary btn-sm"><i data-lucide="external-link"></i> Odoo</button>
         <a class="btn btn-primary btn-sm" id="promote-btn" href="admin-abonnements.html?promote=doubs-micro">
           <i data-lucide="user-plus"></i> Promouvoir → signature
         </a>
@@ -53,6 +63,7 @@
         <div class="kpi-card"><div class="kpi-label">Score jeu Naia</div><div class="kpi-value tabular" data-lead-score>187 / 250</div><div class="kpi-delta muted">top 18 %</div></div>
         <div class="kpi-card"><div class="kpi-label">Capacité estimée</div><div class="kpi-value tabular" data-lead-kw>240 kW</div><div class="kpi-delta muted">1 plant déclaré</div></div>
         <div class="kpi-card"><div class="kpi-label">RGPD · consentement</div><div class="kpi-value" style="font-size:18px"><span class="badge badge-green">Oui</span></div><div class="kpi-delta muted" data-lead-purge-eta>Auto-purge dans 23 mois</div></div>
+        <div class="kpi-card"><div class="kpi-label">Plaquette de suivi</div><div class="kpi-value" style="font-size:18px" data-plq-kpi>Vue 2×</div><div class="kpi-delta muted" data-plq-kpi-sub>PDF téléchargé · 6 mai</div></div>
       </div>
 
       <div style="display:grid; gap:14px; grid-template-columns: 1.4fr 1fr">
@@ -66,7 +77,7 @@
             <div class="ld-section-body">
               <div class="funnel-step done"><div class="funnel-dot">✓</div><div class="funnel-main"><div class="funnel-title">Lead capturé</div><div class="funnel-meta" data-lead-capture>Conf. Hydro 2026 · Lyon · 30 avril 2026 · stand · jeu Naia (score 187)</div></div></div>
               <div class="funnel-step done"><div class="funnel-dot">✓</div><div class="funnel-main"><div class="funnel-title">Consentement RGPD</div><div class="funnel-meta">Coché sur la tablette du stand · 30 avril 2026</div></div></div>
-              <div class="funnel-step done"><div class="funnel-dot">✓</div><div class="funnel-main"><div class="funnel-title">Email post-conférence envoyé</div><div class="funnel-meta">Brevo campagne <b class="tabular">CONF-LYON-MAI-26</b> · 1 mai 2026 · ouvert ✓ · cliqué ✓</div></div></div>
+              <div class="funnel-step done"><div class="funnel-dot">✓</div><div class="funnel-main"><div class="funnel-title">Email post-conférence envoyé</div><div class="funnel-meta">Odoo · campagne <b class="tabular">CONF-LYON-MAI-26</b> · 1 mai 2026 · ouvert ✓ · cliqué ✓</div></div></div>
               <div class="funnel-step current"><div class="funnel-dot">4</div><div class="funnel-main"><div class="funnel-title">Demo provisionnée — actuel</div><div class="funnel-meta">Compte demo créé le 1 mai 2026 · expire 23 mai 2026 · 3 sessions de connexion</div></div></div>
               <div class="funnel-step future"><div class="funnel-dot">5</div><div class="funnel-main"><div class="funnel-title">Promouvoir vers signature</div><div class="funnel-meta">Cliquer "Promouvoir → signature" en haut · le wizard FR-SIGNUP s'ouvrira pré-rempli avec toutes les infos du lead</div></div></div>
               <div class="funnel-step future"><div class="funnel-dot">6</div><div class="funnel-main"><div class="funnel-title">Yousign envelope · contrat + mandats DSO</div><div class="funnel-meta">Envoyée à <span data-lead-email>antoine@doubs-hydro.fr</span> · expire +7 j · auto-relance +24 h</div></div></div>
@@ -111,6 +122,53 @@
             </div>
           </div>
 
+          <!-- Section: Plaquette de suivi (FR-PLAQUETTE) -->
+          <div class="ld-section" id="plaquette">
+            <div class="ld-section-head">
+              <div class="ld-section-title"><i data-lucide="file-text" style="width:15px; color:var(--brand-cyan)"></i> Plaquette de suivi</div>
+              <span class="badge badge-blue" id="plq-head-badge" style="display:none">Vue 2×</span>
+            </div>
+            <div class="ld-section-body">
+              <p class="muted" style="font-size:12px; margin:0 0 14px">Document Naia d'une page, personnalisé pour ce lead, à envoyer en suivi après la démo. Le lien est unique et suivi — chaque ouverture est tracée. Le commercial envoie le lien depuis Odoo ; les vues remontent vers Odoo CRM.</p>
+
+              <!-- État : pas encore générée -->
+              <div id="plq-state-empty" style="display:none">
+                <div class="plq-empty">
+                  <i data-lucide="file-plus-2" style="width:22px; height:22px; color:var(--text-subtle)"></i>
+                  <div style="font-size:13px; margin:10px 0 2px">Pas encore de plaquette</div>
+                  <div class="muted" style="font-size:12px; margin-bottom:14px">Générez une plaquette personnalisée à envoyer en suivi de démo.</div>
+                  <button class="btn btn-primary btn-sm" id="plq-generate"><i data-lucide="sparkles"></i> Générer la plaquette</button>
+                </div>
+              </div>
+
+              <!-- État : générée -->
+              <div id="plq-state-generated" style="display:none">
+                <div class="ld-info-row"><span class="lbl">État</span><span><span class="badge badge-green">Générée · figée</span></span></div>
+                <div class="ld-info-row"><span class="lbl">Personnalisée pour</span><span data-plq-for>Antoine Bertin — Microcentrale du Doubs</span></div>
+                <div class="ld-info-row"><span class="lbl">Contenu</span><span data-plq-content>Plaquette Naia · FR · v2</span></div>
+                <div class="ld-info-row"><span class="lbl">Générée</span><span data-plq-gen>4 mai 2026 · par Bernard</span></div>
+
+                <div class="plq-link-box">
+                  <i data-lucide="link" style="width:14px; height:14px; color:var(--brand-cyan); flex-shrink:0"></i>
+                  <code data-plq-url>naia.energy/p/d8f3a92c</code>
+                  <button class="btn btn-secondary btn-xs" id="plq-copy"><i data-lucide="copy"></i> Copier</button>
+                  <a class="btn btn-secondary btn-xs" id="plq-preview" target="_blank"><i data-lucide="external-link"></i> Aperçu</a>
+                </div>
+
+                <div style="margin-top:16px">
+                  <div class="plq-sub-title">Engagement — suivi des vues</div>
+                  <div id="plq-events"></div>
+                  <div class="plq-sync"><i data-lucide="refresh-cw" style="width:12px; height:12px"></i> Vues synchronisées vers Odoo CRM comme activités du lead.</div>
+                </div>
+
+                <div style="display:flex; gap:6px; margin-top:16px">
+                  <button class="btn btn-secondary btn-sm" id="plq-regenerate"><i data-lucide="rotate-cw"></i> Régénérer</button>
+                  <a class="btn btn-secondary btn-sm" id="plq-preview-2" target="_blank"><i data-lucide="eye"></i> Voir la plaquette</a>
+                </div>
+              </div>
+            </div>
+          </div>
+
         </div>
 
         <!-- RIGHT COLUMN -->
@@ -134,7 +192,7 @@
             <div class="ld-section-body">
               <div class="ld-info-row"><span class="lbl">Compte demo</span><span><a class="link" href="admin-customer.html">demo-doubs-micro →</a></span></div>
               <div class="ld-info-row"><span class="lbl">Client payant</span><span class="muted">— pas encore</span></div>
-              <div class="ld-info-row"><span class="lbl">Brevo contact</span><span><a class="link" target="_blank" href="#">contact_d8429 ↗</a></span></div>
+              <div class="ld-info-row"><span class="lbl">Odoo contact</span><span><a class="link" target="_blank" href="#">res.partner #d8429 ↗</a></span></div>
               <div class="ld-info-row"><span class="lbl">days_from_capture</span><span class="tabular" data-lead-days>3 jours</span></div>
             </div>
           </div>
@@ -156,7 +214,8 @@
             <div class="ld-section-body" style="display:flex; flex-direction:column; gap:6px">
               <a class="btn btn-primary btn-sm" id="promote-btn-2" href="admin-abonnements.html?promote=doubs-micro" style="justify-content:flex-start"><i data-lucide="user-plus"></i> Promouvoir → signature</a>
               <button class="btn btn-secondary btn-sm" style="justify-content:flex-start"><i data-lucide="play-circle"></i> Prolonger la demo (+30 j)</button>
-              <button class="btn btn-secondary btn-sm" style="justify-content:flex-start"><i data-lucide="mail"></i> Envoyer un email (Brevo)</button>
+              <button class="btn btn-secondary btn-sm" style="justify-content:flex-start"><i data-lucide="mail"></i> Envoyer un email (Odoo)</button>
+              <button class="btn btn-secondary btn-sm" id="action-plaquette" style="justify-content:flex-start"><i data-lucide="file-text"></i> Plaquette de suivi</button>
               <button class="btn btn-secondary btn-sm" style="justify-content:flex-start"><i data-lucide="phone"></i> Marquer "appelé"</button>
               <button class="btn btn-secondary btn-sm" style="justify-content:flex-start"><i data-lucide="message-square"></i> Ajouter une note</button>
               <button class="btn btn-secondary btn-sm" style="justify-content:flex-start; color:var(--accent-amber)"><i data-lucide="x-circle"></i> Marquer comme dropped</button>
@@ -208,6 +267,80 @@
     document.querySelectorAll('[data-lead-purge-eta-2]').forEach(el => el.textContent = `23 mois`);
     document.getElementById('promote-btn').href = promoteHref;
     document.getElementById('promote-btn-2').href = promoteHref;
+
+    // --- Plaquette de suivi (FR-PLAQUETTE) ---
+    const PLAQUETTES = {
+      'doubs-micro': { token: 'd8f3a92c', content: 'Plaquette Naia · FR · v2', gen: '4 mai 2026 · par Bernard', events: [
+        { label: 'Plaquette ouverte', when: '4 mai · 16:40' },
+        { label: 'Ré-ouverte', when: '6 mai · 09:12' },
+        { label: 'PDF téléchargé', when: '6 mai · 09:14' } ] },
+      'pyrenees': { token: '6b21c7e0', content: 'Plaquette Naia · FR · v2', gen: '29 avril 2026 · par Bernard', events: [
+        { label: 'Plaquette ouverte', when: '30 avril · 11:02' } ] },
+      'ceze': { token: 'a4f0d115', content: 'Plaquette Naia · FR · v2', gen: '22 avril 2026 · par Jan', events: [] },
+      'vhg': { token: 'c93e7a44', content: 'Plaquette Naia · FR · v2', gen: '1 mai 2026 · par Bernard', events: [] }
+      // 'aveyron' : pas de plaquette — lead trop récent
+    };
+    let plq = PLAQUETTES[id] || null;
+
+    function renderPlaquette() {
+      const empty = document.getElementById('plq-state-empty');
+      const gen = document.getElementById('plq-state-generated');
+      const headBadge = document.getElementById('plq-head-badge');
+      const kpi = document.querySelectorAll('[data-plq-kpi]');
+      const kpiSub = document.querySelectorAll('[data-plq-kpi-sub]');
+      if (!plq) {
+        empty.style.display = ''; gen.style.display = 'none'; headBadge.style.display = 'none';
+        kpi.forEach(el => el.textContent = 'Non générée');
+        kpiSub.forEach(el => el.textContent = 'à envoyer en suivi de démo');
+        return;
+      }
+      empty.style.display = 'none'; gen.style.display = '';
+      const opens = plq.events.filter(e => /ouvert/i.test(e.label)).length;
+      const pdf = plq.events.some(e => /pdf/i.test(e.label));
+      document.querySelector('[data-plq-for]').textContent = lead.contact + ' — ' + lead.org;
+      document.querySelector('[data-plq-content]').textContent = plq.content;
+      document.querySelector('[data-plq-gen]').textContent = plq.gen;
+      document.querySelector('[data-plq-url]').textContent = 'naia.energy/p/' + plq.token;
+      const evWrap = document.getElementById('plq-events');
+      evWrap.innerHTML = plq.events.length
+        ? plq.events.map(e => `<div class="plq-event"><span class="dot"></span><span>${e.label}</span><span class="ev-when tabular">${e.when}</span></div>`).join('')
+        : '<div class="muted" style="font-size:12px; padding:4px 0">Pas encore ouverte — en attente d’envoi par le commercial depuis Odoo.</div>';
+      if (opens > 0) {
+        headBadge.style.display = ''; headBadge.textContent = 'Vue ' + opens + '×';
+        kpi.forEach(el => el.textContent = 'Vue ' + opens + '×');
+        kpiSub.forEach(el => el.textContent = pdf ? 'PDF téléchargé' : 'lien ouvert');
+      } else {
+        headBadge.style.display = 'none';
+        kpi.forEach(el => el.textContent = 'Générée');
+        kpiSub.forEach(el => el.textContent = 'pas encore ouverte');
+      }
+      const href = 'plaquette.html?id=' + id;
+      document.getElementById('plq-preview').href = href;
+      document.getElementById('plq-preview-2').href = href;
+    }
+    renderPlaquette();
+
+    document.getElementById('plq-generate').addEventListener('click', function () {
+      plq = { token: Math.random().toString(16).slice(2, 10), content: 'Plaquette Naia · FR · v2', gen: 'aujourd’hui · par vous', events: [] };
+      renderPlaquette();
+      if (typeof initIcons === 'function') initIcons();
+      alert('Plaquette générée — un lien personnalisé suivi a été créé et figé. Copiez-le dans votre email de suivi Odoo.');
+    });
+    document.getElementById('plq-copy').addEventListener('click', function () {
+      const url = 'https://' + document.querySelector('[data-plq-url]').textContent;
+      if (navigator.clipboard) navigator.clipboard.writeText(url);
+      const b = this, html = b.innerHTML;
+      b.innerHTML = '<i data-lucide="check"></i> Copié';
+      if (typeof initIcons === 'function') initIcons();
+      setTimeout(function () { b.innerHTML = html; if (typeof initIcons === 'function') initIcons(); }, 1600);
+    });
+    document.getElementById('plq-regenerate').addEventListener('click', function () {
+      alert('Une nouvelle version est générée à partir du contenu de la plaquette à jour. Le lien déjà envoyé reste figé sur l’ancienne version ; le suivi des vues redémarre sur le nouveau lien.');
+    });
+    document.getElementById('action-plaquette').addEventListener('click', function () {
+      document.getElementById('plaquette').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+
     if (typeof initIcons === 'function') initIcons();
   })();
 </script>

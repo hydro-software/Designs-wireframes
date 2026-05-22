@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Plaquette Naia — personnalisée</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+  :root {
+    --navy: #0a1326;
+    --ink: #1e293b;
+    --ink-soft: #475569;
+    --muted: #64748b;
+    --cyan: #0891b2;
+    --cyan-bright: #38bdf8;
+    --line: #e6eaf1;
+    --paper: #ffffff;
+    --backdrop: #eef1f6;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Inter', -apple-system, system-ui, sans-serif;
+    background: var(--backdrop);
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+    font-feature-settings: "cv11", "ss01";
+    line-height: 1.6;
+  }
+
+  /* --- barre d'outils (écran seulement) --- */
+  .toolbar {
+    position: sticky; top: 0; z-index: 10;
+    display: flex; align-items: center; justify-content: space-between; gap: 16px;
+    padding: 11px 22px;
+    background: var(--navy); color: #cbd5e1;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .toolbar .tb-left { display: flex; align-items: center; gap: 10px; font-size: 13px; }
+  .toolbar .tb-tag {
+    font-size: 10px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase;
+    color: #fbbf24; border: 1px solid rgba(251,191,36,0.4); border-radius: 5px; padding: 2px 7px;
+    white-space: nowrap;
+  }
+  .btn-pdf {
+    display: inline-flex; align-items: center; gap: 7px;
+    background: var(--cyan-bright); color: var(--navy);
+    font-weight: 600; font-size: 13px;
+    border: 0; border-radius: 8px; padding: 8px 15px; cursor: pointer;
+    transition: transform .15s ease, box-shadow .15s ease;
+  }
+  .btn-pdf:hover { transform: translateY(-1px); box-shadow: 0 6px 18px -4px rgba(56,189,248,0.5); }
+  .btn-pdf i { width: 16px; height: 16px; }
+
+  /* --- la feuille (le document) --- */
+  .sheet {
+    max-width: 820px; margin: 26px auto; background: var(--paper);
+    box-shadow: 0 10px 40px -12px rgba(10,19,38,0.28);
+    border-radius: 4px; overflow: hidden;
+  }
+
+  .doc-header { background: var(--navy); color: #fff; padding: 30px 48px 26px; }
+  .doc-header .row { display: flex; justify-content: space-between; align-items: flex-start; gap: 20px; }
+  .brand { display: flex; align-items: center; gap: 11px; }
+  .brand .mark {
+    width: 34px; height: 34px; border-radius: 9px;
+    background: linear-gradient(135deg, var(--cyan-bright), #6ee7b7);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--navy); font-weight: 800; font-size: 18px;
+  }
+  .brand .name { font-size: 19px; font-weight: 700; letter-spacing: -0.01em; }
+  .brand .tagline { font-size: 11px; color: #94a3b8; }
+  .doc-for { text-align: right; font-size: 12px; color: #cbd5e1; }
+  .doc-for b { color: #fff; font-weight: 600; }
+  .doc-rule { height: 3px; background: linear-gradient(90deg, var(--cyan-bright), #6ee7b7 60%, transparent); margin-top: 22px; border-radius: 2px; }
+
+  .doc-body { padding: 38px 48px 16px; }
+  .eyebrow { font-size: 12px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: var(--cyan); }
+  h1 { font-size: 29px; line-height: 1.24; font-weight: 800; letter-spacing: -0.02em; color: var(--navy); margin: 10px 0 14px; }
+  .lead-p { font-size: 15px; color: var(--ink-soft); }
+
+  .value-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin: 28px 0 8px; }
+  .value-card { border: 1px solid var(--line); border-radius: 12px; padding: 18px 16px; }
+  .value-card .vi {
+    width: 38px; height: 38px; border-radius: 9px; background: rgba(8,145,178,0.09);
+    display: flex; align-items: center; justify-content: center; margin-bottom: 11px;
+  }
+  .value-card .vi i { width: 19px; height: 19px; color: var(--cyan); }
+  .value-card h3 { font-size: 14px; font-weight: 700; color: var(--navy); margin-bottom: 5px; }
+  .value-card p { font-size: 12.5px; color: var(--muted); }
+
+  .callout {
+    margin: 26px 0; padding: 20px 22px; border-radius: 12px;
+    background: linear-gradient(135deg, #f0f9ff, #ecfdf5);
+    border: 1px solid #d6eef0;
+  }
+  .callout .co-label { font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--cyan); }
+  .callout .co-text { font-size: 14px; color: var(--ink); margin-top: 6px; }
+  .callout .co-text b { color: var(--navy); }
+
+  .section-h { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--navy); margin: 26px 0 14px; }
+  .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .step { display: flex; gap: 10px; }
+  .step .sn {
+    width: 22px; height: 22px; flex-shrink: 0; border-radius: 50%;
+    background: var(--navy); color: #fff; font-size: 12px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .step .st { font-size: 12.5px; }
+  .step .st b { color: var(--navy); }
+  .step .st span { color: var(--muted); }
+
+  .cta {
+    margin: 30px 0 8px; padding: 24px; border-radius: 14px; text-align: center;
+    background: var(--navy); color: #fff;
+  }
+  .cta h2 { font-size: 18px; font-weight: 700; margin-bottom: 6px; }
+  .cta p { font-size: 13px; color: #94a3b8; margin-bottom: 16px; }
+  .cta-btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: linear-gradient(135deg, var(--cyan-bright), #6ee7b7); color: var(--navy);
+    font-weight: 700; font-size: 14px; border: 0; border-radius: 9px; padding: 11px 22px; cursor: pointer;
+  }
+  .cta-btn i { width: 17px; height: 17px; }
+
+  .doc-footer {
+    padding: 20px 48px 30px; border-top: 1px solid var(--line);
+    display: flex; justify-content: space-between; gap: 16px; font-size: 11px; color: var(--muted);
+  }
+  .doc-footer b { color: var(--ink-soft); }
+
+  /* --- impression / PDF --- */
+  @media print {
+    @page { size: A4; margin: 13mm; }
+    body { background: #fff; }
+    .toolbar { display: none; }
+    .sheet { max-width: none; margin: 0; box-shadow: none; border-radius: 0; }
+    .doc-header, .cta, .callout, .value-card, .brand .mark, .step .sn {
+      -webkit-print-color-adjust: exact; print-color-adjust: exact;
+    }
+  }
+  @media (max-width: 720px) {
+    .doc-header, .doc-body, .doc-footer { padding-left: 24px; padding-right: 24px; }
+    .value-grid, .steps { grid-template-columns: 1fr; }
+    .doc-header .row, .doc-footer { flex-direction: column; }
+    .doc-for { text-align: left; }
+    h1 { font-size: 24px; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="toolbar">
+    <div class="tb-left">
+      <i data-lucide="file-text" style="width:16px;height:16px"></i>
+      <span>Plaquette personnalisée pour <b style="color:#fff" data-p-org>Microcentrale du Doubs</b></span>
+      <span class="tb-tag">Contenu de démonstration</span>
+    </div>
+    <button class="btn-pdf" onclick="window.print()"><i data-lucide="download"></i> Télécharger en PDF</button>
+  </div>
+
+  <div class="sheet">
+
+    <div class="doc-header">
+      <div class="row">
+        <div class="brand">
+          <div class="mark">N</div>
+          <div>
+            <div class="name">Naia</div>
+            <div class="tagline">Intelligence de revenus pour la petite hydroélectricité</div>
+          </div>
+        </div>
+        <div class="doc-for">
+          Préparé pour<br>
+          <b data-p-contact>Antoine Bertin</b><br>
+          <span data-p-org>Microcentrale du Doubs</span><br>
+          <span data-p-date>mai 2026</span>
+        </div>
+      </div>
+      <div class="doc-rule"></div>
+    </div>
+
+    <div class="doc-body">
+      <div class="eyebrow">Suite à notre démonstration</div>
+      <h1>Chaque mégawattheure que votre centrale ne produit pas a un coût. Naia le chiffre.</h1>
+      <p class="lead-p">
+        Vous connaissez votre centrale mieux que personne. Ce qui manque, c'est l'outil qui met un
+        montant en euros sur chaque perte de production — et qui montre lesquelles méritent une
+        intervention. C'est exactement ce que fait Naia : connecter vos données, quantifier l'écart
+        de performance, et le classer par impact financier.
+      </p>
+
+      <div class="value-grid">
+        <div class="value-card">
+          <div class="vi"><i data-lucide="euro"></i></div>
+          <h3>Vos pertes, en euros</h3>
+          <p>Chaque écart de production est converti en revenu perdu — pas en courbe abstraite.</p>
+        </div>
+        <div class="value-card">
+          <div class="vi"><i data-lucide="bar-chart-3"></i></div>
+          <h3>Classées par impact</h3>
+          <p>Les pertes sont hiérarchisées : vous savez par où commencer pour récupérer le plus.</p>
+        </div>
+        <div class="value-card">
+          <div class="vi"><i data-lucide="trending-up"></i></div>
+          <h3>Le retour de chaque correction</h3>
+          <p>Pour chaque action corrective, Naia estime le gain et le temps de retour.</p>
+        </div>
+      </div>
+
+      <div class="callout">
+        <div class="co-label">Pour une centrale comme la vôtre</div>
+        <div class="co-text">
+          <span data-p-org>Microcentrale du Doubs</span> — <b data-p-kw>~ 240 kW</b>, au fil de l'eau.
+          Sur ce profil, l'analyse Naia met généralement en évidence <b>plusieurs milliers d'euros de
+          production récupérable par an</b>, une fois les pertes identifiées et corrigées.
+          <span style="color:var(--muted)">(Chiffre illustratif — l'estimation réelle se fait sur vos données.)</span>
+        </div>
+      </div>
+
+      <div class="section-h">Comment ça se passe</div>
+      <div class="steps">
+        <div class="step"><div class="sn">1</div><div class="st"><b>Connecter</b><br><span>Vos données de production sont reliées (Enedis, compteurs) — sans matériel à installer.</span></div></div>
+        <div class="step"><div class="sn">2</div><div class="st"><b>Identifier</b><br><span>Naia détecte et chiffre les pertes, période par période.</span></div></div>
+        <div class="step"><div class="sn">3</div><div class="st"><b>Agir &amp; mesurer</b><br><span>Vous priorisez les corrections et suivez le revenu récupéré.</span></div></div>
+      </div>
+
+      <div class="cta">
+        <h2>Prêt à voir vos chiffres ?</h2>
+        <p>Activez votre centrale dans Naia, ou répondez simplement à notre email pour programmer un échange.</p>
+        <button class="cta-btn" onclick="alert('À venir — ouvre le parcours d’activation FR-SIGNUP, pré-rempli depuis ce lead.')"><i data-lucide="arrow-right"></i> Activer ma centrale</button>
+      </div>
+    </div>
+
+    <div class="doc-footer">
+      <div><b>Naia</b> — Hydro Software Services SRL · Namur, Belgique<br>contact@naia.energy</div>
+      <div style="text-align:right">Plaquette personnalisée.<br>Lien à usage de suivi — vous pouvez le partager avec votre équipe.</div>
+    </div>
+
+  </div>
+
+<script>
+  // Personnalisation depuis ?id= — mêmes identifiants que admin-lead.html.
+  (function () {
+    const id = (new URLSearchParams(location.search).get('id') || 'doubs-micro').toLowerCase();
+    const LEADS = {
+      'doubs-micro': { contact: 'Antoine Bertin', org: 'Microcentrale du Doubs', kw: '~ 240 kW' },
+      'pyrenees':    { contact: 'Hélène Gros',    org: 'Pyrénées Hydroélec',     kw: '~ 1,8 MW · 3 centrales' },
+      'ceze':        { contact: 'Jean Renard',    org: 'Moulin de la Cèze',      kw: '~ 80 kW' },
+      'vhg':         { contact: 'Sophie Klein',   org: 'Vosges Hydro Group',     kw: '~ 5,4 MW · 7 centrales' },
+      'aveyron':     { contact: 'Marc Couteau',   org: 'Hydraulique Aveyron',    kw: '~ 320 kW' }
+    };
+    const lead = LEADS[id] || LEADS['doubs-micro'];
+    document.querySelectorAll('[data-p-contact]').forEach(el => el.textContent = lead.contact);
+    document.querySelectorAll('[data-p-org]').forEach(el => el.textContent = lead.org);
+    document.querySelectorAll('[data-p-kw]').forEach(el => el.textContent = lead.kw);
+    document.querySelectorAll('[data-p-date]').forEach(el => el.textContent = 'mai 2026');
+    document.title = 'Plaquette Naia — ' + lead.org;
+    if (window.lucide) lucide.createIcons();
+  })();
+</script>
+</body>
+</html>
