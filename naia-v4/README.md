@@ -82,7 +82,7 @@ Profile area at bottom-left → opens dropdown with Mon profil, Mon abonnement, 
 Per-app audit logs, no unified cross-app feed. The two tabs are two views over two distinct database tables (`community.audit_log`, `subscription.audit_log`); the page only consolidates the **navigation**, not the underlying data. Auth and infra events live in a separate `platform.audit_log` (page TBD if/when platform admin surfaces are mockup'd).
 
 ### Lead-facing (public, no login)
-- `plaquette.html` — the personalised one-page Naia **plaquette** sent as a post-demo follow-up (subscription PRD §FR-PLAQUETTE). Document-styled, downloadable as PDF, reached through a per-lead tracked link. Adapts to `?id=` (try `?id=pyrenees`, `?id=vhg`). Placeholder copy — final content supplied by Jan. The admin side — generate, copy the tracked link, view tracking, Odoo sync — lives in the **Plaquette de suivi** section of `admin-lead.html`.
+- `plaquette.html` — the real Naia **plaquette** (bilingual FR/EN, 2-page A4, annotated product screenshots + case study + pricing) sent as a post-demo follow-up (subscription PRD §FR-PLAQUETTE). Self-contained, downloadable as PDF, reached through a per-lead tracked link; personalised via `?id=` — the "Préparé pour" addressee in the header (try `?id=pyrenees`, `?id=vhg`). The admin side — generate, copy the tracked link, view tracking, Odoo sync — lives in the **Plaquette de suivi** section of `admin-lead.html`.
 
 ## What to click for review
 
