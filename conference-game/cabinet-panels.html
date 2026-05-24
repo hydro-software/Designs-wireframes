@@ -1658,6 +1658,52 @@ document.addEventListener('DOMContentLoaded', () => {
       svg.innerHTML = c;
     }
   }
+
+  // ========================
+  // ARCADE 2 — Philips 243S7E (wide-screen variant)
+  // ========================
+  // Same cabinet as the original (height, depth, tilt, roof slope all
+  // unchanged); outer width grows from 58 to 60 cm so the 24-inch
+  // Philips 243S7E monitor (54 cm bezel, 53.5 × 30.3 cm visible) fits
+  // with comfortable clearance.
+  {
+    const W2       = 60;             // outer width (vs 58 in arcade 1)
+    const INNER_W2 = W2 - 2 * T;     // 57 cm inner width (vs 54.4)
+    const WIN_W2   = 53.5;           // window cutout = visible screen area
+    const WIN_H2   = 30.3;
+
+    // ---- Arcade 2: Front Panel ----
+    {
+      const svg = document.getElementById('front-panel-2-svg');
+      const pad = 35;
+      const pw = INNER_W2, ph = FP_SURF;
+      const w = pw * S + pad * 2, h = ph * S + pad * 2;
+      svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
+      svg.setAttribute('width', w);
+      svg.setAttribute('height', h);
+
+      const tx = (x) => pad + x * S;
+      const ty = (y) => pad + (ph - y) * S;
+
+      let content = '';
+      content += `<rect x="${tx(0)}" y="${ty(ph)}" width="${pw*S}" height="${ph*S}" class="panel-fill"/>`;
+      // Screen window — sized to the visible area (53.5 × 30.3). The
+      // bezel (54 × 32.5) sits behind the panel; ~0.25 cm of bezel each
+      // side and ~1.1 cm top/bottom hide behind the cutout edge.
+      const wcx = pw / 2, wcy = WIN_CENTER_S;
+      content += `<rect x="${tx(wcx - WIN_W2/2)}" y="${ty(wcy + WIN_H2/2)}" width="${WIN_W2*S}" height="${WIN_H2*S}" class="cutout"/>`;
+      content += `<text x="${tx(wcx)}" y="${ty(wcy)}" class="panel-label" font-size="8">Screen window</text>`;
+      content += `<text x="${tx(wcx)}" y="${ty(wcy)+12}" class="panel-label" font-size="7" fill="#555">${WIN_W2} × ${WIN_H2}</text>`;
+      content += `<text x="${tx(wcx)}" y="${ty(wcy)+22}" class="panel-label" font-size="7" fill="#555">Philips 243S7E</text>`;
+
+      // Dimensions
+      content += svgDim(tx(0), ty(0), tx(0), ty(ph), `${ph} (surface)`, -18);
+      content += svgDim(tx(0), ty(0), tx(pw), ty(0), `${INNER_W2}`, 18);
+      content += svgDim(tx(pw), ty(0), tx(pw), ty(wcy - WIN_H2/2), `${(wcy - WIN_H2/2).toFixed(1)}`, 18);
+
+      svg.innerHTML = content;
+    }
+  }
 });
 </script>
 
@@ -1994,6 +2040,55 @@ document.addEventListener('DOMContentLoaded', () => {
     rigid and fixes the top panel — flat-locks at each hinge plus the
     load-path for the arcade's weight still need detailing before this
     is a build spec.
+  </p>
+</div>
+
+<div class="section">
+  <h2>Arcade 2 — Wide-screen variant (Philips 243S7E)</h2>
+  <p class="note">
+    A second build for the larger Philips 243S7E 24-inch monitor.
+    <strong>Same cabinet</strong> as the original — same height (95 cm
+    front, 88 cm back), same depth (50 cm), same 20° front tilt, same
+    roof slope. <strong>2 cm wider outer</strong> (60 cm vs 58) so the
+    wider monitor bezel has comfortable room inside.
+  </p>
+
+  <div class="panel-card">
+    <h3>What changes vs. the original arcade</h3>
+    <table>
+      <thead><tr><th>Dimension</th><th>Arcade 1</th><th>Arcade 2</th></tr></thead>
+      <tbody>
+        <tr><td>Monitor</td><td>—</td><td>Philips 243S7E</td></tr>
+        <tr><td>Screen visible</td><td>~48.7 × 31.0 cm</td><td><strong>53.5 × 30.3 cm</strong></td></tr>
+        <tr><td>Monitor bezel</td><td>—</td><td>54.0 × 32.5 cm</td></tr>
+        <tr><td>Window cutout (front panel)</td><td>48.7 × 31.0 cm</td><td><strong>53.5 × 30.3 cm</strong></td></tr>
+        <tr><td>Cabinet outer width</td><td>58.0 cm</td><td><strong>60.0 cm</strong></td></tr>
+        <tr><td>Cabinet inner width (INNER_W)</td><td>54.4 cm</td><td><strong>57.0 cm</strong></td></tr>
+        <tr><td>Height, depth, tilt, roof slope</td><td colspan="2" style="text-align:center">unchanged</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="panel-card" style="margin-top: 16px">
+    <h3>D2 — Front Panel (Arcade 2)</h3>
+    <p class="qty">
+      Same shape as Arcade 1's front panel — tilted 20°, 82 cm surface
+      length — but <strong>57.0 cm wide</strong> (vs 54.4) and with the
+      <strong>53.5 × 30.3 cm</strong> screen window (vs 48.7 × 31.0). The
+      bezel (54 × 32.5) sits behind the panel; ~0.25 cm of bezel each
+      side and ~1.1 cm top/bottom hide behind the cutout edge.
+    </p>
+    <svg id="front-panel-2-svg"></svg>
+  </div>
+
+  <p class="note" style="margin-top: 12px">
+    <strong>Other panel adjustments</strong> (same shape, width grows
+    from 54.4 to 57.0 cm): roof panel · soffit panel · monitor shelf ·
+    logo panel housing. <strong>Unchanged</strong>: side panels (50 × 95
+    rectangle, same polygon profile), side mouse ledges (25 × 17,
+    side-mounted), and the transport-crate dimensions — the side panel
+    at 50 × 95 is still the biggest single piece, so the crate stays at
+    95 × 56 × 18 for both arcades.
   </p>
 </div>
 
