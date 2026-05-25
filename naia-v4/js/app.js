@@ -22,19 +22,12 @@ const COMMUNITY_TOPICS = [
   { slug: "forum",        label: "Forum & annuaire",     icon: "users",       href: "#",                        tier: "v2" },
 ];
 
-// ADMIN_TOPICS — sidebar sub-items under "Administration".
-//
-// 2026-05-25 PO decision: keep only the "Tableau de bord" entry. All
-// admin pages are reachable from the dashboard's Raccourcis cards
-// (admin.html), which is the discovery surface — duplicating them in
-// the sidebar adds noise without value. When a deep admin page is
-// open, the back-link via "Tableau de bord" returns the admin to the
-// shortcut grid. If a power-user pattern emerges (e.g. reps living in
-// admin-leads all day), revisit and add a pinned-shortcut affordance
-// then.
-const ADMIN_TOPICS = [
-  { slug: "admin-dashboard",   label: "Tableau de bord",      icon: "layout-dashboard", href: "admin.html" },
-];
+// 2026-05-25 PO decision: the sidebar's "Administration" entry is now
+// a flat link straight to admin.html (no submenu, no chevron). All
+// admin pages are reachable from the Raccourcis cards on admin.html,
+// so a sidebar submenu would just duplicate them. If a power-user
+// pattern emerges (e.g. reps living in admin-leads all day), revisit
+// and add a pinned-shortcut affordance then.
 
 // ---- THEME ----
 function getTheme() { return localStorage.getItem("naia-theme") || "dark"; }
@@ -102,13 +95,6 @@ function buildSidebar() {
     return `<a href="${t.href}" class="subnav-item ${activeClass} ${v2Class}" ${onclick}>
       <span>${t.label}</span>
       ${v2Pill}
-    </a>`;
-  }).join("");
-
-  const adminItems = ADMIN_TOPICS.map(t => {
-    const activeClass = (page === t.slug) ? "active" : "";
-    return `<a href="${t.href}" class="subnav-item ${activeClass}">
-      <span>${t.label}</span>
     </a>`;
   }).join("");
 
@@ -190,14 +176,10 @@ function buildSidebar() {
         ${centraleItems('parametres')}
       </div>
 
-      <a href="admin.html" class="sidebar-item ${section === 'admin' ? 'active' : ''}" aria-expanded="${open.admin}">
+      <a href="admin.html" class="sidebar-item ${section === 'admin' ? 'active' : ''}">
         <i data-lucide="shield"></i>
         <span>Administration</span>
-        <i data-lucide="chevron-right" class="chev" onclick="event.preventDefault(); event.stopPropagation(); toggleFoldByLink(this)"></i>
       </a>
-      <div class="subnav" data-open="${open.admin}">
-        ${adminItems}
-      </div>
     </nav>
 
     <div class="sidebar-foot">
