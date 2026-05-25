@@ -22,17 +22,18 @@ const COMMUNITY_TOPICS = [
   { slug: "forum",        label: "Forum & annuaire",     icon: "users",       href: "#",                        tier: "v2" },
 ];
 
+// ADMIN_TOPICS — sidebar sub-items under "Administration".
+//
+// 2026-05-25 PO decision: keep only the "Tableau de bord" entry. All
+// admin pages are reachable from the dashboard's Raccourcis cards
+// (admin.html), which is the discovery surface — duplicating them in
+// the sidebar adds noise without value. When a deep admin page is
+// open, the back-link via "Tableau de bord" returns the admin to the
+// shortcut grid. If a power-user pattern emerges (e.g. reps living in
+// admin-leads all day), revisit and add a pinned-shortcut affordance
+// then.
 const ADMIN_TOPICS = [
   { slug: "admin-dashboard",   label: "Tableau de bord",      icon: "layout-dashboard", href: "admin.html" },
-  { slug: "admin-programme",   label: "Programme communauté", icon: "zap",            href: "admin-programme.html" },
-  { slug: "admin-membres",     label: "Membres communauté",   icon: "users",          href: "admin-membres.html" },
-  { slug: "admin-abonnements", label: "Clients",              icon: "credit-card",    href: "admin-abonnements.html" },
-  { slug: "admin-leads",       label: "Leads",                icon: "filter",         href: "admin-leads.html" },
-  { slug: "admin-pricing",     label: "Pricing schedules",    icon: "list-ordered",   href: "admin-pricing.html" },
-  { slug: "admin-promotions",  label: "Promotions",           icon: "ticket",         href: "admin-promotions.html" },
-  { slug: "admin-dso",         label: "Mandats DSO",          icon: "file-signature", href: "admin-dso.html" },
-  { slug: "admin-onboarding",  label: "Onboarding emails",    icon: "send",           href: "admin-onboarding.html" },
-  { slug: "admin-audit",       label: "Audit log",            icon: "shield",         href: "admin-audit.html" },
 ];
 
 // ---- THEME ----
