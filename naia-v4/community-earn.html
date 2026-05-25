@@ -29,6 +29,60 @@
         <div class="kpi-card"><div class="kpi-label">Vers le niveau Or</div><div class="kpi-value tabular" style="font-size:20px">550 pts</div><div style="height:6px; background:var(--bg-input); border-radius:999px; overflow:hidden; margin-top:8px"><div style="width:86%; height:100%; background:linear-gradient(90deg,#38bdf8,#84cc16); border-radius:999px"></div></div></div>
       </div>
 
+      <!-- Convert points → tokens (FR-TB-1..6 + FR-EXC-7) -->
+      <div class="card" style="margin-bottom:18px">
+        <div class="card-head">
+          <div><div class="card-head-title"><i data-lucide="repeat-2" style="width:14px; height:14px; display:inline-block; vertical-align:-2px; margin-right:4px"></i> Convertir mes points en jetons</div><div class="card-head-sub">FR-TB · 10 points = 1 jeton · les jetons sont consommés dans Insight + Valorise</div></div>
+          <button class="btn btn-primary" onclick="openOverlay('tb-convert')"><i data-lucide="arrow-right-left"></i> Convertir</button>
+        </div>
+        <div class="card-body" style="display:grid; gap:14px; grid-template-columns: 1fr 1fr">
+          <div style="padding:14px 16px; background:var(--bg-input); border-radius:10px">
+            <div class="muted" style="font-size:11px; text-transform:uppercase; letter-spacing:0.06em; font-weight:600; margin-bottom:6px">Convertible · actuel</div>
+            <div style="font-size:22px; font-weight:700" class="tabular">3 450 points</div>
+            <div class="muted" style="font-size:12px; margin-top:2px">→ 345 jetons potentiels au taux 10:1</div>
+          </div>
+          <div style="padding:14px 16px; background:var(--bg-input); border-radius:10px">
+            <div class="muted" style="font-size:11px; text-transform:uppercase; letter-spacing:0.06em; font-weight:600; margin-bottom:6px">Jetons disponibles · côté abonnement</div>
+            <div style="font-size:22px; font-weight:700" class="tabular">24 jetons</div>
+            <div class="muted" style="font-size:12px; margin-top:2px"><a class="link" href="profil-jetons.html">Voir le solde et l'historique côté abonnement →</a></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Conversion history (FR-TB-3) -->
+      <div class="card" style="margin-bottom:18px">
+        <div class="card-head">
+          <div class="card-title">Historique des conversions</div>
+          <span class="muted" style="font-size:11px">FR-TB-3 · journal append-only · les conversions ne sont pas réversibles</span>
+        </div>
+        <table class="data-table">
+          <thead><tr><th>Date</th><th>Initiée par</th><th class="num" style="text-align:right">Points convertis</th><th class="num" style="text-align:right">Jetons reçus</th><th>Statut</th></tr></thead>
+          <tbody>
+            <tr>
+              <td class="tabular">18 avr. 14:08</td>
+              <td>Marc</td>
+              <td class="num tabular" style="text-align:right">240</td>
+              <td class="num tabular" style="text-align:right; font-weight:600; color:#fcd34d">+24</td>
+              <td><span class="badge badge-green">Crédités</span></td>
+            </tr>
+            <tr>
+              <td class="tabular">12 mars 10:23</td>
+              <td>Marc</td>
+              <td class="num tabular" style="text-align:right">300</td>
+              <td class="num tabular" style="text-align:right; font-weight:600; color:#fcd34d">+30</td>
+              <td><span class="badge badge-green">Crédités</span></td>
+            </tr>
+            <tr>
+              <td class="tabular">2 févr. 16:40</td>
+              <td>Sophie</td>
+              <td class="num tabular" style="text-align:right">150</td>
+              <td class="num tabular" style="text-align:right; font-weight:600; color:#fcd34d">+15</td>
+              <td><span class="badge badge-green">Crédités</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
       <!-- Game promo -->
       <div class="card" style="margin-bottom:18px; background:linear-gradient(135deg, #1e293b, #0f1a32); border-color:rgba(56,189,248,0.3)">
         <div style="display:flex; gap:16px; align-items:center; padding:18px 22px">
@@ -109,6 +163,59 @@
     </div>
   </main>
 </div>
+
+<!-- Modal: convert points → tokens (FR-TB-1..6) -->
+<div class="overlay" id="tb-convert">
+  <div class="modal" style="max-width:520px">
+    <div class="modal-head">
+      <div>
+        <div class="page-eyebrow">Conversion · points → jetons</div>
+        <div style="font-size:16px; font-weight:600">Moulin du Bocq</div>
+      </div>
+      <button class="icon-btn" onclick="closeOverlay('tb-convert')"><i data-lucide="x"></i></button>
+    </div>
+    <div class="modal-body">
+      <div style="padding:12px 14px; background: rgba(56,189,248,0.08); border-left:3px solid var(--brand-cyan); border-radius:6px; font-size:12px; margin-bottom:16px">
+        <b>Taux fixe : 10 points = 1 jeton</b> (FR-TB-2). La conversion est immédiate et <b>irréversible</b> — les jetons crédités apparaissent dans votre solde côté abonnement et peuvent être consommés dans Insight + Valorise (FR-TB-5).
+      </div>
+
+      <label class="field" style="margin-bottom:14px">
+        <span class="field-label">Points à convertir <b style="color:var(--accent-red)">*</b></span>
+        <input class="input tabular" value="500" style="font-size:18px; font-weight:600">
+        <span style="font-size:11px; color:var(--text-subtle); margin-top:4px">Multiple de 10 · min. 100 points · max. 3 450 (solde actuel)</span>
+      </label>
+
+      <div style="display:grid; grid-template-columns: 1fr auto 1fr; gap:14px; align-items:center; padding:14px 16px; background:var(--bg-input); border-radius:10px">
+        <div style="text-align:center">
+          <div class="muted" style="font-size:10px; text-transform:uppercase; letter-spacing:0.06em; font-weight:600">Vous débitez</div>
+          <div style="font-size:22px; font-weight:700; margin-top:4px" class="tabular">500</div>
+          <div class="muted" style="font-size:11px">points</div>
+        </div>
+        <div style="color:var(--brand-cyan)"><i data-lucide="arrow-right" style="width:18px; height:18px"></i></div>
+        <div style="text-align:center">
+          <div class="muted" style="font-size:10px; text-transform:uppercase; letter-spacing:0.06em; font-weight:600">Vous recevez</div>
+          <div style="font-size:22px; font-weight:700; margin-top:4px; color:#fcd34d" class="tabular">+50</div>
+          <div class="muted" style="font-size:11px">jetons</div>
+        </div>
+      </div>
+
+      <div style="margin-top:14px; font-size:12px; color:var(--text-muted); padding:10px 12px; background:var(--bg-input); border-radius:8px">
+        <b style="color:var(--text)">Après conversion :</b><br>
+        Points : <b class="tabular">2 950</b> (était 3 450)<br>
+        Jetons : <b class="tabular" style="color:#fcd34d">74</b> (était 24)
+      </div>
+
+      <p class="muted" style="font-size:11px; margin-top:12px; line-height:1.55">
+        Toute conversion est journalisée sur votre organisation et apparaît dans l'historique ci-dessous (FR-TB-3). Aucun retour en arrière possible une fois validée (FR-TB-6).
+      </p>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-secondary" onclick="closeOverlay('tb-convert')">Annuler</button>
+      <button class="btn btn-primary"><i data-lucide="arrow-right-left"></i> Confirmer la conversion</button>
+    </div>
+  </div>
+</div>
+
 <script src="https://unpkg.com/lucide@latest"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="js/app.js"></script>
