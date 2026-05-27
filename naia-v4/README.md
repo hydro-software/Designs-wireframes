@@ -9,6 +9,19 @@ Replaces:
 - `naia-points-v2/` — superseded (kept for Community-pattern reference)
 - `naia-v3/` — earlier in-flight settings mockup; v4 supersedes it visually
 
+## V1 descope for the 10-11 June 2026 conference (2026-05-27)
+
+The PO is reducing the Community surface for the conference V1 so the
+shipped product is tighter and fully validated. The following are deferred
+to **V2**, with the V2 toggle in the profile dropdown bringing them back
+for previews:
+
+- **F3 LinkedIn amplification** (member submit tile + admin pending-queue row) — backend kill-switch lives at `COMMUNITY_LINKEDIN_ENABLED` ([platform#535](https://github.com/hydro-software/platform/pull/535))
+- **D5 Surveys** (member earn tile + admin catalogue row + recent-activity entry)
+- **D6 Agenda** sidebar entry — the `community-agenda.html` page itself stays for V2 demo
+
+The seed activity rows (`community.linkedin.shared`, survey activity) remain in the DB so past awards keep resolving; the V2 restore is a single env-var flip plus re-adding the descoped tiles.
+
 ## Visual language
 
 - **Dark theme primary**, matching the actual Naia platform (cf. screenshots in `hydro-software/game/.screenshots/`).
@@ -38,8 +51,7 @@ Communauté              ← folds to topics
   ├ Récompenses
   ├ Intelligence
   ├ Mises à jour marché
-  ├ Agenda
-  └ V2 stubs (behind toggle)
+  └ V2 stubs (behind toggle: Agenda, Classement, Visites, Opportunités, Forum)
 Paramètres              (per-centrale)
 Administration          (admin-only — folds to programme / membres / abonnements / pricing)
 ```
@@ -64,11 +76,11 @@ Profile area at bottom-left → opens dropdown with Mon profil, Mon abonnement, 
 - `profil-jetons.html` — Token balance with three sources (purchase / inclusion / conversion) + history + deep-link to community-rewards for conversion
 
 ### Community module (V1)
-- `community-earn.html` — Gagner des points (org-level balance, game promo, activity catalogue grouped by category)
+- `community-earn.html` — Gagner des points (org-level balance, game promo, activity catalogue grouped by category). LinkedIn + survey tiles V2-deferred (2026-05-27 descope).
 - `community-rewards.html` — Récompenses (token conversion modal, reward catalogue, V2 visit reward grayed)
-- `community-intelligence.html` — Articles (6 cards across the editorial programmes) + survey card + webinars
+- `community-intelligence.html` — Articles (6 cards across the editorial programmes) + webinars. Survey card V2-deferred (2026-05-27 descope).
 - `community-market.html` — Mises à jour marché (Belpex chart, source health table, region selector)
-- `community-agenda.html` — Events list (upcoming / past)
+- `community-agenda.html` — Events list (upcoming / past). **V2-deferred** (2026-05-27 descope) — page stays for V2 demo via the toggle.
 
 ### Administration (admin-only)
 - `admin.html` — Cross-module dashboard with shortcuts to programme communauté + abonnements
@@ -93,7 +105,7 @@ For Bernard / Ugo / Paul:
 3. **Settings rework lead-in** — `parametres.html` shows current state; the orange banner flags the planned #261 evolution.
 4. **Profile → Subscription** — open the dropdown, walk Mon abonnement → Mes factures → Mes jetons. Note the bracket comparison and the conversion deep-link.
 5. **Community growth loop** — `community-earn.html` → click any "tester" tile → arrive at `community-rewards.html` → "Convertir" modal → confirm flow.
-6. **Article + survey** — `community-intelligence.html` shows the editorial programmes (Julien quarterly + comptable / climatologie / risques / Tendances Naia) and the in-flight survey.
+6. **Editorial programmes** — `community-intelligence.html` shows the programmes (Julien quarterly + comptable / climatologie / risques / Tendances Naia). The in-flight survey card and the LinkedIn submit tile are V2-deferred (see top-of-file descope note).
 7. **Market data** — `community-market.html` for Belpex + source health.
 8. **Administration** — `admin.html` → `admin-programme.html` for the activity catalogue + approvals queue, then `admin-abonnements.html` for the customer table.
 9. **Plaquette** — open `admin-lead.html`, scroll to **Plaquette de suivi**: copy the tracked link, click **Aperçu** to open the personalised one-pager (`plaquette.html`), try **Télécharger en PDF**. Open `admin-lead.html?id=aveyron` to see the "not generated yet" state and the **Générer** action.

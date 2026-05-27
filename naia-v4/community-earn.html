@@ -91,7 +91,7 @@
             <div style="font-weight:600; font-size:16px">Le jeu Naia est de retour à <i>Hydro 2026</i> — Lyon, du 12 au 14 mai</div>
             <div class="muted" style="font-size:13px; margin-top:4px">Repérez les pertes sur un tableau de bord Naia, gagnez jusqu'à 200 points par partie. En ligne en juin.</div>
           </div>
-          <a class="btn btn-cyan" href="community-agenda.html"><i data-lucide="calendar"></i> Voir l'agenda</a>
+          <span class="muted" style="font-size:12px; white-space:nowrap"><i data-lucide="calendar" style="width:13px;height:13px"></i> En ligne dès juin</span>
         </div>
       </div>
 
@@ -124,11 +124,6 @@
             <div class="activity-points">+50</div>
           </div>
           <div class="activity-row">
-            <div class="activity-icon" style="background:rgba(168,85,247,0.15); color:#d8b4fe"><i data-lucide="lightbulb"></i></div>
-            <div class="activity-main"><div class="activity-title">Réponse à l'enquête « comptable »</div><div class="activity-meta">par Marc · 20 avr.</div></div>
-            <div class="activity-points">+25</div>
-          </div>
-          <div class="activity-row">
             <div class="activity-icon" style="background:rgba(245,158,11,0.15); color:#fcd34d"><i data-lucide="gift"></i></div>
             <div class="activity-main"><div class="activity-title">Conversion en jetons</div><div class="activity-meta">par Marc · 18 avr. · 240 pts → 24 jetons</div></div>
             <div class="activity-points minus">−240</div>
@@ -153,10 +148,12 @@
       </div>
 
       <h3 style="font-size:13px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em; font-weight:600; margin: 0 0 10px">Communauté</h3>
+      <!-- 2026-05-27 PO descope for the 10-11 June conference V1: the
+           "Enquête" (D5) and "LinkedIn" (F3) tiles are deferred to V2.
+           Reinstate when COMMUNITY_LINKEDIN_ENABLED flips on for F3
+           and the D5 survey API ships. -->
       <div style="display:grid; gap:12px; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr))">
-        <div class="tile"><div class="tile-head"><span class="badge badge-purple">Enquête</span><span class="tile-points">+25</span></div><div class="tile-title">Combien payez-vous votre comptable ?</div><div class="tile-desc">Résultats publiés en mai · clôture le 30 avr.</div><div class="tile-foot"><a href="community-intelligence.html" class="btn btn-sm btn-primary">Répondre</a></div></div>
-        <div class="tile"><div class="tile-head"><span class="badge badge-cyan">LinkedIn</span><span class="tile-points">+50</span></div><div class="tile-title">Publier un post sur LinkedIn</div><div class="tile-desc">Mention de Naia + lien public · validation manuelle · 2×/mois max.</div><div class="tile-foot"><button class="btn btn-sm btn-secondary">Soumettre</button></div></div>
-        <div class="tile"><div class="tile-head"><span class="badge badge-amber">Jeu</span><span class="tile-points">jusqu'à +200</span></div><div class="tile-title">Jouer au jeu Naia</div><div class="tile-desc">Conférences ou en ligne · 3 parties par campagne.</div><div class="tile-foot"><a href="community-agenda.html" class="btn btn-sm btn-secondary">Agenda</a></div></div>
+        <div class="tile"><div class="tile-head"><span class="badge badge-amber">Jeu</span><span class="tile-points">jusqu'à +200</span></div><div class="tile-title">Jouer au jeu Naia</div><div class="tile-desc">Conférences ou en ligne · 3 parties par campagne.</div><div class="tile-foot"><span class="muted" style="font-size:11px"><i data-lucide="calendar" style="width:11px;height:11px"></i> En ligne dès juin</span></div></div>
         <div class="tile"><div class="tile-head"><span class="badge badge-pink" style="background:rgba(236,72,153,0.18); color:#fbcfe8">Parrainage</span><span class="tile-points">+100/+100</span></div><div class="tile-title">Inviter un opérateur</div><div class="tile-desc">Code MB-2026 · vous et le filleul recevez 100 pts à l'activation.</div><div class="tile-foot"><button class="btn btn-sm btn-primary">Inviter</button></div></div>
       </div>
 
