@@ -95,6 +95,9 @@ Per-app audit logs, no unified cross-app feed. The two tabs are two views over t
 
 ### Lead-facing (public, no login)
 - `plaquette.html` — the real Naia **plaquette** (bilingual FR/EN, 2-page A4, annotated product screenshots + case study + pricing) sent as a post-demo follow-up (subscription PRD §FR-PLAQUETTE). Self-contained, downloadable as PDF, reached through a per-lead tracked link; personalised via `?id=` — the "Préparé pour" addressee in the header (try `?id=pyrenees`, `?id=vhg`). The admin side — generate, copy the tracked link, view tracking, Odoo sync — lives in the **Plaquette de suivi** section of `admin-lead.html`.
+- `inscription.html` — **Public sign-up form** (Sub.A8b · subscription PRD §FR-LEAD-2(b-bis)). Standalone landing-style layout (no app shell), captures lead identity + GDPR consent + parrainage code from `?p=<code>`. Honeypot + Cloudflare Turnstile widget (placeholder in the mockup). The form POSTs to `/api/v1/subscription/public/leads` and redirects to `merci.html`.
+- `merci.html` — **Thank-you confirmation** after a successful sign-up. Echoes the parrain code if the URL still carries `?p=`, sets expectation for the 24h follow-up + the confirmation email (sent best-effort via Celery + Odoo per Sub.A8b PO decision).
+- `inscription-erreur.html` — **Invalid parrain code** soft-error state. Shown when the prospect lands with a `?p=<code>` that doesn't resolve. The form still works (continue without a code), the page explains the likely causes (link truncation, expired code).
 
 ## What to click for review
 
@@ -109,6 +112,7 @@ For Bernard / Ugo / Paul:
 7. **Market data** — `community-market.html` for Belpex + source health.
 8. **Administration** — `admin.html` → `admin-programme.html` for the activity catalogue + approvals queue, then `admin-abonnements.html` for the customer table.
 9. **Plaquette** — open `admin-lead.html`, scroll to **Plaquette de suivi**: copy the tracked link, click **Aperçu** to open the personalised one-pager (`plaquette.html`), try **Télécharger en PDF**. Open `admin-lead.html?id=aveyron` to see the "not generated yet" state and the **Générer** action.
+10. **Public sign-up (Sub.A8b)** — open `inscription.html?p=ABCD123` to see the parrainage banner state. Fill in the fields, submit → `merci.html?p=ABCD123` displays the echo. Open `inscription-erreur.html?p=WXYZ999` to review the invalid-code soft error state.
 
 ## Tech stack
 
