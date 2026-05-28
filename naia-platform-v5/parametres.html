@@ -264,61 +264,163 @@
         </div>
       </div>
 
-      <!-- ============================ Section 6 — Catégories de pertes (per #591) ============================ -->
+      <!-- ============================ Section 6 — Catégories de pertes ============================
+           v5 polish round 2: each row is a loss CATEGORY. Click a category to expand its
+           loss TYPES (indented sub-rows). Columns: Label | Type (default) | Display (checkbox).
+           Removed: Reset button and "Default loss type" column (the "Type (default)" cell
+           replaces it — shown as a chip behind the label). -->
       <div class="pd-section" data-open="false">
         <div class="pd-section-head" onclick="this.parentElement.dataset.open = this.parentElement.dataset.open === 'true' ? 'false' : 'true'">
-          <div class="pd-section-title"><i data-lucide="alert-triangle" style="width:16px; height:16px; color:var(--brand-cyan)"></i> Catégories de pertes <span class="badge badge-slate">#591</span></div>
+          <div class="pd-section-title"><i data-lucide="alert-triangle" style="width:16px; height:16px; color:var(--brand-cyan)"></i> Catégories de pertes <span class="muted" style="font-size:12px; font-weight:400">6 catégories · 12 types</span></div>
           <i data-lucide="chevron-down" class="pd-chev"></i>
         </div>
         <div class="pd-section-body">
-          <p class="muted" style="font-size:13px; margin:0 0 12px">Catégories utilisées pour classifier les pertes de production sur cette centrale. Cf. <a href="https://github.com/hydro-software/platform/issues/591" class="link" target="_blank">issue #591</a>.</p>
-          <div style="display:flex; flex-wrap:wrap; gap:8px">
-            <span class="badge badge-amber">Maintenance</span>
-            <span class="badge badge-red">Panne</span>
-            <span class="badge badge-cyan">Environnement</span>
-            <span class="badge badge-blue">Opérationnel</span>
-            <span class="badge badge-purple">Réseau / Contrainte</span>
-            <span class="badge badge-slate">Données</span>
+          <p class="muted" style="font-size:13px; margin:0 0 12px">Cliquez une catégorie pour voir ses sous-types. La case <b>Affichage</b> contrôle si la catégorie/le type apparaît dans les rapports et listes de pertes.</p>
+          <table class="data-table loss-cats">
+            <thead><tr><th>Libellé</th><th>Type (par défaut)</th><th style="text-align:center; width:90px">Affichage</th></tr></thead>
+            <tbody>
+
+              <!-- Maintenance -->
+              <tr class="loss-cat-row" onclick="toggleLossCat(this)" data-open="false">
+                <td><i data-lucide="chevron-right" class="loss-chev"></i> <span class="badge badge-amber">Maintenance</span></td>
+                <td><span class="muted" style="font-size:12px">Maintenance planifiée</span></td>
+                <td style="text-align:center"><input type="checkbox" checked onclick="event.stopPropagation()"></td>
+              </tr>
+              <tr class="loss-type-row" hidden><td style="padding-left:32px">Maintenance planifiée</td><td class="muted" style="font-size:12px">par défaut</td><td style="text-align:center"><input type="checkbox" checked></td></tr>
+              <tr class="loss-type-row" hidden><td style="padding-left:32px">Inspection</td><td></td><td style="text-align:center"><input type="checkbox" checked></td></tr>
+              <tr class="loss-type-row" hidden><td style="padding-left:32px">Nettoyage grille</td><td></td><td style="text-align:center"><input type="checkbox" checked></td></tr>
+
+              <!-- Panne -->
+              <tr class="loss-cat-row" onclick="toggleLossCat(this)" data-open="false">
+                <td><i data-lucide="chevron-right" class="loss-chev"></i> <span class="badge badge-red">Panne</span></td>
+                <td><span class="muted" style="font-size:12px">Défaut électrique</span></td>
+                <td style="text-align:center"><input type="checkbox" checked onclick="event.stopPropagation()"></td>
+              </tr>
+              <tr class="loss-type-row" hidden><td style="padding-left:32px">Défaut électrique</td><td class="muted" style="font-size:12px">par défaut</td><td style="text-align:center"><input type="checkbox" checked></td></tr>
+              <tr class="loss-type-row" hidden><td style="padding-left:32px">Défaut mécanique</td><td></td><td style="text-align:center"><input type="checkbox" checked></td></tr>
+
+              <!-- Environnement -->
+              <tr class="loss-cat-row" onclick="toggleLossCat(this)" data-open="false">
+                <td><i data-lucide="chevron-right" class="loss-chev"></i> <span class="badge badge-cyan">Environnement</span></td>
+                <td><span class="muted" style="font-size:12px">Crue</span></td>
+                <td style="text-align:center"><input type="checkbox" checked onclick="event.stopPropagation()"></td>
+              </tr>
+              <tr class="loss-type-row" hidden><td style="padding-left:32px">Crue</td><td class="muted" style="font-size:12px">par défaut</td><td style="text-align:center"><input type="checkbox" checked></td></tr>
+              <tr class="loss-type-row" hidden><td style="padding-left:32px">Étiage</td><td></td><td style="text-align:center"><input type="checkbox" checked></td></tr>
+
+              <!-- Opérationnel -->
+              <tr class="loss-cat-row" onclick="toggleLossCat(this)" data-open="false">
+                <td><i data-lucide="chevron-right" class="loss-chev"></i> <span class="badge badge-blue">Opérationnel</span></td>
+                <td><span class="muted" style="font-size:12px">Arrêt manuel</span></td>
+                <td style="text-align:center"><input type="checkbox" checked onclick="event.stopPropagation()"></td>
+              </tr>
+              <tr class="loss-type-row" hidden><td style="padding-left:32px">Arrêt manuel</td><td class="muted" style="font-size:12px">par défaut</td><td style="text-align:center"><input type="checkbox" checked></td></tr>
+
+              <!-- Réseau / Contrainte -->
+              <tr class="loss-cat-row" onclick="toggleLossCat(this)" data-open="false">
+                <td><i data-lucide="chevron-right" class="loss-chev"></i> <span class="badge badge-purple">Réseau / Contrainte</span></td>
+                <td><span class="muted" style="font-size:12px">Contrainte réseau</span></td>
+                <td style="text-align:center"><input type="checkbox" checked onclick="event.stopPropagation()"></td>
+              </tr>
+              <tr class="loss-type-row" hidden><td style="padding-left:32px">Contrainte réseau</td><td class="muted" style="font-size:12px">par défaut</td><td style="text-align:center"><input type="checkbox" checked></td></tr>
+              <tr class="loss-type-row" hidden><td style="padding-left:32px">Effacement contractuel</td><td></td><td style="text-align:center"><input type="checkbox" checked></td></tr>
+
+              <!-- Données -->
+              <tr class="loss-cat-row" onclick="toggleLossCat(this)" data-open="false">
+                <td><i data-lucide="chevron-right" class="loss-chev"></i> <span class="badge badge-slate">Données</span></td>
+                <td><span class="muted" style="font-size:12px">Capteur défaillant</span></td>
+                <td style="text-align:center"><input type="checkbox" onclick="event.stopPropagation()"></td>
+              </tr>
+              <tr class="loss-type-row" hidden><td style="padding-left:32px">Capteur défaillant</td><td class="muted" style="font-size:12px">par défaut</td><td style="text-align:center"><input type="checkbox"></td></tr>
+
+            </tbody>
+          </table>
+          <div style="margin-top:14px; display:flex; gap:8px">
+            <button class="btn btn-secondary btn-sm"><i data-lucide="plus"></i> Ajouter une catégorie</button>
           </div>
-          <div style="margin-top:14px"><button class="btn btn-secondary btn-sm"><i data-lucide="edit-3"></i> Configurer</button></div>
+          <script>
+            function toggleLossCat(row) {
+              const open = row.dataset.open === "true";
+              row.dataset.open = open ? "false" : "true";
+              const chev = row.querySelector(".loss-chev");
+              if (chev) chev.style.transform = open ? "rotate(0deg)" : "rotate(90deg)";
+              // toggle the immediately-following sibling loss-type-row entries until the next loss-cat-row
+              let n = row.nextElementSibling;
+              while (n && n.classList.contains("loss-type-row")) {
+                n.hidden = open ? true : false;
+                n = n.nextElementSibling;
+              }
+            }
+          </script>
         </div>
       </div>
 
-      <!-- ============================ Section 7 — Tarification (per #591) ============================ -->
+      <!-- ============================ Section 7 — Tarification ============================
+           v5 polish round 2: replace the fixed Tarif d'achat / Prix moyen rows by an editable
+           list of tariffs. "Ajouter un tarif" opens a form (modal) with:
+             Nom | Type (manuel | automatique) | Source (spot if auto, free text if manual)
+             Unité | Note (free text). -->
       <div class="pd-section" data-open="false">
         <div class="pd-section-head" onclick="this.parentElement.dataset.open = this.parentElement.dataset.open === 'true' ? 'false' : 'true'">
-          <div class="pd-section-title"><i data-lucide="euro" style="width:16px; height:16px; color:var(--brand-cyan)"></i> Tarification <span class="badge badge-slate">#591</span></div>
+          <div class="pd-section-title"><i data-lucide="euro" style="width:16px; height:16px; color:var(--brand-cyan)"></i> Tarification <span class="muted" style="font-size:12px; font-weight:400">2 tarifs · 1 actif</span></div>
           <i data-lucide="chevron-down" class="pd-chev"></i>
         </div>
         <div class="pd-section-body">
-          <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px">
-            <div>
-              <div class="pd-info-row"><span class="lbl">Tarif d'achat</span><span>Marché spot Belpex (FR)</span></div>
-              <div class="pd-info-row"><span class="lbl">Contrat</span><span>OA + complément</span></div>
-              <div class="pd-info-row"><span class="lbl">Durée restante</span><span>11 ans</span></div>
-            </div>
-            <div>
-              <div class="pd-info-row"><span class="lbl">Prix moyen 2025</span><span class="tabular">93,2 €/MWh</span></div>
-              <div class="pd-info-row"><span class="lbl">Prix moyen YTD 2026</span><span class="tabular">91,8 €/MWh</span></div>
-              <div class="pd-info-row"><span class="lbl">Indice révision</span><span>EDF tarif régulé</span></div>
-            </div>
-          </div>
+          <table class="data-table">
+            <thead><tr><th>Nom</th><th>Type</th><th>Source</th><th>Unité</th><th>Note</th><th></th></tr></thead>
+            <tbody>
+              <tr>
+                <td><b>OA + complément</b></td>
+                <td><span class="badge badge-blue">Automatique</span></td>
+                <td>Spot Belpex FR</td>
+                <td class="tabular">€/MWh</td>
+                <td class="muted" style="font-size:12px">Contrat OA jusqu'en 2037</td>
+                <td><a class="link" style="font-size:12px">Modifier</a></td>
+              </tr>
+              <tr>
+                <td>Tarif fixe annuel 2025</td>
+                <td><span class="badge badge-slate">Manuel</span></td>
+                <td>Saisi par PO</td>
+                <td class="tabular">€/MWh</td>
+                <td class="muted" style="font-size:12px">Référence historique</td>
+                <td><a class="link" style="font-size:12px">Modifier</a></td>
+              </tr>
+            </tbody>
+          </table>
+          <div style="margin-top:14px"><button class="btn btn-primary btn-sm" onclick="openOverlay('add-tariff')"><i data-lucide="plus"></i> Ajouter un tarif</button></div>
         </div>
       </div>
 
-      <!-- ============================ Section 8 — Partage d'accès (per #591) ============================ -->
+      <!-- ============================ Section 8 — Partage d'accès ============================
+           v5 polish round 2: add a remove-access icon on each row. -->
       <div class="pd-section" data-open="false">
         <div class="pd-section-head" onclick="this.parentElement.dataset.open = this.parentElement.dataset.open === 'true' ? 'false' : 'true'">
-          <div class="pd-section-title"><i data-lucide="share-2" style="width:16px; height:16px; color:var(--brand-cyan)"></i> Partage d'accès <span class="badge badge-slate">#591</span></div>
+          <div class="pd-section-title"><i data-lucide="share-2" style="width:16px; height:16px; color:var(--brand-cyan)"></i> Partage d'accès <span class="muted" style="font-size:12px; font-weight:400">2 accès partagés</span></div>
           <i data-lucide="chevron-down" class="pd-chev"></i>
         </div>
         <div class="pd-section-body">
           <p class="muted" style="font-size:13px; margin:0 0 12px">Inviter un autre opérateur (comparateur), une banque (lecture seule), un assureur, etc. — sans les ajouter à votre organisation.</p>
           <table class="data-table">
-            <thead><tr><th>Personne / org.</th><th>Rôle</th><th>Type</th><th>Depuis</th></tr></thead>
+            <thead><tr><th>Personne / org.</th><th>Rôle</th><th>Type</th><th>Depuis</th><th style="text-align:center; width:60px">Retirer</th></tr></thead>
             <tbody>
-              <tr><td>Sophie Legrand · Centrale de la Semois</td><td><span class="badge badge-cyan">Comparateur</span></td><td>Lecture agrégée</td><td class="muted">12 mars</td></tr>
-              <tr><td>Crédit Agricole Sud-Ouest</td><td><span class="badge badge-blue">Banque</span></td><td>Rapport mensuel</td><td class="muted">8 mars</td></tr>
+              <tr>
+                <td>Sophie Legrand · Centrale de la Semois</td>
+                <td><span class="badge badge-cyan">Comparateur</span></td>
+                <td>Lecture agrégée</td>
+                <td class="muted">12 mars</td>
+                <td style="text-align:center">
+                  <button class="icon-action" title="Retirer l'accès" onclick="if(confirm('Retirer l\\'accès partagé pour Sophie Legrand ?')) alert('Accès retiré (démo)')"><i data-lucide="user-minus" style="color:var(--accent-red)"></i></button>
+                </td>
+              </tr>
+              <tr>
+                <td>Crédit Agricole Sud-Ouest</td>
+                <td><span class="badge badge-blue">Banque</span></td>
+                <td>Rapport mensuel</td>
+                <td class="muted">8 mars</td>
+                <td style="text-align:center">
+                  <button class="icon-action" title="Retirer l'accès" onclick="if(confirm('Retirer l\\'accès partagé pour Crédit Agricole Sud-Ouest ?')) alert('Accès retiré (démo)')"><i data-lucide="user-minus" style="color:var(--accent-red)"></i></button>
+                </td>
+              </tr>
             </tbody>
           </table>
           <div style="margin-top:14px"><button class="btn btn-secondary btn-sm"><i data-lucide="user-plus"></i> Inviter</button></div>
@@ -406,6 +508,79 @@
     </div>
   </div>
 </div>
+
+<!-- v5 polish round 2: Add-tariff overlay (Tarification section) -->
+<div id="add-tariff" class="overlay" onclick="if(event.target===this) closeOverlay('add-tariff')">
+  <div class="modal">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px">
+      <div>
+        <div class="modal-title">Ajouter un tarif</div>
+        <div class="modal-subtitle">Définit un tarif appliqué à cette centrale.</div>
+      </div>
+      <button class="btn btn-ghost" onclick="closeOverlay('add-tariff')"><i data-lucide="x"></i></button>
+    </div>
+
+    <div style="display:flex; flex-direction:column; gap:14px">
+      <div>
+        <label style="display:block; font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em; font-weight:600; margin-bottom:6px">Nom <span style="color:var(--accent-red)">*</span></label>
+        <input class="input" type="text" placeholder="ex. OA + complément 2026">
+      </div>
+
+      <div>
+        <label style="display:block; font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em; font-weight:600; margin-bottom:6px">Type <span style="color:var(--accent-red)">*</span></label>
+        <div class="type-seg" style="display:inline-flex; background:var(--bg-input); border-radius:999px; padding:3px; gap:1px">
+          <button id="tariff-type-manual" class="on" onclick="switchTariffType('manual')" style="padding:6px 14px; font-size:13px; border:0; background:var(--brand-blue-strong); color:white; border-radius:999px; cursor:pointer; font-family:inherit; font-weight:500">Manuel</button>
+          <button id="tariff-type-auto" onclick="switchTariffType('auto')" style="padding:6px 14px; font-size:13px; border:0; background:transparent; color:var(--text-muted); border-radius:999px; cursor:pointer; font-family:inherit; font-weight:500">Automatique</button>
+        </div>
+      </div>
+
+      <div id="tariff-source-row">
+        <label style="display:block; font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em; font-weight:600; margin-bottom:6px">Source <span style="color:var(--accent-red)">*</span></label>
+        <input id="tariff-source-manual" class="input" type="text" placeholder="ex. Saisi par PO · contrat 2026">
+        <select id="tariff-source-auto" class="select" style="display:none">
+          <option>Spot Belpex BE · base load</option>
+          <option>Spot Belpex BE · peak load</option>
+          <option>Spot EPEX FR · base load</option>
+          <option>Spot EPEX FR · peak load</option>
+          <option>EDF tarif régulé</option>
+        </select>
+      </div>
+
+      <div>
+        <label style="display:block; font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em; font-weight:600; margin-bottom:6px">Unité <span style="color:var(--accent-red)">*</span></label>
+        <select class="select"><option selected>€/MWh</option><option>€/kWh</option><option>cts/kWh</option></select>
+      </div>
+
+      <div>
+        <label style="display:block; font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em; font-weight:600; margin-bottom:6px">Note</label>
+        <textarea class="input" rows="3" placeholder="Texte libre (durée du contrat, conditions, indice de révision…)"></textarea>
+      </div>
+    </div>
+
+    <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:18px; padding-top:14px; border-top:1px solid var(--border-subtle)">
+      <button class="btn btn-ghost" onclick="closeOverlay('add-tariff')">Annuler</button>
+      <button class="btn btn-primary" onclick="alert('Tarif ajouté (démo)'); closeOverlay('add-tariff')"><i data-lucide="check"></i> Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  function switchTariffType(t) {
+    const m = document.getElementById("tariff-type-manual");
+    const a = document.getElementById("tariff-type-auto");
+    const ms = document.getElementById("tariff-source-manual");
+    const as = document.getElementById("tariff-source-auto");
+    if (t === "manual") {
+      m.style.background = "var(--brand-blue-strong)"; m.style.color = "white";
+      a.style.background = "transparent";              a.style.color = "var(--text-muted)";
+      ms.style.display = ""; as.style.display = "none";
+    } else {
+      a.style.background = "var(--brand-blue-strong)"; a.style.color = "white";
+      m.style.background = "transparent";              m.style.color = "var(--text-muted)";
+      ms.style.display = "none"; as.style.display = "";
+    }
+  }
+</script>
 
 <script src="https://unpkg.com/lucide@latest"></script>
 <script src="js/app.js"></script>

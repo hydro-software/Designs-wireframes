@@ -42,24 +42,18 @@
         <div><b>V2 :</b> module de simulation Valorise (BTM, batterie, digital twin) — visible dans le mockup pour validation, non livré en V1.</div>
       </div>
 
-      <!-- Chart card with the same toolbar structure as Production -->
+      <!-- Chart card — same toolbar structure as Production (v5 polish round 2): expandable
+           Légende on the left, discrete icons on the right, floating right-axis toggle. -->
       <div class="card" style="margin-bottom:14px">
         <div class="card-head" style="border-bottom:1px solid var(--border-subtle)">
 
-          <div style="display:flex; gap:14px; align-items:center; flex-wrap:wrap">
-            <div class="ind-cycler" id="ind-cycler">
-              <button class="arrow" onclick="cycleIndicateur(-1)" aria-label="Indicateur précédent"><i data-lucide="chevron-left"></i></button>
-              <span class="ind-label">
-                <span class="ind-swatch" id="ind-swatch" style="background:#fbbf24"></span>
-                <span id="ind-name">Spot Belpex</span>
-              </span>
-              <button class="arrow" onclick="cycleIndicateur(1)" aria-label="Indicateur suivant"><i data-lucide="chevron-right"></i></button>
-            </div>
-
-            <button class="axis-toggle" onclick="toggleRightAxis()" title="Basculer l'axe droit">
-              Axe droit : <b id="axis-label">Prix spot (€/MWh)</b>
-              <i data-lucide="repeat"></i>
+          <div class="legende" id="legende" data-open="false">
+            <button class="legende-head" onclick="toggleLegende()" aria-expanded="false">
+              <i data-lucide="chevron-down" class="legende-chev"></i>
+              <span>Légende</span>
+              <span class="legende-count" id="legende-count">3 indicateurs</span>
             </button>
+            <div class="legende-body" id="legende-body"></div>
           </div>
 
           <div style="display:flex; gap:4px">
@@ -68,7 +62,13 @@
           </div>
         </div>
 
-        <div style="height:480px; padding:14px"><div class="chart-container" style="height:100%"><canvas id="production-chart"></canvas></div></div>
+        <div style="position:relative; height:480px; padding:14px">
+          <button class="right-axis-toggle" id="right-axis-toggle" onclick="toggleRightAxis()" title="Basculer l'axe droit entre Prix spot et Débit">
+            <span id="right-axis-label">Prix spot (€/MWh)</span>
+            <i data-lucide="arrow-left-right"></i>
+          </button>
+          <div class="chart-container" style="height:100%"><canvas id="production-chart"></canvas></div>
+        </div>
       </div>
 
       <!-- v5: per-centrale breakdown table removed — same rule as Production (centrale info is in the tabs). -->
@@ -86,23 +86,60 @@
     document.querySelectorAll(".time-pills button").forEach(b => b.classList.remove("on"));
     btn.classList.add("on");
   }
-  const INDICATEURS = [
-    { name: "Spot Belpex",       color: "#fbbf24" },
-    { name: "Revenus N-1",       color: "#7dd3fc" },
-    { name: "Pluie · Bergerac",  color: "#60a5fa" },
-    { name: "Débit · Dordogne",  color: "#a3e635" },
+  // Légende (expandable) — same shape as production.html.
+  const LEGENDE_SLOTS = [
+    { key: "comparateur", label: "Comparateur",   active: 0, options: [
+      { name: "Revenus N-1",       color: "#7dd3fc" },
+      { name: "Objectif budgété",  color: "#c4b5fd" },
+    ]},
+    { key: "prix",        label: "Prix",          active: 0, options: [
+      { name: "Spot Belpex",       color: "#fbbf24" },
+      { name: "Spot EPEX FR",      color: "#f59e0b" },
+    ]},
+    { key: "debit",       label: "Hydro · débit", active: 0, options: [
+      { name: "Débit · Dordogne",  color: "#a3e635" },
+      { name: "Débit · affluent",  color: "#65a30d" },
+    ]},
   ];
-  let indIdx = 0;
-  function cycleIndicateur(delta) {
-    indIdx = (indIdx + delta + INDICATEURS.length) % INDICATEURS.length;
-    const ind = INDICATEURS[indIdx];
-    document.getElementById("ind-name").textContent = ind.name;
-    document.getElementById("ind-swatch").style.background = ind.color;
+  function buildLegende() {
+    const body = document.getElementById("legende-body");
+    if (!body) return;
+    body.innerHTML = LEGENDE_SLOTS.map((slot, i) => {
+      const active = slot.options[slot.active];
+      return `<div class="legende-row">
+        <span class="legende-slot-label">${slot.label}</span>
+        <button class="legende-arrow" onclick="cycleSlot(${i}, -1)" aria-label="Précédent"><i data-lucide="chevron-left"></i></button>
+        <span class="legende-active">
+          <span class="legende-swatch" style="background:${active.color}"></span>
+          <span class="legende-name" id="legende-active-${i}">${active.name}</span>
+        </span>
+        <button class="legende-arrow" onclick="cycleSlot(${i}, 1)"  aria-label="Suivant"><i data-lucide="chevron-right"></i></button>
+      </div>`;
+    }).join("");
+    document.getElementById("legende-count").textContent = `${LEGENDE_SLOTS.length} indicateurs`;
+    initIcons();
   }
+  function toggleLegende() {
+    const el = document.getElementById("legende");
+    const open = el.dataset.open === "true";
+    el.dataset.open = open ? "false" : "true";
+    el.querySelector(".legende-head").setAttribute("aria-expanded", open ? "false" : "true");
+  }
+  function cycleSlot(slotIdx, delta) {
+    const slot = LEGENDE_SLOTS[slotIdx];
+    slot.active = (slot.active + delta + slot.options.length) % slot.options.length;
+    const active = slot.options[slot.active];
+    const nameEl = document.getElementById(`legende-active-${slotIdx}`);
+    if (nameEl) nameEl.textContent = active.name;
+    const swatch = nameEl?.previousElementSibling;
+    if (swatch) swatch.style.background = active.color;
+  }
+  document.addEventListener("DOMContentLoaded", () => setTimeout(buildLegende, 0));
+
   let rightAxis = "prix";
   function toggleRightAxis() {
     rightAxis = rightAxis === "prix" ? "debit" : "prix";
-    document.getElementById("axis-label").textContent = rightAxis === "prix" ? "Prix spot (€/MWh)" : "Débit (m³/s)";
+    document.getElementById("right-axis-label").textContent = rightAxis === "prix" ? "Prix spot (€/MWh)" : "Débit (m³/s)";
   }
 </script>
 </body>

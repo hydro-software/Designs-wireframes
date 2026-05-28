@@ -13,22 +13,24 @@
     <header class="topbar"><div><div class="page-eyebrow">Profil</div><div style="font-size:18px; font-weight:600">Mon profil</div></div></header>
 
     <!-- Profile sub-tabs.
-         v5 MVP toggle: subscription + gamification tabs (Mon abonnement, Mes factures,
-         Mes jetons, Mes badges) carry data-mvp="1" — hidden in MVP 0.9 mode. -->
+         v5 update: Sécurité tab removed (moved into the Paramètres utilisateur tile on Identité).
+         Mes badges tab removed (badges live on the Identité page directly).
+         MVP toggle: subscription tabs (Mon abonnement, Mes factures, Mes jetons)
+         carry data-mvp="1" — hidden in MVP 0.9. -->
     <div class="centrale-tabs">
       <a class="centrale-tab active" href="profil.html"><span>Identité</span></a>
       <a class="centrale-tab" href="profil-abonnement.html" data-mvp="1"><span>Mon abonnement</span></a>
       <a class="centrale-tab" href="profil-factures.html"   data-mvp="1"><span>Mes factures</span></a>
       <a class="centrale-tab" href="profil-jetons.html"     data-mvp="1"><span>Mes jetons</span></a>
-      <a class="centrale-tab" href="#" data-mvp="1" onclick="event.preventDefault(); alert('Mes badges (Marc) — par utilisateur (Sophie a sa propre collection)')"><span>Mes badges</span></a>
-      <a class="centrale-tab" href="#" onclick="event.preventDefault(); alert('Sécurité &amp; MFA — couvert par #315')"><span>Sécurité</span></a>
     </div>
 
     <div class="page-content">
 
-      <div style="display:grid; gap:14px; grid-template-columns: 1.5fr 1fr">
+      <!-- v5: flex layout so the Mon organisation card collapses cleanly in MVP 0.9
+           (when hidden via data-mvp="1") and the two remaining cards split the row. -->
+      <div style="display:flex; flex-wrap:wrap; gap:14px; align-items:stretch">
 
-        <div class="card">
+        <div class="card" style="flex: 2 1 380px">
           <div class="card-head"><div class="card-head-title">Identité</div><button class="btn btn-secondary btn-sm"><i data-lucide="edit-3"></i> Modifier</button></div>
           <div class="card-body">
             <div style="display:flex; gap:14px; align-items:center; padding-bottom:14px; border-bottom:1px solid var(--border-subtle); margin-bottom:14px">
@@ -51,7 +53,7 @@
         </div>
 
         <!-- Subscription / gamification side card — hidden in MVP 0.9 (profil shows only user data there). -->
-        <div class="card" data-mvp="1">
+        <div class="card" data-mvp="1" style="flex: 1 1 260px">
           <div class="card-head"><div class="card-head-title">Mon organisation</div></div>
           <div class="card-body">
             <div style="display:flex; gap:14px; align-items:center; padding-bottom:14px; border-bottom:1px solid var(--border-subtle); margin-bottom:14px">
@@ -63,6 +65,51 @@
             <div style="display:flex; justify-content:space-between; padding:6px 0"><span class="muted">Plan d'abonnement</span><span>Per-plant · 210 kW</span></div>
             <div style="display:flex; justify-content:space-between; padding:6px 0"><span class="muted">Jetons disponibles</span><span class="tabular">24</span></div>
             <a href="profil-abonnement.html" class="btn btn-secondary btn-block" style="margin-top:14px">Gérer l'abonnement</a>
+          </div>
+        </div>
+
+        <!-- v5: Paramètres utilisateur tile.
+             Replaces the old Sécurité tab + the theme/language entries that used to live
+             in the profile dropdown. Always visible in both MVP 0.9 and MVP 1. -->
+        <div class="card" style="flex: 1 1 260px">
+          <div class="card-head"><div class="card-head-title">Paramètres utilisateur</div></div>
+          <div class="card-body" style="display:flex; flex-direction:column; gap:14px">
+
+            <!-- Sécurité / MFA -->
+            <div>
+              <div style="font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em; font-weight:600; margin-bottom:6px"><i data-lucide="shield" style="width:12px; height:12px; vertical-align:-1px"></i> Sécurité</div>
+              <div style="display:flex; justify-content:space-between; align-items:center; gap:10px">
+                <div>
+                  <div style="font-size:13px; font-weight:500">Authentification à deux facteurs (MFA)</div>
+                  <div class="muted" style="font-size:11.5px">Application TOTP (Google Authenticator, 1Password, etc.)</div>
+                </div>
+                <span class="badge badge-amber">À activer</span>
+              </div>
+              <button class="btn btn-secondary btn-sm" style="margin-top:8px"><i data-lucide="key"></i> Configurer MFA</button>
+            </div>
+
+            <div style="height:1px; background:var(--border-subtle)"></div>
+
+            <!-- Langue -->
+            <div>
+              <div style="font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em; font-weight:600; margin-bottom:6px"><i data-lucide="globe" style="width:12px; height:12px; vertical-align:-1px"></i> Langue</div>
+              <select class="select"><option selected>Français</option><option>Nederlands</option><option>English</option><option>Deutsch</option></select>
+            </div>
+
+            <div style="height:1px; background:var(--border-subtle)"></div>
+
+            <!-- Thème -->
+            <div>
+              <div style="font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em; font-weight:600; margin-bottom:6px"><i data-lucide="palette" style="width:12px; height:12px; vertical-align:-1px"></i> Thème</div>
+              <div class="seg" style="display:inline-flex; background:var(--bg-input); border-radius:8px; padding:3px; gap:1px">
+                <button data-theme-btn="dark" onclick="setTheme('dark')" style="padding:5px 12px; font-size:12px; border:0; background:transparent; color:var(--text-muted); border-radius:6px; cursor:pointer; font-family:inherit"><i data-lucide="moon" style="width:13px; height:13px; vertical-align:-2px; margin-right:4px"></i>Sombre</button>
+                <button data-theme-btn="light" onclick="setTheme('light')" style="padding:5px 12px; font-size:12px; border:0; background:transparent; color:var(--text-muted); border-radius:6px; cursor:pointer; font-family:inherit"><i data-lucide="sun" style="width:13px; height:13px; vertical-align:-2px; margin-right:4px"></i>Clair</button>
+              </div>
+            </div>
+
+            <div style="height:1px; background:var(--border-subtle); margin-top:auto"></div>
+
+            <button class="btn btn-secondary btn-sm" style="color:var(--accent-red)" onclick="alert('Déconnexion (démo)')"><i data-lucide="log-out"></i> Se déconnecter</button>
           </div>
         </div>
 

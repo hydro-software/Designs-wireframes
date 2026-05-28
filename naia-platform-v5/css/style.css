@@ -334,6 +334,17 @@ body[data-show-v2="true"] .subnav-item.v2 .v2-pill { background: rgba(217,119,6,
 .theme-row .seg button.on { background: var(--bg-card-hover); color: var(--text-primary); box-shadow: 0 1px 2px rgba(0,0,0,0.2); }
 .theme-row .seg i { width: 13px; height: 13px; }
 
+/* v5: generic segmented control "on" highlight (used in the Paramètres utilisateur
+   tile on profil.html — the theme picker that moved out of the old dropdown). */
+.seg button.on { background: var(--bg-card-hover); color: var(--text-primary); box-shadow: 0 1px 2px rgba(0,0,0,0.2); }
+
+/* v5 polish round 2: expandable loss-category rows in Paramètres → Catégories de pertes. */
+.loss-cats .loss-cat-row { cursor: pointer; }
+.loss-cats .loss-cat-row:hover { background: var(--bg-card-hover); }
+.loss-cats .loss-chev { width: 12px; height: 12px; color: var(--text-muted); transition: transform 0.18s; margin-right: 2px; vertical-align: -1px; }
+.loss-cats .loss-type-row { background: var(--bg-base); }
+.loss-cats .loss-type-row td { font-size: 12.5px; }
+
 /* ============ MAIN AREA ============ */
 
 .main-area { display: flex; flex-direction: column; min-width: 0; }
@@ -1061,6 +1072,112 @@ body[data-mvp="1"]   [data-mvp="0.9"] { display: none !important; }
 }
 .axis-toggle:hover { color: var(--brand-cyan); border-color: var(--brand-cyan); }
 .axis-toggle i { width: 12px; height: 12px; }
+
+/* v5 polish round 2: Légende — expandable list above the chart.
+   Header shows a chevron + "Légende" + count. Click expands to reveal one row per slot,
+   each row has a swatch + the active indicator name + ← → arrows to cycle within the slot. */
+.legende {
+  display: inline-block;
+  background: var(--bg-input);
+  border: 1px solid var(--border-default);
+  border-radius: 8px;
+  font-family: inherit;
+  overflow: hidden;
+}
+.legende-head {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px 6px 10px;
+  background: transparent;
+  border: 0;
+  color: var(--text-primary);
+  font-size: 12.5px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+  width: 100%;
+  text-align: left;
+}
+.legende-head:hover { background: var(--bg-card-hover); }
+.legende-chev { width: 14px; height: 14px; color: var(--text-muted); transition: transform 0.18s; }
+.legende[data-open="true"] .legende-chev { transform: rotate(180deg); }
+.legende-count {
+  margin-left: auto;
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--text-muted);
+  padding-left: 12px;
+}
+.legende-body {
+  display: none;
+  border-top: 1px solid var(--border-subtle);
+  padding: 6px 8px;
+  flex-direction: column;
+  gap: 2px;
+}
+.legende[data-open="true"] .legende-body { display: flex; }
+.legende-row {
+  display: grid;
+  grid-template-columns: 100px 24px 1fr 24px;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 6px;
+  border-radius: 6px;
+}
+.legende-row:hover { background: var(--bg-card-hover); }
+.legende-slot-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.legende-active {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12.5px;
+  color: var(--text-primary);
+  min-width: 0;
+}
+.legende-swatch { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+.legende-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.legende-arrow {
+  width: 22px; height: 22px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 5px; border: 0;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-family: inherit;
+}
+.legende-arrow:hover { background: var(--bg-input); color: var(--brand-cyan); }
+.legende-arrow i { width: 13px; height: 13px; }
+
+/* v5 polish round 2: Right-axis toggle floats above the chart's right axis label.
+   A small pill that swaps the right axis between Pluie and Débit. */
+.right-axis-toggle {
+  position: absolute;
+  top: 10px;
+  right: 24px;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-default);
+  border-radius: 999px;
+  padding: 3px 9px 3px 10px;
+  cursor: pointer;
+  font-family: inherit;
+  box-shadow: 0 2px 6px -2px rgba(0,0,0,0.3);
+}
+.right-axis-toggle:hover { color: var(--brand-cyan); border-color: var(--brand-cyan); }
+.right-axis-toggle i { width: 11px; height: 11px; }
 
 /* Indicateurs arrows (left/right cyclers — replace "Indicateurs" toggle button) */
 .ind-cycler {

@@ -180,15 +180,18 @@ function buildSidebar() {
       </a>
     </div>
 
-    <div id="profile-container" style="position:relative">
-      <button id="profile-trigger" class="profile-trigger" onclick="toggleProfileDropdown()" data-open="false">
+    <div id="profile-container">
+      <!-- v5 update: this button no longer opens a dropdown — it navigates directly to
+           profil.html where Mon profil / Mon abonnement / Mes factures / Mes jetons sit
+           as tabs and a User Settings tile hosts language, theme and security. -->
+      <a id="profile-trigger" class="profile-trigger" href="profil.html">
         <div class="avatar" style="width:30px; height:30px; font-size:11px">MD</div>
         <div style="flex:1; min-width:0">
           <div style="color:white; font-size:13px; font-weight:500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis">Marc Dupont</div>
           <div style="color:rgba(255,255,255,0.55); font-size:11px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis">Moulin du Bocq · BE</div>
         </div>
-        <i data-lucide="chevron-up" class="chev-up" style="width:14px; height:14px"></i>
-      </button>
+        <i data-lucide="chevron-right" style="width:14px; height:14px; color:rgba(255,255,255,0.55)"></i>
+      </a>
     </div>
   `;
 }
@@ -209,64 +212,22 @@ function toggleFoldByLink(chevEl) {
   link.setAttribute("aria-expanded", open ? "false" : "true");
 }
 
-// ---- PROFILE DROPDOWN ----
-function toggleProfileDropdown() {
-  let dd = document.getElementById("profile-dropdown");
-  const trigger = document.getElementById("profile-trigger");
-  if (!dd) {
-    dd = document.createElement("div");
-    dd.id = "profile-dropdown";
-    dd.className = "profile-dropdown";
-    dd.innerHTML = `
-      <a href="profil.html"><i data-lucide="user" style="width:14px;height:14px"></i> Mon profil</a>
-      <a href="profil-abonnement.html" data-mvp="1"><i data-lucide="credit-card" style="width:14px;height:14px"></i> Mon abonnement</a>
-      <a href="profil-factures.html"   data-mvp="1"><i data-lucide="file-text"   style="width:14px;height:14px"></i> Mes factures</a>
-      <a href="profil-jetons.html"     data-mvp="1"><i data-lucide="coins"       style="width:14px;height:14px"></i> Mes jetons</a>
-      <button onclick="openHelp()"><i data-lucide="life-buoy" style="width:14px;height:14px"></i> Aide &amp; support</button>
-      <div class="divider"></div>
-      <div class="theme-row">
-        <span style="display:inline-flex; align-items:center; gap:8px"><i data-lucide="palette" style="width:14px;height:14px"></i> Thème</span>
-        <span class="seg">
-          <button data-theme-btn="dark" onclick="setTheme('dark')"><i data-lucide="moon"></i> Sombre</button>
-          <button data-theme-btn="light" onclick="setTheme('light')"><i data-lucide="sun"></i> Clair</button>
-        </span>
-      </div>
-      <div class="theme-row" style="padding-top:0" data-mvp="1">
-        <span style="display:inline-flex; align-items:center; gap:8px"><i data-lucide="flask-conical" style="width:14px;height:14px"></i> Voir V2 (mockup)</span>
-        <span class="seg">
-          <button data-v2-btn="false" onclick="setShowV2(false); refreshV2Buttons()">Off</button>
-          <button data-v2-btn="true" onclick="setShowV2(true); refreshV2Buttons()">On</button>
-        </span>
-      </div>
-      <button onclick="alert('Langue — FR / DE / EN (à venir)')"><i data-lucide="globe" style="width:14px;height:14px"></i> Langue</button>
-      <a href="admin.html" data-mvp="1"><i data-lucide="shield" style="width:14px;height:14px"></i> Administration</a>
-      <div class="divider"></div>
-      <button class="danger" onclick="alert('Déconnexion (démo)')"><i data-lucide="log-out" style="width:14px;height:14px"></i> Se déconnecter</button>
-    `;
-    document.getElementById("profile-container").appendChild(dd);
-    initIcons();
-    refreshThemeButtons();
-    refreshV2Buttons();
-  }
-  const isOpen = dd.classList.toggle("open");
-  if (trigger) trigger.setAttribute("data-open", isOpen ? "true" : "false");
-}
+// ---- PROFILE BUTTON ----
+// v5 update: the bottom-left profile button no longer opens a dropdown.
+// It navigates directly to profil.html, where:
+//   - Identité tab hosts user identity, badges, and a User Settings tile
+//     (Sécurité / MFA, Langue, Thème)
+//   - Mon abonnement / Mes factures / Mes jetons are the other tabs (MVP1)
+// The Sécurité and Mes badges tabs are removed (badges sit on Identité; security
+// moved into the settings tile).
 
+// V2-content visibility helper kept for any future toggle surface (e.g. an
+// admin power-user pref). Currently no UI control flips it — call setShowV2(true)
+// from the console to preview V2 community items.
 function refreshV2Buttons() {
   const v = getShowV2();
   document.querySelectorAll("[data-v2-btn]").forEach(b => b.classList.toggle("on", b.dataset.v2Btn === String(v)));
 }
-
-document.addEventListener("click", (e) => {
-  const container = document.getElementById("profile-container");
-  if (!container || container.contains(e.target)) return;
-  const dd = document.getElementById("profile-dropdown");
-  const trigger = document.getElementById("profile-trigger");
-  if (dd && dd.classList.contains("open")) {
-    dd.classList.remove("open");
-    if (trigger) trigger.setAttribute("data-open", "false");
-  }
-});
 
 // ---- CENTRALE TABS (top of page when applicable) ----
 // Tabs use URL hash (#all, #moulins, #bocq, ...). Clicking a tab updates

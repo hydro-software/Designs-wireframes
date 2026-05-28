@@ -10,6 +10,21 @@ with Bernard, Ugo and Paul. v4 is kept untouched as the comparison reference.
 The May 2026 review produced the following targeted changes. Each is annotated
 with the page(s) it affects.
 
+### Round 2 polish (post-review iteration)
+
+These applied to both MVP 0.9 and MVP 1 after a second pass with the team:
+
+- **Légende expandable** on Production + Revenus — chevron-collapsed by default; expands to one row per "slot" (Comparateur · Pluie · Débit, or Comparateur · Prix · Débit on Revenus). Each row has ← → arrows to cycle through the alternatives in its slot, swatch + active name in the middle.
+- **Right-axis toggle moved out of the toolbar** — now a small floating pill positioned **above** the chart's right-axis label, swaps the axis between Pluie/Débit (Production) or Prix/Débit (Revenus).
+- **Données upload preview** confirmed: 3 columns (Horodatage · Valeur · Statut), no "Unité de Valeur" column (the unit is inferred from the compteur).
+- **Paramètres** — all references to issue #591 removed (the redesigned sections are now the canonical spec).
+- **Paramètres → Catégories de pertes** — table redesign: each row is a category (click to expand its loss types as indented sub-rows). Columns: Libellé · Type (par défaut) · Affichage (checkbox). Removed the "Reset" button and the standalone "Default loss type" column.
+- **Paramètres → Tarification** — replaced the fixed Tarif d'achat / Prix moyen rows with an editable list of tariffs. "Ajouter un tarif" opens a modal with: Nom · Type (manuel | automatique) · Source (free text if manuel, spot dropdown if automatique) · Unité · Note (free text).
+- **Paramètres → Partage d'accès** — each row now has a "Retirer l'accès" icon button (user-minus icon, red).
+- **Profil** — Sécurité and Mes badges tabs removed (badges live on the Identité page; security moved into a new "Paramètres utilisateur" tile on Identité). The new tile hosts MFA · Langue · Thème · Se déconnecter.
+- **Sidebar profile button → direct navigation**: the bottom-left profile button no longer opens a popup dropdown. It navigates straight to `profil.html` where all the items that used to live in the dropdown now sit as tabs (Mon abonnement / Mes factures / Mes jetons) or in the new Paramètres utilisateur tile (Thème / Langue / Sécurité).
+
+
 ### Sidebar — flattened "Pilotage" block
 - **All sections regrouped under "Pilotage"**: Tableau de bord · Production · Revenus · Données · Paramètres.
 - **No more per-centrale fold-outs** under Production / Revenus / Paramètres — centrales are reached via top tabs on each page (one less layer of navigation).
