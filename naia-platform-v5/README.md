@@ -81,12 +81,12 @@ with the page(s) it affects.
 A small **MVP 0.9 | MVP 1** segmented switch sits **fixed in the top-right** corner of every page (labelled *Vue conférence*). It persists in `localStorage` (`naia-mvp-tier`) and drives a `body[data-mvp="…"]` attribute.
 
 **MVP 0.9 hides** (via the CSS rule `body[data-mvp="0.9"] [data-mvp="1"] { display: none }`):
-- **Sidebar**: Tableau de bord · Données · Simulateur · the entire Communauté group (title + link + Inbox sub-item) · Administration.
+- **Sidebar**: Tableau de bord · Simulateur · the entire Communauté group (title + link + Inbox sub-item) · Administration.
 - **Profile dropdown**: Mon abonnement · Mes factures · Mes jetons · Voir V2 (mockup) · Administration.
 - **Profil page tabs**: Mon abonnement · Mes factures · Mes jetons · Mes badges. The "Mon organisation" card, the badge chips on the identity row, the dedicated "Mes badges" grid and the "Code parrainage org." row are also hidden.
-- **Index (Tableau de bord)** and **Données** pages: the actual content cards are hidden and replaced by a friendly *"This page is MVP 1"* fallback banner with a one-click link back to Production.
+- **Index (Tableau de bord)** page: the actual content cards are hidden and replaced by a friendly *"This page is MVP 1"* fallback banner with a one-click link back to Production.
 
-**What stays visible in MVP 0.9**: Production · Revenus · Paramètres · Profil (identity only) · the Aide & support sidebar entry · the profile dropdown items that are not subscription-related (Mon profil, Thème, Langue, Se déconnecter).
+**What stays visible in MVP 0.9**: Production · Revenus · Données · Paramètres · Profil (identity only) · the Aide & support sidebar entry · the profile dropdown items that are not subscription-related (Mon profil, Thème, Langue, Se déconnecter).
 
 To extend the descope, tag any element with `data-mvp="1"` and it disappears in MVP 0.9. Inverse: tag with `data-mvp="0.9"` to show something *only* in MVP 0.9 (used by the fallback banners).
 

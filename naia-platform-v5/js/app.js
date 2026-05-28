@@ -140,7 +140,7 @@ function buildSidebar() {
         <span>Revenus</span>
       </a>
 
-      <a href="data.html" class="sidebar-item ${section === 'data' ? 'active' : ''}" data-mvp="1">
+      <a href="data.html" class="sidebar-item ${section === 'data' ? 'active' : ''}">
         <i data-lucide="upload"></i>
         <span>Données</span>
       </a>
