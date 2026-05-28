@@ -68,42 +68,94 @@
         <span class="wa-link" onclick="openOverlay('wa-events')">Voir / éditer →</span>
       </div>
 
-      <!-- Chart card with restructured toolbar (v5 polish round 2):
-           - Left: Légende (expandable) — chevron expands a list where each indicator
-                   has left/right arrows to cycle within its slot
-           - Right: discrete icon-action buttons for Configuration + Export
-           - The right-axis toggle moved from the toolbar to a small floating chip
-             positioned absolutely above the chart's right-axis title.        -->
-      <div class="card" style="margin-bottom:14px">
+      <!-- Chart card (v5 polish round 3, matching dev.app.naiahydro.com):
+           - Left slide-out Indicateurs contextuels panel (checkbox grid Int./30j/12m/Ann.)
+             — same pattern as the actual production system (v4 already had this).
+           - Clickable chevron arrow on the panel/chart boundary triggers the fold-out:
+               · panel expanded → chevron-left inside the panel header collapses it
+               · panel collapsed → chevron-right tab on the chart's left edge re-expands
+           - Top toolbar: only the discrete config + export icons on the right
+             (the old "Indicateurs" toggle button is gone — the chevron tab replaces it).
+           - Right-axis toggle stays as a small floating pill above the chart's right axis. -->
+      <div class="card" style="margin-bottom:14px; padding:0; overflow:hidden">
         <div class="card-head" style="border-bottom:1px solid var(--border-subtle)">
-
-          <!-- Left side: Légende (expandable) -->
-          <div class="legende" id="legende" data-open="false">
-            <button class="legende-head" onclick="toggleLegende()" aria-expanded="false">
-              <i data-lucide="chevron-down" class="legende-chev"></i>
-              <span>Légende</span>
-              <span class="legende-count" id="legende-count">3 indicateurs</span>
-            </button>
-            <div class="legende-body" id="legende-body">
-              <!-- Rows are populated by buildLegende() so each row is paired with a slot
-                   and can cycle through the alternatives in that slot. -->
-            </div>
+          <div style="font-size:12.5px; color:var(--text-muted)">
+            <i data-lucide="info" style="width:13px; height:13px; vertical-align:-2px"></i>
+            Cochez les indicateurs à afficher · panneau de gauche (rétractable)
           </div>
-
-          <!-- Right side: discrete icon-action buttons -->
           <div style="display:flex; gap:4px">
             <button class="icon-action" title="Configurer ce graphique (par utilisateur)" onclick="openOverlay('chart-config')"><i data-lucide="sliders-horizontal"></i></button>
             <button class="icon-action" title="Exporter" onclick="alert('Export PNG / CSV / PDF (démo)')"><i data-lucide="download"></i></button>
           </div>
         </div>
 
-        <!-- Chart canvas + floating right-axis toggle (positioned above the right axis label). -->
-        <div style="position:relative; height:480px; padding:14px">
-          <button class="right-axis-toggle" id="right-axis-toggle" onclick="toggleRightAxis()" title="Basculer l'axe droit entre Pluie et Débit">
-            <span id="right-axis-label">Pluie (mm)</span>
-            <i data-lucide="arrow-left-right"></i>
-          </button>
-          <div class="chart-container" style="height:100%"><canvas id="production-chart"></canvas></div>
+        <div class="chart-with-panel" id="chart-with-panel">
+
+          <!-- Indicateurs contextuels — left slide-out panel matching dev.app.naiahydro.com.
+               Expanded by default in v5 so the demo lands on the most informative state. -->
+          <div class="indicateurs-panel" id="indicateurs-panel">
+            <div class="indicateurs-panel-title">
+              <span>Indicateurs contextuels</span>
+              <button class="collapse" onclick="toggleIndicateursPanel()" title="Réduire le panneau" aria-label="Réduire"><i data-lucide="chevron-left"></i></button>
+            </div>
+
+            <div class="ind-headers">
+              <span></span><span>Int.</span><span>30j</span><span>12m</span><span>Ann.</span>
+            </div>
+
+            <div class="ind-section">
+              <div class="ind-section-title">Indicateurs inversés</div>
+              <div class="ind-row">
+                <label><span class="swatch" style="background:#60a5fa"></span>Météo</label>
+                <span class="ind-cell"><input type="checkbox" checked></span>
+                <span class="ind-cell"><input type="checkbox" checked></span>
+                <span class="ind-cell"><input type="checkbox" checked></span>
+                <span class="ind-cell"><input type="checkbox" checked></span>
+              </div>
+            </div>
+
+            <div class="ind-section">
+              <div class="ind-section-title">Indicateurs courbes</div>
+              <div class="ind-row">
+                <label><span class="swatch" style="background:#a3e635"></span>Débit</label>
+                <span class="ind-cell"><input type="checkbox" checked></span>
+                <span class="ind-cell"><input type="checkbox" checked></span>
+                <span class="ind-cell"><input type="checkbox" checked></span>
+                <span class="ind-cell"><input type="checkbox" checked></span>
+              </div>
+            </div>
+
+            <div class="ind-section">
+              <div class="ind-section-title">Comparateurs</div>
+              <div class="ind-row">
+                <label><span class="swatch" style="background:#7dd3fc"></span>AGG DAILY MDA</label>
+                <span class="ind-cell"><input type="checkbox" checked></span>
+                <span class="ind-cell"><input type="checkbox" checked></span>
+                <span class="ind-cell"><input type="checkbox" checked></span>
+                <span class="ind-cell"><input type="checkbox" checked></span>
+              </div>
+              <div class="ind-row">
+                <label><span class="swatch" style="background:#c4b5fd"></span>Centrale ref.</label>
+                <span class="ind-cell"><input type="checkbox"></span>
+                <span class="ind-cell"><input type="checkbox"></span>
+                <span class="ind-cell"><input type="checkbox"></span>
+                <span class="ind-cell"><input type="checkbox"></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Chart + the two floating overlays (expand-arrow on the left, axis-toggle on the right). -->
+          <div style="position:relative; height:480px; padding:14px">
+            <!-- Chevron tab on the chart's left edge — only visible when the panel is collapsed -->
+            <button class="panel-expand-arrow" id="panel-expand-arrow" onclick="toggleIndicateursPanel()" title="Afficher les indicateurs" aria-label="Afficher les indicateurs">
+              <i data-lucide="chevron-right"></i>
+            </button>
+            <button class="right-axis-toggle" id="right-axis-toggle" onclick="toggleRightAxis()" title="Basculer l'axe droit entre Pluie et Débit">
+              <span id="right-axis-label">Pluie (mm)</span>
+              <i data-lucide="arrow-left-right"></i>
+            </button>
+            <div class="chart-container" style="height:100%"><canvas id="production-chart"></canvas></div>
+          </div>
         </div>
       </div>
 
@@ -228,59 +280,17 @@
     if (strip) strip.style.display = pill === "intraday" ? "" : "none";
   }
 
-  // ---- Légende (expandable) ----
-  // Each "slot" is a category the chart displays (one comparator, one rain source,
-  // one flow source). The slot's active alternative cycles via ← → arrows. Adding
-  // a new slot is done from Paramètres → Indicateurs contextuels (per #225).
-  const LEGENDE_SLOTS = [
-    { key: "comparateur", label: "Comparateur",       active: 0, options: [
-      { name: "AGG DAILY MDA",        color: "#7dd3fc" },
-      { name: "Production N-1",       color: "#c4b5fd" },
-    ]},
-    { key: "pluie",       label: "Pluie",             active: 0, options: [
-      { name: "Pluie · Bergerac",     color: "#60a5fa" },
-      { name: "Pluie · station amont", color: "#3b82f6" },
-    ]},
-    { key: "debit",       label: "Hydro · débit",     active: 0, options: [
-      { name: "Débit · Dordogne",     color: "#a3e635" },
-      { name: "Débit · affluent",     color: "#65a30d" },
-    ]},
-  ];
-
-  function buildLegende() {
-    const body = document.getElementById("legende-body");
-    if (!body) return;
-    body.innerHTML = LEGENDE_SLOTS.map((slot, i) => {
-      const active = slot.options[slot.active];
-      return `<div class="legende-row">
-        <span class="legende-slot-label">${slot.label}</span>
-        <button class="legende-arrow" onclick="cycleSlot(${i}, -1)" aria-label="Précédent"><i data-lucide="chevron-left"></i></button>
-        <span class="legende-active">
-          <span class="legende-swatch" style="background:${active.color}"></span>
-          <span class="legende-name" id="legende-active-${i}">${active.name}</span>
-        </span>
-        <button class="legende-arrow" onclick="cycleSlot(${i}, 1)"  aria-label="Suivant"><i data-lucide="chevron-right"></i></button>
-      </div>`;
-    }).join("");
-    document.getElementById("legende-count").textContent = `${LEGENDE_SLOTS.length} indicateurs`;
-    initIcons();
+  // ---- Indicateurs contextuels panel (left slide-out) ----
+  // Match dev.app.naiahydro.com: panel collapses left, chart fills the freed space.
+  // Two clickable triggers, only one is visible at a time:
+  //   - panel expanded → chevron-left button inside the panel header collapses it
+  //   - panel collapsed → chevron-right tab on the chart's left edge re-expands it
+  function toggleIndicateursPanel() {
+    const wrap = document.getElementById("chart-with-panel");
+    const panel = document.getElementById("indicateurs-panel");
+    panel.classList.toggle("collapsed");
+    wrap.classList.toggle("collapsed");
   }
-  function toggleLegende() {
-    const el = document.getElementById("legende");
-    const open = el.dataset.open === "true";
-    el.dataset.open = open ? "false" : "true";
-    el.querySelector(".legende-head").setAttribute("aria-expanded", open ? "false" : "true");
-  }
-  function cycleSlot(slotIdx, delta) {
-    const slot = LEGENDE_SLOTS[slotIdx];
-    slot.active = (slot.active + delta + slot.options.length) % slot.options.length;
-    const active = slot.options[slot.active];
-    const nameEl = document.getElementById(`legende-active-${slotIdx}`);
-    if (nameEl) nameEl.textContent = active.name;
-    const swatch = nameEl?.previousElementSibling;
-    if (swatch) swatch.style.background = active.color;
-  }
-  document.addEventListener("DOMContentLoaded", () => setTimeout(buildLegende, 0));
 
   // ---- Right-axis toggle (moved to a floating chip above the right axis) ----
   let rightAxis = "pluie";

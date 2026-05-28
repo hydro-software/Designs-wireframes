@@ -1073,87 +1073,51 @@ body[data-mvp="1"]   [data-mvp="0.9"] { display: none !important; }
 .axis-toggle:hover { color: var(--brand-cyan); border-color: var(--brand-cyan); }
 .axis-toggle i { width: 12px; height: 12px; }
 
-/* v5 polish round 2: Légende — expandable list above the chart.
-   Header shows a chevron + "Légende" + count. Click expands to reveal one row per slot,
-   each row has a swatch + the active indicator name + ← → arrows to cycle within the slot. */
-.legende {
-  display: inline-block;
-  background: var(--bg-input);
-  border: 1px solid var(--border-default);
-  border-radius: 8px;
-  font-family: inherit;
-  overflow: hidden;
-}
-.legende-head {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 12px 6px 10px;
-  background: transparent;
-  border: 0;
-  color: var(--text-primary);
-  font-size: 12.5px;
-  font-weight: 500;
-  cursor: pointer;
-  font-family: inherit;
-  width: 100%;
-  text-align: left;
-}
-.legende-head:hover { background: var(--bg-card-hover); }
-.legende-chev { width: 14px; height: 14px; color: var(--text-muted); transition: transform 0.18s; }
-.legende[data-open="true"] .legende-chev { transform: rotate(180deg); }
-.legende-count {
-  margin-left: auto;
-  font-size: 11px;
-  font-weight: 400;
-  color: var(--text-muted);
-  padding-left: 12px;
-}
-.legende-body {
+/* v5 polish round 3: Indicateurs panel expand-arrow.
+   The v4 panel + collapse arrow are kept verbatim — this just adds the missing
+   re-expand affordance when the panel is collapsed: a chevron-right tab attached
+   to the chart's left edge. Hidden when the panel is expanded. */
+.panel-expand-arrow {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
   display: none;
-  border-top: 1px solid var(--border-subtle);
-  padding: 6px 8px;
-  flex-direction: column;
-  gap: 2px;
-}
-.legende[data-open="true"] .legende-body { display: flex; }
-.legende-row {
-  display: grid;
-  grid-template-columns: 100px 24px 1fr 24px;
   align-items: center;
-  gap: 4px;
-  padding: 4px 6px;
-  border-radius: 6px;
-}
-.legende-row:hover { background: var(--bg-card-hover); }
-.legende-slot-label {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-.legende-active {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  font-size: 12.5px;
-  color: var(--text-primary);
-  min-width: 0;
-}
-.legende-swatch { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
-.legende-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.legende-arrow {
-  width: 22px; height: 22px;
-  display: inline-flex; align-items: center; justify-content: center;
-  border-radius: 5px; border: 0;
-  background: transparent;
+  justify-content: center;
+  width: 22px;
+  height: 56px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-default);
+  border-left: 0;
+  border-radius: 0 8px 8px 0;
   color: var(--text-muted);
   cursor: pointer;
   font-family: inherit;
+  z-index: 2;
+  transition: color 0.15s, background 0.15s;
 }
-.legende-arrow:hover { background: var(--bg-input); color: var(--brand-cyan); }
-.legende-arrow i { width: 13px; height: 13px; }
+.chart-with-panel.collapsed .panel-expand-arrow { display: inline-flex; }
+.panel-expand-arrow:hover { color: var(--brand-cyan); background: var(--bg-card-hover); }
+.panel-expand-arrow i { width: 14px; height: 14px; }
+
+/* Promote the in-panel collapse arrow to a real icon button (was a literal "«" in v4).
+   Lives inside .indicateurs-panel-title — only visible when the panel is expanded. */
+.indicateurs-panel-title .collapse {
+  width: 22px; height: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  background: transparent;
+  border-radius: 5px;
+  cursor: pointer;
+  color: var(--text-muted);
+  font-family: inherit;
+  padding: 0;
+}
+.indicateurs-panel-title .collapse:hover { background: var(--bg-card-hover); color: var(--brand-cyan); }
+.indicateurs-panel-title .collapse i { width: 14px; height: 14px; }
 
 /* v5 polish round 2: Right-axis toggle floats above the chart's right axis label.
    A small pill that swaps the right axis between Pluie and Débit. */

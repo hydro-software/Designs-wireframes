@@ -42,32 +42,90 @@
         <div><b>V2 :</b> module de simulation Valorise (BTM, batterie, digital twin) — visible dans le mockup pour validation, non livré en V1.</div>
       </div>
 
-      <!-- Chart card — same toolbar structure as Production (v5 polish round 2): expandable
-           Légende on the left, discrete icons on the right, floating right-axis toggle. -->
-      <div class="card" style="margin-bottom:14px">
+      <!-- Chart card (v5 polish round 3): same Indicateurs slide-out pattern as Production
+           (matching dev.app.naiahydro.com), with a chevron tab on the chart's left edge
+           that re-expands the panel after it's been collapsed. -->
+      <div class="card" style="margin-bottom:14px; padding:0; overflow:hidden">
         <div class="card-head" style="border-bottom:1px solid var(--border-subtle)">
-
-          <div class="legende" id="legende" data-open="false">
-            <button class="legende-head" onclick="toggleLegende()" aria-expanded="false">
-              <i data-lucide="chevron-down" class="legende-chev"></i>
-              <span>Légende</span>
-              <span class="legende-count" id="legende-count">3 indicateurs</span>
-            </button>
-            <div class="legende-body" id="legende-body"></div>
+          <div style="font-size:12.5px; color:var(--text-muted)">
+            <i data-lucide="info" style="width:13px; height:13px; vertical-align:-2px"></i>
+            Cochez les indicateurs à afficher · panneau de gauche (rétractable)
           </div>
-
           <div style="display:flex; gap:4px">
             <button class="icon-action" title="Configurer ce graphique" onclick="alert('Config par utilisateur — voir Production pour le wireframe complet')"><i data-lucide="sliders-horizontal"></i></button>
             <button class="icon-action" title="Exporter" onclick="alert('Export (démo)')"><i data-lucide="download"></i></button>
           </div>
         </div>
 
-        <div style="position:relative; height:480px; padding:14px">
-          <button class="right-axis-toggle" id="right-axis-toggle" onclick="toggleRightAxis()" title="Basculer l'axe droit entre Prix spot et Débit">
-            <span id="right-axis-label">Prix spot (€/MWh)</span>
-            <i data-lucide="arrow-left-right"></i>
-          </button>
-          <div class="chart-container" style="height:100%"><canvas id="production-chart"></canvas></div>
+        <div class="chart-with-panel" id="chart-with-panel">
+          <div class="indicateurs-panel" id="indicateurs-panel">
+            <div class="indicateurs-panel-title">
+              <span>Indicateurs contextuels</span>
+              <button class="collapse" onclick="toggleIndicateursPanel()" title="Réduire le panneau" aria-label="Réduire"><i data-lucide="chevron-left"></i></button>
+            </div>
+
+            <div class="ind-headers">
+              <span></span><span>Int.</span><span>30j</span><span>12m</span><span>Ann.</span>
+            </div>
+
+            <div class="ind-section">
+              <div class="ind-section-title">Indicateurs inversés</div>
+              <div class="ind-row">
+                <label><span class="swatch" style="background:#60a5fa"></span>Météo</label>
+                <span class="ind-cell"><input type="checkbox" checked></span>
+                <span class="ind-cell"><input type="checkbox" checked></span>
+                <span class="ind-cell"><input type="checkbox" checked></span>
+                <span class="ind-cell"><input type="checkbox" checked></span>
+              </div>
+            </div>
+
+            <div class="ind-section">
+              <div class="ind-section-title">Indicateurs courbes</div>
+              <div class="ind-row">
+                <label><span class="swatch" style="background:#fbbf24"></span>Prix spot Belpex</label>
+                <span class="ind-cell"><input type="checkbox" checked></span>
+                <span class="ind-cell"><input type="checkbox" checked></span>
+                <span class="ind-cell"><input type="checkbox" checked></span>
+                <span class="ind-cell"><input type="checkbox" checked></span>
+              </div>
+              <div class="ind-row">
+                <label><span class="swatch" style="background:#a3e635"></span>Débit</label>
+                <span class="ind-cell"><input type="checkbox"></span>
+                <span class="ind-cell"><input type="checkbox"></span>
+                <span class="ind-cell"><input type="checkbox"></span>
+                <span class="ind-cell"><input type="checkbox"></span>
+              </div>
+            </div>
+
+            <div class="ind-section">
+              <div class="ind-section-title">Comparateurs</div>
+              <div class="ind-row">
+                <label><span class="swatch" style="background:#7dd3fc"></span>Revenus N-1</label>
+                <span class="ind-cell"><input type="checkbox" checked></span>
+                <span class="ind-cell"><input type="checkbox" checked></span>
+                <span class="ind-cell"><input type="checkbox" checked></span>
+                <span class="ind-cell"><input type="checkbox" checked></span>
+              </div>
+              <div class="ind-row">
+                <label><span class="swatch" style="background:#c4b5fd"></span>Objectif budgété</label>
+                <span class="ind-cell"><input type="checkbox"></span>
+                <span class="ind-cell"><input type="checkbox"></span>
+                <span class="ind-cell"><input type="checkbox"></span>
+                <span class="ind-cell"><input type="checkbox"></span>
+              </div>
+            </div>
+          </div>
+
+          <div style="position:relative; height:480px; padding:14px">
+            <button class="panel-expand-arrow" id="panel-expand-arrow" onclick="toggleIndicateursPanel()" title="Afficher les indicateurs" aria-label="Afficher les indicateurs">
+              <i data-lucide="chevron-right"></i>
+            </button>
+            <button class="right-axis-toggle" id="right-axis-toggle" onclick="toggleRightAxis()" title="Basculer l'axe droit entre Prix spot et Débit">
+              <span id="right-axis-label">Prix spot (€/MWh)</span>
+              <i data-lucide="arrow-left-right"></i>
+            </button>
+            <div class="chart-container" style="height:100%"><canvas id="production-chart"></canvas></div>
+          </div>
         </div>
       </div>
 
@@ -86,55 +144,13 @@
     document.querySelectorAll(".time-pills button").forEach(b => b.classList.remove("on"));
     btn.classList.add("on");
   }
-  // Légende (expandable) — same shape as production.html.
-  const LEGENDE_SLOTS = [
-    { key: "comparateur", label: "Comparateur",   active: 0, options: [
-      { name: "Revenus N-1",       color: "#7dd3fc" },
-      { name: "Objectif budgété",  color: "#c4b5fd" },
-    ]},
-    { key: "prix",        label: "Prix",          active: 0, options: [
-      { name: "Spot Belpex",       color: "#fbbf24" },
-      { name: "Spot EPEX FR",      color: "#f59e0b" },
-    ]},
-    { key: "debit",       label: "Hydro · débit", active: 0, options: [
-      { name: "Débit · Dordogne",  color: "#a3e635" },
-      { name: "Débit · affluent",  color: "#65a30d" },
-    ]},
-  ];
-  function buildLegende() {
-    const body = document.getElementById("legende-body");
-    if (!body) return;
-    body.innerHTML = LEGENDE_SLOTS.map((slot, i) => {
-      const active = slot.options[slot.active];
-      return `<div class="legende-row">
-        <span class="legende-slot-label">${slot.label}</span>
-        <button class="legende-arrow" onclick="cycleSlot(${i}, -1)" aria-label="Précédent"><i data-lucide="chevron-left"></i></button>
-        <span class="legende-active">
-          <span class="legende-swatch" style="background:${active.color}"></span>
-          <span class="legende-name" id="legende-active-${i}">${active.name}</span>
-        </span>
-        <button class="legende-arrow" onclick="cycleSlot(${i}, 1)"  aria-label="Suivant"><i data-lucide="chevron-right"></i></button>
-      </div>`;
-    }).join("");
-    document.getElementById("legende-count").textContent = `${LEGENDE_SLOTS.length} indicateurs`;
-    initIcons();
+  // Indicateurs panel — same toggle as production.html.
+  function toggleIndicateursPanel() {
+    const wrap = document.getElementById("chart-with-panel");
+    const panel = document.getElementById("indicateurs-panel");
+    panel.classList.toggle("collapsed");
+    wrap.classList.toggle("collapsed");
   }
-  function toggleLegende() {
-    const el = document.getElementById("legende");
-    const open = el.dataset.open === "true";
-    el.dataset.open = open ? "false" : "true";
-    el.querySelector(".legende-head").setAttribute("aria-expanded", open ? "false" : "true");
-  }
-  function cycleSlot(slotIdx, delta) {
-    const slot = LEGENDE_SLOTS[slotIdx];
-    slot.active = (slot.active + delta + slot.options.length) % slot.options.length;
-    const active = slot.options[slot.active];
-    const nameEl = document.getElementById(`legende-active-${slotIdx}`);
-    if (nameEl) nameEl.textContent = active.name;
-    const swatch = nameEl?.previousElementSibling;
-    if (swatch) swatch.style.background = active.color;
-  }
-  document.addEventListener("DOMContentLoaded", () => setTimeout(buildLegende, 0));
 
   let rightAxis = "prix";
   function toggleRightAxis() {
