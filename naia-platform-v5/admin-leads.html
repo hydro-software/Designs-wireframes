@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin · Leads — Naia</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="css/style.css" rel="stylesheet"><script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body data-page="admin-leads" data-section="admin">
+<div class="app-shell">
+  <aside class="sidebar"></aside>
+  <main class="main-area">
+    <header class="topbar">
+      <div><div class="page-eyebrow">Administration · Leads</div><div style="font-size:18px; font-weight:600">Pré-clients capturés (FR-LEAD)</div></div>
+      <div style="display:flex; gap:8px">
+        <button class="btn btn-secondary btn-sm"><i data-lucide="upload"></i> Import CSV</button>
+        <button class="btn btn-secondary btn-sm"><i data-lucide="download"></i> Export Brevo</button>
+        <button class="btn btn-primary"><i data-lucide="user-plus"></i> Nouveau lead</button>
+      </div>
+    </header>
+
+    <div class="page-content">
+
+      <!-- Funnel KPIs -->
+      <div style="display:grid; gap:14px; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); margin-bottom:18px">
+        <div class="kpi-card"><div class="kpi-label">Leads · 30j</div><div class="kpi-value tabular">42</div><div class="kpi-delta up">+18</div></div>
+        <div class="kpi-card"><div class="kpi-label">Demos provisionnées</div><div class="kpi-value tabular">14</div><div class="kpi-delta muted">33 % conv.</div></div>
+        <div class="kpi-card"><div class="kpi-label">Demos → payant</div><div class="kpi-value tabular">5</div><div class="kpi-delta up">36 %</div></div>
+        <div class="kpi-card"><div class="kpi-label">Pending signatures</div><div class="kpi-value tabular">3</div><div class="kpi-delta muted">médiane 4 j</div></div>
+        <div class="kpi-card"><div class="kpi-label">Dropped signatures</div><div class="kpi-value tabular">1</div><div class="kpi-delta down">expirée</div></div>
+      </div>
+
+      <!-- Filter -->
+      <div class="card" style="margin-bottom:14px">
+        <div class="card-body" style="padding:14px 18px; display:flex; gap:8px; align-items:center; flex-wrap:wrap">
+          <select class="select" style="max-width:180px"><option>Tous statuts</option><option>Nouveau</option><option>Contact en cours</option><option>Demo provisionnée</option><option>Pending signature</option><option>Dropped</option><option>Converti</option></select>
+          <select class="select" style="max-width:200px"><option>Toutes campagnes</option><option>HYDRO24</option><option>HYDRO25</option><option>WEBINAIRE-MARS-26</option><option>Inbound site</option></select>
+          <select class="select" style="max-width:140px"><option>Tous pays</option><option>FR</option><option>BE</option><option>CH</option><option>DE</option></select>
+          <input class="input" placeholder="Recherche…" style="max-width:200px">
+          <span class="muted" style="font-size:12px; margin-left:auto">42 leads · 8 affichés</span>
+        </div>
+      </div>
+
+      <!-- Leads table -->
+      <div class="card">
+        <table class="data-table">
+          <thead><tr><th>Lead</th><th>Source / campagne</th><th>Capacité estimée</th><th>Statut</th><th>Dernière action</th><th>Âge</th><th></th></tr></thead>
+          <tbody>
+            <tr style="cursor:pointer" onclick="if (event.target.tagName !== 'A') location.href='admin-lead.html?id=doubs-micro'"><td><b>Microcentrale du Doubs</b><br><span class="muted" style="font-size:11px">Antoine Bertin · antoine@doubs-hydro.fr</span></td><td><span class="badge badge-amber">HYDRO25</span> Conf. Lyon</td><td class="tabular">~ 240 kW</td><td><span class="badge badge-blue">Demo provisionnée</span></td><td>Demo activée</td><td class="muted">3 j</td><td><a class="link" style="font-size:11px" href="admin-lead.html?id=doubs-micro">Détails →</a> · <a class="link" style="font-size:11px" href="admin-abonnements.html?promote=doubs-micro">Promouvoir</a></td></tr>
+            <tr style="cursor:pointer" onclick="if (event.target.tagName !== 'A') location.href='admin-lead.html?id=pyrenees'"><td><b>Pyrénées Hydroélec</b><br><span class="muted" style="font-size:11px">Hélène Gros · h.gros@pyr-hydro.fr</span></td><td><span class="badge badge-amber">HYDRO25</span> Conf. Lyon</td><td class="tabular">~ 1,8 MW · 3 plants</td><td><span class="badge badge-purple">Pending signature</span></td><td>Envoyé chez Yousign</td><td class="muted">5 j</td><td><a class="link" style="font-size:11px" href="admin-lead.html?id=pyrenees">Détails →</a> · <a class="link" style="font-size:11px">Re-trigger</a></td></tr>
+            <tr style="cursor:pointer" onclick="if (event.target.tagName !== 'A') location.href='admin-lead.html?id=ceze'"><td><b>Moulin de la Cèze</b><br><span class="muted" style="font-size:11px">Jean Renard · j.renard@ceze.fr</span></td><td><span class="badge badge-cyan">Inbound site</span></td><td class="tabular">~ 80 kW</td><td><span class="badge badge-blue">Demo provisionnée</span></td><td>Connexion sur la demo</td><td class="muted">12 j</td><td><a class="link" style="font-size:11px" href="admin-lead.html?id=ceze">Détails →</a> · <a class="link" style="font-size:11px" href="admin-abonnements.html?promote=ceze">Promouvoir</a></td></tr>
+            <tr style="cursor:pointer" onclick="if (event.target.tagName !== 'A') location.href='admin-lead.html?id=vhg'"><td><b>Vosges Hydro Group</b><br><span class="muted" style="font-size:11px">Sophie Klein · contact@vhg.fr</span></td><td><span class="badge badge-cyan">Inbound site</span></td><td class="tabular">~ 5,4 MW · 7 plants</td><td><span class="badge badge-amber">Contact en cours</span></td><td>Email envoyé · attente réponse</td><td class="muted">2 j</td><td><a class="link" style="font-size:11px" href="admin-lead.html?id=vhg">Détails →</a> · <a class="link" style="font-size:11px">Provisionner demo</a></td></tr>
+            <tr style="cursor:pointer" onclick="if (event.target.tagName !== 'A') location.href='admin-lead.html?id=aveyron'"><td><b>Hydraulique Aveyron</b><br><span class="muted" style="font-size:11px">Marc Couteau · m.couteau@aveyron-hydro.fr</span></td><td><span class="badge badge-amber">WEBINAIRE-MARS-26</span></td><td class="tabular">~ 320 kW</td><td><span class="badge badge-slate">Nouveau</span></td><td>Capturé par formulaire webinaire</td><td class="muted">il y a 1 h</td><td><a class="link" style="font-size:11px" href="admin-lead.html?id=aveyron">Détails →</a> · <a class="link" style="font-size:11px">Contacter</a></td></tr>
+            <tr><td><b>Centrale du Doubs</b><br><span class="muted" style="font-size:11px">Pierre Bonin · p.bonin@doubs-c.fr</span></td><td><span class="badge badge-amber">HYDRO24</span> Conf. 2024</td><td class="tabular">~ 1,2 MW · 2 plants</td><td><span class="badge badge-red">Dropped</span></td><td>Signature expirée 30 avr.</td><td class="muted">6 mois</td><td><a class="link" style="font-size:11px">Relancer</a></td></tr>
+            <tr><td><b>Hydromill SRL</b><br><span class="muted" style="font-size:11px">Lucia Bianchi · l.bianchi@hydromill.it</span></td><td><span class="badge badge-cyan">Inbound site</span></td><td class="tabular">~ 220 kW</td><td><span class="badge badge-green">Converti</span></td><td>Plan Per-plant signé</td><td class="muted">2 mois</td><td><a class="link" style="font-size:11px" href="admin-customer.html">Voir client →</a></td></tr>
+            <tr><td><b>Mountain Power AG</b><br><span class="muted" style="font-size:11px">Hans Schäfer · hs@mountain.ch</span></td><td><span class="badge badge-cyan">Inbound site</span></td><td class="tabular">~ 920 kW</td><td><span class="badge badge-green">Converti</span></td><td>Plan Per-plant signé</td><td class="muted">3 mois</td><td><a class="link" style="font-size:11px" href="admin-customer.html">Voir client →</a></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p class="muted" style="font-size:12px; margin-top:14px; max-width:760px; line-height:1.6">
+        <b>FR-LEAD · capture multi-source.</b> Leads viennent de stands conférence (CSV import depuis le jeu Naia ou clipboard), formulaires inbound du site marketing, ou ajout manuel admin. Export CSV / Brevo pour relance commerciale. Promouvoir un lead vers <i>signature</i> ou <i>demo</i> déclenche le flux <a class="link" href="admin-abonnements.html">FR-SIGNUP / FR-DEMO</a>.
+      </p>
+
+    </div>
+  </main>
+</div>
+
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="js/app.js"></script>
+</body></html>

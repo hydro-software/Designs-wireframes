@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Revenus — Naia</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="css/style.css" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body data-page="revenue" data-section="revenue" data-centrale="all">
+
+<div class="app-shell">
+  <aside class="sidebar"></aside>
+  <main class="main-area">
+
+    <!-- v5: same layout as Production — breadcrumbs + time pills, no top title block. -->
+    <header class="topbar" style="align-items:center">
+      <div class="crumbs">
+        <a href="index.html"><i data-lucide="home" style="width:12px; height:12px"></i></a>
+        <span class="sep">/</span>
+        <a href="index.html">Pilotage</a>
+        <span class="sep">/</span>
+        <span class="current">Revenus</span>
+      </div>
+
+      <div class="time-pills" role="tablist" aria-label="Granularité temporelle">
+        <button class="on" onclick="setTimePill(this, 'intraday')">Intraday <span class="pill-dot" title="Événements WhatsApp"></span></button>
+        <button onclick="setTimePill(this, '30j')">30 jours <span class="pill-dot"></span></button>
+        <button onclick="setTimePill(this, '12m')">12 mois <span class="pill-dot"></span></button>
+        <button onclick="setTimePill(this, 'annees')">Années <span class="pill-dot"></span></button>
+      </div>
+    </header>
+
+    <div id="centrale-tabs" class="centrale-tabs"></div>
+
+    <div class="page-content">
+
+      <!-- v5: KPI tiles removed. Only the chart remains. -->
+
+      <div class="card v2-banner" style="margin-bottom:14px">
+        <i data-lucide="rocket"></i>
+        <div><b>V2 :</b> module de simulation Valorise (BTM, batterie, digital twin) — visible dans le mockup pour validation, non livré en V1.</div>
+      </div>
+
+      <!-- Chart card with the same toolbar structure as Production -->
+      <div class="card" style="margin-bottom:14px">
+        <div class="card-head" style="border-bottom:1px solid var(--border-subtle)">
+
+          <div style="display:flex; gap:14px; align-items:center; flex-wrap:wrap">
+            <div class="ind-cycler" id="ind-cycler">
+              <button class="arrow" onclick="cycleIndicateur(-1)" aria-label="Indicateur précédent"><i data-lucide="chevron-left"></i></button>
+              <span class="ind-label">
+                <span class="ind-swatch" id="ind-swatch" style="background:#fbbf24"></span>
+                <span id="ind-name">Spot Belpex</span>
+              </span>
+              <button class="arrow" onclick="cycleIndicateur(1)" aria-label="Indicateur suivant"><i data-lucide="chevron-right"></i></button>
+            </div>
+
+            <button class="axis-toggle" onclick="toggleRightAxis()" title="Basculer l'axe droit">
+              Axe droit : <b id="axis-label">Prix spot (€/MWh)</b>
+              <i data-lucide="repeat"></i>
+            </button>
+          </div>
+
+          <div style="display:flex; gap:4px">
+            <button class="icon-action" title="Configurer ce graphique" onclick="alert('Config par utilisateur — voir Production pour le wireframe complet')"><i data-lucide="sliders-horizontal"></i></button>
+            <button class="icon-action" title="Exporter" onclick="alert('Export (démo)')"><i data-lucide="download"></i></button>
+          </div>
+        </div>
+
+        <div style="height:480px; padding:14px"><div class="chart-container" style="height:100%"><canvas id="production-chart"></canvas></div></div>
+      </div>
+
+      <!-- v5: per-centrale breakdown table removed — same rule as Production (centrale info is in the tabs). -->
+
+    </div>
+  </main>
+</div>
+
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="js/app.js"></script>
+
+<script>
+  function setTimePill(btn, pill) {
+    document.querySelectorAll(".time-pills button").forEach(b => b.classList.remove("on"));
+    btn.classList.add("on");
+  }
+  const INDICATEURS = [
+    { name: "Spot Belpex",       color: "#fbbf24" },
+    { name: "Revenus N-1",       color: "#7dd3fc" },
+    { name: "Pluie · Bergerac",  color: "#60a5fa" },
+    { name: "Débit · Dordogne",  color: "#a3e635" },
+  ];
+  let indIdx = 0;
+  function cycleIndicateur(delta) {
+    indIdx = (indIdx + delta + INDICATEURS.length) % INDICATEURS.length;
+    const ind = INDICATEURS[indIdx];
+    document.getElementById("ind-name").textContent = ind.name;
+    document.getElementById("ind-swatch").style.background = ind.color;
+  }
+  let rightAxis = "prix";
+  function toggleRightAxis() {
+    rightAxis = rightAxis === "prix" ? "debit" : "prix";
+    document.getElementById("axis-label").textContent = rightAxis === "prix" ? "Prix spot (€/MWh)" : "Débit (m³/s)";
+  }
+</script>
+</body>
+</html>

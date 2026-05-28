@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin · Onboarding emails — Naia</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="css/style.css" rel="stylesheet"><script src="https://cdn.tailwindcss.com"></script>
+<style>
+  .seq-step { display:flex; gap:14px; padding:14px; border:1px solid var(--border-subtle); border-radius:10px; background:var(--bg-card); margin-bottom:10px; }
+  .seq-day { width:80px; flex-shrink:0; text-align:center; padding-top:4px; }
+  .seq-day b { font-size:18px; display:block; }
+  .seq-body { flex:1; min-width:0; }
+  .seq-title { font-size:14px; font-weight:600; margin-bottom:4px; }
+  .seq-meta { font-size:11px; color:var(--text-muted); margin-bottom:8px; }
+  .seq-preview { background:var(--bg-input); padding:10px 12px; border-radius:6px; font-size:12px; color:var(--text-muted); line-height:1.6; }
+</style>
+</head>
+<body data-page="admin-onboarding" data-section="admin">
+<div class="app-shell">
+  <aside class="sidebar"></aside>
+  <main class="main-area">
+    <header class="topbar">
+      <div><div class="page-eyebrow">Administration · Onboarding</div><div style="font-size:18px; font-weight:600">Séquence post-signature (FR-ONBOARDING)</div></div>
+      <div style="display:flex; gap:8px">
+        <button class="btn btn-secondary btn-sm"><i data-lucide="eye"></i> Aperçu en FR / DE / EN</button>
+        <button class="btn btn-secondary btn-sm"><i data-lucide="send"></i> Test à mon adresse</button>
+        <button class="btn btn-primary"><i data-lucide="save"></i> Publier modifications</button>
+      </div>
+    </header>
+
+    <div class="page-content">
+
+      <!-- KPIs -->
+      <div style="display:grid; gap:14px; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); margin-bottom:18px">
+        <div class="kpi-card"><div class="kpi-label">Séquences actives · 30j</div><div class="kpi-value tabular">14</div><div class="kpi-delta up">+5</div></div>
+        <div class="kpi-card"><div class="kpi-label">Séquences en pause</div><div class="kpi-value tabular">2</div><div class="kpi-delta muted">par admin</div></div>
+        <div class="kpi-card"><div class="kpi-label">Open rate Day-0</div><div class="kpi-value tabular">86 %</div><div class="kpi-delta up">+3 pts</div></div>
+        <div class="kpi-card"><div class="kpi-label">Open rate Day-3</div><div class="kpi-value tabular">62 %</div><div class="kpi-delta muted">stable</div></div>
+        <div class="kpi-card"><div class="kpi-label">CTR Day-3 (premiers pas)</div><div class="kpi-value tabular">38 %</div><div class="kpi-delta up">+6 pts</div></div>
+        <div class="kpi-card"><div class="kpi-label">Taux réponse Day-10</div><div class="kpi-value tabular">14 %</div><div class="kpi-delta muted">conversations ouvertes</div></div>
+      </div>
+
+      <div style="display:grid; gap:14px; grid-template-columns: 1.5fr 1fr">
+
+        <!-- LEFT: sequence editor -->
+        <div>
+          <div class="card" style="margin-bottom:14px">
+            <div class="card-head"><div class="card-title">Séquence par défaut · 3 emails</div><span class="muted" style="font-size:11px">déclenchée par <span class="tabular">customer.activated</span></span></div>
+            <div class="card-body" style="padding:18px">
+
+              <div class="seq-step">
+                <div class="seq-day"><b>J+0</b><span class="muted" style="font-size:11px">à l'activation</span></div>
+                <div class="seq-body">
+                  <div class="seq-title">Bienvenue & confirmation d'activation</div>
+                  <div class="seq-meta">
+                    Envoyé immédiatement post-signature · langue = <span class="tabular">customer.preferred_lang</span> (FR / DE / EN) ·
+                    pièce jointe : <a class="link">facture NET-14</a>
+                  </div>
+                  <div class="seq-preview">
+                    <b>Sujet:</b> Bienvenue chez Naia, {{contact.first_name}} — votre compte est actif<br>
+                    <b>Contient:</b> bouton magic-link, bouton facture (NET-14, échéance {{invoice.due_at}}), lien <a class="link">/aide</a>, lien FAQ public, email support.
+                  </div>
+                  <div style="display:flex; gap:6px; margin-top:8px">
+                    <button class="btn btn-secondary btn-sm"><i data-lucide="edit-3"></i> Éditer template</button>
+                    <button class="btn btn-secondary btn-sm"><i data-lucide="globe"></i> 3 langues</button>
+                    <button class="btn btn-secondary btn-sm"><i data-lucide="bar-chart-2"></i> Open: 86 % · CTR magic-link: 71 %</button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="seq-step">
+                <div class="seq-day"><b>J+3</b><span class="muted" style="font-size:11px">premiers pas</span></div>
+                <div class="seq-body">
+                  <div class="seq-title">Premiers pas dans Naia</div>
+                  <div class="seq-meta">
+                    Guide en 4 étapes · liens profonds vers les pages d'aide
+                  </div>
+                  <div class="seq-preview">
+                    <b>Sujet:</b> {{contact.first_name}}, 4 étapes pour démarrer avec Naia<br>
+                    <b>Contenu:</b> 1) Vérifier connexion DSO ({{plants.count}} centrales) · 2) Première vue agrégée · 3) Créer un comparateur · 4) Lire votre breakdown de pertes.
+                  </div>
+                  <div style="display:flex; gap:6px; margin-top:8px">
+                    <button class="btn btn-secondary btn-sm"><i data-lucide="edit-3"></i> Éditer template</button>
+                    <button class="btn btn-secondary btn-sm"><i data-lucide="globe"></i> 3 langues</button>
+                    <button class="btn btn-secondary btn-sm"><i data-lucide="bar-chart-2"></i> Open: 62 % · CTR: 38 %</button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="seq-step">
+                <div class="seq-day"><b>J+10</b><span class="muted" style="font-size:11px">check-in humain</span></div>
+                <div class="seq-body">
+                  <div class="seq-title">Mot personnel — Jan / Bernard</div>
+                  <div class="seq-meta">
+                    Email à voix humaine · reply-to → équipe commerciale · pas de tracking de clics
+                  </div>
+                  <div class="seq-preview">
+                    <b>Sujet:</b> Comment démarre l'aventure, {{contact.first_name}} ?<br>
+                    <b>Contenu:</b> message court signé Jan / Bernard, propose un appel de 20 min, ouvre la porte aux questions. Pas de CTA marketing.
+                  </div>
+                  <div style="display:flex; gap:6px; margin-top:8px">
+                    <button class="btn btn-secondary btn-sm"><i data-lucide="edit-3"></i> Éditer template</button>
+                    <button class="btn btn-secondary btn-sm"><i data-lucide="globe"></i> 3 langues</button>
+                    <button class="btn btn-secondary btn-sm"><i data-lucide="message-square"></i> 14 % réponses</button>
+                  </div>
+                </div>
+              </div>
+
+              <div style="text-align:center; margin-top:14px">
+                <button class="btn btn-secondary btn-sm"><i data-lucide="plus"></i> Ajouter une étape</button>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT: in-flight customers + settings -->
+        <div>
+
+          <div class="card" style="margin-bottom:14px">
+            <div class="card-head"><div class="card-title">Séquences en cours</div></div>
+            <div class="card-body" style="padding:0">
+              <table class="data-table" style="font-size:12px">
+                <thead><tr><th>Client</th><th>Étape</th><th>Statut</th></tr></thead>
+                <tbody>
+                  <tr><td><a class="link" href="admin-customer.html">Microcentrale du Doubs</a><br><span class="muted" style="font-size:11px">activé il y a 3 j</span></td><td>J+3 envoyé</td><td><span class="badge badge-green">Actif</span></td></tr>
+                  <tr><td><a class="link" href="admin-customer.html">Moulin de la Cèze</a><br><span class="muted" style="font-size:11px">activé il y a 12 j</span></td><td>J+10 envoyé</td><td><span class="badge badge-green">Terminé</span></td></tr>
+                  <tr><td><a class="link" href="admin-customer.html">Convert FMG</a><br><span class="muted" style="font-size:11px">activé il y a 5 j</span></td><td>J+3 envoyé</td><td><span class="badge badge-amber">Pause admin</span></td></tr>
+                  <tr><td><a class="link" href="admin-customer.html">Pyrénées Hydroélec</a><br><span class="muted" style="font-size:11px">activé hier</span></td><td>J+0 envoyé</td><td><span class="badge badge-green">Actif</span></td></tr>
+                </tbody>
+              </table>
+              <div style="padding:10px 14px; border-top:1px solid var(--border-subtle); font-size:12px; color:var(--text-muted)">
+                Pause / reprise par client → fiche <a class="link" href="admin-customer.html">client</a>. Reprise calcule depuis activation_date, pas resume_date (FR-ONBOARD-6).
+              </div>
+            </div>
+          </div>
+
+          <div class="card" style="margin-bottom:14px">
+            <div class="card-head"><div class="card-title">Réglages globaux</div></div>
+            <div class="card-body" style="padding:18px">
+              <label class="field" style="margin-bottom:12px"><span class="field-label">Provider d'envoi</span><select class="select"><option>Brevo (transactionnel)</option><option>SMTP direct</option></select></label>
+              <label class="field" style="margin-bottom:12px"><span class="field-label">From — adresse</span><input class="input tabular" value="bonjour@naia.energy"></label>
+              <label class="field" style="margin-bottom:12px"><span class="field-label">Reply-to (J+10)</span><input class="input tabular" value="commerce@naia.energy"></label>
+              <label class="field" style="margin-bottom:12px"><span class="field-label">Langues actives</span><input class="input" value="FR (défaut), DE, EN" disabled></label>
+              <div style="display:flex; gap:8px; align-items:center; padding:10px; background:var(--bg-input); border-radius:6px; font-size:12px">
+                <i data-lucide="info" style="width:14px; color:var(--brand-cyan)"></i>
+                <span class="muted">Pas de tracking de clics par-client (FR-ONBOARD-7) — uniquement agrégat.</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-head"><div class="card-title">Liens vers le système</div></div>
+            <div class="card-body" style="padding:18px">
+              <div style="font-size:12px; line-height:2">
+                Déclencheur: <a class="link tabular">customer.activated</a> (FR-ONBOARD-1e)<br>
+                Cible: emails marketing → <a class="link" href="admin-membres.html">Membres communauté</a><br>
+                Audit: <a class="link" href="admin-audit.html?filter=onboarding">Audit log onboarding</a><br>
+                Spec: FR-ONBOARDING dans le PRD subscription
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+      <p class="muted" style="font-size:12px; margin-top:14px; max-width:780px; line-height:1.6">
+        <b>FR-ONBOARDING · 3 emails post-activation, pausables, multilingues.</b> La séquence démarre à <span class="tabular">customer.activated</span>. Chaque template est versionné et localisé en FR / DE / EN (FR-ONBOARD-5). L'admin peut suspendre la séquence par client depuis sa fiche (FR-ONBOARD-6) ; les emails suivants sont décalés depuis l'activation, pas depuis la reprise. Pas de tracking par-client (FR-ONBOARD-7).
+      </p>
+
+    </div>
+  </main>
+</div>
+
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="js/app.js"></script>
+</body></html>

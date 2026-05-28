@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Communauté · Récompenses — Naia</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="css/style.css" rel="stylesheet"><script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body data-page="rewards" data-section="community">
+<div class="app-shell">
+  <aside class="sidebar"></aside>
+  <main class="main-area">
+    <header class="topbar">
+      <div><div class="page-eyebrow">Communauté</div><div style="font-size:18px; font-weight:600">Récompenses</div></div>
+      <div style="display:flex; gap:10px; align-items:center">
+        <span class="org-pill"><span class="avatar">MB</span>Moulin du Bocq</span>
+        <span class="points-pill"><i data-lucide="sparkles"></i><span class="tabular">3 450 pts</span></span>
+      </div>
+    </header>
+
+    <div class="page-content">
+
+      <!-- Conversion box -->
+      <div class="card" style="margin-bottom:18px; background:linear-gradient(135deg, rgba(132,204,22,0.08), rgba(251,191,36,0.08)); border-color:rgba(251,191,36,0.35)">
+        <div style="display:flex; align-items:flex-start; gap:14px; padding:18px 22px">
+          <div style="width:48px; height:48px; background:rgba(251,191,36,0.18); border-radius:12px; display:flex; align-items:center; justify-content:center; color:#fbbf24; flex-shrink:0; border:1px solid rgba(251,191,36,0.3)"><i data-lucide="arrow-right-left"></i></div>
+          <div style="flex:1">
+            <div style="font-weight:600">Convertir vos points en jetons Naia</div>
+            <div class="muted" style="font-size:13px; margin-top:4px; line-height:1.5">Les jetons débloquent des fonctionnalités payantes — simulations BTM, exports avancés, scénarios marché personnalisés.</div>
+            <div style="display:flex; align-items:center; gap:10px; margin-top:14px; font-size:13px">
+              <span style="background:var(--bg-card); padding:5px 12px; border-radius:8px; border:1px solid rgba(251,191,36,0.3); font-weight:600" class="tabular">10 pts</span>
+              <i data-lucide="arrow-right" style="width:14px; height:14px; color:var(--text-muted)"></i>
+              <span style="background:var(--bg-card); padding:5px 12px; border-radius:8px; border:1px solid rgba(251,191,36,0.3); font-weight:600" class="tabular">1 jeton</span>
+              <span class="muted" style="margin-left:14px">Minimum : 50 points par conversion</span>
+            </div>
+            <div class="muted" style="font-size:11px; margin-top:6px">Taux défini par le module Subscription dans la pricing schedule v01 — il s'applique tant que votre organisation reste sur ce schedule.</div>
+          </div>
+          <button class="btn btn-cyan" style="background:var(--accent-amber-strong); align-self:flex-start" onclick="openOverlay('convert-modal')"><i data-lucide="arrow-right-left"></i> Convertir</button>
+        </div>
+      </div>
+
+      <!-- Catalogue -->
+      <h3 style="font-size:13px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em; font-weight:600; margin: 0 0 10px">Accès &amp; expériences</h3>
+      <div style="display:grid; gap:12px; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); margin-bottom:18px">
+        <div class="tile"><div class="tile-head"><span class="badge badge-cyan">Accès</span><span class="badge badge-green">Disponible</span></div><div class="tile-title">Session 1:1 expert marché</div><div class="tile-desc">30 min avec les analystes Naia.</div><div class="tile-foot"><span class="tile-cost"><i data-lucide="sparkles"></i>500 pts</span><button class="btn btn-sm btn-primary">Échanger</button></div></div>
+        <div class="tile"><div class="tile-head"><span class="badge badge-cyan">Accès</span><span class="badge badge-green">Disponible</span></div><div class="tile-title">Accès anticipé aux nouveautés</div><div class="tile-desc">Beta des futures fonctionnalités Naia.</div><div class="tile-foot"><span class="tile-cost"><i data-lucide="sparkles"></i>400 pts</span><button class="btn btn-sm btn-primary">Échanger</button></div></div>
+        <div class="tile"><div class="tile-head"><span class="badge badge-cyan">Accès</span><span class="badge badge-amber">Premium</span></div><div class="tile-title">Siège conseil consultatif (trimestre)</div><div class="tile-desc">Naia Community Advisory Board.</div><div class="tile-foot"><span class="tile-cost"><i data-lucide="sparkles"></i>2 000 pts</span><button class="btn btn-sm btn-secondary" disabled>Insuffisant</button></div></div>
+        <div class="tile" style="opacity:0.5"><div class="tile-head"><span class="badge badge-slate">Visite</span><span class="badge badge-v2">V2</span></div><div class="tile-title">Visite de centrale prioritaire</div><div class="tile-desc">Premier accès aux prochaines visites.</div><div class="tile-foot"><span class="tile-cost"><i data-lucide="sparkles"></i>300 pts</span><span class="muted" style="font-size:11px">Disponible en V2</span></div></div>
+      </div>
+
+      <h3 style="font-size:13px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em; font-weight:600; margin: 0 0 10px">Contenu &amp; produit</h3>
+      <div style="display:grid; gap:12px; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); margin-bottom:18px">
+        <div class="tile"><div class="tile-head"><span class="badge badge-blue">Contenu</span><span class="badge badge-green">Disponible</span></div><div class="tile-title">Article premium « Tendances Q1 »</div><div class="tile-desc">Analyse approfondie des pertes sur la base Naia.</div><div class="tile-foot"><span class="tile-cost"><i data-lucide="sparkles"></i>150 pts</span><button class="btn btn-sm btn-primary">Échanger</button></div></div>
+        <div class="tile"><div class="tile-head"><span class="badge badge-blue">Plateforme</span><span class="badge badge-green">Disponible</span></div><div class="tile-title">10 jetons Naia (offre packagée)</div><div class="tile-desc">Pack équivalent à plusieurs simulations BTM.</div><div class="tile-foot"><span class="tile-cost"><i data-lucide="sparkles"></i>100 pts</span><button class="btn btn-sm btn-primary" onclick="openOverlay('convert-modal')">Convertir</button></div></div>
+      </div>
+
+      <h3 style="font-size:13px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em; font-weight:600; margin: 0 0 10px">Reconnaissance — badges <span style="text-transform:none; letter-spacing:0; font-weight:500; color:var(--text-subtle); margin-left:8px">attribués à un utilisateur (Marc ou Sophie)</span></h3>
+      <div style="display:grid; gap:12px; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr))">
+        <div class="tile"><div class="tile-head"><span class="badge badge-purple">Badge user</span><span class="badge badge-green">Disponible</span></div><div class="tile-title">Pionnier hydro</div><div class="tile-desc">Visible sur le profil personnel.</div><div class="tile-foot"><span class="tile-cost"><i data-lucide="sparkles"></i>100 pts</span><select class="select" style="max-width:120px; padding:4px 24px 4px 8px; font-size:12px"><option>Pour Marc</option><option>Pour Sophie</option></select></div></div>
+        <div class="tile"><div class="tile-head"><span class="badge badge-purple">Badge user</span><span class="badge badge-green">Disponible</span></div><div class="tile-title">Contributeur savoir</div><div class="tile-desc">5 articles ou commentaires approuvés.</div><div class="tile-foot"><span class="tile-cost"><i data-lucide="sparkles"></i>200 pts</span><button class="btn btn-sm btn-primary">Choisir</button></div></div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<!-- Convert modal -->
+<div id="convert-modal" class="overlay" onclick="if(event.target===this)closeOverlay('convert-modal')">
+  <div class="modal modal-lg">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px">
+      <div><div class="modal-title">Convertir des points en jetons</div><div class="modal-subtitle">Pricing schedule v01 — taux 10 points = 1 jeton — minimum 50 points</div></div>
+      <button class="btn btn-ghost" onclick="closeOverlay('convert-modal')"><i data-lucide="x"></i></button>
+    </div>
+    <div style="padding:14px 16px; background:var(--bg-input); border-radius:10px; margin-bottom:14px; display:flex; justify-content:space-between; align-items:center">
+      <div><div class="muted" style="font-size:11px; text-transform:uppercase; letter-spacing:0.04em; font-weight:600">Solde — Moulin du Bocq</div><div class="tabular" style="font-size:22px; font-weight:600; margin-top:4px">3 450 pts</div></div>
+      <div style="text-align:right; font-size:13px" class="muted">Solde jetons<br><b style="color:var(--text-primary); font-size:18px">24 jetons</b></div>
+    </div>
+    <label style="display:block; font-size:13px; font-weight:500; margin-bottom:6px">Combien de points convertir ?</label>
+    <input class="input" type="number" value="500" step="10" min="50" max="3450" id="convert-input" style="font-size:18px" oninput="document.getElementById('convert-tokens').textContent = Math.floor(this.value / 10) + ' jetons'">
+    <div class="muted" style="font-size:13px; margin-top:6px">→ <span id="convert-tokens" style="color:var(--brand-cyan); font-weight:600">50 jetons</span></div>
+    <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:6px; margin-top:14px">
+      <button class="btn btn-secondary btn-sm" onclick="document.getElementById('convert-input').value=100; document.getElementById('convert-tokens').textContent='10 jetons'">100 pts</button>
+      <button class="btn btn-secondary btn-sm" onclick="document.getElementById('convert-input').value=500; document.getElementById('convert-tokens').textContent='50 jetons'">500 pts</button>
+      <button class="btn btn-secondary btn-sm" onclick="document.getElementById('convert-input').value=1000; document.getElementById('convert-tokens').textContent='100 jetons'">1 000 pts</button>
+      <button class="btn btn-secondary btn-sm" onclick="document.getElementById('convert-input').value=3450; document.getElementById('convert-tokens').textContent='345 jetons'">Tout</button>
+    </div>
+    <div style="padding:12px 14px; background:rgba(251,191,36,0.10); border:1px solid rgba(251,191,36,0.3); border-radius:10px; font-size:12px; color:#fcd34d; margin-top:14px">
+      <b>Conversion irréversible.</b> Les points convertis disparaissent du solde communautaire. Les jetons restent sur votre compte tant que l'abonnement est actif.
+    </div>
+    <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:18px">
+      <button class="btn btn-secondary" onclick="closeOverlay('convert-modal')">Annuler</button>
+      <button class="btn btn-cyan" style="background:var(--accent-amber-strong)" onclick="alert('Conversion confirmée — appel in-process à services/subscription/tokens.convert_points_to_tokens(...) (ADR-001)'); closeOverlay('convert-modal')"><i data-lucide="check"></i> Confirmer</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="js/app.js"></script>
+</body></html>

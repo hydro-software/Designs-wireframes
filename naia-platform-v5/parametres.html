@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Paramètres — Naia</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="css/style.css" rel="stylesheet"><script src="https://cdn.tailwindcss.com"></script>
+<style>
+  /* Plant-detail collapsible sections */
+  .pd-section { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 12px; margin-bottom: 12px; overflow: hidden; }
+  .pd-section-head { padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none; }
+  .pd-section-head:hover { background: var(--bg-card-hover); }
+  .pd-section-title { font-size: 15px; font-weight: 600; display: flex; align-items: center; gap: 10px; }
+  .pd-section-body { padding: 0 20px 20px; border-top: 1px solid var(--border-subtle); padding-top: 18px; }
+  .pd-section[data-open="false"] .pd-section-body { display: none; }
+  .pd-section[data-open="false"] .pd-chev { transform: rotate(-90deg); }
+  .pd-chev { transition: transform 0.18s; color: var(--text-muted); }
+  .pd-info-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border-subtle); font-size: 13px; }
+  .pd-info-row:last-child { border-bottom: 0; }
+  .pd-info-row .lbl { color: var(--text-muted); }
+  /* Indicator catalog (#225) */
+  .ind-cat { background: var(--bg-base); border: 1px solid var(--border-subtle); border-radius: 10px; padding: 14px 16px; }
+  .ind-cat-title { font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-primary); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+  .ind-cat-title .swatch { width: 10px; height: 10px; border-radius: 50%; }
+  .ind-cat-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; font-size: 13px; border-bottom: 1px dashed var(--border-subtle); }
+  .ind-cat-row:last-child { border-bottom: 0; }
+  .ind-cat-row .name { color: var(--text-primary); }
+  .ind-cat-row .src { color: var(--text-muted); font-size: 11px; }
+  .ind-cat-row input[type="checkbox"] { width: 14px; height: 14px; accent-color: var(--brand-blue); }
+  /* Édition fields */
+  .fld { display: flex; flex-direction: column; gap: 4px; margin-bottom: 12px; }
+  .fld label { font-size: 11.5px; color: var(--text-muted); font-weight: 500; display: inline-flex; align-items: center; }
+  .fld input[type="text"], .fld input[type="number"], .fld select, .fld textarea {
+    padding: 8px 10px;
+    background: var(--bg-input);
+    border: 1px solid var(--border-default);
+    border-radius: 8px;
+    color: var(--text-primary);
+    font-size: 13px;
+    font-family: inherit;
+  }
+  .fld input:focus, .fld select:focus { outline: none; border-color: var(--brand-cyan); }
+</style>
+</head>
+<body data-page="parametres" data-section="parametres" data-centrale="moulins">
+<div class="app-shell">
+  <aside class="sidebar"></aside>
+  <main class="main-area">
+
+    <header class="topbar">
+      <div>
+        <div class="page-eyebrow">Paramètres</div>
+        <div style="font-size:18px; font-weight:600" id="parametres-title">Centrale des Moulins</div>
+      </div>
+      <div style="display:flex; gap:8px" id="parametres-actions">
+        <button class="btn btn-secondary btn-sm"><i data-lucide="share-2"></i> Partager l'accès</button>
+        <button class="btn btn-secondary btn-sm" style="color:var(--accent-red)"><i data-lucide="trash-2"></i> Supprimer</button>
+      </div>
+    </header>
+
+    <!-- v5: top tabs only — Général Org removed. User management moved to per-centrale tab (issue #12).
+         Each centrale is its own tab, plus an "Ajouter" CTA at the end. -->
+    <div id="parametres-tabs" class="centrale-tabs">
+      <a href="#moulins" data-tab="moulins" onclick="switchParametresTab(event, 'moulins')" class="centrale-tab active"><span>Centrale des Moulins</span><span class="cap">450 kW</span></a>
+      <a href="#bocq"    data-tab="bocq"    onclick="switchParametresTab(event, 'bocq')"    class="centrale-tab"><span>Moulin du Bocq</span><span class="cap">210 kW</span></a>
+      <a href="#ariege"  data-tab="ariege"  onclick="switchParametresTab(event, 'ariege')"  class="centrale-tab"><span>Centrale d'Ariège</span><span class="cap">780 kW</span></a>
+      <a href="#lesse"   data-tab="lesse"   onclick="switchParametresTab(event, 'lesse')"   class="centrale-tab"><span>Moulin de la Lesse</span><span class="cap">320 kW</span></a>
+      <a href="#" onclick="event.preventDefault(); alert('Wizard d\\'ajout — 4 étapes : Info → Compteurs+données → Indicateurs → Récap (#261, sub-issue #271)')" class="centrale-tab" style="margin-left:auto; color:var(--brand-cyan)"><i data-lucide="plus" style="width:13px; height:13px"></i> Ajouter</a>
+    </div>
+
+    <!-- Per-centrale settings — single view, no Général tab in v5.
+         Pure org-wide preferences moved to the profile dropdown; user management is per-centrale. -->
+    <div class="page-content" data-tab-content="centrale" style="max-width:980px">
+
+      <!-- ============================ Section 1 — Informations générales ============================ -->
+      <div class="pd-section" data-open="true">
+        <div class="pd-section-head" onclick="this.parentElement.dataset.open = this.parentElement.dataset.open === 'true' ? 'false' : 'true'">
+          <div class="pd-section-title"><i data-lucide="info" style="width:16px; height:16px; color:var(--brand-cyan)"></i> Informations générales</div>
+          <i data-lucide="chevron-down" class="pd-chev"></i>
+        </div>
+        <div class="pd-section-body">
+          <p class="muted" style="font-size:12px; margin:0 0 14px"><span class="req"></span> indique un champ obligatoire</p>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px">
+            <div>
+              <div class="fld"><label class="req">Nom</label><input type="text" value="Centrale des Moulins" data-pd-name-input></div>
+              <div class="fld"><label class="req">Alias court</label><input type="text" value="MOU" data-pd-alias-input></div>
+              <div class="fld"><label class="req">Pays / région</label><input type="text" value="Bergerac, Dordogne · FR" data-pd-country-input></div>
+              <div class="fld"><label class="req">Code postal</label><input type="text" value="24100" placeholder="ex. 24100"></div>
+              <div class="fld"><label class="req">Bassin versant</label><input type="text" value="Dordogne"></div>
+            </div>
+            <div>
+              <div class="fld">
+                <label class="req">
+                  Puissance max
+                  <span class="info-i" title="Définit deux valeurs : puissance max de la turbine (kW) et puissance maximale d'injection (kW). Utilisé pour le facteur de charge et l'écrêtage.">i</span>
+                </label>
+                <div style="display:flex; gap:8px">
+                  <input type="text" value="450" style="flex:1" placeholder="Turbine (kW)" title="Puissance max turbine">
+                  <input type="text" value="420" style="flex:1" placeholder="Injection (kW)" title="Puissance max injection">
+                </div>
+                <span class="muted" style="font-size:11px; margin-top:2px">Turbine · Injection (kW)</span>
+              </div>
+              <div class="fld"><label>Type de turbine</label><select><option>Kaplan</option><option>Francis</option><option>Pelton</option></select></div>
+              <div class="fld"><label>Mise en service</label><input type="text" value="1968 (rénovée 2018)"></div>
+              <div class="fld"><label class="req">Fuseau horaire</label><select><option>Europe/Paris</option><option>Europe/Brussels</option></select></div>
+            </div>
+          </div>
+          <div style="margin-top:10px"><button class="btn btn-primary btn-sm"><i data-lucide="save"></i> Enregistrer</button></div>
+        </div>
+      </div>
+
+      <!-- ============================ Section 2 — Informations détaillées (new in v5) ============================ -->
+      <div class="pd-section" data-open="false">
+        <div class="pd-section-head" onclick="this.parentElement.dataset.open = this.parentElement.dataset.open === 'true' ? 'false' : 'true'">
+          <div class="pd-section-title"><i data-lucide="ruler" style="width:16px; height:16px; color:var(--brand-cyan)"></i> Informations détaillées</div>
+          <i data-lucide="chevron-down" class="pd-chev"></i>
+        </div>
+        <div class="pd-section-body">
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px">
+            <div>
+              <div class="fld">
+                <label>Hauteur de chute brut <span class="info-i" title="Différence d'altitude entre le plan d'eau amont et aval, en mètres.">i</span></label>
+                <input type="text" value="6,4 m" placeholder="ex. 6,4 m">
+              </div>
+              <div class="fld"><label>Débit nominal</label><input type="text" value="9,5 m³/s"></div>
+              <div class="fld"><label>Débit réservé</label><input type="text" value="0,8 m³/s"></div>
+            </div>
+            <div>
+              <div class="fld"><label>Rendement global</label><input type="text" value="84 %"></div>
+              <div class="fld"><label>Catégorie</label><select><option>Petite hydro &lt; 1 MW</option><option>Moyenne hydro 1–10 MW</option></select></div>
+              <div class="fld"><label>Statut administratif</label><input type="text" value="Autorisation 30 ans"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============================ Section 3 — Compteurs Électriques (redesigned in v5) ============================ -->
+      <div class="pd-section" data-open="true">
+        <div class="pd-section-head" onclick="this.parentElement.dataset.open = this.parentElement.dataset.open === 'true' ? 'false' : 'true'">
+          <div class="pd-section-title"><i data-lucide="cpu" style="width:16px; height:16px; color:var(--brand-cyan)"></i> Compteurs Électriques</div>
+          <i data-lucide="chevron-down" class="pd-chev"></i>
+        </div>
+        <div class="pd-section-body">
+          <!-- v5 columns: Compteur | Origine des données (GDR / Naia Box / Manuel) | Code compteur (PRM / autre / —) | Remarques.
+               Removed: Source, Couverture, "Charger des données", "Voir l'historique". -->
+          <table class="data-table">
+            <thead><tr><th>Compteur</th><th>Origine des données</th><th>Code compteur</th><th>Remarques</th><th></th></tr></thead>
+            <tbody>
+              <tr>
+                <td><b><span data-pd-alias>MOU</span>-PRINC</b><br><span class="muted" style="font-size:11px">Production principale</span></td>
+                <td>
+                  <select class="select" style="font-size:12.5px">
+                    <option selected>GDR</option><option>Naia Box</option><option>Manuel</option>
+                  </select>
+                </td>
+                <td class="tabular">25130200000123 <span class="muted" style="font-size:11px">(PRM)</span></td>
+                <td><input type="text" class="select" style="font-size:12.5px" placeholder="—" value="Principal Enedis"></td>
+                <td><a class="link" style="font-size:12px">Éditer</a></td>
+              </tr>
+              <tr>
+                <td><b><span data-pd-alias>MOU</span>-AUX</b><br><span class="muted" style="font-size:11px">Auxiliaires</span></td>
+                <td>
+                  <select class="select" style="font-size:12.5px">
+                    <option>GDR</option><option selected>Naia Box</option><option>Manuel</option>
+                  </select>
+                </td>
+                <td class="tabular">NX-2104-A</td>
+                <td><input type="text" class="select" style="font-size:12.5px" placeholder="—" value="Naia Box installée 03/2025"></td>
+                <td><a class="link" style="font-size:12px">Éditer</a></td>
+              </tr>
+              <tr>
+                <td><b><span data-pd-alias>MOU</span>-MANU</b><br><span class="muted" style="font-size:11px">Relève manuelle</span></td>
+                <td>
+                  <select class="select" style="font-size:12.5px">
+                    <option>GDR</option><option>Naia Box</option><option selected>Manuel</option>
+                  </select>
+                </td>
+                <td class="muted" style="font-size:12px">—</td>
+                <td><input type="text" class="select" style="font-size:12.5px" placeholder="—" value="Relève hebdomadaire"></td>
+                <td><a class="link" style="font-size:12px">Éditer</a></td>
+              </tr>
+            </tbody>
+          </table>
+          <div style="display:flex; gap:8px; margin-top:14px">
+            <button class="btn btn-secondary btn-sm"><i data-lucide="plus"></i> Ajouter un compteur</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============================ Section 4 — Flux de production (new in v5) ============================ -->
+      <div class="pd-section" data-open="true">
+        <div class="pd-section-head" onclick="this.parentElement.dataset.open = this.parentElement.dataset.open === 'true' ? 'false' : 'true'">
+          <div class="pd-section-title"><i data-lucide="git-merge" style="width:16px; height:16px; color:var(--brand-cyan)"></i> Flux de production</div>
+          <i data-lucide="chevron-down" class="pd-chev"></i>
+        </div>
+        <div class="pd-section-body">
+          <p class="muted" style="font-size:13px; margin:0 0 12px">
+            Combine plusieurs compteurs via une formule (ex. <span class="flux-formula" style="padding:1px 7px; font-size:12px">A + B</span>) pour reconstituer
+            la production effective sur une période. Utile en cas de changement de configuration de comptage.
+          </p>
+
+          <!-- Table of existing fluxes -->
+          <table class="data-table" style="margin-bottom:12px">
+            <thead><tr><th>Nom</th><th>Date début</th><th>Date fin</th><th>Formule</th><th></th></tr></thead>
+            <tbody>
+              <tr>
+                <td><b>Flux principal · 2018→</b></td>
+                <td class="tabular">01/01/2018</td>
+                <td class="muted">— (en cours)</td>
+                <td><span class="flux-formula">A + B</span></td>
+                <td><button class="icon-action" title="Éditer" onclick="openOverlay('flux-modal')"><i data-lucide="edit-3"></i></button></td>
+              </tr>
+              <tr>
+                <td><b>Flux historique · ≤2017</b></td>
+                <td class="tabular">01/01/2010</td>
+                <td class="tabular">31/12/2017</td>
+                <td><span class="flux-formula">A × 0,98</span></td>
+                <td><button class="icon-action" title="Éditer"><i data-lucide="edit-3"></i></button></td>
+              </tr>
+            </tbody>
+          </table>
+
+          <button class="btn btn-primary btn-sm" onclick="openOverlay('flux-modal')"><i data-lucide="plus"></i> Ajouter un flux de production</button>
+        </div>
+      </div>
+
+      <!-- ============================ Section 5 — Indicateurs contextuels & comparateurs (no change in v5) ============================ -->
+      <div class="pd-section" data-open="false">
+        <div class="pd-section-head" onclick="this.parentElement.dataset.open = this.parentElement.dataset.open === 'true' ? 'false' : 'true'">
+          <div class="pd-section-title"><i data-lucide="layers" style="width:16px; height:16px; color:var(--brand-cyan)"></i> Indicateurs contextuels &amp; comparateurs <span class="muted" style="font-size:12px; font-weight:400; margin-left:6px">(#225 · catégories)</span></div>
+          <i data-lucide="chevron-down" class="pd-chev"></i>
+        </div>
+        <div class="pd-section-body">
+          <p class="muted" style="font-size:13px; margin:0 0 14px">
+            Indicateurs disponibles pour <b data-pd-name>Centrale des Moulins</b>, organisés par catégorie. Cochez ceux à afficher à côté de la production.
+          </p>
+
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:12px">
+            <div class="ind-cat">
+              <div class="ind-cat-title"><span class="swatch" style="background:#60a5fa"></span> Pluie</div>
+              <div class="ind-cat-row"><label style="display:flex; align-items:center; gap:8px"><input type="checkbox" checked><span><span class="name">Pluie · <span data-pd-locality>Bergerac</span></span><br><span class="src">Météo France · stat. proche</span></span></label></div>
+              <div class="ind-cat-row"><label style="display:flex; align-items:center; gap:8px"><input type="checkbox"><span><span class="name">Pluie · station amont</span><br><span class="src">SCHAPI · 12 km amont</span></span></label></div>
+              <div class="ind-cat-row" style="text-align:center; padding-top:8px"><a href="#" class="link" style="font-size:12px">+ Ajouter une source pluie</a></div>
+            </div>
+            <div class="ind-cat">
+              <div class="ind-cat-title"><span class="swatch" style="background:#a3e635"></span> Hydro · débit</div>
+              <div class="ind-cat-row"><label style="display:flex; align-items:center; gap:8px"><input type="checkbox" checked><span><span class="name">Débit · <span data-pd-river>Dordogne</span></span><br><span class="src">SCHAPI · station Bergerac</span></span></label></div>
+              <div class="ind-cat-row"><label style="display:flex; align-items:center; gap:8px"><input type="checkbox"><span><span class="name">Débit · affluent</span><br><span class="src">SCHAPI · station amont</span></span></label></div>
+              <div class="ind-cat-row" style="text-align:center; padding-top:8px"><a href="#" class="link" style="font-size:12px">+ Ajouter un capteur débit</a></div>
+            </div>
+            <div class="ind-cat">
+              <div class="ind-cat-title"><span class="swatch" style="background:#fbbf24"></span> Prix</div>
+              <div class="ind-cat-row"><label style="display:flex; align-items:center; gap:8px"><input type="checkbox"><span><span class="name">Spot Belpex</span><br><span class="src">EPEX SPOT BE · base load</span></span></label></div>
+              <div class="ind-cat-row"><label style="display:flex; align-items:center; gap:8px"><input type="checkbox"><span><span class="name">Spot EPEX FR</span><br><span class="src">EPEX SPOT FR · base load</span></span></label></div>
+            </div>
+            <div class="ind-cat">
+              <div class="ind-cat-title"><span class="swatch" style="background:#7dd3fc"></span> Comparateurs</div>
+              <div class="ind-cat-row"><label style="display:flex; align-items:center; gap:8px"><input type="checkbox" checked><span><span class="name">AGG DAILY MDA</span><br><span class="src">Centrale ref. ×1,38</span></span></label></div>
+              <div class="ind-cat-row"><label style="display:flex; align-items:center; gap:8px"><input type="checkbox"><span><span class="name">Production N-1</span><br><span class="src">Cette centrale · même mois 2025</span></span></label></div>
+              <div class="ind-cat-row" style="text-align:center; padding-top:8px"><a href="#" class="link" style="font-size:12px">+ Ajouter un comparateur</a></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============================ Section 6 — Catégories de pertes (per #591) ============================ -->
+      <div class="pd-section" data-open="false">
+        <div class="pd-section-head" onclick="this.parentElement.dataset.open = this.parentElement.dataset.open === 'true' ? 'false' : 'true'">
+          <div class="pd-section-title"><i data-lucide="alert-triangle" style="width:16px; height:16px; color:var(--brand-cyan)"></i> Catégories de pertes <span class="badge badge-slate">#591</span></div>
+          <i data-lucide="chevron-down" class="pd-chev"></i>
+        </div>
+        <div class="pd-section-body">
+          <p class="muted" style="font-size:13px; margin:0 0 12px">Catégories utilisées pour classifier les pertes de production sur cette centrale. Cf. <a href="https://github.com/hydro-software/platform/issues/591" class="link" target="_blank">issue #591</a>.</p>
+          <div style="display:flex; flex-wrap:wrap; gap:8px">
+            <span class="badge badge-amber">Maintenance</span>
+            <span class="badge badge-red">Panne</span>
+            <span class="badge badge-cyan">Environnement</span>
+            <span class="badge badge-blue">Opérationnel</span>
+            <span class="badge badge-purple">Réseau / Contrainte</span>
+            <span class="badge badge-slate">Données</span>
+          </div>
+          <div style="margin-top:14px"><button class="btn btn-secondary btn-sm"><i data-lucide="edit-3"></i> Configurer</button></div>
+        </div>
+      </div>
+
+      <!-- ============================ Section 7 — Tarification (per #591) ============================ -->
+      <div class="pd-section" data-open="false">
+        <div class="pd-section-head" onclick="this.parentElement.dataset.open = this.parentElement.dataset.open === 'true' ? 'false' : 'true'">
+          <div class="pd-section-title"><i data-lucide="euro" style="width:16px; height:16px; color:var(--brand-cyan)"></i> Tarification <span class="badge badge-slate">#591</span></div>
+          <i data-lucide="chevron-down" class="pd-chev"></i>
+        </div>
+        <div class="pd-section-body">
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px">
+            <div>
+              <div class="pd-info-row"><span class="lbl">Tarif d'achat</span><span>Marché spot Belpex (FR)</span></div>
+              <div class="pd-info-row"><span class="lbl">Contrat</span><span>OA + complément</span></div>
+              <div class="pd-info-row"><span class="lbl">Durée restante</span><span>11 ans</span></div>
+            </div>
+            <div>
+              <div class="pd-info-row"><span class="lbl">Prix moyen 2025</span><span class="tabular">93,2 €/MWh</span></div>
+              <div class="pd-info-row"><span class="lbl">Prix moyen YTD 2026</span><span class="tabular">91,8 €/MWh</span></div>
+              <div class="pd-info-row"><span class="lbl">Indice révision</span><span>EDF tarif régulé</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============================ Section 8 — Partage d'accès (per #591) ============================ -->
+      <div class="pd-section" data-open="false">
+        <div class="pd-section-head" onclick="this.parentElement.dataset.open = this.parentElement.dataset.open === 'true' ? 'false' : 'true'">
+          <div class="pd-section-title"><i data-lucide="share-2" style="width:16px; height:16px; color:var(--brand-cyan)"></i> Partage d'accès <span class="badge badge-slate">#591</span></div>
+          <i data-lucide="chevron-down" class="pd-chev"></i>
+        </div>
+        <div class="pd-section-body">
+          <p class="muted" style="font-size:13px; margin:0 0 12px">Inviter un autre opérateur (comparateur), une banque (lecture seule), un assureur, etc. — sans les ajouter à votre organisation.</p>
+          <table class="data-table">
+            <thead><tr><th>Personne / org.</th><th>Rôle</th><th>Type</th><th>Depuis</th></tr></thead>
+            <tbody>
+              <tr><td>Sophie Legrand · Centrale de la Semois</td><td><span class="badge badge-cyan">Comparateur</span></td><td>Lecture agrégée</td><td class="muted">12 mars</td></tr>
+              <tr><td>Crédit Agricole Sud-Ouest</td><td><span class="badge badge-blue">Banque</span></td><td>Rapport mensuel</td><td class="muted">8 mars</td></tr>
+            </tbody>
+          </table>
+          <div style="margin-top:14px"><button class="btn btn-secondary btn-sm"><i data-lucide="user-plus"></i> Inviter</button></div>
+        </div>
+      </div>
+
+      <!-- ============================ Section 9 — Utilisateurs (moved to per-centrale in v5) ============================ -->
+      <div class="pd-section" data-open="false">
+        <div class="pd-section-head" onclick="this.parentElement.dataset.open = this.parentElement.dataset.open === 'true' ? 'false' : 'true'">
+          <div class="pd-section-title"><i data-lucide="users" style="width:16px; height:16px; color:var(--brand-cyan)"></i> Utilisateurs &amp; rôles <span class="muted" style="font-size:12px; font-weight:400">de cette centrale</span></div>
+          <i data-lucide="chevron-down" class="pd-chev"></i>
+        </div>
+        <div class="pd-section-body">
+          <p class="muted" style="font-size:13px; margin:0 0 14px">v5 : la gestion des utilisateurs est désormais <b>par centrale</b> (et non plus globale à l'organisation).</p>
+          <table class="data-table">
+            <thead><tr><th>Nom</th><th>Email</th><th>Rôle (sur cette centrale)</th><th>2FA</th><th></th></tr></thead>
+            <tbody>
+              <tr><td><b>Marc Dupont</b><br><span class="muted" style="font-size:11px">vous</span></td><td>marc.dupont@moulin.be</td><td><span class="badge badge-purple">Admin</span></td><td><span class="badge badge-green">✓</span></td><td><a class="link" style="font-size:12px">Modifier</a></td></tr>
+              <tr><td><b>Sophie Legrand</b></td><td>sophie@moulin.be</td><td><span class="badge badge-blue">Opérateur</span></td><td><span class="badge badge-amber">à activer</span></td><td><a class="link" style="font-size:12px">Modifier</a></td></tr>
+            </tbody>
+          </table>
+          <div style="display:flex; gap:8px; margin-top:14px">
+            <button class="btn btn-primary btn-sm"><i data-lucide="user-plus"></i> Inviter un utilisateur</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+</div>
+
+<!-- ============================ Flux de production modal (v5) ============================ -->
+<div id="flux-modal" class="overlay" onclick="if(event.target===this) closeOverlay('flux-modal')">
+  <div class="modal modal-lg">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px">
+      <div>
+        <div class="modal-title"><i data-lucide="git-merge" style="width:16px; height:16px; vertical-align:-2px; color:var(--brand-cyan)"></i> Ajouter un flux de production</div>
+        <div class="modal-subtitle">Combine un ou plusieurs compteurs via une formule.</div>
+      </div>
+      <button class="btn btn-ghost" onclick="closeOverlay('flux-modal')"><i data-lucide="x"></i></button>
+    </div>
+
+    <div style="display:grid; grid-template-columns: 2fr 1fr 1fr; gap:14px; margin-bottom:18px">
+      <div class="fld"><label class="req">Nom</label><input type="text" placeholder="ex. Flux principal · 2018→"></div>
+      <div class="fld"><label class="req">De</label><input type="text" placeholder="01/01/2018"></div>
+      <div class="fld"><label>À</label><input type="text" placeholder="— (en cours)"></div>
+    </div>
+
+    <div class="fld">
+      <label class="req">Puissance produite — formule</label>
+      <div style="display:flex; gap:8px; align-items:center">
+        <input type="text" value="A + B" style="font-family: ui-monospace, monospace; font-size:15px; padding:10px 12px; max-width:240px">
+        <span class="muted" style="font-size:11.5px">utilisez les variables A, B, C… définies ci-dessous</span>
+      </div>
+    </div>
+
+    <div style="margin-top:14px">
+      <div style="font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em; font-weight:600; margin-bottom:6px">Variables</div>
+
+      <div class="flux-row">
+        <span class="var">A</span>
+        <select class="select"><option selected>MOU-PRINC · principal</option><option>MOU-AUX · auxiliaires</option><option>MOU-MANU · relève manuelle</option></select>
+        <select class="select"><option>kW</option><option selected>kWh</option><option>MWh</option></select>
+        <input type="text" placeholder="coefficient" value="1.0">
+        <button class="icon-action" title="Supprimer"><i data-lucide="trash-2"></i></button>
+      </div>
+
+      <div class="flux-row">
+        <span class="var">B</span>
+        <select class="select"><option>MOU-PRINC · principal</option><option selected>MOU-AUX · auxiliaires</option><option>MOU-MANU · relève manuelle</option></select>
+        <select class="select"><option>kW</option><option selected>kWh</option><option>MWh</option></select>
+        <input type="text" placeholder="coefficient" value="-0.05">
+        <button class="icon-action" title="Supprimer"><i data-lucide="trash-2"></i></button>
+      </div>
+
+      <div style="margin-top:8px">
+        <button class="btn btn-secondary btn-sm" onclick="addFluxRow()"><i data-lucide="plus"></i> Ajouter compteur</button>
+      </div>
+    </div>
+
+    <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:18px; padding-top:14px; border-top:1px solid var(--border-subtle)">
+      <button class="btn btn-ghost" onclick="closeOverlay('flux-modal')">Annuler</button>
+      <button class="btn btn-primary" onclick="alert('Flux enregistré (démo)'); closeOverlay('flux-modal')"><i data-lucide="check"></i> Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="js/app.js"></script>
+<script>
+  const CENTRALES_PARAM = {
+    moulins: { name: "Centrale des Moulins", capacity: "450 kW", country: "Bergerac, Dordogne · FR", alias: "MOU", tz: "Europe/Paris",   river: "Dordogne", locality: "Bergerac" },
+    bocq:    { name: "Moulin du Bocq",       capacity: "210 kW", country: "Spontin, Namur · BE",     alias: "BOC", tz: "Europe/Brussels", river: "Bocq",     locality: "Spontin" },
+    ariege:  { name: "Centrale d'Ariège",    capacity: "780 kW", country: "Foix, Ariège · FR",       alias: "ARI", tz: "Europe/Paris",   river: "Ariège",   locality: "Foix" },
+    lesse:   { name: "Moulin de la Lesse",   capacity: "320 kW", country: "Houyet, Namur · BE",      alias: "LES", tz: "Europe/Brussels", river: "Lesse",    locality: "Houyet" },
+  };
+
+  function applyCentraleParametres(slug) {
+    const c = CENTRALES_PARAM[slug] || CENTRALES_PARAM.moulins;
+    document.querySelectorAll("[data-pd-name]").forEach(el => el.textContent = c.name);
+    document.querySelectorAll("[data-pd-alias]").forEach(el => el.textContent = c.alias);
+    document.querySelectorAll("[data-pd-river]").forEach(el => el.textContent = c.river);
+    document.querySelectorAll("[data-pd-locality]").forEach(el => el.textContent = c.locality);
+    const nameInput = document.querySelector("[data-pd-name-input]"); if (nameInput) nameInput.value = c.name;
+    const aliasInput = document.querySelector("[data-pd-alias-input]"); if (aliasInput) aliasInput.value = c.alias;
+    const countryInput = document.querySelector("[data-pd-country-input]"); if (countryInput) countryInput.value = c.country;
+    document.getElementById("parametres-title").textContent = c.name;
+    document.body.dataset.centrale = slug;
+  }
+
+  function switchParametresTab(e, tab) {
+    if (e) e.preventDefault();
+    if (location.hash !== "#" + tab) history.replaceState(null, "", "#" + tab);
+    document.querySelectorAll(".centrale-tab").forEach(t => t.classList.toggle("active", t.dataset.tab === tab));
+    applyCentraleParametres(tab);
+    if (typeof initIcons === "function") initIcons();
+  }
+
+  function addFluxRow() {
+    alert("Ajout d'une variable (démo) — incrémenterait C, D, E… avec le même layout.");
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const tab = (location.hash || "#moulins").replace("#", "");
+    const valid = Object.keys(CENTRALES_PARAM).includes(tab) ? tab : "moulins";
+    switchParametresTab(null, valid);
+  });
+  window.addEventListener("hashchange", () => {
+    const tab = (location.hash || "#moulins").replace("#", "");
+    const valid = Object.keys(CENTRALES_PARAM).includes(tab) ? tab : "moulins";
+    switchParametresTab(null, valid);
+  });
+</script>
+</body></html>

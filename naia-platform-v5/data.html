@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Données — Naia</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="css/style.css" rel="stylesheet"><script src="https://cdn.tailwindcss.com"></script>
+<style>
+  /* Type de données segmented control (3 pills per v5) */
+  .type-seg { display: inline-flex; background: var(--bg-input); border: 1px solid var(--border-default); border-radius: 999px; padding: 3px; gap: 1px; }
+  .type-seg button { padding: 6px 14px; font-size: 13px; border: 0; background: transparent; color: var(--text-muted); border-radius: 999px; cursor: pointer; font-family: inherit; font-weight: 500; }
+  .type-seg button.on { background: var(--brand-blue-strong); color: white; }
+  .dropzone {
+    border: 2px dashed var(--border-default);
+    border-radius: 12px;
+    padding: 36px 24px;
+    text-align: center;
+    background: var(--bg-base);
+    transition: all 0.15s;
+  }
+  .dropzone:hover { border-color: var(--brand-cyan); background: var(--bg-card-hover); }
+  .dropzone i { color: var(--text-muted); }
+</style>
+</head>
+<body data-page="data" data-section="data" data-centrale="moulins">
+<div class="app-shell">
+  <aside class="sidebar"></aside>
+  <main class="main-area">
+    <header class="topbar">
+      <div>
+        <div class="page-eyebrow">Données</div>
+        <div style="font-size:18px; font-weight:600">Importer &amp; gérer vos flux</div>
+      </div>
+      <div class="topbar-meta"><div class="plant" data-centrale-name>Centrale des Moulins</div><div>Dernier upload : il y a 2 h</div></div>
+    </header>
+
+    <!-- Centrales as tabs -->
+    <div class="centrale-tabs" data-mvp="1">
+      <a class="centrale-tab" href="data.html" data-centrale="all"><span>Toutes · santé des flux</span></a>
+      <a class="centrale-tab active" data-centrale="moulins" onclick="switchCentrale(event, 'moulins')"><span>Centrale des Moulins</span><span class="cap">450 kW</span></a>
+      <a class="centrale-tab" data-centrale="bocq" onclick="switchCentrale(event, 'bocq')"><span>Moulin du Bocq</span><span class="cap">210 kW</span></a>
+      <a class="centrale-tab" data-centrale="ariege" onclick="switchCentrale(event, 'ariege')"><span>Centrale d'Ariège</span><span class="cap">780 kW</span></a>
+      <a class="centrale-tab" data-centrale="lesse" onclick="switchCentrale(event, 'lesse')"><span>Moulin de la Lesse</span><span class="cap">320 kW</span></a>
+    </div>
+
+    <div class="page-content">
+
+      <!-- MVP 0.9 fallback: Données is MVP1-only. -->
+      <div class="mvp09-fallback" data-mvp="0.9">
+        <div class="ico"><i data-lucide="info"></i></div>
+        <div class="title">Données — MVP 1</div>
+        <div class="desc">L'import et la gestion des flux ne sont pas livrés pour la conférence (MVP 0.9). Ils arrivent dans MVP 1.</div>
+        <a class="btn btn-primary" href="production.html"><i data-lucide="zap"></i> Aller à Production</a>
+      </div>
+
+      <!-- v5: 3 pills — Électricité (renamed from Production), Indicateur/Comparateur (merged), Prix d'Électricité (new).
+           Compteur dropdown moves UNDERNEATH the pills. -->
+      <div class="card" data-mvp="1" style="margin-bottom:14px">
+        <div class="card-body" style="padding:18px 20px">
+
+          <div style="font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em; font-weight:600; margin-bottom:6px">Type de données</div>
+          <div class="type-seg" style="margin-bottom:14px">
+            <button class="on" data-type="electricite" onclick="switchType('electricite')">Électricité</button>
+            <button data-type="indcomp"      onclick="switchType('indcomp')">Indicateur / Comparateur</button>
+            <button data-type="prix"         onclick="switchType('prix')">Prix d'Électricité</button>
+          </div>
+
+          <!-- Électricité: compteur dropdown — unité is shown as text per the compteur config -->
+          <div id="elec-controls" style="display:flex; gap:14px; align-items:end">
+            <div>
+              <div style="font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em; font-weight:600; margin-bottom:6px">Compteur</div>
+              <select class="select" id="elec-compteur" onchange="updateUnite()" style="min-width:240px">
+                <option data-unite="kWh">MOU-PRINC · principal — kWh</option>
+                <option data-unite="kWh">MOU-AUX · auxiliaires — kWh</option>
+                <option data-unite="MWh">MOU-GROUPE · agrégat — MWh</option>
+              </select>
+            </div>
+            <div style="font-size:13px; color:var(--text-muted); padding-bottom:10px">
+              <span style="font-size:11px; text-transform:uppercase; letter-spacing:0.06em; font-weight:600; display:block; margin-bottom:4px">Unité (compteur)</span>
+              <span style="color:var(--text-primary); font-weight:600" id="elec-unite">kWh</span>
+              <span class="muted" style="font-size:11.5px; display:block; margin-top:2px">défini dans Paramètres → Compteurs</span>
+            </div>
+          </div>
+
+          <!-- Indicateur / Comparateur (merged into one button per v5) -->
+          <div id="indcomp-controls" style="display:none; gap:14px; align-items:end">
+            <div>
+              <div style="font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em; font-weight:600; margin-bottom:6px">Indicateur / comparateur</div>
+              <select class="select" id="indcomp-select" style="min-width:320px">
+                <option>Pluie · Bergerac (indicateur · Météo)</option>
+                <option>Débit · Dordogne (indicateur · Hydro)</option>
+                <option selected>AGG DAILY MDA (comparateur · ×1,38)</option>
+                <option>Centrale d'Ariège (comparateur · ×0,58)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Prix d'Électricité (new in v5) -->
+          <div id="prix-controls" style="display:none; gap:14px; align-items:end">
+            <div>
+              <div style="font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em; font-weight:600; margin-bottom:6px">Marché</div>
+              <select class="select" style="min-width:240px">
+                <option selected>EPEX SPOT FR · base load</option>
+                <option>EPEX SPOT FR · peak load</option>
+                <option>Belpex BE · base load</option>
+                <option>Tarif d'obligation d'achat</option>
+              </select>
+            </div>
+            <div style="font-size:13px; color:var(--text-muted); padding-bottom:10px">
+              <span style="font-size:11px; text-transform:uppercase; letter-spacing:0.06em; font-weight:600; display:block; margin-bottom:4px">Unité</span>
+              <span style="color:var(--text-primary); font-weight:600">€/MWh</span>
+            </div>
+          </div>
+
+          <p class="muted" style="font-size:12px; max-width:520px; line-height:1.5; margin-top:14px; margin-bottom:0">
+            La création ou modification d'un compteur, indicateur ou comparateur se fait depuis
+            <a class="link" href="parametres.html">Paramètres → Centrale</a>. Cette page ne sert qu'à
+            l'<b>import de données</b> (tâche fréquente).
+          </p>
+        </div>
+      </div>
+
+      <!-- Upload card with Évènementiel | Fréquentiel toggle (v5) -->
+      <div class="card" data-mvp="1" style="margin-bottom:14px">
+        <div class="card-head">
+          <div>
+            <div class="card-head-title">Charger un fichier</div>
+            <div class="card-head-sub" id="upload-context">Électricité pour <b data-centrale-name>Centrale des Moulins</b> · compteur MOU-PRINC · unité kWh</div>
+          </div>
+          <!-- v5: Évènementiel | Fréquentiel toggle on the same row as "Charger un fichier" -->
+          <div class="freq-toggle" role="tablist" aria-label="Mode d'enregistrement">
+            <button class="on" data-freq="evenementiel">Évènementiel</button>
+            <button data-freq="frequentiel">Fréquentiel</button>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="dropzone" onclick="simulateUpload()">
+            <i data-lucide="upload-cloud" style="width:36px; height:36px"></i>
+            <div style="font-size:14px; color:var(--text-primary); margin-top:10px; font-weight:500">Glissez-déposez un fichier ici</div>
+            <div style="font-size:12px; color:var(--text-muted); margin-top:4px">CSV avec horodatages ISO · XLSX · Enedis R63 · max 50 Mo</div>
+            <button class="btn btn-secondary" style="margin-top:14px" onclick="event.stopPropagation(); simulateUpload()"><i data-lucide="folder-open"></i> Parcourir</button>
+          </div>
+          <div style="display:flex; gap:8px; align-items:center; margin-top:12px; font-size:12px; color:var(--text-muted)">
+            <i data-lucide="info" style="width:13px; height:13px"></i>
+            Les doublons (mêmes horodatages) seront remplacés. Couverture par défaut : 1 valeur par 15 min.
+          </div>
+
+          <!-- v5: Prévisualisation card shown after a CSV/XLSX upload.
+               Per the team meeting: NO "unité de Valeur" column — the unit is inferred from the compteur. -->
+          <div class="preview-card" id="preview-card" style="display:none">
+            <div class="pv-head">
+              <div class="pv-title"><i data-lucide="eye"></i> Prévisualisation · <span id="pv-filename">production_mou-princ_avril.csv</span></div>
+              <div class="pv-actions">
+                <button class="btn btn-ghost btn-sm" onclick="hidePreview()">Annuler</button>
+                <button class="btn btn-primary btn-sm" onclick="confirmImport()"><i data-lucide="check"></i> Confirmer l'import</button>
+              </div>
+            </div>
+            <div class="pv-meta" style="margin-bottom:8px">2 880 lignes détectées · pas 15 min · 1–30 avr. 2026 · 2 trous (1 h cumulée)</div>
+            <table class="data-table" style="font-size:12.5px">
+              <thead>
+                <tr><th>Horodatage</th><th class="num" style="text-align:right">Valeur</th><th>Statut</th></tr>
+              </thead>
+              <tbody>
+                <tr><td class="tabular">2026-04-01 00:00</td><td class="num" style="text-align:right">42,8</td><td><span class="badge badge-green">OK</span></td></tr>
+                <tr><td class="tabular">2026-04-01 00:15</td><td class="num" style="text-align:right">41,2</td><td><span class="badge badge-green">OK</span></td></tr>
+                <tr><td class="tabular">2026-04-01 00:30</td><td class="num" style="text-align:right">39,7</td><td><span class="badge badge-green">OK</span></td></tr>
+                <tr><td class="tabular">2026-04-01 00:45</td><td class="num" style="text-align:right">—</td><td><span class="badge badge-amber">trou</span></td></tr>
+                <tr><td class="tabular">2026-04-01 01:00</td><td class="num" style="text-align:right">40,1</td><td><span class="badge badge-green">OK</span></td></tr>
+                <tr><td class="tabular">…</td><td class="num" style="text-align:right">…</td><td class="muted">2 875 lignes supplémentaires</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent uploads (this centrale) -->
+      <div class="card" data-mvp="1" style="margin-bottom:14px">
+        <div class="card-head"><div class="card-head-title">Imports récents · <span data-centrale-name>Centrale des Moulins</span></div><a href="#" class="link" style="font-size:12px">Voir tout l'historique →</a></div>
+        <table class="data-table">
+          <thead><tr><th>Date</th><th>Compteur / Indicateur</th><th>Type</th><th>Période</th><th>Lignes</th><th>Statut</th></tr></thead>
+          <tbody>
+            <tr><td class="tabular">23 avr. 14:23</td><td>MOU-PRINC</td><td><span class="badge badge-blue">Électricité · SCADA</span></td><td>auto · 1–22 avr.</td><td class="num">8 640</td><td><span class="badge badge-green">Validé</span></td></tr>
+            <tr><td class="tabular">22 avr. 09:12</td><td>Pluie · Bergerac</td><td><span class="badge badge-cyan">Indicateur · Météo</span></td><td>1–22 avr.</td><td class="num">22</td><td><span class="badge badge-green">Validé</span></td></tr>
+            <tr><td class="tabular">10 avr. 16:48</td><td>MOU-PRINC</td><td><span class="badge badge-blue">Électricité · CSV</span></td><td>1–9 avr.</td><td class="num">864</td><td><span class="badge badge-amber">2 trous détectés</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Sources health (compact) -->
+      <div class="card" data-mvp="1">
+        <div class="card-head"><div class="card-head-title">Sources automatisées</div></div>
+        <table class="data-table">
+          <thead><tr><th>Source</th><th>Type</th><th>Dernière maj.</th><th>Fréquence</th><th>Statut</th></tr></thead>
+          <tbody>
+            <tr><td>SCADA · MOU-PRINC</td><td>Électricité</td><td>il y a 2 h</td><td>quart-horaire</td><td><span class="badge badge-green">OK</span></td></tr>
+            <tr><td>Enedis R63 · MOU-PRINC</td><td>Électricité · backup</td><td>hier</td><td>quotidien</td><td><span class="badge badge-green">OK</span></td></tr>
+            <tr><td>Météo France · Bergerac</td><td>Indicateur · pluie</td><td>il y a 35 min</td><td>quotidien</td><td><span class="badge badge-green">OK</span></td></tr>
+            <tr><td>SCHAPI · Dordogne</td><td>Indicateur · débit</td><td>il y a 14 min</td><td>quart-horaire</td><td><span class="badge badge-green">OK</span></td></tr>
+            <tr><td>EPEX SPOT FR · base load</td><td>Prix d'électricité</td><td>il y a 1 h</td><td>horaire</td><td><span class="badge badge-green">OK</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="js/app.js"></script>
+<script>
+function switchType(type) {
+  document.querySelectorAll(".type-seg button").forEach(b => b.classList.toggle("on", b.dataset.type === type));
+  const elec    = document.getElementById("elec-controls");
+  const indcomp = document.getElementById("indcomp-controls");
+  const prix    = document.getElementById("prix-controls");
+  elec.style.display    = type === "electricite" ? "flex" : "none";
+  indcomp.style.display = type === "indcomp"     ? "flex" : "none";
+  prix.style.display    = type === "prix"        ? "flex" : "none";
+
+  const ctx = document.getElementById("upload-context");
+  const centrale = document.querySelector('[data-centrale-name]')?.textContent || "Centrale des Moulins";
+  if (type === "electricite") {
+    const sel = document.getElementById("elec-compteur");
+    const opt = sel.options[sel.selectedIndex];
+    ctx.innerHTML = `Électricité pour <b>${centrale}</b> · compteur ${opt.text.split(' ·')[0]} · unité ${opt.dataset.unite}`;
+  } else if (type === "indcomp") {
+    const sel = document.getElementById("indcomp-select");
+    ctx.innerHTML = `Indicateur / comparateur — <b>${sel.value}</b> sur <b>${centrale}</b>`;
+  } else {
+    ctx.innerHTML = `Prix d'électricité sur <b>${centrale}</b> · unité €/MWh`;
+  }
+}
+
+function updateUnite() {
+  const sel = document.getElementById("elec-compteur");
+  const opt = sel.options[sel.selectedIndex];
+  document.getElementById("elec-unite").textContent = opt.dataset.unite;
+  switchType("electricite");
+}
+
+document.querySelectorAll(".freq-toggle button").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".freq-toggle button").forEach(b => b.classList.remove("on"));
+    btn.classList.add("on");
+  });
+});
+
+function simulateUpload() {
+  document.getElementById("preview-card").style.display = "block";
+  setTimeout(() => { if (window.lucide) lucide.createIcons({ attrs: { "stroke-width": 1.75 } }); }, 0);
+}
+function hidePreview() { document.getElementById("preview-card").style.display = "none"; }
+function confirmImport() { alert("Import confirmé (démo)"); hidePreview(); }
+
+function switchCentrale(e, slug) {
+  if (e) e.preventDefault();
+  document.querySelectorAll(".centrale-tab").forEach(t => t.classList.toggle("active", t.dataset.centrale === slug));
+  const map = {
+    moulins: "Centrale des Moulins",
+    bocq:    "Moulin du Bocq",
+    ariege:  "Centrale d'Ariège",
+    lesse:   "Moulin de la Lesse",
+  };
+  const name = map[slug] || "Centrale";
+  document.querySelectorAll('[data-centrale-name]').forEach(el => el.textContent = name);
+  document.body.dataset.centrale = slug;
+}
+</script>
+</body></html>
