@@ -744,11 +744,15 @@ table.data-table { width: 100%; border-collapse: collapse; }
 
 .chart-container { position: relative; min-height: 240px; }
 
-/* ============ INDICATEURS PANEL (left of chart, per indicateurs.png) ============ */
+/* ============ CHART PANELS (left Indicateurs + right Légende, per dev.app.naiahydro.com) ============ */
 
+/* The grid columns shift based on the open/collapsed state of each side:
+   data-ind="open"      → left column is 240px (the panel)
+   data-ind="collapsed" → left column shrinks to 32px (the strip)
+   Same for data-leg. */
 .chart-with-panel {
   display: grid;
-  grid-template-columns: 240px 1fr;
+  grid-template-columns: 240px 1fr 220px;
   gap: 0;
   background: var(--bg-card);
   border: 1px solid var(--border-subtle);
@@ -851,10 +855,140 @@ table.data-table { width: 100%; border-collapse: collapse; }
   color: white;
 }
 
-/* Collapsed state — panel fully hidden; chart goes full width.
-   User clicks the "Indicateurs" button in the chart toolbar to fold it out. */
-.indicateurs-panel.collapsed { display: none; }
-.chart-with-panel.collapsed { grid-template-columns: 1fr; }
+/* v5 polish round 4 — collapsed-state shifts the grid columns and swaps the
+   panel for a thin vertical strip on each side. */
+.chart-with-panel[data-ind="open"][data-leg="open"]           { grid-template-columns: 240px 1fr 220px; }
+.chart-with-panel[data-ind="collapsed"][data-leg="open"]      { grid-template-columns: 32px  1fr 220px; }
+.chart-with-panel[data-ind="open"][data-leg="collapsed"]      { grid-template-columns: 240px 1fr 32px;  }
+.chart-with-panel[data-ind="collapsed"][data-leg="collapsed"] { grid-template-columns: 32px  1fr 32px;  }
+
+.chart-with-panel[data-ind="open"]      .indicateurs-panel { display: block; }
+.chart-with-panel[data-ind="collapsed"] .indicateurs-panel { display: none; }
+.chart-with-panel[data-ind="open"]      .panel-strip-left  { display: none; }
+.chart-with-panel[data-ind="collapsed"] .panel-strip-left  { display: flex; }
+
+.chart-with-panel[data-leg="open"]      .legende-panel    { display: block; }
+.chart-with-panel[data-leg="collapsed"] .legende-panel    { display: none; }
+.chart-with-panel[data-leg="open"]      .panel-strip-right { display: none; }
+.chart-with-panel[data-leg="collapsed"] .panel-strip-right { display: flex; }
+
+/* ============ LÉGENDE PANEL (right of chart) ============ */
+.legende-panel {
+  padding: 16px 14px;
+  border-left: 1px solid var(--border-subtle);
+  background: var(--bg-card);
+}
+.legende-panel-title {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  margin-bottom: 14px;
+  display: flex;
+  justify-content: flex-end; /* collapse button on the LEFT of the title */
+  align-items: center;
+  gap: 8px;
+}
+.legende-panel-title > span { margin-left: auto; }
+.legende-panel-title .collapse {
+  width: 22px; height: 22px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border: 0; background: transparent; border-radius: 5px;
+  cursor: pointer; color: var(--text-muted); font-family: inherit; padding: 0;
+}
+.legende-panel-title .collapse:hover { background: var(--bg-card-hover); color: var(--brand-cyan); }
+.legende-panel-title .collapse i { width: 14px; height: 14px; }
+.legende-items { display: flex; flex-direction: column; gap: 8px; }
+.legende-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12.5px;
+  color: var(--text-primary);
+}
+.legende-item .dot {
+  width: 9px; height: 9px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* ============ COLLAPSED STRIPS (thin vertical tabs with rotated label) ============ */
+.panel-strip {
+  display: none; /* visibility driven by data-attribute selectors above */
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0;
+  width: 32px;
+  background: var(--bg-card);
+  border: 0;
+  cursor: pointer;
+  font-family: inherit;
+  color: var(--text-muted);
+}
+.panel-strip-left  { border-right: 1px solid var(--border-subtle); }
+.panel-strip-right { border-left:  1px solid var(--border-subtle); }
+.panel-strip:hover { background: var(--bg-card-hover); color: var(--brand-cyan); }
+.panel-strip .strip-chev { width: 14px; height: 14px; flex-shrink: 0; }
+.panel-strip .strip-label {
+  writing-mode: vertical-rl;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.panel-strip-left  .strip-label { transform: rotate(180deg); /* read bottom-to-top */ }
+
+/* ============ BOTTOM OVERLAYS ON THE CHART ============ */
+/* Quick comparator pills, bottom-left of chart */
+.quick-comparators {
+  position: absolute;
+  bottom: 14px;
+  left: 18px;
+  display: flex;
+  gap: 6px;
+  z-index: 2;
+}
+.qc-pill {
+  padding: 4px 12px;
+  font-size: 11.5px;
+  font-weight: 600;
+  border-radius: 999px;
+  border: 1px solid var(--border-default);
+  background: var(--bg-elevated);
+  color: var(--text-muted);
+  cursor: pointer;
+  font-family: inherit;
+}
+.qc-pill:hover { color: var(--text-primary); border-color: var(--brand-cyan); }
+.qc-pill.active {
+  background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+  border-color: transparent;
+  color: white;
+  box-shadow: 0 4px 12px -3px rgba(139,92,246,0.45);
+}
+
+/* Discrete wrench config icon, bottom-right of chart */
+.chart-config-wrench {
+  position: absolute;
+  bottom: 14px;
+  right: 18px;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: 0;
+  background: transparent;
+  color: var(--text-subtle);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: inherit;
+  z-index: 2;
+}
+.chart-config-wrench:hover { color: var(--brand-cyan); background: var(--bg-card-hover); }
+.chart-config-wrench i { width: 15px; height: 15px; }
 
 /* ============ ANIMATIONS ============ */
 
@@ -1073,35 +1207,7 @@ body[data-mvp="1"]   [data-mvp="0.9"] { display: none !important; }
 .axis-toggle:hover { color: var(--brand-cyan); border-color: var(--brand-cyan); }
 .axis-toggle i { width: 12px; height: 12px; }
 
-/* v5 polish round 3: Indicateurs panel expand-arrow.
-   The v4 panel + collapse arrow are kept verbatim — this just adds the missing
-   re-expand affordance when the panel is collapsed: a chevron-right tab attached
-   to the chart's left edge. Hidden when the panel is expanded. */
-.panel-expand-arrow {
-  position: absolute;
-  top: 50%;
-  left: 0;
-  transform: translateY(-50%);
-  display: none;
-  align-items: center;
-  justify-content: center;
-  width: 22px;
-  height: 56px;
-  background: var(--bg-elevated);
-  border: 1px solid var(--border-default);
-  border-left: 0;
-  border-radius: 0 8px 8px 0;
-  color: var(--text-muted);
-  cursor: pointer;
-  font-family: inherit;
-  z-index: 2;
-  transition: color 0.15s, background 0.15s;
-}
-.chart-with-panel.collapsed .panel-expand-arrow { display: inline-flex; }
-.panel-expand-arrow:hover { color: var(--brand-cyan); background: var(--bg-card-hover); }
-.panel-expand-arrow i { width: 14px; height: 14px; }
-
-/* Promote the in-panel collapse arrow to a real icon button (was a literal "«" in v4).
+/* v5 polish round 4: in-panel collapse button (was a literal "«" in v4).
    Lives inside .indicateurs-panel-title — only visible when the panel is expanded. */
 .indicateurs-panel-title .collapse {
   width: 22px; height: 22px;

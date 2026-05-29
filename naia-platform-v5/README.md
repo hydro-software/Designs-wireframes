@@ -14,7 +14,11 @@ with the page(s) it affects.
 
 These applied to both MVP 0.9 and MVP 1 after a second pass with the team:
 
-- **Indicateurs contextuels panel** on Production + Revenus restored to the **dev.app.naiahydro.com pattern** — a left slide-out with the checkbox grid (Int. / 30j / 12m / Ann. columns × indicator rows, grouped Indicateurs inversés / Indicateurs courbes / Comparateurs). Expanded by default. A small **chevron-left** button inside the panel header collapses it; once collapsed, a **chevron-right tab** attached to the chart's left edge re-expands it. (Round 2 introduced a "Légende expandable" widget that diverged from the production system — reverted.)
+- **Indicateurs contextuels panel** on Production + Revenus restored to the **dev.app.naiahydro.com pattern** — left slide-out with the checkbox grid (Int. / 30j / 12m / Ann. columns × indicator rows, grouped Indicateurs inversés / Indicateurs courbes / Comparateurs). (Round 2 introduced a "Légende expandable" widget that diverged from the production system — reverted.)
+- **Légende panel on the right** (new in round 4, matching dev.app.naiahydro.com) — lists the chart's coloured categories: Production · Pannes · Maintenance · Environnement · Exploitation · Structurel · Contraintes · Données manquantes (Revenus uses a revenue-flavoured variant). Each item is a swatch dot + label.
+- **Collapsed-state vertical strips** — both panels collapse into a 32 px-wide strip with a chevron at the top and the panel name written vertically (`writing-mode: vertical-rl`; left strip rotated 180° so it reads bottom-to-top). Click anywhere on the strip to re-expand. The two sides are independent — collapse one without touching the other.
+- **Bottom-left quick comparator pills** (MDA / Hydro… on Production, N-1 / Budget on Revenus) — small pills that hint at the active comparator.
+- **Bottom-right wrench icon** — discrete config affordance for the chart, replaces the toolbar config button.
 - **Right-axis toggle moved out of the toolbar** — now a small floating pill positioned **above** the chart's right-axis label, swaps the axis between Pluie/Débit (Production) or Prix/Débit (Revenus).
 - **Données upload preview** confirmed: 3 columns (Horodatage · Valeur · Statut), no "Unité de Valeur" column (the unit is inferred from the compteur).
 - **Paramètres** — all references to issue #591 removed (the redesigned sections are now the canonical spec).

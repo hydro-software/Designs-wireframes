@@ -42,22 +42,13 @@
         <div><b>V2 :</b> module de simulation Valorise (BTM, batterie, digital twin) — visible dans le mockup pour validation, non livré en V1.</div>
       </div>
 
-      <!-- Chart card (v5 polish round 3): same Indicateurs slide-out pattern as Production
-           (matching dev.app.naiahydro.com), with a chevron tab on the chart's left edge
-           that re-expands the panel after it's been collapsed. -->
+      <!-- Chart card (v5 polish round 4): mirrors the Production card — Indicateurs
+           panel on the left, Légende on the right, both collapsible into thin
+           vertical strips. Bottom-left MDA/Hydro pills, bottom-right wrench. -->
       <div class="card" style="margin-bottom:14px; padding:0; overflow:hidden">
-        <div class="card-head" style="border-bottom:1px solid var(--border-subtle)">
-          <div style="font-size:12.5px; color:var(--text-muted)">
-            <i data-lucide="info" style="width:13px; height:13px; vertical-align:-2px"></i>
-            Cochez les indicateurs à afficher · panneau de gauche (rétractable)
-          </div>
-          <div style="display:flex; gap:4px">
-            <button class="icon-action" title="Configurer ce graphique" onclick="alert('Config par utilisateur — voir Production pour le wireframe complet')"><i data-lucide="sliders-horizontal"></i></button>
-            <button class="icon-action" title="Exporter" onclick="alert('Export (démo)')"><i data-lucide="download"></i></button>
-          </div>
-        </div>
+        <div class="chart-with-panel" id="chart-with-panel" data-ind="open" data-leg="open">
 
-        <div class="chart-with-panel" id="chart-with-panel">
+          <!-- LEFT: Indicateurs contextuels (expanded) -->
           <div class="indicateurs-panel" id="indicateurs-panel">
             <div class="indicateurs-panel-title">
               <span>Indicateurs contextuels</span>
@@ -116,16 +107,51 @@
             </div>
           </div>
 
-          <div style="position:relative; height:480px; padding:14px">
-            <button class="panel-expand-arrow" id="panel-expand-arrow" onclick="toggleIndicateursPanel()" title="Afficher les indicateurs" aria-label="Afficher les indicateurs">
-              <i data-lucide="chevron-right"></i>
-            </button>
+          <!-- LEFT collapsed strip -->
+          <button class="panel-strip panel-strip-left" id="indicateurs-strip" onclick="toggleIndicateursPanel()" aria-label="Afficher Indicateurs contextuels">
+            <i data-lucide="chevrons-right" class="strip-chev"></i>
+            <span class="strip-label">Indicateurs contextuels</span>
+          </button>
+
+          <!-- CHART AREA -->
+          <div class="chart-area" style="position:relative; height:480px; padding:14px">
             <button class="right-axis-toggle" id="right-axis-toggle" onclick="toggleRightAxis()" title="Basculer l'axe droit entre Prix spot et Débit">
               <span id="right-axis-label">Prix spot (€/MWh)</span>
               <i data-lucide="arrow-left-right"></i>
             </button>
             <div class="chart-container" style="height:100%"><canvas id="production-chart"></canvas></div>
+
+            <div class="quick-comparators">
+              <button class="qc-pill active" title="Revenus N-1">N-1</button>
+              <button class="qc-pill" title="Objectif budgété" onclick="alert('Objectif budgété (démo)')">Budget</button>
+            </div>
+
+            <button class="chart-config-wrench" onclick="alert('Configurer ce graphique (démo)')" title="Configurer ce graphique"><i data-lucide="wrench"></i></button>
           </div>
+
+          <!-- RIGHT collapsed strip -->
+          <button class="panel-strip panel-strip-right" id="legende-strip" onclick="toggleLegende()" aria-label="Afficher la Légende">
+            <i data-lucide="chevrons-left" class="strip-chev"></i>
+            <span class="strip-label">Légende</span>
+          </button>
+
+          <!-- RIGHT: Légende (revenue-flavoured categories) -->
+          <div class="legende-panel" id="legende-panel">
+            <div class="legende-panel-title">
+              <button class="collapse" onclick="toggleLegende()" title="Réduire le panneau" aria-label="Réduire"><i data-lucide="chevron-right"></i></button>
+              <span>Légende</span>
+            </div>
+            <div class="legende-items">
+              <div class="legende-item"><span class="dot" style="background:#3b82f6"></span>Revenus</div>
+              <div class="legende-item"><span class="dot" style="background:#10b981"></span>Bonus / capacité</div>
+              <div class="legende-item"><span class="dot" style="background:#ef4444"></span>Manque à gagner · pannes</div>
+              <div class="legende-item"><span class="dot" style="background:#a855f7"></span>Manque à gagner · environnement</div>
+              <div class="legende-item"><span class="dot" style="background:#ec4899"></span>Manque à gagner · exploitation</div>
+              <div class="legende-item"><span class="dot" style="background:#94a3b8"></span>Contraintes réseau</div>
+              <div class="legende-item"><span class="dot" style="background:#dc2626"></span>Données manquantes</div>
+            </div>
+          </div>
+
         </div>
       </div>
 
@@ -144,12 +170,15 @@
     document.querySelectorAll(".time-pills button").forEach(b => b.classList.remove("on"));
     btn.classList.add("on");
   }
-  // Indicateurs panel — same toggle as production.html.
-  function toggleIndicateursPanel() {
+  // Side panels — same toggle as production.html (data-attribute driven).
+  function toggleIndicateursPanel() { _flipPanel("ind"); }
+  function toggleLegende()          { _flipPanel("leg"); }
+  function _flipPanel(side) {
     const wrap = document.getElementById("chart-with-panel");
-    const panel = document.getElementById("indicateurs-panel");
-    panel.classList.toggle("collapsed");
-    wrap.classList.toggle("collapsed");
+    const cur = wrap.dataset[side === "ind" ? "ind" : "leg"];
+    const next = cur === "open" ? "collapsed" : "open";
+    if (side === "ind") wrap.dataset.ind = next;
+    else                wrap.dataset.leg = next;
   }
 
   let rightAxis = "prix";

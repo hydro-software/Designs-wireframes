@@ -68,31 +68,18 @@
         <span class="wa-link" onclick="openOverlay('wa-events')">Voir / éditer →</span>
       </div>
 
-      <!-- Chart card (v5 polish round 3, matching dev.app.naiahydro.com):
-           - Left slide-out Indicateurs contextuels panel (checkbox grid Int./30j/12m/Ann.)
-             — same pattern as the actual production system (v4 already had this).
-           - Clickable chevron arrow on the panel/chart boundary triggers the fold-out:
-               · panel expanded → chevron-left inside the panel header collapses it
-               · panel collapsed → chevron-right tab on the chart's left edge re-expands
-           - Top toolbar: only the discrete config + export icons on the right
-             (the old "Indicateurs" toggle button is gone — the chevron tab replaces it).
-           - Right-axis toggle stays as a small floating pill above the chart's right axis. -->
+      <!-- Chart card (v5 polish round 4, matching dev.app.naiahydro.com screenshots from PO):
+           - LEFT slide-out: Indicateurs contextuels (checkbox grid Int./30j/12m/Ann.)
+           - RIGHT slide-out: Légende (loss/event categories with coloured dots)
+           - Each side collapses into a thin vertical strip with rotated label + chevron at top
+           - Bottom-left: MDA / Hydro… quick-comparator pills
+           - Bottom-right: small floating wrench icon for chart configuration
+           - Right-axis toggle stays as a floating pill above the right axis. -->
       <div class="card" style="margin-bottom:14px; padding:0; overflow:hidden">
-        <div class="card-head" style="border-bottom:1px solid var(--border-subtle)">
-          <div style="font-size:12.5px; color:var(--text-muted)">
-            <i data-lucide="info" style="width:13px; height:13px; vertical-align:-2px"></i>
-            Cochez les indicateurs à afficher · panneau de gauche (rétractable)
-          </div>
-          <div style="display:flex; gap:4px">
-            <button class="icon-action" title="Configurer ce graphique (par utilisateur)" onclick="openOverlay('chart-config')"><i data-lucide="sliders-horizontal"></i></button>
-            <button class="icon-action" title="Exporter" onclick="alert('Export PNG / CSV / PDF (démo)')"><i data-lucide="download"></i></button>
-          </div>
-        </div>
 
-        <div class="chart-with-panel" id="chart-with-panel">
+        <div class="chart-with-panel" id="chart-with-panel" data-ind="open" data-leg="open">
 
-          <!-- Indicateurs contextuels — left slide-out panel matching dev.app.naiahydro.com.
-               Expanded by default in v5 so the demo lands on the most informative state. -->
+          <!-- ============== LEFT: Indicateurs contextuels (expanded) ============== -->
           <div class="indicateurs-panel" id="indicateurs-panel">
             <div class="indicateurs-panel-title">
               <span>Indicateurs contextuels</span>
@@ -123,6 +110,13 @@
                 <span class="ind-cell"><input type="checkbox" checked></span>
                 <span class="ind-cell"><input type="checkbox" checked></span>
               </div>
+              <div class="ind-row">
+                <label><span class="swatch" style="background:#c4b5fd"></span>Prix spot de l'électricité</label>
+                <span class="ind-cell"><input type="checkbox"></span>
+                <span class="ind-cell"><input type="checkbox"></span>
+                <span class="ind-cell"><input type="checkbox"></span>
+                <span class="ind-cell"><input type="checkbox"></span>
+              </div>
             </div>
 
             <div class="ind-section">
@@ -135,7 +129,7 @@
                 <span class="ind-cell"><input type="checkbox" checked></span>
               </div>
               <div class="ind-row">
-                <label><span class="swatch" style="background:#c4b5fd"></span>Centrale ref.</label>
+                <label><span class="swatch" style="background:#a5b4fc"></span>Centrale ref.</label>
                 <span class="ind-cell"><input type="checkbox"></span>
                 <span class="ind-cell"><input type="checkbox"></span>
                 <span class="ind-cell"><input type="checkbox"></span>
@@ -144,18 +138,54 @@
             </div>
           </div>
 
-          <!-- Chart + the two floating overlays (expand-arrow on the left, axis-toggle on the right). -->
-          <div style="position:relative; height:480px; padding:14px">
-            <!-- Chevron tab on the chart's left edge — only visible when the panel is collapsed -->
-            <button class="panel-expand-arrow" id="panel-expand-arrow" onclick="toggleIndicateursPanel()" title="Afficher les indicateurs" aria-label="Afficher les indicateurs">
-              <i data-lucide="chevron-right"></i>
-            </button>
+          <!-- ============== LEFT collapsed strip (shown when indicateurs is collapsed) ============== -->
+          <button class="panel-strip panel-strip-left" id="indicateurs-strip" onclick="toggleIndicateursPanel()" aria-label="Afficher Indicateurs contextuels">
+            <i data-lucide="chevrons-right" class="strip-chev"></i>
+            <span class="strip-label">Indicateurs contextuels</span>
+          </button>
+
+          <!-- ============== CHART AREA ============== -->
+          <div class="chart-area" style="position:relative; height:480px; padding:14px">
             <button class="right-axis-toggle" id="right-axis-toggle" onclick="toggleRightAxis()" title="Basculer l'axe droit entre Pluie et Débit">
               <span id="right-axis-label">Pluie (mm)</span>
               <i data-lucide="arrow-left-right"></i>
             </button>
             <div class="chart-container" style="height:100%"><canvas id="production-chart"></canvas></div>
+
+            <!-- Bottom-left: quick comparator pills (MDA = active, Hydro… secondary) -->
+            <div class="quick-comparators">
+              <button class="qc-pill active" title="Comparateur MDA (AGG DAILY)">MDA</button>
+              <button class="qc-pill" title="Comparateur Hydro régional" onclick="alert('Comparateur Hydro régional (démo)')">Hydro…</button>
+            </div>
+
+            <!-- Bottom-right: discrete wrench icon for chart settings -->
+            <button class="chart-config-wrench" onclick="openOverlay('chart-config')" title="Configurer ce graphique"><i data-lucide="wrench"></i></button>
           </div>
+
+          <!-- ============== RIGHT collapsed strip (shown when légende is collapsed) ============== -->
+          <button class="panel-strip panel-strip-right" id="legende-strip" onclick="toggleLegende()" aria-label="Afficher la Légende">
+            <i data-lucide="chevrons-left" class="strip-chev"></i>
+            <span class="strip-label">Légende</span>
+          </button>
+
+          <!-- ============== RIGHT: Légende (expanded) ============== -->
+          <div class="legende-panel" id="legende-panel">
+            <div class="legende-panel-title">
+              <button class="collapse" onclick="toggleLegende()" title="Réduire le panneau" aria-label="Réduire"><i data-lucide="chevron-right"></i></button>
+              <span>Légende</span>
+            </div>
+            <div class="legende-items">
+              <div class="legende-item"><span class="dot" style="background:#3b82f6"></span>Production</div>
+              <div class="legende-item"><span class="dot" style="background:#ef4444"></span>Pannes</div>
+              <div class="legende-item"><span class="dot" style="background:#10b981"></span>Maintenance</div>
+              <div class="legende-item"><span class="dot" style="background:#a855f7"></span>Environnement</div>
+              <div class="legende-item"><span class="dot" style="background:#ec4899"></span>Exploitation</div>
+              <div class="legende-item"><span class="dot" style="background:#eab308"></span>Structurel</div>
+              <div class="legende-item"><span class="dot" style="background:#94a3b8"></span>Contraintes</div>
+              <div class="legende-item"><span class="dot" style="background:#dc2626"></span>Données manquantes</div>
+            </div>
+          </div>
+
         </div>
       </div>
 
@@ -280,16 +310,18 @@
     if (strip) strip.style.display = pill === "intraday" ? "" : "none";
   }
 
-  // ---- Indicateurs contextuels panel (left slide-out) ----
-  // Match dev.app.naiahydro.com: panel collapses left, chart fills the freed space.
-  // Two clickable triggers, only one is visible at a time:
-  //   - panel expanded → chevron-left button inside the panel header collapses it
-  //   - panel collapsed → chevron-right tab on the chart's left edge re-expands it
-  function toggleIndicateursPanel() {
+  // ---- Side panels (Indicateurs contextuels + Légende) ----
+  // Match dev.app.naiahydro.com: each panel collapses into a thin vertical strip with
+  // a rotated label + chevron at top. The strip click re-expands the panel.
+  // Container has two data attributes: data-ind="open|collapsed" and data-leg="open|collapsed".
+  function toggleIndicateursPanel() { _flipPanel("ind"); }
+  function toggleLegende()          { _flipPanel("leg"); }
+  function _flipPanel(side) {
     const wrap = document.getElementById("chart-with-panel");
-    const panel = document.getElementById("indicateurs-panel");
-    panel.classList.toggle("collapsed");
-    wrap.classList.toggle("collapsed");
+    const cur = wrap.dataset[side === "ind" ? "ind" : "leg"];
+    const next = cur === "open" ? "collapsed" : "open";
+    if (side === "ind") wrap.dataset.ind = next;
+    else                wrap.dataset.leg = next;
   }
 
   // ---- Right-axis toggle (moved to a floating chip above the right axis) ----
