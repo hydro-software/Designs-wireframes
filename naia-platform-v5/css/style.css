@@ -1141,6 +1141,21 @@ body[data-mvp="1"]   [data-mvp="0.9"] { display: none !important; }
 .time-pills .pill-dot.amber  { background: var(--accent-amber); box-shadow: 0 0 0 2px rgba(251,191,36,0.18); }
 .time-pills .pill-dot.red    { background: var(--accent-red);   box-shadow: 0 0 0 2px rgba(248,113,113,0.18); }
 
+/* Conference/demo fix: the fixed top-right dev toggles (.mvp-toggle / .access-toggle)
+   overlapped the topbar-right time-pills on production & revenue. Center the time-pills
+   in the topbar and pin the breadcrumbs to the left, so the pills clear the toggle stack
+   while the toggle stays top-right. Scoped to these two pages so other topbars are
+   unaffected. */
+body[data-page="production"] .topbar,
+body[data-page="revenue"]    .topbar { justify-content: center; position: relative; }
+body[data-page="production"] .topbar > .crumbs,
+body[data-page="revenue"]    .topbar > .crumbs {
+  position: absolute;
+  left: 28px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
 /* ============ V5 — BREADCRUMBS ============ */
 
 .crumbs {
