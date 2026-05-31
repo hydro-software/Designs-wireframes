@@ -81,6 +81,43 @@ function injectMvpToggle() {
   refreshMvpButtons();
 }
 
+// ---- ACCESS-persona toggle (v5 add — funnel decision 2026-05-31, platform#647) ----
+// "lead"      = logged-in conference lead: has community points, but NO connected plant
+//               and NO subscription. Insight pages (Production/Revenus) show a locked
+//               overlay with a "Connectez votre centrale" CTA → plaquette.
+// "connected" = paying customer with a connected plant and real data (the normal view).
+// Only injected on pages that carry a .lock-overlay element, so it doesn't appear
+// everywhere. Mirrors the MVP-tier toggle pattern above.
+function getAccess() { return localStorage.getItem("naia-access") || "lead"; }
+function setAccess(a) {
+  localStorage.setItem("naia-access", a);
+  document.body.dataset.access = a;
+  refreshAccessButtons();
+}
+function refreshAccessButtons() {
+  const a = getAccess();
+  document.querySelectorAll("[data-access-btn]").forEach(btn => {
+    btn.classList.toggle("on", btn.dataset.accessBtn === a);
+  });
+}
+function injectAccessToggle() {
+  // Only relevant on pages that declare a lockable region.
+  if (!document.querySelector(".lock-overlay")) return;
+  if (document.getElementById("access-toggle")) return;
+  const wrap = document.createElement("div");
+  wrap.id = "access-toggle";
+  wrap.className = "access-toggle";
+  wrap.innerHTML = `
+    <span class="access-label">Accès</span>
+    <span class="access-seg">
+      <button data-access-btn="lead"      onclick="setAccess('lead')">Lead</button>
+      <button data-access-btn="connected" onclick="setAccess('connected')">Client</button>
+    </span>
+  `;
+  document.body.appendChild(wrap);
+  refreshAccessButtons();
+}
+
 // ---- SIDEBAR BUILD ----
 function buildSidebar() {
   const aside = document.querySelector("aside.sidebar");
@@ -614,12 +651,14 @@ document.addEventListener("DOMContentLoaded", () => {
   document.documentElement.setAttribute("data-theme", getTheme());
   setShowV2(getShowV2());
   document.body.dataset.mvp = getMvpTier();
+  document.body.dataset.access = getAccess();
   buildSidebar();
   buildCentraleTabs();
   // Apply current centrale (from hash if present) on first paint so titles + chart match
   applyCentrale(currentCentrale());
   injectHelpModal();
   injectMvpToggle();
+  injectAccessToggle();
   initIcons();
   setTimeout(() => {
     buildHomeChart();

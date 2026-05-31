@@ -1473,6 +1473,115 @@ body[data-mvp="1"]   [data-mvp="0.9"] { display: none !important; }
 }
 .info-i:hover { color: var(--brand-cyan); border-color: var(--brand-cyan); }
 
+/* ============ V5 — LOCKED INSIGHT STATE (magic-link community-only lead) ============ */
+
+/* Funnel decision 2026-05-31 (platform#647 / Q2): a conference lead can log in with a
+   magic link and has community points, but NO connected plant and NO subscription yet.
+   On the Insight pages (Production / Revenus) the chart is shown greyed + blurred behind
+   a locked overlay with a "Connectez votre centrale" CTA → plaquette.
+
+   Driven by body[data-access]:
+     - data-access="lead"      → locked overlay shown, chart blurred  (the funnel state)
+     - data-access="connected" → normal page (paying customer with data)
+   Tag the lockable card with .locked-wrap and put the overlay inside as .lock-overlay.
+   A small fixed toggle (injected by app.js, mirroring the MVP toggle) lets reviewers
+   flip personas. Mirrors the existing data-mvp / data-show-v2 attribute pattern. */
+
+.locked-wrap { position: relative; }
+
+/* Blur + desaturate the real content underneath only in the lead state. */
+body[data-access="lead"] .locked-wrap > .locked-content {
+  filter: blur(3px) grayscale(0.85) opacity(0.55);
+  pointer-events: none;
+  user-select: none;
+}
+
+/* The overlay itself — hidden for connected customers, shown for leads. */
+.lock-overlay { display: none; }
+body[data-access="lead"] .lock-overlay {
+  display: flex;
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: linear-gradient(180deg, rgba(10,19,38,0.35), rgba(10,19,38,0.72));
+  backdrop-filter: blur(1px);
+  border-radius: 12px;
+}
+:root[data-theme="light"] body[data-access="lead"] .lock-overlay {
+  background: linear-gradient(180deg, rgba(246,248,252,0.45), rgba(246,248,252,0.82));
+}
+
+.lock-card {
+  max-width: 440px;
+  text-align: center;
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
+  border-radius: 14px;
+  padding: 26px 28px;
+  box-shadow: var(--shadow-pop);
+}
+.lock-card .lock-ico {
+  width: 48px; height: 48px;
+  border-radius: 50%;
+  background: var(--brand-cyan-soft);
+  color: var(--brand-cyan);
+  display: inline-flex; align-items: center; justify-content: center;
+  margin-bottom: 12px;
+}
+.lock-card .lock-ico i { width: 22px; height: 22px; }
+.lock-card .lock-title { font-size: 17px; font-weight: 600; color: var(--text-primary); margin-bottom: 6px; }
+.lock-card .lock-desc { font-size: 13px; color: var(--text-muted); line-height: 1.55; margin-bottom: 18px; }
+.lock-card .lock-points {
+  display: inline-flex; align-items: center; gap: 6px;
+  margin-bottom: 16px;
+  padding: 4px 12px;
+  background: rgba(132,204,22,0.16);
+  border: 1px solid rgba(132,204,22,0.4);
+  border-radius: 999px;
+  font-size: 12px; font-weight: 600; color: #bef264;
+}
+:root[data-theme="light"] .lock-card .lock-points { color: #15803d; background: #dcfce7; border-color: #a7f3d0; }
+
+/* Persona/access toggle chip — sits just under the MVP toggle (top:12 + height).
+   Same visual language as .mvp-toggle so the two stack cleanly. */
+.access-toggle {
+  position: fixed;
+  top: 56px;
+  right: 16px;
+  z-index: 1000;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 5px 8px 5px 12px;
+  background: rgba(15, 26, 50, 0.92);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid var(--border-default);
+  border-radius: 999px;
+  box-shadow: 0 6px 18px -6px rgba(0,0,0,0.55);
+  font-family: inherit;
+}
+:root[data-theme="light"] .access-toggle { background: rgba(255,255,255,0.92); }
+.access-toggle .access-label {
+  font-size: 11px; font-weight: 600; color: var(--text-muted);
+  letter-spacing: 0.04em; text-transform: uppercase;
+}
+@media (max-width: 980px) { .access-toggle .access-label { display: none; } }
+.access-toggle .access-seg { display: inline-flex; background: var(--bg-input); border-radius: 999px; padding: 2px; gap: 1px; }
+.access-toggle .access-seg button {
+  padding: 4px 10px; font-size: 11.5px; font-weight: 600;
+  border: 0; background: transparent; color: var(--text-muted);
+  border-radius: 999px; cursor: pointer; font-family: inherit;
+}
+.access-toggle .access-seg button.on {
+  background: var(--brand-blue-strong); color: white;
+  box-shadow: 0 2px 6px -2px rgba(59,130,246,0.5);
+}
+.access-toggle .access-seg button:not(.on):hover { color: var(--text-primary); }
+
 /* ============ RESPONSIVE ============ */
 
 @media (max-width: 1024px) {

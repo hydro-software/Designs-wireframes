@@ -68,14 +68,43 @@
         <span class="wa-link" onclick="openOverlay('wa-events')">Voir / éditer →</span>
       </div>
 
-      <!-- Chart card (v5 polish round 4, matching dev.app.naiahydro.com screenshots from PO):
-           - LEFT slide-out: Indicateurs contextuels (checkbox grid Int./30j/12m/Ann.)
-           - RIGHT slide-out: Légende (loss/event categories with coloured dots)
-           - Each side collapses into a thin vertical strip with rotated label + chevron at top
-           - Bottom-left: MDA / Hydro… quick-comparator pills
-           - Bottom-right: small floating wrench icon for chart configuration
-           - Right-axis toggle stays as a floating pill above the right axis. -->
-      <div class="card" style="margin-bottom:14px; padding:0; overflow:hidden">
+      <!-- Funnel state 2026-05-31 (platform#647): when a logged-in conference LEAD
+           (community points, no connected plant, no subscription) lands here via their
+           magic link, the chart is greyed/blurred behind a locked overlay with a
+           "Connectez votre centrale" CTA → plaquette. Toggle persona via the "Accès"
+           chip (top-right). Paying customers ("Client") see the chart normally.
+           The .locked-wrap / .locked-content / .lock-overlay structure is driven by
+           body[data-access] — see css/style.css "LOCKED INSIGHT STATE". -->
+      <div class="locked-wrap" style="margin-bottom:14px">
+
+        <!-- Locked overlay — only visible in data-access="lead" -->
+        <div class="lock-overlay">
+          <div class="lock-card">
+            <div class="lock-ico"><i data-lucide="lock"></i></div>
+            <span class="lock-points"><i data-lucide="sparkles" style="width:13px;height:13px"></i> 187 points gagnés au jeu Naia</span>
+            <div class="lock-title">Connectez votre centrale pour voir votre production</div>
+            <div class="lock-desc">
+              Vous êtes connecté, mais aucune centrale n'est encore reliée à votre compte.
+              Activez votre abonnement Naia pour brancher vos données et débloquer l'analyse
+              de production, des pertes et des revenus.
+            </div>
+            <a class="btn btn-primary" href="plaquette.html">
+              <i data-lucide="plug-zap"></i> Connectez votre centrale
+            </a>
+            <div class="muted" style="font-size:11px; margin-top:12px">
+              Vos points restent acquis et seront transférés à votre organisation à l'activation.
+            </div>
+          </div>
+        </div>
+
+        <!-- Chart card (v5 polish round 4, matching dev.app.naiahydro.com screenshots from PO):
+             - LEFT slide-out: Indicateurs contextuels (checkbox grid Int./30j/12m/Ann.)
+             - RIGHT slide-out: Légende (loss/event categories with coloured dots)
+             - Each side collapses into a thin vertical strip with rotated label + chevron at top
+             - Bottom-left: MDA / Hydro… quick-comparator pills
+             - Bottom-right: small floating wrench icon for chart configuration
+             - Right-axis toggle stays as a floating pill above the right axis. -->
+      <div class="card locked-content" style="padding:0; overflow:hidden">
 
         <div class="chart-with-panel" id="chart-with-panel" data-ind="open" data-leg="open">
 
@@ -188,6 +217,7 @@
 
         </div>
       </div>
+      </div><!-- /.locked-wrap -->
 
       <!-- v5: "Pertes détectées · top 5" table removed from this page.
            It now lives as one of the report types in "Générer un rapport"

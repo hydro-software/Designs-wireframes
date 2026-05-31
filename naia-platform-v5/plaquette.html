@@ -305,7 +305,12 @@
       <h4><span data-fr>Vous avez vu ηaia en action. Lancez votre centrale.</span><span data-en>You've seen ηaia in action. Get your plant started.</span></h4>
       <p><span data-fr>Inscription en quelques minutes — le contrat s'ouvre directement pour signature en ligne.</span><span data-en>Sign up in minutes — the contract opens directly for online signature.</span></p>
     </div>
-    <a href="https://naia.energy/signup" target="_blank">
+    <!-- Funnel decision 2026-05-31 (Q1): the "s'inscrire" link points to the in-app
+         stage-2 conversion form ("compléter mon abonnement"), NOT the marketing site.
+         The ?code= param carries the campaign/parrain code through to the form so it
+         resolves the right pricing + entitlement text. Real plaquette layout is still
+         pending from the PO — this CTA target is the only funnel change on this page. -->
+    <a href="inscription-abonnement.html?code=CONF2026">
       <span data-fr>S'inscrire et signer</span><span data-en>Sign up</span>
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
     </a>

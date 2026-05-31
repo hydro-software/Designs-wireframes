@@ -42,10 +42,36 @@
         <div><b>V2 :</b> module de simulation Valorise (BTM, batterie, digital twin) — visible dans le mockup pour validation, non livré en V1.</div>
       </div>
 
-      <!-- Chart card (v5 polish round 4): mirrors the Production card — Indicateurs
-           panel on the left, Légende on the right, both collapsible into thin
-           vertical strips. Bottom-left MDA/Hydro pills, bottom-right wrench. -->
-      <div class="card" style="margin-bottom:14px; padding:0; overflow:hidden">
+      <!-- Funnel state 2026-05-31 (platform#647): a logged-in conference LEAD (points,
+           no connected plant, no subscription) sees this chart greyed/blurred behind a
+           "Connectez votre centrale" CTA → plaquette. Toggle via the "Accès" chip
+           (top-right). Mirrors production.html. See css/style.css "LOCKED INSIGHT STATE". -->
+      <div class="locked-wrap" style="margin-bottom:14px">
+
+        <!-- Locked overlay — only visible in data-access="lead" -->
+        <div class="lock-overlay">
+          <div class="lock-card">
+            <div class="lock-ico"><i data-lucide="lock"></i></div>
+            <span class="lock-points"><i data-lucide="sparkles" style="width:13px;height:13px"></i> 187 points gagnés au jeu Naia</span>
+            <div class="lock-title">Connectez votre centrale pour voir vos revenus</div>
+            <div class="lock-desc">
+              Vous êtes connecté, mais aucune centrale n'est encore reliée à votre compte.
+              Activez votre abonnement Naia pour brancher vos données et suivre vos revenus,
+              votre manque à gagner et vos comparatifs.
+            </div>
+            <a class="btn btn-primary" href="plaquette.html">
+              <i data-lucide="plug-zap"></i> Connectez votre centrale
+            </a>
+            <div class="muted" style="font-size:11px; margin-top:12px">
+              Vos points restent acquis et seront transférés à votre organisation à l'activation.
+            </div>
+          </div>
+        </div>
+
+        <!-- Chart card (v5 polish round 4): mirrors the Production card — Indicateurs
+             panel on the left, Légende on the right, both collapsible into thin
+             vertical strips. Bottom-left MDA/Hydro pills, bottom-right wrench. -->
+      <div class="card locked-content" style="padding:0; overflow:hidden">
         <div class="chart-with-panel" id="chart-with-panel" data-ind="open" data-leg="open">
 
           <!-- LEFT: Indicateurs contextuels (expanded) -->
@@ -154,6 +180,7 @@
 
         </div>
       </div>
+      </div><!-- /.locked-wrap -->
 
       <!-- v5: per-centrale breakdown table removed — same rule as Production (centrale info is in the tabs). -->
 
