@@ -88,6 +88,10 @@
   .sel-empty { font-size: 12.5px; color: var(--text-muted); text-align: center; padding: 28px 8px; }
   @media (max-width: 760px) { .picker { grid-template-columns: 1fr; } }
   .fd-extra[hidden] { display: none !important; }
+  /* v6 — Comparateur · Vue revenus: revenu composite = somme de flux (énergie × tarification) */
+  .rev-flux-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding: 10px 0; border-bottom: 1px dashed var(--border-subtle); }
+  .rev-flux-label { font-size: 14px; font-weight: 600; color: var(--text-primary); font-family: ui-monospace, monospace; white-space: nowrap; }
+  .rev-times { font-size: 15px; font-weight: 600; color: var(--text-muted); font-family: ui-monospace, monospace; }
 </style>
 </head>
 <body data-page="parametres" data-section="parametres" data-centrale="moulins">
@@ -97,7 +101,7 @@
 
     <header class="topbar">
       <div>
-        <div class="page-eyebrow">Paramètres · brouillon BL</div>
+        <div class="page-eyebrow">Paramètres</div>
         <div style="font-size:18px; font-weight:600" id="parametres-title">Centrale des Moulins</div>
       </div>
       <div style="display:flex; gap:8px" id="parametres-actions">
@@ -728,14 +732,61 @@
             </div>
           </div>
 
-          <!-- Sous-chapitre : Vue revenus (à détailler) -->
+          <!-- Sous-chapitre : Vue revenus (Bernard's standalone integrated — bl_draft/comparateur-vue-revenus-standalone.html).
+               Un revenu = énergie × prix → pas de donnée publique. Deux sources de comparaison :
+                 - revenu privé (importé sur Naia · CSV)
+                 - revenu composite = somme de flux (énergie × tarification), cf. menu "Flux de revenus".
+               data-picker-flavor="revenue" disambiguates the dispatch in srcDetail()
+               so the rev-source / rev-composite modals are opened instead of the production ones. -->
           <div class="pd-sub" data-open="false">
             <div class="pd-sub-head" onclick="this.parentElement.dataset.open = this.parentElement.dataset.open === 'true' ? 'false' : 'true'">
               <div class="pd-sub-title"><i data-lucide="banknote" style="width:16px; height:16px; color:var(--brand-cyan)"></i> Vue revenus</div>
               <i data-lucide="chevron-down" class="pd-sub-chev"></i>
             </div>
             <div class="pd-sub-body">
-              <p class="muted" style="font-size:12.5px; margin:0">À compléter — même principe (sources de revenus à comparer). Dis-moi les sources publiques / privées / composites que tu veux y mettre.</p>
+              <p class="muted" style="font-size:12.5px; margin:0 0 14px; line-height:1.6">
+                Un revenu n'est jamais une donnée brute&nbsp;: <b style="color:var(--text-primary)">revenu = énergie (production) × prix (tarification)</b>.
+                Pas de donnée publique ici — on compare soit un <b style="color:var(--text-primary)">revenu privé importé</b> (CSV), soit un
+                <b style="color:var(--text-primary)">revenu composite</b> = somme de flux (chaque flux = énergie × tarification), comme dans le menu « Flux de revenus ».
+                Cochez une ou plusieurs sources à gauche, puis appuyez sur la flèche pour les ajouter.
+              </p>
+
+              <div class="picker" data-picker-max="10" data-picker-flavor="revenue">
+                <div>
+                  <div class="picker-col-title">Sources disponibles</div>
+
+                  <div class="src-group" data-cat-max="3" data-create-max="5" data-cat="privee">
+                    <div class="src-main">
+                      <div class="src-group-title"><span class="swatch" style="background:#a3e635"></span> Revenu simulé hors Naia <span class="src-group-max">(CSV importé)</span></div>
+                      <div class="src-list">
+                        <div class="src-row" data-name="Revenus simulation" data-meta="Import sur Naia · CSV" data-unite="€" onclick="toggleSrcRow(this)"><div class="src-row-main"><span class="src-name">Revenus simulation</span><button class="src-detail-btn" onclick="srcDetail(event,this)">Détail</button></div><div class="src-detail" hidden>Import sur Naia · CSV</div></div>
+                        <div class="src-row" data-name="Revenus année de référence" data-meta="Import sur Naia · CSV" data-unite="€" onclick="toggleSrcRow(this)"><div class="src-row-main"><span class="src-name">Revenus année de référence</span><button class="src-detail-btn" onclick="srcDetail(event,this)">Détail</button></div><div class="src-detail" hidden>Import sur Naia · CSV</div></div>
+                      </div>
+                      <button class="src-create" onclick="openRevSource(this)"><i data-lucide="plus"></i> Importer un CSV</button>
+                    </div>
+                    <div class="src-arrow"><button title="Ajouter à la sélection" onclick="movePluieSelected(this)" disabled><i data-lucide="arrow-right"></i></button><span class="arrow-count">0/3</span></div>
+                  </div>
+
+                  <div class="src-group" data-cat-max="3" data-create-max="5" data-cat="composite">
+                    <div class="src-main">
+                      <div class="src-group-title"><span class="swatch" style="background:#7dd3fc"></span> Revenus composites <span class="src-group-max">(somme de flux)</span></div>
+                      <div class="src-list">
+                        <div class="src-row" data-name="Revenu moyen du parc" data-meta="Composite · 3 flux" onclick="toggleSrcRow(this)"><div class="src-row-main"><span class="src-name">Revenu moyen du parc</span><button class="src-detail-btn" onclick="srcDetail(event,this)">Détail</button></div><div class="src-detail" hidden>Composite · 3 flux</div></div>
+                        <div class="src-row" data-name="Revenu théorique tout-OA" data-meta="Composite · 1 flux" onclick="toggleSrcRow(this)"><div class="src-row-main"><span class="src-name">Revenu théorique tout-OA</span><button class="src-detail-btn" onclick="srcDetail(event,this)">Détail</button></div><div class="src-detail" hidden>Composite · 1 flux</div></div>
+                      </div>
+                      <button class="src-create" onclick="openRevComposite(this)"><i data-lucide="plus"></i> Composer un revenu</button>
+                    </div>
+                    <div class="src-arrow"><button title="Ajouter à la sélection" onclick="movePluieSelected(this)" disabled><i data-lucide="arrow-right"></i></button><span class="arrow-count">0/3</span></div>
+                  </div>
+                </div>
+
+                <div>
+                  <div class="picker-col-title">Revenus sélectionnables <span id="cmprev-count" class="sel-count" style="color:var(--text-muted); font-weight:400; text-transform:none; letter-spacing:0">(0/10)</span></div>
+                  <div class="sel-box" id="cmprev-selection">
+                    <div class="sel-empty">Aucun revenu sélectionné.<br>Cochez des sources à gauche puis appuyez sur la flèche.</div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -1349,7 +1400,82 @@
   </div>
 </div>
 
-<!-- Popup : donnée composite (combinaison de données via une formule) — brouillon BL -->
+<!-- v6 — Popup : importer un revenu privé (Comparateur · Vue revenus).
+     A revenue is always énergie × prix → no public source can be wired here, the user
+     imports their own CSV (their own simulation / reference year / scenario). -->
+<div id="rev-source" class="overlay" onclick="if(event.target===this) closeOverlay('rev-source')">
+  <div class="modal">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px">
+      <div>
+        <div class="modal-title"><i data-lucide="upload" style="width:16px; height:16px; vertical-align:-2px; color:var(--brand-cyan)"></i> <span id="rev-source-title">Importer un revenu simulé</span></div>
+        <div class="modal-subtitle"><span id="rev-source-sub">Nouvelle source ajoutée à</span> <b id="rev-source-cat" style="color:var(--text-primary)">—</b>.</div>
+      </div>
+      <button class="btn btn-ghost" onclick="closeOverlay('rev-source')"><i data-lucide="x"></i></button>
+    </div>
+
+    <div style="display:flex; flex-direction:column; gap:14px">
+      <div>
+        <label style="display:block; font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em; font-weight:600; margin-bottom:6px">Nom du revenu <span style="color:var(--accent-red)">*</span></label>
+        <input id="rev-source-nom" class="input" type="text" placeholder="ex. Revenus simulation 2025">
+      </div>
+      <div>
+        <label style="display:block; font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em; font-weight:600; margin-bottom:6px">Unité <span style="color:var(--accent-red)">*</span></label>
+        <select id="rev-source-unite" class="select"><option>€</option><option>k€</option><option>€/MWh</option></select>
+      </div>
+      <div style="background:var(--bg-base); border:1px solid var(--border-subtle); border-radius:10px; padding:12px 14px; font-size:12.5px; color:var(--text-muted); line-height:1.6">
+        <i data-lucide="info" style="width:14px; height:14px; vertical-align:-2px; color:var(--brand-cyan)"></i>
+        <b style="color:var(--text-primary)">Import sur Naia</b>. À vous d'importer votre <b style="color:var(--text-primary)">CSV</b> en fonction de vos
+        <b style="color:var(--text-primary)">simulations hors Naia</b> : le calcul du revenu se fait de votre côté, Naia stocke et compare le résultat.
+      </div>
+    </div>
+
+    <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:18px; padding-top:14px; border-top:1px solid var(--border-subtle)">
+      <button class="btn btn-ghost" onclick="closeOverlay('rev-source')">Annuler</button>
+      <button id="rev-source-save" class="btn btn-primary" onclick="saveRevSource()"><i data-lucide="check"></i> Importer</button>
+    </div>
+  </div>
+</div>
+
+<!-- v6 — Popup : revenu composite = somme de flux (énergie × tarification).
+     Different from data-composites (which combine indicateurs via a formula with a
+     constant): here every row is a flux exactly like in the "Flux de revenus" menu. -->
+<div id="rev-composite" class="overlay" onclick="if(event.target===this) closeOverlay('rev-composite')">
+  <div class="modal modal-lg">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px">
+      <div>
+        <div class="modal-title"><i data-lucide="coins" style="width:16px; height:16px; vertical-align:-2px; color:var(--brand-cyan)"></i> <span id="rev-composite-title">Composer un revenu</span></div>
+        <div class="modal-subtitle">Somme de flux — chaque flux = une énergie × une tarification.</div>
+      </div>
+      <button class="btn btn-ghost" onclick="closeOverlay('rev-composite')"><i data-lucide="x"></i></button>
+    </div>
+
+    <div style="display:flex; flex-direction:column; gap:14px">
+      <div>
+        <label style="display:block; font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em; font-weight:600; margin-bottom:6px">Nom <span style="color:var(--accent-red)">*</span></label>
+        <input id="rev-composite-nom" class="input" type="text" placeholder="ex. Revenu moyen du parc">
+      </div>
+      <div>
+        <label style="display:block; font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em; font-weight:600; margin-bottom:6px">Revenu composite — formule</label>
+        <input id="rev-composite-formula" type="text" readonly value="Flux A + Flux B" style="font-family: ui-monospace, monospace; font-size:15px; padding:10px 12px; min-width:280px; width:100%; background:var(--bg-base); border:1px solid var(--border-subtle); border-radius:8px; color:var(--text-primary)">
+        <div class="muted" style="font-size:11.5px; margin-top:6px">Le revenu composite est la <b>somme</b> de ses flux. Chaque flux = énergie × tarification (sur chaque pas de temps, puis cumul).</div>
+      </div>
+      <div style="background:var(--bg-base); border:1px solid var(--border-subtle); border-radius:10px; padding:12px 14px">
+        <div style="font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em; font-weight:600; margin-bottom:8px">Flux (énergie × tarification)</div>
+        <div id="rev-composite-flux"></div>
+        <div style="margin-top:8px">
+          <button class="btn btn-secondary btn-sm" onclick="revAddFlux()"><i data-lucide="plus"></i> Ajouter un flux</button>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:18px; padding-top:14px; border-top:1px solid var(--border-subtle)">
+      <button class="btn btn-ghost" onclick="closeOverlay('rev-composite')">Annuler</button>
+      <button id="rev-composite-save" class="btn btn-primary" onclick="saveRevComposite()"><i data-lucide="check"></i> Créer</button>
+    </div>
+  </div>
+</div>
+
+<!-- Popup : donnée composite (combinaison de données via une formule) — Vue production -->
 <div id="composite-modal" class="overlay" onclick="if(event.target===this) closeOverlay('composite-modal')">
   <div class="modal modal-lg">
     <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px">
@@ -1482,6 +1608,14 @@
     ev.stopPropagation();
     const row = btn.closest(".src-row");
     const cat = row.closest(".src-group").dataset.cat;
+    // v6: the Comparateur · Vue revenus picker carries data-picker-flavor="revenue".
+    // The cat names ("privee" / "composite") are shared with the production picker,
+    // so dispatch on the flavor first to open the right modal.
+    const flavor = btn.closest(".picker")?.dataset.pickerFlavor;
+    if (flavor === "revenue") {
+      if (cat === "privee")    { editRevSource(row);    return; }
+      if (cat === "composite") { editRevComposite(row); return; }
+    }
     if (cat === "privee") { editFluxDonnee(row); return; }
     if (cat === "composite") { editComposite(row); return; }
     // Pluie publique (et autres) : simple affichage du détail en ligne
@@ -1892,5 +2026,169 @@
     const valid = Object.keys(CENTRALES_PARAM).includes(tab) ? tab : "moulins";
     switchParametresTab(null, valid);
   });
+
+  // ============================================================================
+  // Comparateur · Vue revenus — JS helpers (Bernard's bl_draft/comparateur-vue-revenus-standalone.html).
+  // The picker shell (toggleSrcRow, refreshArrow, movePluieSelected, removePluieItem,
+  // pickerRefreshCount) is shared with Vue production — only the modals (rev-source +
+  // rev-composite) and their open/edit/save helpers are flavor-specific.
+  // ============================================================================
+
+  // ---- Popup "Importer un revenu" privé (Import sur Naia uniquement) ----
+  let revSourceTarget = null;
+  let revSourceEditRow = null;
+  function _setSelectValue(sel, val) {
+    const opt = [...sel.options].find(o => o.value === val);
+    sel.value = opt ? val : sel.options[0].value;
+  }
+  function openRevSource(btn) {
+    const group = btn.closest(".src-group");
+    const createMax = parseInt(group.dataset.createMax || "0", 10);
+    if (createMax) {
+      const created = group.querySelectorAll('.src-row[data-custom="true"]').length;
+      if (created >= createMax) { alert("Maximum " + createMax + " revenus importés dans cette catégorie."); return; }
+    }
+    revSourceTarget = group;
+    revSourceEditRow = null;
+    document.getElementById("rev-source-title").textContent = "Importer un revenu simulé";
+    document.getElementById("rev-source-sub").textContent = "Nouvelle source ajoutée à";
+    document.getElementById("rev-source-cat").textContent = group.querySelector(".src-group-title").textContent.replace(/\(.*?\)/, "").trim();
+    document.getElementById("rev-source-save").innerHTML = '<i data-lucide="check"></i> Importer';
+    document.getElementById("rev-source-nom").value = "";
+    document.getElementById("rev-source-unite").selectedIndex = 0;
+    openOverlay("rev-source");
+    initIcons();
+  }
+  function editRevSource(row) {
+    revSourceTarget = row.closest(".src-group");
+    revSourceEditRow = row;
+    document.getElementById("rev-source-title").textContent = "Modifier le revenu importé";
+    document.getElementById("rev-source-sub").textContent = "Revenu de";
+    document.getElementById("rev-source-cat").textContent = revSourceTarget.querySelector(".src-group-title").textContent.replace(/\(.*?\)/, "").trim();
+    document.getElementById("rev-source-save").innerHTML = '<i data-lucide="check"></i> Enregistrer';
+    document.getElementById("rev-source-nom").value = row.dataset.name || "";
+    _setSelectValue(document.getElementById("rev-source-unite"), row.dataset.unite || "€");
+    openOverlay("rev-source");
+    initIcons();
+  }
+  function saveRevSource() {
+    if (!revSourceTarget) return;
+    const nom = document.getElementById("rev-source-nom").value.trim();
+    if (!nom) { alert("Indiquez le nom du revenu."); return; }
+    const unite = document.getElementById("rev-source-unite").value;
+    const meta = "Import sur Naia · " + unite;
+    if (revSourceEditRow) {
+      const row = revSourceEditRow;
+      row.dataset.name = nom; row.dataset.meta = meta; row.dataset.unite = unite;
+      row.querySelector(".src-name").textContent = nom;
+      row.querySelector(".src-detail").textContent = meta;
+    } else {
+      const row = document.createElement("div");
+      row.className = "src-row";
+      row.dataset.name = nom; row.dataset.meta = meta; row.dataset.unite = unite; row.dataset.custom = "true";
+      row.setAttribute("onclick", "toggleSrcRow(this)");
+      row.innerHTML =
+        '<div class="src-row-main"><span class="src-name">' + nom + '</span><button class="src-detail-btn" onclick="srcDetail(event,this)">Détail</button></div>' +
+        '<div class="src-detail" hidden>' + meta + '</div>';
+      revSourceTarget.querySelector(".src-list").appendChild(row);
+    }
+    closeOverlay("rev-source");
+    initIcons();
+  }
+
+  // ---- Popup "Composer un revenu" : somme de flux (énergie × tarification) ----
+  let revCompTarget = null;
+  let revCompEditRow = null;
+  // Énergies valorisables (Flux de production + Compteurs) — partagées avec le menu "Flux de revenus".
+  const REV_ENERGIE_OPTS =
+    '<optgroup label="Flux de production"><option>Production injectée (flux principal)</option></optgroup>' +
+    '<optgroup label="Compteurs"><option>MOU-PRINC · Production principale</option><option>MOU-AUX · Auxiliaires</option><option>MOU-MANU · Relève manuelle</option></optgroup>';
+  // Tarifications (menu "Tarification").
+  const REV_TARIF_OPTS =
+    '<option>OA + complément</option><option>Tarif fixe annuel 2025</option><option>Prix évité (achat réseau)</option><option>Tarif ACC</option>';
+  function _revFluxRow(letter, mandatory) {
+    const div = document.createElement("div");
+    div.className = "rev-flux-row";
+    div.innerHTML =
+      '<span class="rev-flux-label">Flux ' + letter + ' =</span>' +
+      '<select class="select rev-flux-energie" style="min-width:210px">' + REV_ENERGIE_OPTS + '</select>' +
+      '<span class="rev-times">×</span>' +
+      '<select class="select rev-flux-tarif" style="min-width:170px">' + REV_TARIF_OPTS + '</select>' +
+      (mandatory ? "" : '<button class="icon-action" title="Supprimer ce flux" style="margin-left:auto" onclick="this.closest(\'.rev-flux-row\').remove(); revRelabel()"><i data-lucide="trash-2"></i></button>');
+    return div;
+  }
+  function revRelabel() {
+    const rows = [...document.querySelectorAll("#rev-composite-flux .rev-flux-row")];
+    rows.forEach((r, i) => { r.querySelector(".rev-flux-label").textContent = "Flux " + String.fromCharCode(65 + i) + " ="; });
+    _revUpdateFormula();
+  }
+  function _revUpdateFormula() {
+    const rows = [...document.querySelectorAll("#rev-composite-flux .rev-flux-row")];
+    const terms = rows.map((r, i) => "Flux " + String.fromCharCode(65 + i));
+    document.getElementById("rev-composite-formula").value = terms.length ? terms.join(" + ") : "—";
+  }
+  function _revBuildFlux(n) {
+    const box = document.getElementById("rev-composite-flux");
+    box.innerHTML = "";
+    for (let i = 0; i < n; i++) box.appendChild(_revFluxRow(String.fromCharCode(65 + i), i === 0));
+    _revUpdateFormula();
+  }
+  function revAddFlux() {
+    const box = document.getElementById("rev-composite-flux");
+    const i = box.querySelectorAll(".rev-flux-row").length;
+    box.appendChild(_revFluxRow(String.fromCharCode(65 + i), false));
+    _revUpdateFormula();
+    initIcons();
+  }
+  function openRevComposite(btn) {
+    const group = btn.closest(".src-group");
+    const createMax = parseInt(group.dataset.createMax || "0", 10);
+    if (createMax) {
+      const created = group.querySelectorAll('.src-row[data-custom="true"]').length;
+      if (created >= createMax) { alert("Maximum " + createMax + " revenus composites dans cette catégorie."); return; }
+    }
+    revCompTarget = group;
+    revCompEditRow = null;
+    document.getElementById("rev-composite-title").textContent = "Composer un revenu";
+    document.getElementById("rev-composite-save").innerHTML = '<i data-lucide="check"></i> Créer';
+    document.getElementById("rev-composite-nom").value = "";
+    _revBuildFlux(2);
+    openOverlay("rev-composite");
+    initIcons();
+  }
+  function editRevComposite(row) {
+    revCompTarget = row.closest(".src-group");
+    revCompEditRow = row;
+    document.getElementById("rev-composite-title").textContent = "Modifier le revenu composite";
+    document.getElementById("rev-composite-save").innerHTML = '<i data-lucide="check"></i> Enregistrer';
+    document.getElementById("rev-composite-nom").value = row.dataset.name || "";
+    _revBuildFlux(2);
+    openOverlay("rev-composite");
+    initIcons();
+  }
+  function saveRevComposite() {
+    if (!revCompTarget) return;
+    const nom = document.getElementById("rev-composite-nom").value.trim();
+    if (!nom) { alert("Indiquez le nom du revenu composite."); return; }
+    const nFlux = document.querySelectorAll("#rev-composite-flux .rev-flux-row").length;
+    const meta = "Composite · " + nFlux + " flux";
+    if (revCompEditRow) {
+      const row = revCompEditRow;
+      row.dataset.name = nom; row.dataset.meta = meta;
+      row.querySelector(".src-name").textContent = nom;
+      row.querySelector(".src-detail").textContent = meta;
+    } else {
+      const row = document.createElement("div");
+      row.className = "src-row";
+      row.dataset.name = nom; row.dataset.meta = meta; row.dataset.custom = "true";
+      row.setAttribute("onclick", "toggleSrcRow(this)");
+      row.innerHTML =
+        '<div class="src-row-main"><span class="src-name">' + nom + '</span><button class="src-detail-btn" onclick="srcDetail(event,this)">Détail</button></div>' +
+        '<div class="src-detail" hidden>' + meta + '</div>';
+      revCompTarget.querySelector(".src-list").appendChild(row);
+    }
+    closeOverlay("rev-composite");
+    initIcons();
+  }
 </script>
 </body></html>
