@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inscription · Naia Hydro</title>
+<meta name="description" content="Demandez votre compte de démonstration Naia — la plateforme de supervision des centrales hydroélectriques.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="css/style.css" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  /* Public sign-up surface — no app shell, centered card layout.
+     Per Sub.A8b: prospect-facing form rendered inside the Naia app at /sign-up,
+     same-origin API. Standalone layout (no sidebar) so the page reads as a
+     marketing surface, not a logged-in dashboard. */
+  body.public-shell {
+    background:
+      radial-gradient(800px 600px at 15% -10%, rgba(56,189,248,0.10), transparent 65%),
+      radial-gradient(700px 500px at 90% 10%, rgba(132,204,22,0.08), transparent 60%),
+      var(--bg-base);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  .public-nav {
+    padding: 20px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border-subtle);
+    background: rgba(10,19,38,0.45);
+    backdrop-filter: blur(8px);
+  }
+  .public-logo {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 18px; font-weight: 700; color: var(--text-primary);
+    text-decoration: none;
+  }
+  .public-logo-mark {
+    width: 32px; height: 32px; border-radius: 8px;
+    background: linear-gradient(135deg, var(--brand-cyan) 0%, var(--accent-green) 100%);
+    display: flex; align-items: center; justify-content: center;
+    color: #0a1326; font-weight: 700; font-size: 16px;
+  }
+  .public-locale-switch {
+    display: flex; gap: 4px; padding: 4px;
+    background: var(--bg-card); border: 1px solid var(--border-subtle);
+    border-radius: 8px; font-size: 12px;
+  }
+  .public-locale-switch button {
+    padding: 4px 10px; border-radius: 5px; background: transparent;
+    color: var(--text-muted); cursor: pointer; border: none;
+  }
+  .public-locale-switch button.active {
+    background: var(--brand-cyan-soft); color: var(--brand-cyan);
+  }
+  .public-container {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    gap: 48px;
+    max-width: 1100px;
+    margin: 56px auto;
+    padding: 0 40px;
+    align-items: start;
+  }
+  @media (max-width: 900px) {
+    .public-container { grid-template-columns: 1fr; gap: 32px; }
+  }
+  .pitch h1 {
+    font-size: 34px; line-height: 1.15; font-weight: 700;
+    color: var(--text-primary); margin: 0 0 18px;
+  }
+  .pitch h1 .accent { color: var(--brand-cyan); }
+  .pitch .lead {
+    font-size: 16px; line-height: 1.55; color: var(--text-secondary);
+    margin: 0 0 28px;
+  }
+  .pitch-features {
+    display: grid; gap: 16px;
+  }
+  .pitch-feature {
+    display: flex; gap: 12px; align-items: flex-start;
+  }
+  .pitch-feature .ico {
+    flex-shrink: 0; width: 32px; height: 32px; border-radius: 8px;
+    background: var(--brand-cyan-soft); color: var(--brand-cyan);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .pitch-feature .body { font-size: 14px; color: var(--text-secondary); line-height: 1.5; }
+  .pitch-feature .body strong { color: var(--text-primary); display: block; margin-bottom: 2px; font-weight: 600; }
+
+  .signup-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: 16px;
+    padding: 32px;
+    box-shadow: var(--shadow-card);
+  }
+  .signup-card-head {
+    margin-bottom: 22px;
+  }
+  .signup-card-head .title {
+    font-size: 20px; font-weight: 600; color: var(--text-primary);
+    margin: 0 0 4px;
+  }
+  .signup-card-head .sub {
+    font-size: 13px; color: var(--text-muted); margin: 0;
+  }
+  .form-group {
+    margin-bottom: 16px;
+  }
+  .form-label {
+    display: block; font-size: 12px; font-weight: 500;
+    color: var(--text-secondary); margin-bottom: 6px;
+  }
+  .form-label .req { color: var(--accent-red); margin-left: 2px; }
+  .form-row {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+  }
+  /* Honeypot field — visually hidden, accessible to bots only.
+     Per Sub.A8b PO decision: minimum anti-abuse bar is honeypot + email regex +
+     per-IP rate limit + Cloudflare Turnstile (added below). */
+  .honeypot {
+    position: absolute !important;
+    width: 1px; height: 1px; padding: 0; margin: -1px;
+    overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+  }
+  .turnstile-placeholder {
+    margin: 18px 0;
+    padding: 20px;
+    background: var(--bg-input);
+    border: 1px dashed var(--border-default);
+    border-radius: 8px;
+    text-align: center;
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+  .turnstile-placeholder strong { color: var(--text-secondary); }
+  .consent-row {
+    display: flex; align-items: flex-start; gap: 10px;
+    margin: 18px 0;
+    padding: 14px;
+    background: var(--bg-input);
+    border: 1px solid var(--border-subtle);
+    border-radius: 8px;
+  }
+  .consent-row input[type=checkbox] {
+    margin-top: 2px; flex-shrink: 0;
+  }
+  .consent-row label {
+    font-size: 12px; color: var(--text-secondary); line-height: 1.45;
+  }
+  .consent-row a { color: var(--brand-cyan); }
+
+  .parrain-banner {
+    margin-bottom: 22px;
+    padding: 14px 16px;
+    background: linear-gradient(135deg, rgba(132,204,22,0.10), rgba(56,189,248,0.08));
+    border: 1px solid rgba(132,204,22,0.25);
+    border-radius: 10px;
+    display: flex; gap: 12px; align-items: center;
+  }
+  .parrain-banner .ico {
+    width: 38px; height: 38px; border-radius: 9px;
+    background: rgba(132,204,22,0.18); color: var(--accent-green);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .parrain-banner .body { font-size: 13px; color: var(--text-primary); line-height: 1.4; }
+  .parrain-banner .body strong { color: var(--accent-green); }
+  .parrain-banner .body .sub { display: block; color: var(--text-muted); font-size: 12px; margin-top: 2px; }
+
+  .public-footer {
+    padding: 24px 40px;
+    border-top: 1px solid var(--border-subtle);
+    display: flex; justify-content: space-between;
+    font-size: 12px; color: var(--text-subtle);
+  }
+  .public-footer a { color: var(--text-muted); }
+
+  .submit-row {
+    display: flex; gap: 10px; align-items: center; margin-top: 22px;
+  }
+  .submit-row button { flex: 1; padding: 12px; font-size: 14px; font-weight: 600; }
+  .signup-card-foot {
+    margin-top: 16px; text-align: center;
+    font-size: 12px; color: var(--text-muted);
+  }
+  .signup-card-foot a { color: var(--brand-cyan); }
+</style>
+</head>
+<body class="public-shell" data-page="public-signup">
+
+<nav class="public-nav">
+  <a href="#" class="public-logo">
+    <span class="public-logo-mark">N</span>
+    <span>Naia Hydro</span>
+  </a>
+  <div class="public-locale-switch" role="group" aria-label="Sélecteur de langue">
+    <button class="active">FR</button>
+    <button>EN</button>
+    <button>DE</button>
+  </div>
+</nav>
+
+<div class="public-container">
+
+  <!-- LEFT: pitch -->
+  <div class="pitch">
+    <h1>La supervision <span class="accent">claire et simple</span> de vos centrales hydroélectriques.</h1>
+    <p class="lead">
+      Naia consolide vos données de production, vos pertes, et votre revenu en un tableau de bord unique —
+      utilisable depuis votre tablette, depuis votre bureau, ou depuis le terrain. Demandez un compte
+      de démonstration : nous vous recontactons sous 24 heures avec un accès personnalisé.
+    </p>
+
+    <div class="pitch-features">
+      <div class="pitch-feature">
+        <div class="ico"><i data-lucide="zap" style="width:16px;height:16px"></i></div>
+        <div class="body">
+          <strong>Production temps réel + historique</strong>
+          Toutes vos centrales, toutes vos sources de données, dans une seule vue.
+        </div>
+      </div>
+      <div class="pitch-feature">
+        <div class="ico"><i data-lucide="bar-chart-3" style="width:16px;height:16px"></i></div>
+        <div class="body">
+          <strong>Comparaisons et analyses de pertes</strong>
+          Comparez vos années, vos saisons, vos centrales entre elles, et identifiez les causes de sous-production.
+        </div>
+      </div>
+      <div class="pitch-feature">
+        <div class="ico"><i data-lucide="file-text" style="width:16px;height:16px"></i></div>
+        <div class="body">
+          <strong>Rapports mensuels prêts à partager</strong>
+          PDF générés automatiquement avec votre charte, votre légende, votre commentaire météo.
+        </div>
+      </div>
+      <div class="pitch-feature">
+        <div class="ico"><i data-lucide="shield-check" style="width:16px;height:16px"></i></div>
+        <div class="body">
+          <strong>RGPD + hébergement européen</strong>
+          Vos données restent en Europe. Pas de revente. Droit à l'effacement honoré sous 30 jours.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT: form -->
+  <div class="signup-card">
+
+    <!-- Parrainage banner — only shown when ?p=<code> is present in the URL.
+         The code is resolved server-side to the parrain's name; if the lookup
+         succeeds the banner reads "Vous êtes invité par {nom}". If the code
+         is invalid the form still renders but the banner is replaced with a
+         soft warning (see inscription-erreur.html for the dedicated error
+         state when the prospect lands directly on that error path). -->
+    <div class="parrain-banner" data-parrain-banner>
+      <div class="ico"><i data-lucide="user-check" style="width:18px;height:18px"></i></div>
+      <div class="body">
+        Vous êtes invité par <strong data-parrain-name>Antoine Dubois (Microcentrale du Doubs)</strong>
+        <span class="sub">Code parrain · <code data-parrain-code>ABCD123</code> · enregistré sur votre profil</span>
+      </div>
+    </div>
+
+    <div class="signup-card-head">
+      <p class="title">Demander un compte de démonstration</p>
+      <p class="sub">Compte personnel, gratuit, accès 14 jours. Aucune carte bancaire requise.</p>
+    </div>
+
+    <form id="signup-form" autocomplete="on" novalidate>
+      <!-- Honeypot — hidden field bots tend to fill. Real users never touch it.
+           Server returns 200 (silent drop) when this field has a value, to avoid
+           telling the bot it was caught. -->
+      <div class="honeypot" aria-hidden="true">
+        <label for="company_url">Company URL (laisser vide)</label>
+        <input type="text" id="company_url" name="company_url" tabindex="-1" autocomplete="off">
+      </div>
+
+      <!-- Hidden propagation fields populated from URL params on page load -->
+      <input type="hidden" name="parrain_code" value="ABCD123">
+      <input type="hidden" name="campaign_code" value="">
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label" for="full_name">Nom complet <span class="req">*</span></label>
+          <input type="text" id="full_name" name="full_name" class="input" required autocomplete="name" placeholder="Antoine Dubois">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="email">Adresse e-mail <span class="req">*</span></label>
+          <input type="email" id="email" name="email" class="input" required autocomplete="email" placeholder="antoine@centrale.fr">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label" for="organization">Société / Centrale <span class="req">*</span></label>
+          <input type="text" id="organization" name="organization" class="input" required autocomplete="organization" placeholder="Microcentrale du Doubs">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="country">Pays <span class="req">*</span></label>
+          <select id="country" name="country" class="select" required>
+            <option value="">—</option>
+            <option value="FR">France</option>
+            <option value="BE">Belgique</option>
+            <option value="CH">Suisse</option>
+            <option value="LU">Luxembourg</option>
+            <option value="DE">Allemagne</option>
+            <option value="other">Autre</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="phone">Téléphone <span style="color:var(--text-subtle); font-weight:400">(facultatif)</span></label>
+        <input type="tel" id="phone" name="phone" class="input" autocomplete="tel" placeholder="+33 6 12 34 56 78">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="plant_interest_notes">Vos centrales en quelques mots <span style="color:var(--text-subtle); font-weight:400">(facultatif)</span></label>
+        <textarea id="plant_interest_notes" name="plant_interest_notes" class="input" rows="3" placeholder="Ex : 2 centrales, ~ 350 kW, sur la rivière X. Cherche surtout à analyser les pertes."></textarea>
+      </div>
+
+      <!-- Cloudflare Turnstile widget — per Sub.A8b PO decision.
+           In production: `<div class="cf-turnstile" data-sitekey="..."></div>`
+           plus `<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>`
+           on the page. Mockup uses a placeholder for the design review. -->
+      <div class="turnstile-placeholder">
+        <i data-lucide="shield" style="width:14px; height:14px; vertical-align:-2px"></i>
+        <strong>Vérification de sécurité — Cloudflare Turnstile</strong>
+        <br><span style="font-size:11px">Aucune action requise · validation invisible en arrière-plan</span>
+      </div>
+
+      <div class="consent-row">
+        <input type="checkbox" id="consent_given" name="consent_given" required>
+        <label for="consent_given">
+          J'accepte que Naia Hydro me contacte au sujet de ma demande de démonstration et conserve mes données
+          conformément à sa <a href="#">politique de confidentialité</a>. Je peux demander leur effacement à tout moment.
+          <span class="req">*</span>
+        </label>
+      </div>
+
+      <div class="submit-row">
+        <button type="submit" class="btn btn-primary">
+          <i data-lucide="send"></i> Envoyer ma demande
+        </button>
+      </div>
+
+      <div class="signup-card-foot">
+        Déjà client ? <a href="index.html">Connectez-vous</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<footer class="public-footer">
+  <div>© 2026 Naia Hydro — Tous droits réservés.</div>
+  <div style="display:flex; gap:18px">
+    <a href="#">Confidentialité</a>
+    <a href="#">Mentions légales</a>
+    <a href="#">Contact</a>
+  </div>
+</footer>
+
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script>
+  lucide.createIcons();
+
+  // Mockup-only — demo the parrain banner state. In production:
+  //  - The URL's ?p=<code> is read on page load.
+  //  - If empty → hide the banner.
+  //  - If present → call /api/v1/subscription/public/parrain-lookup?code=<code>
+  //    (cached lookup, returns parrain.full_name + organization or 404).
+  //  - On 404 → don't show the banner, but still pass the code through on submit
+  //    so the audit row can record the invalid attempt (or redirect to
+  //    inscription-erreur.html if the PO prefers an explicit error state).
+  document.getElementById('signup-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    if (!this.consent_given.checked) {
+      alert('Le consentement RGPD est requis.');
+      return;
+    }
+    // In production: POST to /api/v1/subscription/public/leads with the form
+    // body + the Turnstile token. On 201 → redirect to merci.html?p=<code>.
+    window.location.href = 'merci.html?p=' + encodeURIComponent(this.parrain_code.value);
+  });
+</script>
+</body>
+</html>

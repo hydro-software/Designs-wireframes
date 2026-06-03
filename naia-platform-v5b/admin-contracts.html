@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin · Contrats — Naia</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="css/style.css" rel="stylesheet"><script src="https://cdn.tailwindcss.com"></script>
+<style>
+  .ctr-matrix { display: grid; grid-template-columns: 120px 1fr 1fr; gap: 8px; margin-top: 4px; }
+  .ctr-matrix-cell { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 10px; padding: 12px 14px; min-height: 96px; display: flex; flex-direction: column; justify-content: space-between; }
+  .ctr-matrix-header { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; color: var(--text-subtle); padding: 8px 12px; text-align: center; }
+  .ctr-matrix-rowlabel { font-size: 12px; font-weight: 600; padding: 12px 0; display: flex; align-items: center; justify-content: flex-end; padding-right: 12px; color: var(--text-muted); }
+  .ctr-uncovered { border-style: dashed; }
+  .ctr-tuple-readout { font-size: 11px; color: var(--text-muted); font-family: ui-monospace, monospace; }
+  .ctr-status-badge { font-size: 10px; text-transform: uppercase; letter-spacing: 0.04em; }
+  .token-chip { display: inline-block; padding: 1px 7px; background: var(--brand-cyan-soft); color: var(--brand-cyan); border-radius: 4px; font-size: 11px; font-family: ui-monospace, monospace; margin: 0 2px; cursor: pointer; user-select: none; }
+  .ctr-editor { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 12px; min-height: 320px; padding: 18px 22px; font-size: 13px; line-height: 1.6; }
+  .ctr-editor h2 { font-size: 16px; font-weight: 600; margin: 14px 0 6px; }
+  .ctr-editor p { margin: 8px 0; }
+  .ctr-toolbar { background: var(--bg-input); border-bottom: 1px solid var(--border-subtle); padding: 6px 10px; display: flex; gap: 4px; align-items: center; flex-wrap: wrap; border-radius: 12px 12px 0 0; }
+  .ctr-toolbar-btn { padding: 4px 8px; font-size: 12px; color: var(--text-muted); background: none; border: 0; border-radius: 5px; cursor: pointer; }
+  .ctr-toolbar-btn:hover { background: var(--bg-card); color: var(--text); }
+  .ctr-toolbar-token { background: var(--brand-cyan-soft); color: var(--brand-cyan); font-size: 11px; }
+  .ctr-changelog-row { display: flex; gap: 12px; padding: 9px 0; border-bottom: 1px solid var(--border-subtle); font-size: 12px; }
+  .ctr-changelog-row:last-child { border-bottom: 0; }
+  .ctr-changelog-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--brand-cyan); flex-shrink: 0; margin-top: 6px; }
+  .ctr-changelog-meta { color: var(--text-muted); font-size: 11px; }
+</style>
+</head>
+<body data-page="admin-contracts" data-section="admin">
+<div class="app-shell">
+  <aside class="sidebar"></aside>
+  <main class="main-area">
+    <header class="topbar">
+      <div><div class="page-eyebrow">Administration · Abonnements</div><div style="font-size:18px; font-weight:600">Contrats Naia (FR-CONTRACT)</div></div>
+      <div style="display:flex; gap:8px">
+        <button class="btn btn-secondary btn-sm"><i data-lucide="eye"></i> Aperçu version sélectionnée</button>
+        <button class="btn btn-primary" onclick="openOverlay('ctr-new-draft')"><i data-lucide="plus"></i> Nouveau brouillon</button>
+      </div>
+    </header>
+
+    <div class="page-content">
+
+      <!-- KPIs -->
+      <div style="display:grid; gap:14px; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); margin-bottom:18px">
+        <div class="kpi-card"><div class="kpi-label">Versions publiées</div><div class="kpi-value tabular">1 / 8</div><div class="kpi-delta muted">7 quadrants à rédiger</div></div>
+        <div class="kpi-card"><div class="kpi-label">Brouillons en cours</div><div class="kpi-value tabular">2</div><div class="kpi-delta muted">BE/fr/be + meter-box FR</div></div>
+        <div class="kpi-card"><div class="kpi-label">Clients signés (v1)</div><div class="kpi-value tabular">87</div><div class="kpi-delta muted">100 % FR / MDA SAS / sans boîtier</div></div>
+        <div class="kpi-card"><div class="kpi-label">Dernière publication</div><div class="kpi-value tabular" style="font-size:14px">15 jan 2026</div><div class="kpi-delta muted">v1 par Jan — seed legacy</div></div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="card" style="margin-bottom:14px">
+        <div class="card-body" style="padding:0">
+          <div style="display:flex; border-bottom:1px solid var(--border-subtle)">
+            <div style="padding:12px 18px; font-size:13px; font-weight:600; border-bottom:2px solid var(--brand-cyan); color:var(--brand-cyan); cursor:pointer">Matrice de couverture</div>
+            <div style="padding:12px 18px; font-size:13px; color:var(--text-muted); cursor:pointer">Contrats signés (87)</div>
+            <div style="padding:12px 18px; font-size:13px; color:var(--text-muted); cursor:pointer">Historique de publication</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filter chips (the 3 secondary axes) -->
+      <div class="card" style="margin-bottom:14px">
+        <div class="card-body" style="padding:14px 18px; display:flex; gap:10px; align-items:center; flex-wrap:wrap">
+          <span class="muted" style="font-size:11px; text-transform:uppercase; letter-spacing:0.06em; font-weight:600">Axes secondaires</span>
+          <select class="select" style="max-width:180px"><option>Segment · default</option><option>(Multi-segment v2)</option></select>
+          <select class="select" style="max-width:180px"><option>Langue · fr</option><option>nl (BE, à venir)</option></select>
+          <select class="select" style="max-width:200px"><option>Sans boîtier de relevé</option><option>Avec boîtier de relevé</option></select>
+          <span class="muted" style="font-size:12px; margin-left:auto">Affichage : 4 quadrants <code class="tabular" style="font-size:11px">pays × entité</code></span>
+        </div>
+      </div>
+
+      <!-- 2D matrix: country × invoicing_entity -->
+      <div class="card" style="margin-bottom:18px">
+        <div class="card-head"><div class="card-title">Matrice <code class="tabular" style="font-size:12px">pays × entité de facturation</code> · langue=fr · sans boîtier</div></div>
+        <div class="card-body">
+          <div class="ctr-matrix">
+            <div></div>
+            <div class="ctr-matrix-header">Entité <b>fr</b> · MDA SAS</div>
+            <div class="ctr-matrix-header">Entité <b>be</b> · Hydro Software Services SRL</div>
+
+            <!-- Row FR -->
+            <div class="ctr-matrix-rowlabel">Pays · <b>FR</b></div>
+            <div class="ctr-matrix-cell" style="cursor:pointer" onclick="openOverlay('ctr-edit-published')">
+              <div>
+                <span class="badge badge-green ctr-status-badge">Publié · v1</span>
+                <div class="ctr-tuple-readout" style="margin-top:4px">(default, FR, fr, fr, false)</div>
+              </div>
+              <div style="display:flex; justify-content:space-between; align-items:flex-end">
+                <div><div style="font-size:11px; color:var(--text-muted)">Publié 15 jan 2026 par Jan</div><div style="font-size:11px; color:var(--text-muted)">87 clients signés</div></div>
+                <a class="link" style="font-size:11px">Voir →</a>
+              </div>
+            </div>
+            <div class="ctr-matrix-cell ctr-uncovered" style="cursor:pointer" onclick="openOverlay('ctr-new-draft')">
+              <div>
+                <span class="badge badge-slate ctr-status-badge">Non couvert</span>
+                <div class="ctr-tuple-readout" style="margin-top:4px">(default, FR, fr, be, false)</div>
+              </div>
+              <div style="display:flex; justify-content:space-between; align-items:flex-end">
+                <div style="font-size:11px; color:var(--text-muted)">Cas cross-border<br>client FR facturé BE</div>
+                <a class="link" style="font-size:11px">Rédiger →</a>
+              </div>
+            </div>
+
+            <!-- Row BE -->
+            <div class="ctr-matrix-rowlabel">Pays · <b>BE</b></div>
+            <div class="ctr-matrix-cell ctr-uncovered">
+              <div>
+                <span class="badge badge-slate ctr-status-badge">Non couvert</span>
+                <div class="ctr-tuple-readout" style="margin-top:4px">(default, BE, fr, fr, false)</div>
+              </div>
+              <div style="display:flex; justify-content:space-between; align-items:flex-end">
+                <div style="font-size:11px; color:var(--text-muted)">Cas cross-border<br>client BE facturé FR</div>
+                <a class="link" style="font-size:11px">Rédiger →</a>
+              </div>
+            </div>
+            <div class="ctr-matrix-cell" style="border-color: var(--brand-cyan); cursor:pointer" onclick="openOverlay('ctr-edit-draft')">
+              <div>
+                <span class="badge badge-amber ctr-status-badge">Brouillon · en cours</span>
+                <div class="ctr-tuple-readout" style="margin-top:4px">(default, BE, fr, be, false)</div>
+              </div>
+              <div style="display:flex; justify-content:space-between; align-items:flex-end">
+                <div><div style="font-size:11px; color:var(--text-muted)">Édité par Bernard</div><div style="font-size:11px; color:var(--text-muted)">il y a 2 jours · révision légale en cours</div></div>
+                <a class="link" style="font-size:11px">Continuer →</a>
+              </div>
+            </div>
+          </div>
+
+          <p class="muted" style="font-size:11px; margin-top:14px; line-height:1.5">
+            Le résolveur (FR-CTR-4) attend exactement une version <b>publiée</b> par tuple <code class="tabular">(segment, pays, langue, entité, boîtier)</code>. Un quadrant non couvert renvoie une erreur claire à la signature (FR-CTR-9) — jamais de fallback silencieux. Pour basculer un axe (langue, boîtier), utilisez les filtres ci-dessus.
+          </p>
+        </div>
+      </div>
+
+      <!-- Mockup notes -->
+      <p class="muted" style="font-size:12px; max-width:780px; line-height:1.6">
+        <b>FR-CONTRACT · entité versionnée en base de données.</b> Chaque contrat est une ligne <code class="tabular">subscription.contract_versions</code> scopée à un tuple <code class="tabular">(segment, pays, langue, entité, boîtier)</code>. La publication rend la version immuable (FR-CTR-6) ; un nouveau brouillon supersède (FR-CTR-4). À la signature, le PDF rendu et la version exacte sont gelés sur le dossier client (FR-CTR-7). La migration v1 importe le contenu de <code class="tabular">naia_contract_fr.html</code> sur le quadrant FR/fr/fr/false (FR-CTR-9). Voir aussi <a class="link" href="admin-plaquette.html">admin-plaquette.html</a> (FR-PLQ-1, même mécanique d'éditeur).
+      </p>
+
+    </div>
+  </main>
+</div>
+
+<!-- Modal: edit published version (read-only mode) -->
+<div class="overlay" id="ctr-edit-published">
+  <div class="modal" style="max-width:880px">
+    <div class="modal-head">
+      <div>
+        <div class="page-eyebrow">Contrat · v1 publié <span class="badge badge-green" style="margin-left:8px">Immuable</span></div>
+        <div style="font-size:16px; font-weight:600" class="tabular">(default, FR, fr, fr=MDA SAS, sans boîtier)</div>
+      </div>
+      <button class="icon-btn" onclick="closeOverlay('ctr-edit-published')"><i data-lucide="x"></i></button>
+    </div>
+    <div class="modal-body">
+
+      <!-- Tabs inside the modal -->
+      <div style="display:flex; border-bottom:1px solid var(--border-subtle); margin-bottom:14px">
+        <div style="padding:8px 14px; font-size:13px; font-weight:600; border-bottom:2px solid var(--brand-cyan); color:var(--brand-cyan); cursor:pointer">Contenu</div>
+        <div style="padding:8px 14px; font-size:13px; color:var(--text-muted); cursor:pointer">Historique des publications (3)</div>
+      </div>
+
+      <!-- Editor toolbar (disabled because read-only) -->
+      <div class="ctr-toolbar" style="opacity:0.55; cursor:not-allowed">
+        <button class="ctr-toolbar-btn"><b>B</b></button>
+        <button class="ctr-toolbar-btn"><i>I</i></button>
+        <button class="ctr-toolbar-btn">H2</button>
+        <button class="ctr-toolbar-btn">H3</button>
+        <button class="ctr-toolbar-btn">•</button>
+        <span style="width:1px; height:18px; background:var(--border-subtle); margin:0 4px"></span>
+        <button class="ctr-toolbar-btn ctr-toolbar-token"><i data-lucide="braces" style="width:11px; height:11px; display:inline-block"></i> Insérer un champ</button>
+        <span style="margin-left:auto; font-size:11px; color:var(--text-subtle)">Lecture seule · version publiée immuable</span>
+      </div>
+
+      <!-- Rendered content (preview-style) -->
+      <div class="ctr-editor" style="border-radius: 0 0 12px 12px; border-top: 0">
+        <h2>Contrat d'abonnement Naia</h2>
+        <p><b>Entre les soussignés :</b></p>
+        <p>D'une part, la société <span class="token-chip">customer_org_name</span>, sise <span class="token-chip">customer_address</span>, immatriculée TVA <span class="token-chip">customer_vat_number</span>, représentée par <span class="token-chip">signatory_name</span> en qualité de <span class="token-chip">signatory_role</span>, ci-après dénommée « le Client » ;</p>
+        <p>Et d'autre part, <b>MDA SAS</b>, sise [adresse MDA SAS], immatriculée au RCS de [ville], ci-après dénommée « Naia » ;</p>
+        <h2>Article 1 — Objet</h2>
+        <p>Naia met à disposition du Client la plateforme d'observation et d'analyse de production hydroélectrique, pour les centrales listées en annexe.</p>
+        <h2>Article 2 — Centrales couvertes</h2>
+        <span class="token-chip">plants_table</span>
+        <h2>Article 3 — Tarification et facturation</h2>
+        <span class="token-chip">pricing_table</span>
+        <p>Le règlement s'effectue par carte bancaire (PayPlug) sous 14 jours à compter de l'émission de la facture (NET-14).</p>
+        <p style="color:var(--text-subtle); font-style:italic">… (clauses 4 à 12 omises dans cette maquette — contenu seedé depuis <code class="tabular">naia_contract_fr.html</code> par la migration FR-CTR-9)</p>
+        <h2>Article 13 — Signature</h2>
+        <p>Le présent contrat prend effet à la date indiquée ci-dessous, à la signature électronique des deux parties via Yousign.</p>
+        <p>Fait à <span class="token-chip">signing_city</span>, le <span class="token-chip">signing_date</span>.</p>
+      </div>
+
+      <div style="margin-top:14px; padding:10px 12px; background:var(--bg-input); border-radius:8px; font-size:12px; color:var(--text-muted)">
+        <b style="color:var(--text)">Champs nommés utilisés (8) :</b> <code class="tabular">customer_org_name</code>, <code class="tabular">customer_address</code>, <code class="tabular">customer_vat_number</code>, <code class="tabular">signatory_name</code>, <code class="tabular">signatory_role</code>, <code class="tabular">plants_table</code>, <code class="tabular">pricing_table</code>, <code class="tabular">signing_city</code>, <code class="tabular">signing_date</code>. Substitués par les données client à la génération du PDF (FR-CTR-5 / FR-CTR-8).
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-secondary" onclick="closeOverlay('ctr-edit-published')">Fermer</button>
+      <button class="btn btn-secondary"><i data-lucide="copy-plus"></i> Cloner pour brouillon v2</button>
+      <button class="btn btn-secondary"><i data-lucide="archive"></i> Archiver (manuel)</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: edit draft (full editor with publish action) -->
+<div class="overlay" id="ctr-edit-draft">
+  <div class="modal" style="max-width:880px">
+    <div class="modal-head">
+      <div>
+        <div class="page-eyebrow">Contrat · brouillon <span class="badge badge-amber" style="margin-left:8px">Modifiable</span></div>
+        <div style="font-size:16px; font-weight:600" class="tabular">(default, BE, fr, be=HSS SRL, sans boîtier)</div>
+      </div>
+      <button class="icon-btn" onclick="closeOverlay('ctr-edit-draft')"><i data-lucide="x"></i></button>
+    </div>
+    <div class="modal-body">
+
+      <!-- Editor toolbar (active) -->
+      <div class="ctr-toolbar">
+        <button class="ctr-toolbar-btn"><b>B</b></button>
+        <button class="ctr-toolbar-btn"><i>I</i></button>
+        <button class="ctr-toolbar-btn">H2</button>
+        <button class="ctr-toolbar-btn">H3</button>
+        <button class="ctr-toolbar-btn">•</button>
+        <button class="ctr-toolbar-btn">↶</button>
+        <span style="width:1px; height:18px; background:var(--border-subtle); margin:0 4px"></span>
+        <button class="ctr-toolbar-btn ctr-toolbar-token"><i data-lucide="braces" style="width:11px; height:11px; display:inline-block"></i> Insérer un champ</button>
+        <span style="margin-left:auto; font-size:11px; color:var(--text-subtle)"><i data-lucide="save" style="width:11px; height:11px"></i> Sauvegardé automatiquement il y a 14 s</span>
+      </div>
+
+      <div class="ctr-editor" style="border-radius: 0 0 12px 12px; border-top: 0">
+        <h2>Contrat d'abonnement Naia · Belgique</h2>
+        <p><b>Entre les soussignés :</b></p>
+        <p>D'une part, la société <span class="token-chip">customer_org_name</span>, sise <span class="token-chip">customer_address</span>, BCE <span class="token-chip">customer_vat_number</span>, représentée par <span class="token-chip">signatory_name</span> en qualité de <span class="token-chip">signatory_role</span> ;</p>
+        <p>Et d'autre part, <b>Hydro Software Services SRL</b>, sise Rue [adresse HSS SRL], B-XXXX, BCE BE0XXX.XXX.XXX, ci-après « Naia » ;</p>
+        <p style="color:var(--accent-amber); font-style:italic; padding:6px 10px; background: rgba(245,158,11,0.08); border-left:3px solid var(--accent-amber); border-radius:4px">⚠ Bernard · clause de juridiction belge à valider avec le conseil juridique — voir commentaire du 23/05.</p>
+        <p>… (texte adapté à la juridiction BE — en cours de rédaction)</p>
+      </div>
+
+      <!-- Tuple readout sidebar -->
+      <div style="margin-top:14px; display:grid; grid-template-columns: 1fr 1fr; gap:10px">
+        <div style="padding:10px 12px; background:var(--bg-input); border-radius:8px; font-size:12px">
+          <div style="font-size:10px; text-transform:uppercase; letter-spacing:0.06em; font-weight:600; color:var(--text-subtle); margin-bottom:6px">Tuple de résolution</div>
+          <div class="tabular">segment=<b>default</b></div>
+          <div class="tabular">country=<b>BE</b></div>
+          <div class="tabular">language=<b>fr</b></div>
+          <div class="tabular">invoicing_entity=<b>be</b> (HSS SRL)</div>
+          <div class="tabular">meter_box_included=<b>false</b></div>
+          <div style="font-size:11px; color:var(--text-muted); margin-top:6px">verrouillé sur ce brouillon — créer un autre brouillon pour un tuple différent</div>
+        </div>
+        <div style="padding:10px 12px; background:var(--bg-input); border-radius:8px; font-size:12px">
+          <div style="font-size:10px; text-transform:uppercase; letter-spacing:0.06em; font-weight:600; color:var(--text-subtle); margin-bottom:6px">Champs disponibles (Q4 = liste figée)</div>
+          <div style="display:flex; flex-wrap:wrap; gap:3px">
+            <span class="token-chip">customer_org_name</span><span class="token-chip">customer_country</span><span class="token-chip">customer_vat_number</span><span class="token-chip">customer_address</span><span class="token-chip">signatory_name</span><span class="token-chip">signatory_role</span><span class="token-chip">plants_table</span><span class="token-chip">pricing_table</span><span class="token-chip">signing_city</span><span class="token-chip">signing_date</span><span class="token-chip">effective_date</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-secondary" onclick="closeOverlay('ctr-edit-draft')">Annuler</button>
+      <button class="btn btn-secondary"><i data-lucide="eye"></i> Aperçu PDF</button>
+      <button class="btn btn-secondary"><i data-lucide="trash-2"></i> Supprimer brouillon</button>
+      <button class="btn btn-primary" onclick="closeOverlay('ctr-edit-draft'); openOverlay('ctr-publish-modal')"><i data-lucide="upload-cloud"></i> Publier (immuable)</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: publish (mandatory change_summary + diff) -->
+<div class="overlay" id="ctr-publish-modal">
+  <div class="modal" style="max-width:640px">
+    <div class="modal-head">
+      <div>
+        <div class="page-eyebrow">Publier la version</div>
+        <div style="font-size:16px; font-weight:600" class="tabular">(default, BE, fr, be, false)</div>
+      </div>
+      <button class="icon-btn" onclick="closeOverlay('ctr-publish-modal')"><i data-lucide="x"></i></button>
+    </div>
+    <div class="modal-body">
+      <div style="padding:12px 14px; background: rgba(245,158,11,0.08); border-left:3px solid var(--accent-amber); border-radius:6px; font-size:12px; margin-bottom:14px">
+        ⚠ <b>La publication rend cette version immuable.</b> Toute modification future nécessitera un nouveau brouillon (FR-CTR-6). Le contrôle est l'immuabilité + le présent journal de publication, pas un second relecteur.
+      </div>
+
+      <div style="font-size:12px; color:var(--text-muted); margin-bottom:6px">Différences avec la version publiée actuelle pour ce tuple :</div>
+      <div style="padding:10px 12px; background:var(--bg-input); border-radius:8px; font-size:11px; font-family:ui-monospace, monospace; margin-bottom:14px">
+        <div style="color:var(--text-subtle); font-style:italic">(aucune version publiée pour ce tuple — première publication)</div>
+      </div>
+
+      <label class="field" style="margin-bottom:0">
+        <span class="field-label">Résumé de la modification (publication) <b style="color:var(--accent-red)">*</b></span>
+        <textarea class="input" rows="3" placeholder="Ex : Contrat BE-entité v1 — rédaction initiale, revue par Bernard + conseil juridique 23/05.">Contrat BE-entité v1 — rédaction initiale, revue par Bernard + conseil juridique le 23/05/2026.</textarea>
+        <span style="font-size:11px; color:var(--text-subtle); margin-top:4px">min. 20 caractères · max. 500 · visible dans l'historique de publication (FR-CTR-6)</span>
+      </label>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-secondary" onclick="closeOverlay('ctr-publish-modal'); openOverlay('ctr-edit-draft')">Annuler</button>
+      <button class="btn btn-primary"><i data-lucide="upload-cloud"></i> Publier maintenant</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: new draft picker -->
+<div class="overlay" id="ctr-new-draft">
+  <div class="modal" style="max-width:560px">
+    <div class="modal-head">
+      <div><div class="page-eyebrow">Nouveau brouillon</div><div style="font-size:16px; font-weight:600">Choisir le tuple</div></div>
+      <button class="icon-btn" onclick="closeOverlay('ctr-new-draft')"><i data-lucide="x"></i></button>
+    </div>
+    <div class="modal-body">
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px">
+        <label class="field"><span class="field-label">Segment</span><select class="select"><option>default</option></select></label>
+        <label class="field"><span class="field-label">Pays</span><select class="select"><option>FR · France</option><option>BE · Belgique</option></select></label>
+        <label class="field"><span class="field-label">Langue</span><select class="select"><option>fr · français</option><option disabled>nl · néerlandais (à venir, OQ-4)</option></select></label>
+        <label class="field"><span class="field-label">Entité de facturation</span><select class="select"><option>fr · MDA SAS</option><option>be · Hydro Software Services SRL</option></select></label>
+        <label class="field" style="grid-column: span 2"><span class="field-label">Boîtier de relevé inclus ?</span><select class="select"><option>Non · sans boîtier</option><option>Oui · avec boîtier (FR-CTR-11)</option></select></label>
+      </div>
+      <div style="margin-top:14px; padding:10px 12px; background:var(--bg-input); border-radius:8px; font-size:12px; color:var(--text-muted)">
+        Si un brouillon existe déjà pour ce tuple, vous serez redirigé vers son édition. Une seule version <b>publiée</b> peut exister par tuple à la fois.
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-secondary" onclick="closeOverlay('ctr-new-draft')">Annuler</button>
+      <button class="btn btn-primary" onclick="closeOverlay('ctr-new-draft'); openOverlay('ctr-edit-draft')">Créer le brouillon</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="js/app.js"></script>
+</body></html>
