@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin · Client — Naia</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="css/style.css" rel="stylesheet"><script src="https://cdn.tailwindcss.com"></script>
+<style>
+  .cd-section { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 12px; margin-bottom: 12px; }
+  .cd-section-head { padding: 14px 20px; border-bottom: 1px solid var(--border-subtle); display: flex; justify-content: space-between; align-items: center; }
+  .cd-section-title { font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 10px; }
+  .cd-section-body { padding: 18px 20px; }
+  .cd-info-row { display: flex; justify-content: space-between; padding: 7px 0; border-bottom: 1px solid var(--border-subtle); font-size: 13px; }
+  .cd-info-row:last-child { border-bottom: 0; }
+  .cd-info-row .lbl { color: var(--text-muted); }
+  .health-bar { height: 8px; background: var(--bg-input); border-radius: 999px; overflow: hidden; }
+  .health-bar-fill { height: 100%; border-radius: 999px; transition: width 0.3s; }
+  .timeline-item { display: flex; gap: 14px; padding: 10px 0; border-bottom: 1px solid var(--border-subtle); }
+  .timeline-item:last-child { border-bottom: 0; }
+  .timeline-dot { width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+  .timeline-dot i { width: 14px; height: 14px; }
+  .timeline-main { flex: 1; min-width: 0; }
+  .timeline-title { font-size: 13px; font-weight: 500; }
+  .timeline-meta { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+</style>
+</head>
+<body data-page="admin-customer" data-section="admin">
+<div class="app-shell">
+  <aside class="sidebar"></aside>
+  <main class="main-area">
+
+    <header class="topbar">
+      <div>
+        <div class="page-eyebrow"><a class="link" href="admin-abonnements.html">Administration · Clients</a> ·  Convert FMG</div>
+        <div style="font-size:18px; font-weight:600; display:flex; align-items:center; gap:10px">
+          Convert FMG <span class="badge badge-green">Active</span> <span class="badge badge-amber">Watch</span>
+        </div>
+      </div>
+      <div style="display:flex; gap:8px">
+        <button class="btn btn-secondary btn-sm"><i data-lucide="external-link"></i> PayPlug</button>
+        <button class="btn btn-secondary btn-sm" onclick="openOverlay('action-modal')"><i data-lucide="zap"></i> Action</button>
+      </div>
+    </header>
+
+    <div class="page-content" style="max-width:1100px">
+
+      <!-- Top KPI strip -->
+      <div style="display:grid; gap:14px; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); margin-bottom:18px">
+        <div class="kpi-card"><div class="kpi-label">MRR</div><div class="kpi-value tabular">740 €</div><div class="kpi-delta muted">depuis sept. 2024</div></div>
+        <div class="kpi-card"><div class="kpi-label">Statut</div><div class="kpi-value" style="font-size:18px">Active</div><div class="kpi-delta muted">renouvel. 22 mai</div></div>
+        <div class="kpi-card"><div class="kpi-label">Health score</div><div class="kpi-value tabular">62 / 100</div><div class="kpi-delta down"><i data-lucide="trending-down" style="width:13px"></i> Watch</div></div>
+        <div class="kpi-card"><div class="kpi-label">Solde jetons</div><div class="kpi-value tabular">14</div><div class="kpi-delta muted">9 utilisés ce mois</div></div>
+        <div class="kpi-card"><div class="kpi-label">Naia points (org.)</div><div class="kpi-value tabular">2 240</div><div class="kpi-delta muted">tier Argent</div></div>
+      </div>
+
+      <!-- Two-column layout: subscription + usage/health on left, financial + history on right -->
+      <div style="display:grid; gap:14px; grid-template-columns: 1.4fr 1fr">
+
+        <!-- LEFT COLUMN -->
+        <div>
+
+          <!-- Section: Subscription -->
+          <div class="cd-section">
+            <div class="cd-section-head">
+              <div class="cd-section-title"><i data-lucide="credit-card" style="width:15px; color:var(--brand-cyan)"></i> Abonnement</div>
+              <div style="display:flex; gap:6px">
+                <button class="btn btn-secondary btn-sm"><i data-lucide="edit-3"></i> Changer le plan</button>
+                <button class="btn btn-secondary btn-sm"><i data-lucide="repeat"></i> Migrer vers v02</button>
+              </div>
+            </div>
+            <div class="cd-section-body">
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px">
+                <div>
+                  <div class="cd-info-row"><span class="lbl">Mode de facturation</span><span><span class="badge badge-purple">Enterprise</span></span></div>
+                  <div class="cd-info-row"><span class="lbl">Capacité totale</span><span class="tabular">11 MW · 9 plants</span></div>
+                  <div class="cd-info-row"><span class="lbl">Pricing schedule</span><span><a class="link">v01</a> · pinné</span></div>
+                  <div class="cd-info-row"><span class="lbl">Cadence</span><span>Mensuel</span></div>
+                </div>
+                <div>
+                  <div class="cd-info-row"><span class="lbl">MRR (récurrent)</span><span class="tabular">740 €</span></div>
+                  <div class="cd-info-row"><span class="lbl">Hardware</span><span>0 box</span></div>
+                  <div class="cd-info-row"><span class="lbl">Jetons inclus / mois</span><span class="tabular">5</span></div>
+                  <div class="cd-info-row"><span class="lbl">Renouvellement</span><span>22 mai 2026</span></div>
+                </div>
+              </div>
+              <div style="margin-top:14px; padding:10px 12px; background:var(--bg-input); border-radius:8px; font-size:12px; color:var(--text-muted)">
+                Décomposition : 650 € (palier 10–25 MW) + 9 × 10 € (per-plant add-on) = 740 €/mois HT
+              </div>
+            </div>
+          </div>
+
+          <!-- Section: Usage & health -->
+          <div class="cd-section">
+            <div class="cd-section-head">
+              <div class="cd-section-title"><i data-lucide="activity" style="width:15px; color:var(--brand-cyan)"></i> Utilisation &amp; santé du compte</div>
+              <button class="btn btn-secondary btn-sm"><i data-lucide="info"></i> Override health</button>
+            </div>
+            <div class="cd-section-body">
+
+              <!-- Health score breakdown -->
+              <div style="margin-bottom:18px">
+                <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:6px">
+                  <span style="font-size:13px; font-weight:500">Score de santé</span>
+                  <span class="tabular" style="font-size:18px; font-weight:600; color:#fbbf24">62 / 100 — Watch</span>
+                </div>
+                <div class="health-bar"><div class="health-bar-fill" style="width:62%; background:linear-gradient(90deg, var(--brand-cyan), #fbbf24)"></div></div>
+                <table class="data-table" style="font-size:12px; margin-top:14px">
+                  <thead><tr><th>Signal</th><th>Poids</th><th>Valeur</th><th>Contribution</th></tr></thead>
+                  <tbody>
+                    <tr><td>Statut paiement</td><td class="muted">×0,40</td><td><span class="badge badge-green">à jour</span></td><td class="num">+40</td></tr>
+                    <tr><td>Tendance usage 30j vs 90j</td><td class="muted">×0,25</td><td>−18 %</td><td class="num" style="color:var(--accent-amber)">+8</td></tr>
+                    <tr><td>Temps depuis dernier login</td><td class="muted">×0,15</td><td>il y a 6 jours</td><td class="num">+9</td></tr>
+                    <tr><td>Ancienneté du compte</td><td class="muted">×0,10</td><td>1 an 8 mois</td><td class="num">+8</td></tr>
+                    <tr><td>Tickets support / qualité</td><td class="muted">×0,10</td><td>2 tickets ouverts</td><td class="num" style="color:var(--accent-amber)">−3</td></tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <!-- Usage rollups -->
+              <h4 style="font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em; font-weight:600; margin:18px 0 8px">Utilisation par module · 30 derniers jours</h4>
+              <table class="data-table" style="font-size:13px">
+                <thead><tr><th>Module</th><th class="num" style="text-align:right">Logins</th><th class="num" style="text-align:right">Actions clés</th><th>Tendance</th></tr></thead>
+                <tbody>
+                  <tr><td>Dashboard (production / revenus)</td><td class="num" style="text-align:right">42</td><td class="num" style="text-align:right">128 vues</td><td><span style="color:var(--accent-amber)">−14 %</span></td></tr>
+                  <tr><td>Données (ingestion)</td><td class="num" style="text-align:right">8</td><td class="num" style="text-align:right">12 imports</td><td><span style="color:var(--accent-green)">+4 %</span></td></tr>
+                  <tr><td>Communauté</td><td class="num" style="text-align:right">6</td><td class="num" style="text-align:right">3 articles lus, 1 commentaire</td><td><span class="muted">stable</span></td></tr>
+                  <tr><td>Simulateur (V2)</td><td class="num" style="text-align:right">0</td><td class="num" style="text-align:right">0</td><td class="muted">—</td></tr>
+                </tbody>
+              </table>
+
+              <div style="font-size:12px; color:var(--text-muted); margin-top:14px; display:flex; gap:18px">
+                <span><b>Dernier login :</b> il y a 6 jours · Foix · Pierre Lefebvre</span>
+                <span><b>Active days 30j :</b> 18</span>
+                <span><b>Active days 90j :</b> 64</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- RIGHT COLUMN -->
+        <div>
+
+          <!-- Section: Identity & contacts -->
+          <div class="cd-section">
+            <div class="cd-section-head"><div class="cd-section-title"><i data-lucide="building-2" style="width:15px; color:var(--brand-cyan)"></i> Organisation</div></div>
+            <div class="cd-section-body">
+              <div class="cd-info-row"><span class="lbl">Raison sociale</span><span>Convert FMG</span></div>
+              <div class="cd-info-row"><span class="lbl">Pays</span><span>France</span></div>
+              <div class="cd-info-row"><span class="lbl">TVA</span><span class="tabular">FR12 345 678 901</span></div>
+              <div class="cd-info-row"><span class="lbl">Contact principal</span><span>Pierre Lefebvre</span></div>
+              <div class="cd-info-row"><span class="lbl">Email facturation</span><span style="font-size:12px">comptable@convert-fmg.fr</span></div>
+              <div class="cd-info-row"><span class="lbl">Utilisateurs Naia</span><span>3</span></div>
+              <div class="cd-info-row"><span class="lbl">Inscrit le</span><span>14 sept. 2024</span></div>
+              <div class="cd-info-row"><span class="lbl">Test subscriber</span><span><span class="badge badge-slate">non</span></span></div>
+              <div class="cd-info-row"><span class="lbl">Source</span><span>Conf. Hydro 2024 · code <span class="tabular">HYDRO24</span></span></div>
+            </div>
+          </div>
+
+          <!-- Section: Financial -->
+          <div class="cd-section">
+            <div class="cd-section-head"><div class="cd-section-title"><i data-lucide="receipt" style="width:15px; color:var(--brand-cyan)"></i> Financier</div><a class="link" style="font-size:12px">Voir factures →</a></div>
+            <div class="cd-section-body" style="padding:0">
+              <table class="data-table" style="font-size:12px">
+                <thead><tr><th>Date</th><th>Numéro</th><th class="num" style="text-align:right">TTC</th><th>Statut</th></tr></thead>
+                <tbody>
+                  <tr><td class="tabular">1 mai</td><td>2026-05-018</td><td class="num" style="text-align:right">895,40 €</td><td><span class="badge badge-green">Payée</span></td></tr>
+                  <tr><td class="tabular">1 avr.</td><td>2026-04-014</td><td class="num" style="text-align:right">895,40 €</td><td><span class="badge badge-green">Payée</span></td></tr>
+                  <tr><td class="tabular">1 mars</td><td>2026-03-009</td><td class="num" style="text-align:right">895,40 €</td><td><span class="badge badge-green">Payée</span></td></tr>
+                </tbody>
+              </table>
+              <div style="padding:10px 14px; border-top:1px solid var(--border-subtle); font-size:12px; color:var(--text-muted); display:flex; justify-content:space-between">
+                <span>Moyen de paiement : SEPA •• 4218</span>
+                <span>Encours : 0 €</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section: Subscription state machine log -->
+          <div class="cd-section">
+            <div class="cd-section-head"><div class="cd-section-title"><i data-lucide="git-branch" style="width:15px; color:var(--brand-cyan)"></i> États abonnement (FR-SUB-11)</div><a class="link" style="font-size:11px" href="admin-audit.html?entity=sub_8a4f">Audit complet →</a></div>
+            <div class="cd-section-body" style="padding:14px 18px">
+              <div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center; font-family:'JetBrains Mono', monospace; font-size:11px; line-height:2">
+                <span class="badge badge-slate">demo</span><span class="muted">→</span>
+                <span class="badge badge-purple">pending_signature</span><span class="muted">→</span>
+                <span class="badge badge-blue">active+pending_payment</span><span class="muted">→</span>
+                <span class="badge badge-green">active</span><span class="muted">←</span>
+                <span style="color:var(--text); font-weight:600">vous êtes ici</span>
+              </div>
+              <div style="font-size:11px; color:var(--text-muted); margin-top:10px; line-height:1.7">
+                14 sept. 2024 · <span class="tabular">demo</span> → <span class="tabular">pending_signature</span> · admin Bernard L. (FR-SIGNUP)<br>
+                14 sept. 2024 · <span class="tabular">pending_signature</span> → <span class="tabular">active+pending_payment</span> · système Yousign (envelope.signed)<br>
+                28 sept. 2024 · <span class="tabular">active+pending_payment</span> → <span class="tabular">active</span> · système PayPlug (charge.succeeded)
+              </div>
+            </div>
+          </div>
+
+          <!-- Section: Modification history (diff format) -->
+          <div class="cd-section">
+            <div class="cd-section-head"><div class="cd-section-title"><i data-lucide="history" style="width:15px; color:var(--brand-cyan)"></i> Historique modifications</div><select class="select" style="max-width:140px; font-size:11px"><option>Toutes</option><option>Plan</option><option>Identité</option><option>Facturation</option><option>Notes admin</option><option>Système</option></select></div>
+            <div class="cd-section-body">
+
+              <div class="timeline-item">
+                <div class="timeline-dot" style="background:rgba(251,191,36,0.18); color:#fcd34d"><i data-lucide="repeat"></i></div>
+                <div class="timeline-main">
+                  <div class="timeline-title">Plan modifié</div>
+                  <div style="font-family:'JetBrains Mono', monospace; font-size:11px; margin-top:4px">
+                    <span class="muted">cadence:</span>
+                    <span style="background:rgba(244,63,94,0.12); color:#fda4af; padding:1px 6px; border-radius:4px; text-decoration:line-through">monthly</span>
+                    <span class="muted">→</span>
+                    <span style="background:rgba(132,204,22,0.18); color:#bef264; padding:1px 6px; border-radius:4px">quarterly</span><br>
+                    <span class="muted">mode:</span>
+                    <span style="background:rgba(244,63,94,0.12); color:#fda4af; padding:1px 6px; border-radius:4px; text-decoration:line-through">per_plant</span>
+                    <span class="muted">→</span>
+                    <span style="background:rgba(132,204,22,0.18); color:#bef264; padding:1px 6px; border-radius:4px">enterprise</span>
+                  </div>
+                  <div class="timeline-meta">2 mai · par Ugo D. · raison: « demande Pierre »</div>
+                </div>
+              </div>
+
+              <div class="timeline-item">
+                <div class="timeline-dot" style="background:rgba(56,189,248,0.18); color:#7dd3fc"><i data-lucide="building-2"></i></div>
+                <div class="timeline-main">
+                  <div class="timeline-title">Email facturation modifié</div>
+                  <div style="font-family:'JetBrains Mono', monospace; font-size:11px; margin-top:4px">
+                    <span style="background:rgba(244,63,94,0.12); color:#fda4af; padding:1px 6px; border-radius:4px; text-decoration:line-through">comptable@convert-fmg.fr</span>
+                    <span class="muted">→</span>
+                    <span style="background:rgba(132,204,22,0.18); color:#bef264; padding:1px 6px; border-radius:4px">finance@convert-fmg.fr</span>
+                  </div>
+                  <div class="timeline-meta">3 mai · par Pierre Lefebvre (client) · via portail self-serve</div>
+                </div>
+              </div>
+
+              <div class="timeline-item">
+                <div class="timeline-dot" style="background:rgba(56,189,248,0.18); color:#7dd3fc"><i data-lucide="user-plus"></i></div>
+                <div class="timeline-main">
+                  <div class="timeline-title">Utilisateur invité · Marie Lambert</div>
+                  <div style="font-family:'JetBrains Mono', monospace; font-size:11px; margin-top:4px">
+                    <span class="muted">rôle:</span>
+                    <span style="background:rgba(132,204,22,0.18); color:#bef264; padding:1px 6px; border-radius:4px">member</span>
+                    <span class="muted">· magic-link envoyé</span>
+                  </div>
+                  <div class="timeline-meta">1 mai · par Pierre Lefebvre (client)</div>
+                </div>
+              </div>
+
+              <div class="timeline-item">
+                <div class="timeline-dot" style="background:rgba(132,204,22,0.18); color:#bef264"><i data-lucide="check-circle"></i></div>
+                <div class="timeline-main">
+                  <div class="timeline-title">Paiement reçu · 895,40 €</div>
+                  <div class="timeline-meta">1 mai · système PayPlug · SEPA •• 4218 · facture 2026-05-018</div>
+                </div>
+              </div>
+
+              <div class="timeline-item">
+                <div class="timeline-dot" style="background:rgba(167,139,250,0.18); color:#c4b5fd"><i data-lucide="message-square"></i></div>
+                <div class="timeline-main">
+                  <div class="timeline-title">Note admin ajoutée</div>
+                  <div style="font-size:12px; color:var(--text-muted); font-style:italic; margin-top:4px">« tickets ouverts depuis 2 sem., à relancer »</div>
+                  <div class="timeline-meta">26 avr. · par Ugo D.</div>
+                </div>
+              </div>
+
+              <div class="timeline-item">
+                <div class="timeline-dot" style="background:rgba(251,191,36,0.18); color:#fcd34d"><i data-lucide="alert-triangle"></i></div>
+                <div class="timeline-main">
+                  <div class="timeline-title">Health passé en Watch (auto)</div>
+                  <div style="font-family:'JetBrains Mono', monospace; font-size:11px; margin-top:4px">
+                    <span style="background:rgba(244,63,94,0.12); color:#fda4af; padding:1px 6px; border-radius:4px; text-decoration:line-through">Healthy (78)</span>
+                    <span class="muted">→</span>
+                    <span style="background:rgba(132,204,22,0.18); color:#bef264; padding:1px 6px; border-radius:4px">Watch (62)</span>
+                  </div>
+                  <div class="timeline-meta">22 avr. · système (cron) · trigger: usage 30j en baisse de 18 %</div>
+                </div>
+              </div>
+
+              <div class="timeline-item">
+                <div class="timeline-dot" style="background:rgba(56,189,248,0.18); color:#7dd3fc"><i data-lucide="zap"></i></div>
+                <div class="timeline-main">
+                  <div class="timeline-title">Centrale ajoutée · Microcentrale du Saux</div>
+                  <div style="font-family:'JetBrains Mono', monospace; font-size:11px; margin-top:4px">
+                    <span class="muted">capacité totale:</span>
+                    <span style="background:rgba(244,63,94,0.12); color:#fda4af; padding:1px 6px; border-radius:4px; text-decoration:line-through">10,5 MW · 8 plants</span>
+                    <span class="muted">→</span>
+                    <span style="background:rgba(132,204,22,0.18); color:#bef264; padding:1px 6px; border-radius:4px">11 MW · 9 plants</span>
+                    <span class="muted">· MRR +10 €</span>
+                  </div>
+                  <div class="timeline-meta">15 mars · par Ugo D.</div>
+                </div>
+              </div>
+
+              <div class="timeline-item">
+                <div class="timeline-dot" style="background:rgba(132,204,22,0.18); color:#bef264"><i data-lucide="user-plus"></i></div>
+                <div class="timeline-main">
+                  <div class="timeline-title">Compte créé · onboarding J+0/J+3/J+10 envoyés</div>
+                  <div class="timeline-meta">14 sept. 2024 · promo <span class="tabular">HYDRO24</span> appliqué (lead conversion)</div>
+                </div>
+              </div>
+
+              <div style="text-align:center; margin-top:10px">
+                <a class="link" style="font-size:11px" href="admin-audit.html?entity=convert-fmg">Voir 42 évènements de plus dans l'audit log →</a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Action buttons (collected) -->
+          <div class="cd-section">
+            <div class="cd-section-head"><div class="cd-section-title"><i data-lucide="zap" style="width:15px; color:var(--brand-cyan)"></i> Actions admin</div></div>
+            <div class="cd-section-body" style="display:flex; flex-direction:column; gap:6px">
+              <button class="btn btn-secondary btn-sm" style="justify-content:flex-start"><i data-lucide="edit-3"></i> Changer le plan / mode</button>
+              <button class="btn btn-secondary btn-sm" style="justify-content:flex-start"><i data-lucide="repeat"></i> Migrer vers une nouvelle pricing schedule</button>
+              <button class="btn btn-secondary btn-sm" style="justify-content:flex-start"><i data-lucide="coins"></i> Octroyer des jetons (avec note)</button>
+              <button class="btn btn-secondary btn-sm" style="justify-content:flex-start"><i data-lucide="cpu"></i> Ajouter un box hardware</button>
+              <button class="btn btn-secondary btn-sm" style="justify-content:flex-start"><i data-lucide="undo-2"></i> Rembourser une facture</button>
+              <button class="btn btn-secondary btn-sm" style="justify-content:flex-start"><i data-lucide="gift"></i> Appliquer un crédit</button>
+              <button class="btn btn-secondary btn-sm" style="justify-content:flex-start"><i data-lucide="flask-conical"></i> Marquer comme test_subscriber</button>
+              <button class="btn btn-secondary btn-sm" style="justify-content:flex-start"><i data-lucide="message-square"></i> Ajouter une note admin</button>
+              <button class="btn btn-secondary btn-sm" style="justify-content:flex-start"><i data-lucide="pause-circle"></i> Pause séquence onboarding <span class="badge badge-slate" style="margin-left:auto; font-size:10px">J+10 dans 4 j</span></button>
+              <button class="btn btn-secondary btn-sm" style="justify-content:flex-start"><i data-lucide="user-plus"></i> Escalader vers CSM</button>
+              <button class="btn btn-secondary btn-sm" style="justify-content:flex-start; color:var(--accent-red)"><i data-lucide="pause"></i> Suspendre l'abonnement</button>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="js/app.js"></script>
+</body></html>

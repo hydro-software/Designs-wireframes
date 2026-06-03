@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin · Mandats DSO — Naia</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="css/style.css" rel="stylesheet"><script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body data-page="admin-dso" data-section="admin">
+<div class="app-shell">
+  <aside class="sidebar"></aside>
+  <main class="main-area">
+    <header class="topbar">
+      <div><div class="page-eyebrow">Administration · Mandats DSO</div><div style="font-size:18px; font-weight:600">Templates d'accès données distributeur (FR-DSO)</div></div>
+      <div style="display:flex; gap:8px">
+        <button class="btn btn-secondary btn-sm"><i data-lucide="upload"></i> Importer template</button>
+        <button class="btn btn-primary"><i data-lucide="plus"></i> Nouveau DSO</button>
+      </div>
+    </header>
+
+    <div class="page-content">
+
+      <!-- KPIs -->
+      <div style="display:grid; gap:14px; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); margin-bottom:18px">
+        <div class="kpi-card"><div class="kpi-label">DSO configurés</div><div class="kpi-value tabular">2 / 5</div><div class="kpi-delta down">3 manquants (BE)</div></div>
+        <div class="kpi-card"><div class="kpi-label">Mandats signés · 30j</div><div class="kpi-value tabular">11</div><div class="kpi-delta up">+4</div></div>
+        <div class="kpi-card"><div class="kpi-label">Mandats en attente</div><div class="kpi-value tabular">3</div><div class="kpi-delta muted">via Yousign</div></div>
+        <div class="kpi-card"><div class="kpi-label">Plants bloqués</div><div class="kpi-value tabular" style="color:var(--accent-red)">2</div><div class="kpi-delta muted">DSO non configuré</div></div>
+      </div>
+
+      <!-- DSO templates table -->
+      <div class="card" style="margin-bottom:18px">
+        <div class="card-head"><div class="card-title">Templates par DSO</div></div>
+        <table class="data-table">
+          <thead><tr><th>DSO</th><th>Pays / région</th><th>Template courant</th><th>Versions</th><th>Mandats émis</th><th>Statut</th><th></th></tr></thead>
+          <tbody>
+            <tr style="cursor:pointer" onclick="if (event.target.tagName !== 'A' && event.target.tagName !== 'BUTTON') openOverlay('dso-detail')">
+              <td><b>Enedis</b><br><span class="muted" style="font-size:11px">distributeur national</span></td>
+              <td><span class="badge badge-blue">FR</span> métropolitain + Corse</td>
+              <td><span class="tabular">DATA-CONSOELEC v3</span><br><span class="muted" style="font-size:11px">PDF · 4 pages</span></td>
+              <td><a class="link">3 versions</a><br><span class="muted" style="font-size:11px">v1, v2, <b>v3</b> active</span></td>
+              <td class="num" style="text-align:right">42</td>
+              <td><span class="badge badge-green">Actif</span></td>
+              <td><a class="link" style="font-size:11px">Détails →</a> · <a class="link" style="font-size:11px">Nouvelle version</a></td>
+            </tr>
+            <tr style="cursor:pointer" onclick="if (event.target.tagName !== 'A' && event.target.tagName !== 'BUTTON') openOverlay('dso-detail')">
+              <td><b>Fluvius</b><br><span class="muted" style="font-size:11px">distributeur régional flamand</span></td>
+              <td><span class="badge badge-amber">BE</span> Flandre</td>
+              <td><span class="tabular">FLUVIUS-MANDATE v1</span><br><span class="muted" style="font-size:11px">PDF · 3 pages · NL</span></td>
+              <td><a class="link">1 version</a></td>
+              <td class="num" style="text-align:right">8</td>
+              <td><span class="badge badge-green">Actif</span></td>
+              <td><a class="link" style="font-size:11px">Détails →</a> · <a class="link" style="font-size:11px">Nouvelle version</a></td>
+            </tr>
+            <tr>
+              <td><b>ORES</b><br><span class="muted" style="font-size:11px">distributeur wallon (majorité)</span></td>
+              <td><span class="badge badge-amber">BE</span> Wallonie · 200 communes</td>
+              <td><span class="muted" style="font-size:12px">— pas de template</span></td>
+              <td><span class="muted" style="font-size:11px">—</span></td>
+              <td class="num" style="text-align:right; color:var(--accent-red)">2 bloqués</td>
+              <td><span class="badge badge-red">Manquant</span></td>
+              <td><a class="link" style="font-size:11px">Téléverser template →</a></td>
+            </tr>
+            <tr>
+              <td><b>RESA</b><br><span class="muted" style="font-size:11px">distributeur Liège</span></td>
+              <td><span class="badge badge-amber">BE</span> Wallonie · zone Liège</td>
+              <td><span class="muted" style="font-size:12px">— pas de template</span></td>
+              <td><span class="muted" style="font-size:11px">—</span></td>
+              <td class="num" style="text-align:right">0</td>
+              <td><span class="badge badge-red">Manquant</span></td>
+              <td><a class="link" style="font-size:11px">Téléverser template →</a></td>
+            </tr>
+            <tr>
+              <td><b>Sibelga</b><br><span class="muted" style="font-size:11px">distributeur Bruxelles</span></td>
+              <td><span class="badge badge-amber">BE</span> Région Bruxelles-Capitale</td>
+              <td><span class="muted" style="font-size:12px">— pas de template</span></td>
+              <td><span class="muted" style="font-size:11px">—</span></td>
+              <td class="num" style="text-align:right">0</td>
+              <td><span class="badge badge-red">Manquant</span></td>
+              <td><a class="link" style="font-size:11px">Téléverser template →</a></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Region → DSO mapping -->
+      <div class="card" style="margin-bottom:18px">
+        <div class="card-head"><div class="card-title">Mapping pays / région → DSO (FR-DSO-4)</div><button class="btn btn-secondary btn-sm"><i data-lucide="edit-3"></i> Éditer</button></div>
+        <table class="data-table">
+          <thead><tr><th>Pays</th><th>Région / critère</th><th>DSO résolu</th><th>Template</th></tr></thead>
+          <tbody>
+            <tr><td><span class="badge badge-blue">FR</span> France</td><td><i>tout territoire</i></td><td>Enedis</td><td><span class="badge badge-green">v3</span></td></tr>
+            <tr><td><span class="badge badge-amber">BE</span> Belgique</td><td>Région flamande</td><td>Fluvius</td><td><span class="badge badge-green">v1</span></td></tr>
+            <tr><td><span class="badge badge-amber">BE</span> Belgique</td><td>Wallonie · code postal ∈ {4xxx Liège}</td><td>RESA</td><td><span class="badge badge-red">manquant</span></td></tr>
+            <tr><td><span class="badge badge-amber">BE</span> Belgique</td><td>Wallonie · autres codes postaux</td><td>ORES</td><td><span class="badge badge-red">manquant</span></td></tr>
+            <tr><td><span class="badge badge-amber">BE</span> Belgique</td><td>Région Bruxelles-Capitale (1xxx)</td><td>Sibelga</td><td><span class="badge badge-red">manquant</span></td></tr>
+            <tr><td><span class="badge badge-slate">CH/DE/IT</span></td><td><i>aucun mapping</i></td><td class="muted">—</td><td class="muted">— sign-up bloqué</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pending mandates -->
+      <div class="card">
+        <div class="card-head"><div class="card-title">Mandats en circulation</div><a class="link" style="font-size:12px" href="admin-audit.html?filter=dso">Voir audit log →</a></div>
+        <table class="data-table">
+          <thead><tr><th>Plant</th><th>Client</th><th>DSO · template</th><th>Yousign</th><th>Statut</th><th>Âge</th><th></th></tr></thead>
+          <tbody>
+            <tr><td><b>Centrale Pyrénées-1</b><br><span class="muted" style="font-size:11px">~ 600 kW · 65000</span></td><td><a class="link" href="admin-customer.html">Pyrénées Hydroélec</a></td><td>Enedis · <span class="tabular">v3</span></td><td><a class="link" style="font-size:11px">envelope-pyr-3</a></td><td><span class="badge badge-purple">Pending sign.</span></td><td class="muted">5 j</td><td><a class="link" style="font-size:11px">Re-trigger</a></td></tr>
+            <tr><td><b>Centrale Pyrénées-2</b><br><span class="muted" style="font-size:11px">~ 720 kW · 65000</span></td><td><a class="link" href="admin-customer.html">Pyrénées Hydroélec</a></td><td>Enedis · <span class="tabular">v3</span></td><td><a class="link" style="font-size:11px">envelope-pyr-3</a></td><td><span class="badge badge-purple">Pending sign.</span></td><td class="muted">5 j</td><td><a class="link" style="font-size:11px">Re-trigger</a></td></tr>
+            <tr><td><b>Microcentrale Doubs-A</b><br><span class="muted" style="font-size:11px">~ 240 kW · 25000</span></td><td><a class="link" href="admin-customer.html">Microcentrale du Doubs</a></td><td>Enedis · <span class="tabular">v3</span></td><td><a class="link" style="font-size:11px">envelope-doubs-1</a></td><td><span class="badge badge-green">Signé · transmis</span></td><td class="muted">2 j</td><td><a class="link" style="font-size:11px">Voir PDF</a></td></tr>
+            <tr><td><b>Hydromill plant 1</b><br><span class="muted" style="font-size:11px">~ 220 kW · 1200 Bxl</span></td><td>Hydromill SRL</td><td style="color:var(--accent-red)">Sibelga · <i>template manquant</i></td><td class="muted">— bloqué</td><td><span class="badge badge-red">Sign-up bloqué</span></td><td class="muted">—</td><td><a class="link" style="font-size:11px">Téléverser template →</a></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p class="muted" style="font-size:12px; margin-top:14px; max-width:780px; line-height:1.6">
+        <b>FR-DSO · un mandat par centrale, généré au sign-up.</b> Le template est résolu depuis pays + région (closed enum, pas de texte libre · FR-DSO-4). Les templates sont versionnés ; chaque mandat émis garde la version au moment du signing (FR-DSO-3). Une zone sans template configuré <b>bloque le sign-up</b> avec message clair. Sur signature, l'événement <span class="tabular">plant.dso_mandate_signed</span> déclenche la connexion DSO via le module Insight (FR-DSO-5).
+      </p>
+
+    </div>
+  </main>
+</div>
+
+<!-- DSO detail modal -->
+<div class="overlay" id="dso-detail">
+  <div class="modal" style="max-width:720px">
+    <div class="modal-head">
+      <div>
+        <div class="page-eyebrow">DSO</div>
+        <div style="font-size:16px; font-weight:600">Enedis · France</div>
+      </div>
+      <button class="icon-btn" onclick="closeOverlay('dso-detail')"><i data-lucide="x"></i></button>
+    </div>
+    <div class="modal-body">
+      <h4 style="font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em; font-weight:600; margin:0 0 10px">Versions de template</h4>
+      <table class="data-table" style="font-size:13px">
+        <thead><tr><th>Version</th><th>Active depuis</th><th>Créée par</th><th>Mandats émis</th><th>Statut</th><th></th></tr></thead>
+        <tbody>
+          <tr><td><b class="tabular">v3</b></td><td class="tabular">15 janv. 2026</td><td>Bernard L.</td><td class="num" style="text-align:right">11</td><td><span class="badge badge-green">Active</span></td><td><a class="link" style="font-size:11px">Voir PDF</a></td></tr>
+          <tr><td class="tabular">v2</td><td class="tabular">3 mars 2025</td><td>Ugo D.</td><td class="num" style="text-align:right">24</td><td><span class="badge badge-slate">Archivée</span></td><td><a class="link" style="font-size:11px">Voir PDF</a></td></tr>
+          <tr><td class="tabular">v1</td><td class="tabular">1 sept. 2024</td><td>Ugo D.</td><td class="num" style="text-align:right">7</td><td><span class="badge badge-slate">Archivée</span></td><td><a class="link" style="font-size:11px">Voir PDF</a></td></tr>
+        </tbody>
+      </table>
+
+      <h4 style="font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em; font-weight:600; margin:18px 0 10px">Variables injectées dans le template</h4>
+      <div style="background:var(--bg-input); padding:12px; border-radius:8px; font-family:'JetBrains Mono', monospace; font-size:11px; line-height:1.7">
+        <span class="muted">// résolu au moment du signing</span><br>
+        <span style="color:var(--brand-cyan)">{{customer.legal_name}}</span> · <span style="color:var(--brand-cyan)">{{customer.vat_number}}</span><br>
+        <span style="color:var(--brand-cyan)">{{plant.name}}</span> · <span style="color:var(--brand-cyan)">{{plant.address}}</span> · <span style="color:var(--brand-cyan)">{{plant.prm_or_pdl}}</span><br>
+        <span style="color:var(--brand-cyan)">{{plant.capacity_kw}}</span> · <span style="color:var(--brand-cyan)">{{plant.commissioning_year}}</span><br>
+        <span style="color:var(--brand-cyan)">{{signed_at}}</span> · <span style="color:var(--brand-cyan)">{{template_version}}</span>
+      </div>
+
+      <h4 style="font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em; font-weight:600; margin:18px 0 10px">Mandats récents</h4>
+      <table class="data-table" style="font-size:12px">
+        <thead><tr><th>Date</th><th>Plant</th><th>Client</th><th>Version</th><th>Statut</th></tr></thead>
+        <tbody>
+          <tr><td class="tabular">2 mai</td><td>Microcentrale Doubs-A</td><td>Microcentrale du Doubs</td><td><b>v3</b></td><td><span class="badge badge-green">Transmis Enedis</span></td></tr>
+          <tr><td class="tabular">28 avr.</td><td>Cèze plant</td><td>Moulin de la Cèze</td><td><b>v3</b></td><td><span class="badge badge-green">Transmis Enedis</span></td></tr>
+          <tr><td class="tabular">22 avr.</td><td>Convert FMG plant 8</td><td>Convert FMG</td><td><b>v3</b></td><td><span class="badge badge-green">Transmis Enedis</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-secondary" onclick="closeOverlay('dso-detail')">Fermer</button>
+      <button class="btn btn-primary"><i data-lucide="upload"></i> Nouvelle version</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="js/app.js"></script>
+</body></html>

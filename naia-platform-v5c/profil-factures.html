@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mes factures — Naia</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="css/style.css" rel="stylesheet"><script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body data-page="profil-factures" data-section="profil">
+<div class="app-shell">
+  <aside class="sidebar"></aside>
+  <main class="main-area">
+    <header class="topbar"><div><div class="page-eyebrow">Profil</div><div style="font-size:18px; font-weight:600">Mes factures</div></div><button class="btn btn-secondary btn-sm"><i data-lucide="download"></i> Exporter CSV</button></header>
+    <div class="centrale-tabs">
+      <a class="centrale-tab" href="profil.html"><span>Identité</span></a>
+      <a class="centrale-tab" href="profil-abonnement.html"><span>Mon abonnement</span></a>
+      <a class="centrale-tab active" href="profil-factures.html"><span>Mes factures</span></a>
+      <a class="centrale-tab" href="profil-jetons.html"><span>Mes jetons</span></a>
+    </div>
+
+    <div class="page-content">
+      <div class="card">
+        <table class="data-table">
+          <thead><tr><th>Date</th><th>Numéro</th><th>Période</th><th class="num" style="text-align:right">Montant HT</th><th class="num" style="text-align:right">TVA</th><th class="num" style="text-align:right">Total TTC</th><th>Statut</th><th></th></tr></thead>
+          <tbody>
+            <tr><td class="tabular">1 avr. 2026</td><td>2026-04-018</td><td>avril 2026</td><td class="num" style="text-align:right">50,00 €</td><td class="num" style="text-align:right">10,50 €</td><td class="num" style="text-align:right; font-weight:600">60,50 €</td><td><span class="badge badge-green">Payée</span></td><td><a href="#" class="link"><i data-lucide="download" style="width:14px;height:14px"></i></a></td></tr>
+            <tr><td class="tabular">1 mars 2026</td><td>2026-03-014</td><td>mars 2026</td><td class="num" style="text-align:right">50,00 €</td><td class="num" style="text-align:right">10,50 €</td><td class="num" style="text-align:right; font-weight:600">60,50 €</td><td><span class="badge badge-green">Payée</span></td><td><a href="#" class="link"><i data-lucide="download" style="width:14px;height:14px"></i></a></td></tr>
+            <tr><td class="tabular">1 fév. 2026</td><td>2026-02-009</td><td>février 2026</td><td class="num" style="text-align:right">50,00 €</td><td class="num" style="text-align:right">10,50 €</td><td class="num" style="text-align:right; font-weight:600">60,50 €</td><td><span class="badge badge-green">Payée</span></td><td><a href="#" class="link"><i data-lucide="download" style="width:14px;height:14px"></i></a></td></tr>
+            <tr><td class="tabular">1 jan. 2026</td><td>2026-01-005</td><td>janvier 2026</td><td class="num" style="text-align:right">50,00 €</td><td class="num" style="text-align:right">10,50 €</td><td class="num" style="text-align:right; font-weight:600">60,50 €</td><td><span class="badge badge-green">Payée</span></td><td><a href="#" class="link"><i data-lucide="download" style="width:14px;height:14px"></i></a></td></tr>
+            <tr><td class="tabular">1 déc. 2025</td><td>2025-12-021</td><td>décembre 2025</td><td class="num" style="text-align:right">50,00 €</td><td class="num" style="text-align:right">10,50 €</td><td class="num" style="text-align:right; font-weight:600">60,50 €</td><td><span class="badge badge-green">Payée</span></td><td><a href="#" class="link"><i data-lucide="download" style="width:14px;height:14px"></i></a></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="js/app.js"></script>
+</body></html>
