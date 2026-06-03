@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Comparateur — Vue revenus — Naia</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="../naia-platform-v5/css/style.css" rel="stylesheet"><script src="https://cdn.tailwindcss.com"></script>
+<style>
+  /* Plant-detail collapsible sections */
+  .pd-section { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 12px; margin-bottom: 12px; overflow: hidden; }
+  .pd-section-head { padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none; }
+  .pd-section-head:hover { background: var(--bg-card-hover); }
+  .pd-section-title { font-size: 15px; font-weight: 600; display: flex; align-items: center; gap: 10px; }
+  .pd-section-body { padding: 0 20px 20px; border-top: 1px solid var(--border-subtle); padding-top: 18px; }
+  .pd-section[data-open="false"] .pd-section-body { display: none; }
+  .pd-section[data-open="false"] .pd-chev { transform: rotate(-90deg); }
+  .pd-chev { transition: transform 0.18s; color: var(--text-muted); }
+  /* Sous-chapitres dépliables */
+  .pd-sub { background: var(--bg-base); border: 1px solid var(--border-subtle); border-radius: 10px; margin-bottom: 10px; overflow: hidden; }
+  .pd-sub-head { padding: 11px 16px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none; }
+  .pd-sub-head:hover { background: var(--bg-card-hover); }
+  .pd-sub-title { font-size: 13.5px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+  .pd-sub-body { padding: 0 16px 16px; border-top: 1px solid var(--border-subtle); padding-top: 14px; }
+  .pd-sub[data-open="false"] .pd-sub-body { display: none; }
+  .pd-sub[data-open="false"] .pd-sub-chev { transform: rotate(-90deg); }
+  .pd-sub-chev { transition: transform 0.18s; color: var(--text-muted); }
+  /* Sélecteur "histogramme inversé" : sources prédéfinies à gauche → sélection à droite (brouillon BL) */
+  .picker { display: grid; grid-template-columns: 1fr 1.15fr; gap: 16px; align-items: start; }
+  .picker-col-title { font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 10px; }
+  .src-group { background: var(--bg-base); border: 1px solid var(--border-subtle); border-radius: 10px; padding: 12px 14px; margin-bottom: 10px; display: flex; gap: 10px; align-items: stretch; }
+  .src-group .src-main { flex: 1; min-width: 0; }
+  .src-group-title { font-size: 12px; font-weight: 600; color: var(--text-primary); margin-bottom: 9px; display: flex; align-items: center; gap: 7px; }
+  .src-group-title .swatch { width: 9px; height: 9px; border-radius: 50%; }
+  .src-group-max { margin-left: auto; font-size: 11px; font-weight: 400; color: var(--text-muted); }
+  .src-create { margin-top: 8px; width: 100%; font-size: 12px; color: var(--brand-cyan); background: none; border: 1px dashed var(--border-default); border-radius: 7px; padding: 6px 10px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+  .src-create:hover { border-color: var(--brand-cyan); background: var(--bg-card-hover); }
+  .src-create i { width: 14px; height: 14px; }
+  .src-list { max-height: 168px; overflow-y: auto; padding-right: 4px; }
+  .src-list::-webkit-scrollbar { width: 8px; }
+  .src-list::-webkit-scrollbar-thumb { background: var(--border-default); border-radius: 4px; }
+  .src-row { padding: 5px 8px; border-radius: 7px; cursor: pointer; border: 1px solid transparent; }
+  .src-row + .src-row { margin-top: 2px; }
+  .src-row:hover { background: var(--bg-card-hover); }
+  .src-row.is-selected { background: rgba(34,211,238,0.16); border-color: var(--brand-cyan); }
+  .src-row.is-added { opacity: 0.4; pointer-events: none; }
+  .src-row-main { display: flex; align-items: center; gap: 8px; }
+  .src-row .src-name { font-size: 13px; color: var(--text-primary); flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .src-detail-btn { flex-shrink: 0; font-size: 11px; color: var(--text-muted); background: none; border: 1px solid var(--border-default); border-radius: 6px; padding: 2px 8px; cursor: pointer; }
+  .src-detail-btn:hover { color: var(--brand-cyan); border-color: var(--brand-cyan); }
+  .src-detail { font-size: 11px; color: var(--text-muted); padding: 4px 2px 2px; }
+  .src-detail[hidden] { display: none; }
+  .src-arrow { flex-shrink: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; }
+  .src-arrow button { width: 36px; height: 36px; border-radius: 9px; border: 1px solid var(--border-default); background: var(--bg-input); color: var(--brand-cyan); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
+  .src-arrow button:hover { background: var(--bg-card-hover); }
+  .src-arrow button:disabled { opacity: 0.4; cursor: default; color: var(--text-muted); }
+  .src-arrow .arrow-count { font-size: 10.5px; font-weight: 600; color: var(--text-muted); }
+  .sel-box { background: var(--bg-base); border: 1px solid var(--border-default); border-radius: 10px; padding: 14px 16px; min-height: 340px; max-height: 600px; overflow-y: auto; }
+  .sel-item { display: flex; align-items: center; gap: 10px; padding: 9px 11px; margin-bottom: 8px; background: var(--bg-input); border: 1px solid var(--border-subtle); border-radius: 8px; }
+  .sel-item .sel-name { font-size: 13px; color: var(--text-primary); }
+  .sel-item .sel-meta { font-size: 11px; color: var(--text-muted); }
+  .sel-item .sel-rm { margin-left: auto; flex-shrink: 0; color: var(--text-muted); cursor: pointer; background: none; border: none; padding: 4px; display: inline-flex; }
+  .sel-item .sel-rm:hover { color: var(--accent-red); }
+  .sel-empty { font-size: 12.5px; color: var(--text-muted); text-align: center; padding: 28px 8px; }
+  @media (max-width: 760px) { .picker { grid-template-columns: 1fr; } }
+  /* Coque autoportante (brouillon BL) */
+  .standalone-wrap { max-width: 980px; margin: 0 auto; padding: 34px 24px 72px; }
+  .standalone-kicker { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--brand-cyan); background: rgba(34,211,238,0.10); border: 1px solid rgba(34,211,238,0.30); border-radius: 999px; padding: 4px 11px; margin-bottom: 14px; }
+  .standalone-h1 { font-size: 22px; font-weight: 700; color: var(--text-primary); margin: 0 0 8px; display: flex; align-items: center; gap: 10px; }
+  .standalone-lead { font-size: 13.5px; color: var(--text-muted); line-height: 1.65; margin: 0 0 22px; max-width: 760px; }
+  .rev-flux-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding: 10px 0; border-bottom: 1px dashed var(--border-subtle); }
+  .rev-flux-label { font-size: 14px; font-weight: 600; color: var(--text-primary); font-family: ui-monospace, monospace; white-space: nowrap; }
+  .rev-times { font-size: 15px; font-weight: 600; color: var(--text-muted); font-family: ui-monospace, monospace; }
+</style>
+</head>
+<body style="background: var(--bg-base); min-height: 100vh;">
+
+<div class="standalone-wrap">
+  <div class="standalone-kicker"><i data-lucide="git-compare" style="width:13px; height:13px"></i> Brouillon BL · Comparateur</div>
+  <h1 class="standalone-h1"><i data-lucide="banknote" style="width:22px; height:22px; color:var(--brand-cyan)"></i> Vue revenus</h1>
+  <p class="standalone-lead">
+    Complément du <b style="color:var(--text-primary)">Comparateur</b> de la page Paramètres : le sous-chapitre <b style="color:var(--text-primary)">Vue revenus</b>.
+    Un revenu n'est jamais une donnée brute&nbsp;: <b style="color:var(--text-primary)">revenu = énergie (production) × prix (tarification)</b>.
+    Il n'y a donc <b style="color:var(--text-primary)">pas de donnée publique</b> ici. On compare soit&nbsp;:
+    une <b style="color:var(--text-primary)">donnée de revenu privée</b> (importée sur Naia&nbsp;: simulation, scénario…),
+    soit un <b style="color:var(--text-primary)">revenu composite</b>, construit comme une <b style="color:var(--text-primary)">somme de flux</b>
+    (chaque flux = une énergie × une tarification — exactement comme le revenu réel de la centrale dans «&nbsp;Flux de revenus&nbsp;»).
+  </p>
+
+  <!-- ============================ Comparateur — Vue revenus ============================ -->
+  <div class="pd-section" data-open="true">
+    <div class="pd-section-head" onclick="this.parentElement.dataset.open = this.parentElement.dataset.open === 'true' ? 'false' : 'true'">
+      <div class="pd-section-title"><i data-lucide="git-compare" style="width:16px; height:16px; color:var(--brand-cyan)"></i> Comparateur</div>
+      <i data-lucide="chevron-down" class="pd-chev"></i>
+    </div>
+    <div class="pd-section-body">
+      <p class="muted" style="font-size:13px; margin:0 0 14px">
+        Choisissez les revenus qui pourront être comparés aux revenus de cette centrale.
+      </p>
+
+      <!-- Sous-chapitre : Vue revenus -->
+      <div class="pd-sub" data-open="true">
+        <div class="pd-sub-head" onclick="this.parentElement.dataset.open = this.parentElement.dataset.open === 'true' ? 'false' : 'true'">
+          <div class="pd-sub-title"><i data-lucide="banknote" style="width:16px; height:16px; color:var(--brand-cyan)"></i> Vue revenus</div>
+          <i data-lucide="chevron-down" class="pd-sub-chev"></i>
+        </div>
+        <div class="pd-sub-body">
+          <p class="muted" style="font-size:12.5px; margin:0 0 14px; line-height:1.6">
+            Sélectionnez les revenus de comparaison qui seront <b style="color:var(--text-primary)">sélectionnables par vos utilisateurs</b>.
+            Cochez une ou plusieurs sources à gauche, puis appuyez sur la flèche pour les ajouter.
+          </p>
+
+          <div class="picker" data-picker-max="10">
+            <div>
+              <div class="picker-col-title">Sources disponibles</div>
+
+              <div class="src-group" data-cat-max="3" data-create-max="5" data-cat="privee">
+                <div class="src-main">
+                  <div class="src-group-title"><span class="swatch" style="background:#a3e635"></span> Revenu simulé hors Naia <span class="src-group-max">(CSV importé)</span></div>
+                  <div class="src-list">
+                    <div class="src-row" data-name="Revenus simulation" data-meta="Import sur Naia · CSV" data-unite="€" onclick="toggleSrcRow(this)"><div class="src-row-main"><span class="src-name">Revenus simulation</span><button class="src-detail-btn" onclick="srcDetail(event,this)">Détail</button></div><div class="src-detail" hidden>Import sur Naia · CSV</div></div>
+                    <div class="src-row" data-name="Revenus année de référence" data-meta="Import sur Naia · CSV" data-unite="€" onclick="toggleSrcRow(this)"><div class="src-row-main"><span class="src-name">Revenus année de référence</span><button class="src-detail-btn" onclick="srcDetail(event,this)">Détail</button></div><div class="src-detail" hidden>Import sur Naia · CSV</div></div>
+                  </div>
+                  <button class="src-create" onclick="openRevSource(this)"><i data-lucide="plus"></i> Importer un CSV</button>
+                </div>
+                <div class="src-arrow"><button title="Ajouter à la sélection" onclick="movePluieSelected(this)" disabled><i data-lucide="arrow-right"></i></button><span class="arrow-count">0/3</span></div>
+              </div>
+
+              <div class="src-group" data-cat-max="3" data-create-max="5" data-cat="composite">
+                <div class="src-main">
+                  <div class="src-group-title"><span class="swatch" style="background:#7dd3fc"></span> Revenus composites <span class="src-group-max">(somme de flux)</span></div>
+                  <div class="src-list">
+                    <div class="src-row" data-name="Revenu moyen du parc" data-meta="Composite · 3 flux" onclick="toggleSrcRow(this)"><div class="src-row-main"><span class="src-name">Revenu moyen du parc</span><button class="src-detail-btn" onclick="srcDetail(event,this)">Détail</button></div><div class="src-detail" hidden>Composite · 3 flux</div></div>
+                    <div class="src-row" data-name="Revenu théorique tout-OA" data-meta="Composite · 1 flux" onclick="toggleSrcRow(this)"><div class="src-row-main"><span class="src-name">Revenu théorique tout-OA</span><button class="src-detail-btn" onclick="srcDetail(event,this)">Détail</button></div><div class="src-detail" hidden>Composite · 1 flux</div></div>
+                  </div>
+                  <button class="src-create" onclick="openRevComposite(this)"><i data-lucide="plus"></i> Composer un revenu</button>
+                </div>
+                <div class="src-arrow"><button title="Ajouter à la sélection" onclick="movePluieSelected(this)" disabled><i data-lucide="arrow-right"></i></button><span class="arrow-count">0/3</span></div>
+              </div>
+            </div>
+
+            <div>
+              <div class="picker-col-title">Revenus sélectionnables <span id="cmprev-count" class="sel-count" style="color:var(--text-muted); font-weight:400; text-transform:none; letter-spacing:0">(0/10)</span></div>
+              <div class="sel-box" id="cmprev-selection">
+                <div class="sel-empty">Aucun revenu sélectionné.<br>Cochez des sources à gauche puis appuyez sur la flèche.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================ Popup : importer une donnée de revenu privée ============================
+     Un revenu = énergie × prix → il ne se branche pas sur une API publique : il est importé sur Naia. -->
+<div id="rev-source" class="overlay" onclick="if(event.target===this) closeOverlay('rev-source')">
+  <div class="modal">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px">
+      <div>
+        <div class="modal-title"><i data-lucide="upload" style="width:16px; height:16px; vertical-align:-2px; color:var(--brand-cyan)"></i> <span id="rev-source-title">Importer un revenu simulé</span></div>
+        <div class="modal-subtitle"><span id="rev-source-sub">Nouvelle source ajoutée à</span> <b id="rev-source-cat" style="color:var(--text-primary)">—</b>.</div>
+      </div>
+      <button class="btn btn-ghost" onclick="closeOverlay('rev-source')"><i data-lucide="x"></i></button>
+    </div>
+
+    <div style="display:flex; flex-direction:column; gap:14px">
+      <div>
+        <label style="display:block; font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em; font-weight:600; margin-bottom:6px">Nom du revenu <span style="color:var(--accent-red)">*</span></label>
+        <input id="rev-source-nom" class="input" type="text" placeholder="ex. Revenus simulation 2025">
+      </div>
+
+      <div>
+        <label style="display:block; font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em; font-weight:600; margin-bottom:6px">Unité <span style="color:var(--accent-red)">*</span></label>
+        <select id="rev-source-unite" class="select"><option>€</option><option>k€</option><option>€/MWh</option></select>
+      </div>
+
+      <div style="background:var(--bg-base); border:1px solid var(--border-subtle); border-radius:10px; padding:12px 14px; font-size:12.5px; color:var(--text-muted); line-height:1.6">
+        <i data-lucide="info" style="width:14px; height:14px; vertical-align:-2px; color:var(--brand-cyan)"></i>
+        <b style="color:var(--text-primary)">Import sur Naia</b>. À vous d'importer votre <b style="color:var(--text-primary)">CSV</b> en fonction de vos
+        <b style="color:var(--text-primary)">simulations hors Naia</b> : le calcul du revenu se fait de votre côté, Naia stocke et compare le résultat.
+      </div>
+    </div>
+
+    <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:18px; padding-top:14px; border-top:1px solid var(--border-subtle)">
+      <button class="btn btn-ghost" onclick="closeOverlay('rev-source')">Annuler</button>
+      <button id="rev-source-save" class="btn btn-primary" onclick="saveRevSource()"><i data-lucide="check"></i> Importer</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================ Popup : revenu composite = somme de flux ============================
+     Différent du composite "données" : ici chaque ligne est un FLUX = énergie × tarification.
+     Le revenu composite est la somme de ses flux (cf. menu "Flux de revenus"). -->
+<div id="rev-composite" class="overlay" onclick="if(event.target===this) closeOverlay('rev-composite')">
+  <div class="modal modal-lg">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px">
+      <div>
+        <div class="modal-title"><i data-lucide="coins" style="width:16px; height:16px; vertical-align:-2px; color:var(--brand-cyan)"></i> <span id="rev-composite-title">Composer un revenu</span></div>
+        <div class="modal-subtitle">Somme de flux — chaque flux = une énergie × une tarification.</div>
+      </div>
+      <button class="btn btn-ghost" onclick="closeOverlay('rev-composite')"><i data-lucide="x"></i></button>
+    </div>
+
+    <div style="display:flex; flex-direction:column; gap:14px">
+      <div>
+        <label style="display:block; font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em; font-weight:600; margin-bottom:6px">Nom <span style="color:var(--accent-red)">*</span></label>
+        <input id="rev-composite-nom" class="input" type="text" placeholder="ex. Revenu moyen du parc">
+      </div>
+
+      <div>
+        <label style="display:block; font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em; font-weight:600; margin-bottom:6px">Revenu composite — formule</label>
+        <input id="rev-composite-formula" type="text" readonly value="Flux A + Flux B" style="font-family: ui-monospace, monospace; font-size:15px; padding:10px 12px; min-width:280px; width:100%; background:var(--bg-base); border:1px solid var(--border-subtle); border-radius:8px; color:var(--text-primary)">
+        <div class="muted" style="font-size:11.5px; margin-top:6px">Le revenu composite est la <b>somme</b> de ses flux. Chaque flux = énergie × tarification (sur chaque pas de temps, puis cumul).</div>
+      </div>
+
+      <div style="background:var(--bg-base); border:1px solid var(--border-subtle); border-radius:10px; padding:12px 14px">
+        <div style="font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em; font-weight:600; margin-bottom:8px">Flux (énergie × tarification)</div>
+        <div id="rev-composite-flux"></div>
+        <div style="margin-top:8px">
+          <button class="btn btn-secondary btn-sm" onclick="revAddFlux()"><i data-lucide="plus"></i> Ajouter un flux</button>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:18px; padding-top:14px; border-top:1px solid var(--border-subtle)">
+      <button class="btn btn-ghost" onclick="closeOverlay('rev-composite')">Annuler</button>
+      <button id="rev-composite-save" class="btn btn-primary" onclick="saveRevComposite()"><i data-lucide="check"></i> Créer</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/lucide@latest"></script>
+<!-- ============================ STANDALONE (brouillon BL) ============================
+     Version autoportante du sous-chapitre "Vue revenus" du Comparateur, pour la revue
+     (commentaire de l'issue Jan + Ugo). On NE charge PAS le app.js de Jan (son routeur
+     reconstruit la barre latérale et peut rediriger la page). On reprend uniquement les
+     3 helpers réellement utilisés (openOverlay / closeOverlay / initIcons) + l'Échap,
+     copiés à l'identique depuis naia-platform-v5/js/app.js, puis la mécanique du picker
+     (copiée de parametres.html) et deux popups spécifiques aux revenus :
+       - rev-source : import d'un revenu privé (Import sur Naia uniquement) ;
+       - rev-composite : revenu = somme de flux (énergie × tarification). -->
+<script>
+  function openOverlay(id) { const el = document.getElementById(id); if (el) { el.classList.add("open"); document.body.style.overflow = "hidden"; } }
+  function closeOverlay(id) { const el = document.getElementById(id); if (el) { el.classList.remove("open"); document.body.style.overflow = ""; } }
+  function initIcons() { if (window.lucide && typeof lucide.createIcons === "function") { lucide.createIcons({ attrs: { "stroke-width": 1.75 } }); } }
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") { document.querySelectorAll(".overlay.open").forEach(el => el.classList.remove("open")); document.body.style.overflow = ""; } });
+</script>
+
+<script>
+  /* ---- Picker "histogramme inversé" (copié de parametres.html) ---- */
+  function catMax(group) { return parseInt(group.dataset.catMax || "3", 10); }
+  function catTaken(group) { return group.querySelectorAll(".src-row.is-added").length; }
+  function srcDetail(ev, btn) {
+    ev.stopPropagation();
+    const row = btn.closest(".src-row");
+    const cat = row.closest(".src-group").dataset.cat;
+    if (cat === "privee") { editRevSource(row); return; }
+    if (cat === "composite") { editRevComposite(row); return; }
+    const d = row.querySelector(".src-detail");
+    if (d) d.hidden = !d.hidden;
+  }
+  function toggleSrcRow(row) {
+    if (row.classList.contains("is-added")) return;
+    const group = row.closest(".src-group");
+    const remaining = catMax(group) - catTaken(group);
+    const staged = group.querySelectorAll(".src-row.is-selected").length;
+    if (!row.classList.contains("is-selected") && staged >= remaining) return;
+    row.classList.toggle("is-selected");
+    refreshArrow(group);
+  }
+  function refreshArrow(group) {
+    const taken = catTaken(group);
+    const staged = group.querySelectorAll(".src-row.is-selected").length;
+    const arrow = group.querySelector(".src-arrow");
+    arrow.querySelector(".arrow-count").textContent = taken + "/" + catMax(group);
+    arrow.querySelector("button").disabled = (staged === 0);
+  }
+  function pickerRefreshCount(picker) {
+    const box = picker.querySelector(".sel-box");
+    const max = parseInt(picker.dataset.pickerMax || "10", 10);
+    const n = box.querySelectorAll(".sel-item").length;
+    const c = picker.querySelector(".sel-count");
+    if (c) c.textContent = "(" + n + "/" + max + ")";
+    if (n === 0 && !box.querySelector(".sel-empty")) {
+      box.innerHTML = '<div class="sel-empty">Aucun revenu sélectionné.<br>Cochez des sources à gauche puis appuyez sur la flèche.</div>';
+    }
+    return n;
+  }
+  function movePluieSelected(btn) {
+    const group = btn.closest(".src-group");
+    const picker = btn.closest(".picker");
+    const box = picker.querySelector(".sel-box");
+    const max = parseInt(picker.dataset.pickerMax || "10", 10);
+    const rows = [...group.querySelectorAll(".src-row.is-selected")];
+    for (const row of rows) {
+      if (catTaken(group) >= catMax(group)) break;
+      if (box.querySelectorAll(".sel-item").length >= max) {
+        alert("Maximum " + max + " revenus sélectionnables au total.");
+        break;
+      }
+      const empty = box.querySelector(".sel-empty");
+      if (empty) empty.remove();
+      const name = row.dataset.name, meta = row.dataset.meta;
+      const div = document.createElement("div");
+      div.className = "sel-item";
+      div.dataset.name = name;
+      div.innerHTML =
+        '<span><span class="sel-name">' + name + '</span><br><span class="sel-meta">' + meta + '</span></span>' +
+        '<button class="sel-rm" title="Retirer" onclick="removePluieItem(this)"><i data-lucide="x"></i></button>';
+      box.appendChild(div);
+      row.classList.remove("is-selected");
+      row.classList.add("is-added");
+    }
+    refreshArrow(group);
+    pickerRefreshCount(picker);
+    if (window.lucide) lucide.createIcons();
+  }
+  function removePluieItem(btn) {
+    const sel = btn.closest(".sel-item");
+    if (!sel) return;
+    const picker = sel.closest(".picker");
+    const name = sel.dataset.name;
+    const src = picker.querySelector('.src-row[data-name="' + (name || "").replace(/"/g, '\\"') + '"]');
+    sel.remove();
+    if (src) { src.classList.remove("is-added"); refreshArrow(src.closest(".src-group")); }
+    pickerRefreshCount(picker);
+  }
+
+  /* ---- Popup "Importer un revenu" privé (Import sur Naia uniquement) ---- */
+  let revSourceTarget = null;
+  let revSourceEditRow = null;
+  function setSelectValue(sel, val) {
+    const opt = [...sel.options].find(o => o.value === val);
+    sel.value = opt ? val : sel.options[0].value;
+  }
+  function openRevSource(btn) {
+    const group = btn.closest(".src-group");
+    const createMax = parseInt(group.dataset.createMax || "0", 10);
+    if (createMax) {
+      const created = group.querySelectorAll('.src-row[data-custom="true"]').length;
+      if (created >= createMax) { alert("Maximum " + createMax + " revenus importés dans cette catégorie."); return; }
+    }
+    revSourceTarget = group;
+    revSourceEditRow = null;
+    document.getElementById("rev-source-title").textContent = "Importer un revenu simulé";
+    document.getElementById("rev-source-sub").textContent = "Nouvelle source ajoutée à";
+    document.getElementById("rev-source-cat").textContent = group.querySelector(".src-group-title").textContent.replace(/\(.*?\)/, "").trim();
+    document.getElementById("rev-source-save").innerHTML = '<i data-lucide="check"></i> Importer';
+    document.getElementById("rev-source-nom").value = "";
+    document.getElementById("rev-source-unite").selectedIndex = 0;
+    openOverlay("rev-source");
+    if (window.lucide) lucide.createIcons();
+  }
+  function editRevSource(row) {
+    revSourceTarget = row.closest(".src-group");
+    revSourceEditRow = row;
+    document.getElementById("rev-source-title").textContent = "Modifier le revenu importé";
+    document.getElementById("rev-source-sub").textContent = "Revenu de";
+    document.getElementById("rev-source-cat").textContent = revSourceTarget.querySelector(".src-group-title").textContent.replace(/\(.*?\)/, "").trim();
+    document.getElementById("rev-source-save").innerHTML = '<i data-lucide="check"></i> Enregistrer';
+    document.getElementById("rev-source-nom").value = row.dataset.name || "";
+    setSelectValue(document.getElementById("rev-source-unite"), row.dataset.unite || "€");
+    openOverlay("rev-source");
+    if (window.lucide) lucide.createIcons();
+  }
+  function saveRevSource() {
+    if (!revSourceTarget) return;
+    const nom = document.getElementById("rev-source-nom").value.trim();
+    if (!nom) { alert("Indiquez le nom du revenu."); return; }
+    const unite = document.getElementById("rev-source-unite").value;
+    const meta = "Import sur Naia · " + unite;
+    if (revSourceEditRow) {
+      const row = revSourceEditRow;
+      row.dataset.name = nom; row.dataset.meta = meta; row.dataset.unite = unite;
+      row.querySelector(".src-name").textContent = nom;
+      row.querySelector(".src-detail").textContent = meta;
+    } else {
+      const row = document.createElement("div");
+      row.className = "src-row";
+      row.dataset.name = nom; row.dataset.meta = meta; row.dataset.unite = unite; row.dataset.custom = "true";
+      row.setAttribute("onclick", "toggleSrcRow(this)");
+      row.innerHTML =
+        '<div class="src-row-main"><span class="src-name">' + nom + '</span><button class="src-detail-btn" onclick="srcDetail(event,this)">Détail</button></div>' +
+        '<div class="src-detail" hidden>' + meta + '</div>';
+      const list = revSourceTarget.querySelector(".src-list");
+      list.appendChild(row);
+      list.scrollTop = list.scrollHeight;
+    }
+    closeOverlay("rev-source");
+    if (window.lucide) lucide.createIcons();
+  }
+
+  /* ---- Popup "Composer un revenu" : somme de flux (énergie × tarification) ---- */
+  let revCompTarget = null;
+  let revCompEditRow = null;
+  // Énergies valorisables (flux de production + compteurs) — repris du menu "Flux de revenus"
+  const REV_ENERGIE_OPTS =
+    '<optgroup label="Flux de production"><option>Production injectée (flux principal)</option></optgroup>' +
+    '<optgroup label="Compteurs"><option>MOU-PRINC · Production principale</option><option>MOU-AUX · Auxiliaires</option><option>MOU-MANU · Relève manuelle</option></optgroup>';
+  // Tarifications disponibles (menu "Tarification")
+  const REV_TARIF_OPTS =
+    '<option>OA + complément</option><option>Tarif fixe annuel 2025</option><option>Prix évité (achat réseau)</option><option>Tarif ACC</option>';
+  function revFluxRow(letter, mandatory) {
+    const div = document.createElement("div");
+    div.className = "rev-flux-row";
+    div.innerHTML =
+      '<span class="rev-flux-label">Flux ' + letter + ' =</span>' +
+      '<select class="select rev-flux-energie" style="min-width:210px">' + REV_ENERGIE_OPTS + '</select>' +
+      '<span class="rev-times">×</span>' +
+      '<select class="select rev-flux-tarif" style="min-width:170px">' + REV_TARIF_OPTS + '</select>' +
+      (mandatory ? "" : '<button class="icon-action" title="Supprimer ce flux" style="margin-left:auto" onclick="this.closest(\'.rev-flux-row\').remove(); revRelabel()"><i data-lucide="trash-2"></i></button>');
+    return div;
+  }
+  function revRelabel() {
+    const rows = [...document.querySelectorAll("#rev-composite-flux .rev-flux-row")];
+    rows.forEach((r, i) => { r.querySelector(".rev-flux-label").textContent = "Flux " + String.fromCharCode(65 + i) + " ="; });
+    revUpdateFormula();
+  }
+  function revUpdateFormula() {
+    const rows = [...document.querySelectorAll("#rev-composite-flux .rev-flux-row")];
+    const terms = rows.map((r, i) => "Flux " + String.fromCharCode(65 + i));
+    document.getElementById("rev-composite-formula").value = terms.length ? terms.join(" + ") : "—";
+  }
+  function revBuildFlux(n) {
+    const box = document.getElementById("rev-composite-flux");
+    box.innerHTML = "";
+    for (let i = 0; i < n; i++) box.appendChild(revFluxRow(String.fromCharCode(65 + i), i === 0));
+    revUpdateFormula();
+  }
+  function revAddFlux() {
+    const box = document.getElementById("rev-composite-flux");
+    const i = box.querySelectorAll(".rev-flux-row").length;
+    box.appendChild(revFluxRow(String.fromCharCode(65 + i), false));
+    revUpdateFormula();
+    if (window.lucide) lucide.createIcons();
+  }
+  function openRevComposite(btn) {
+    const group = btn.closest(".src-group");
+    const createMax = parseInt(group.dataset.createMax || "0", 10);
+    if (createMax) {
+      const created = group.querySelectorAll('.src-row[data-custom="true"]').length;
+      if (created >= createMax) { alert("Maximum " + createMax + " revenus composites dans cette catégorie."); return; }
+    }
+    revCompTarget = group;
+    revCompEditRow = null;
+    document.getElementById("rev-composite-title").textContent = "Composer un revenu";
+    document.getElementById("rev-composite-save").innerHTML = '<i data-lucide="check"></i> Créer';
+    document.getElementById("rev-composite-nom").value = "";
+    revBuildFlux(2);
+    openOverlay("rev-composite");
+    if (window.lucide) lucide.createIcons();
+  }
+  function editRevComposite(row) {
+    revCompTarget = row.closest(".src-group");
+    revCompEditRow = row;
+    document.getElementById("rev-composite-title").textContent = "Modifier le revenu composite";
+    document.getElementById("rev-composite-save").innerHTML = '<i data-lucide="check"></i> Enregistrer';
+    document.getElementById("rev-composite-nom").value = row.dataset.name || "";
+    revBuildFlux(2);
+    openOverlay("rev-composite");
+    if (window.lucide) lucide.createIcons();
+  }
+  function saveRevComposite() {
+    if (!revCompTarget) return;
+    const nom = document.getElementById("rev-composite-nom").value.trim();
+    if (!nom) { alert("Indiquez le nom du revenu composite."); return; }
+    const nFlux = document.querySelectorAll("#rev-composite-flux .rev-flux-row").length;
+    const meta = "Composite · " + nFlux + " flux";
+    if (revCompEditRow) {
+      const row = revCompEditRow;
+      row.dataset.name = nom; row.dataset.meta = meta;
+      row.querySelector(".src-name").textContent = nom;
+      row.querySelector(".src-detail").textContent = meta;
+    } else {
+      const row = document.createElement("div");
+      row.className = "src-row";
+      row.dataset.name = nom; row.dataset.meta = meta; row.dataset.custom = "true";
+      row.setAttribute("onclick", "toggleSrcRow(this)");
+      row.innerHTML =
+        '<div class="src-row-main"><span class="src-name">' + nom + '</span><button class="src-detail-btn" onclick="srcDetail(event,this)">Détail</button></div>' +
+        '<div class="src-detail" hidden>' + meta + '</div>';
+      const list = revCompTarget.querySelector(".src-list");
+      list.appendChild(row);
+      list.scrollTop = list.scrollHeight;
+    }
+    closeOverlay("rev-composite");
+    if (window.lucide) lucide.createIcons();
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll(".picker").forEach(pickerRefreshCount);
+    initIcons();
+  });
+</script>
+</body></html>
