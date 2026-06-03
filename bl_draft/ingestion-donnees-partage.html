@@ -1,0 +1,2621 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Données (ingestion) — BL draft · MVP 0.9</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<!-- copie du MVP 0.9 — on réutilise EXACTEMENT la feuille de style + le JS de la maquette v5 de Jan -->
+<style>
+/* Naia v4 — integrated app mockup
+ * Dark theme primary (matches the actual platform UI per game/.screenshots/).
+ * Light variant available via [data-theme="light"] on <html>.
+ * Per ADR-001: one integrated app — naia + community + subscription modules in one shell. */
+
+/* ============ TOKENS ============ */
+
+:root,
+:root[data-theme="dark"] {
+  --bg-base: #0a1326;
+  --bg-elevated: #0f1a32;
+  --bg-card: #111d36;
+  --bg-card-hover: #15233f;
+  --bg-input: #15223e;
+  --bg-active: #1d3a78;
+
+  --border-subtle: rgba(255,255,255,0.06);
+  --border-default: rgba(255,255,255,0.10);
+  --border-strong: rgba(255,255,255,0.18);
+
+  --text-primary: #e2e8f0;
+  --text-secondary: #b4becc;
+  --text-muted: #94a3b8;
+  --text-subtle: #64748b;
+
+  --brand-cyan: #38bdf8;
+  --brand-cyan-strong: #0ea5e9;
+  --brand-cyan-soft: rgba(56,189,248,0.14);
+  --brand-blue: #3b82f6;
+  --brand-blue-strong: #2563eb;
+  --accent-green: #84cc16;
+  --accent-green-strong: #65a30d;
+  --accent-amber: #fbbf24;
+  --accent-amber-strong: #f59e0b;
+  --accent-red: #f87171;
+  --accent-red-strong: #ef4444;
+  --accent-purple: #a78bfa;
+  --accent-purple-strong: #8b5cf6;
+
+  --chart-bars: #38bdf8;
+  --chart-bars-2: #6ee7b7;
+  --chart-line: #a3e635;
+  --chart-secondary: #fbbf24;
+
+  --shadow-card: 0 1px 3px rgba(0,0,0,0.35), 0 4px 16px rgba(0,0,0,0.18);
+  --shadow-pop: 0 16px 40px -8px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.04);
+}
+
+:root[data-theme="light"] {
+  --bg-base: #f6f8fc;
+  --bg-elevated: #ffffff;
+  --bg-card: #ffffff;
+  --bg-card-hover: #fafbfd;
+  --bg-input: #ffffff;
+  --bg-active: #dbeafe;
+
+  --border-subtle: #eef1f6;
+  --border-default: #e4e8ee;
+  --border-strong: #d6dce6;
+
+  --text-primary: #0f172a;
+  --text-secondary: #334155;
+  --text-muted: #5c6b85;
+  --text-subtle: #8393ad;
+
+  --brand-cyan: #0891b2;
+  --brand-cyan-strong: #0e7490;
+  --brand-cyan-soft: rgba(8,145,178,0.10);
+  --brand-blue: #2563eb;
+  --brand-blue-strong: #1d4ed8;
+  --accent-green: #16a34a;
+  --accent-green-strong: #15803d;
+  --accent-amber: #d97706;
+  --accent-amber-strong: #b45309;
+  --accent-red: #dc2626;
+  --accent-red-strong: #b91c1c;
+  --accent-purple: #7c3aed;
+  --accent-purple-strong: #6d28d9;
+
+  --chart-bars: #2563eb;
+  --chart-bars-2: #16a34a;
+  --chart-line: #65a30d;
+  --chart-secondary: #d97706;
+
+  --shadow-card: 0 1px 2px rgba(15, 23, 42, 0.04);
+  --shadow-pop: 0 16px 40px -8px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.04);
+}
+
+html { font-feature-settings: "cv11", "ss01"; }
+
+body {
+  font-family: 'Inter', -apple-system, system-ui, sans-serif;
+  background: var(--bg-base);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+  font-feature-settings: "cv11", "ss01", "tnum";
+  margin: 0;
+}
+
+.font-display { font-family: 'Inter', sans-serif; letter-spacing: -0.02em; font-weight: 600; }
+.tabular { font-variant-numeric: tabular-nums; }
+.muted { color: var(--text-muted); }
+.subtle { color: var(--text-subtle); }
+.link { color: var(--brand-cyan); text-decoration: none; cursor: pointer; }
+.link:hover { text-decoration: underline; }
+
+/* ============ APP SHELL ============ */
+
+.app-shell { display: grid; grid-template-columns: 248px 1fr; min-height: 100vh; }
+
+/* ============ SIDEBAR ============ */
+
+.sidebar {
+  background: linear-gradient(180deg, #0a1326 0%, #060c1c 100%);
+  border-right: 1px solid var(--border-subtle);
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+:root[data-theme="light"] .sidebar {
+  background: linear-gradient(180deg, #0a1326 0%, #060c1c 100%);
+}
+
+.sidebar-brand {
+  padding: 18px 22px 12px;
+  display: block;
+  color: white;
+}
+.sidebar-brand img {
+  filter: drop-shadow(0 2px 8px rgba(56,189,248,0.18));
+}
+:root[data-theme="light"] .sidebar-brand img {
+  /* The logo has a transparent background; on the dark sidebar it reads natively. */
+  filter: none;
+}
+
+/* Help item in the sidebar, just above the profile area */
+.sidebar-foot {
+  padding: 6px 10px 10px;
+  border-top: 1px solid rgba(255,255,255,0.05);
+}
+.sidebar-foot .sidebar-item {
+  font-size: 13px;
+  color: rgba(255,255,255,0.6);
+}
+.sidebar-foot .sidebar-item:hover { color: white; }
+
+.sidebar-nav {
+  flex: 1;
+  padding: 6px 10px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.1) transparent;
+}
+.sidebar-nav::-webkit-scrollbar { width: 6px; }
+.sidebar-nav::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 999px; }
+
+.sidebar-section-title {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: rgba(255,255,255,0.32);
+  text-transform: uppercase;
+  padding: 14px 12px 6px;
+}
+
+.sidebar-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 9px 12px;
+  border-radius: 8px;
+  color: rgba(255,255,255,0.72);
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.13s ease;
+  text-decoration: none;
+  margin: 1px 0;
+  cursor: pointer;
+  user-select: none;
+}
+.sidebar-item:hover { background: rgba(255,255,255,0.05); color: white; }
+.sidebar-item.active {
+  background: var(--brand-blue-strong);
+  color: white;
+  box-shadow: 0 4px 12px -2px rgba(37,99,235,0.45);
+}
+.sidebar-item i { width: 17px; height: 17px; flex-shrink: 0; }
+.sidebar-item .chev {
+  margin-left: auto;
+  width: 14px; height: 14px;
+  color: rgba(255,255,255,0.4);
+  transition: transform 0.18s;
+}
+.sidebar-item[aria-expanded="true"] .chev { transform: rotate(90deg); }
+.sidebar-item .badge-mini {
+  margin-left: auto;
+  font-size: 10px;
+  background: rgba(255,255,255,0.12);
+  color: white;
+  padding: 1px 7px;
+  border-radius: 999px;
+  font-weight: 600;
+}
+
+/* Sub-nav (centrales / topics) */
+.subnav {
+  padding: 2px 0 6px 0;
+  display: none;
+}
+.subnav[data-open="true"] { display: block; }
+
+.subnav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 12px 6px 36px;
+  font-size: 13px;
+  color: rgba(255,255,255,0.58);
+  text-decoration: none;
+  border-radius: 6px;
+  margin: 1px 6px;
+  position: relative;
+  cursor: pointer;
+}
+.subnav-item::before {
+  content: "";
+  position: absolute;
+  left: 22px; top: 0; bottom: 0;
+  width: 1px;
+  background: rgba(255,255,255,0.08);
+}
+.subnav-item:hover { color: white; background: rgba(255,255,255,0.04); }
+.subnav-item.active { background: rgba(56,189,248,0.16); color: white; font-weight: 500; }
+.subnav-item.v2 { opacity: 0.45; font-style: italic; }
+.subnav-item.v2 .v2-pill {
+  margin-left: auto;
+  font-size: 9px;
+  background: rgba(217,119,6,0.18);
+  color: var(--accent-amber);
+  padding: 1px 6px;
+  border-radius: 999px;
+  font-style: normal;
+  letter-spacing: 0.04em;
+  font-weight: 600;
+  border: 1px solid rgba(251,191,36,0.4);
+}
+body[data-show-v2="true"] .subnav-item.v2 { opacity: 1; font-style: normal; }
+body[data-show-v2="true"] .subnav-item.v2 .v2-pill { background: rgba(217,119,6,0.3); }
+
+/* Profile area at bottom */
+.profile-trigger {
+  width: 100%;
+  padding: 14px 16px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  background: transparent;
+  border-left: 0; border-right: 0; border-bottom: 0;
+  color: white;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.12s;
+}
+.profile-trigger:hover { background: rgba(255,255,255,0.04); }
+.profile-trigger .chev-up { margin-left: auto; color: rgba(255,255,255,0.4); transition: transform 0.15s; }
+.profile-trigger[data-open="true"] .chev-up { transform: rotate(180deg); }
+.profile-dropdown {
+  position: absolute;
+  bottom: 76px; left: 12px; right: 12px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
+  border-radius: 10px;
+  box-shadow: var(--shadow-pop);
+  padding: 6px;
+  z-index: 30;
+  display: none;
+  animation: slideUp 0.15s ease;
+}
+.profile-dropdown.open { display: block; }
+.profile-dropdown a, .profile-dropdown button {
+  width: 100%;
+  padding: 9px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  color: var(--text-primary);
+  background: transparent;
+  border: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  text-align: left;
+  text-decoration: none;
+  font-family: inherit;
+}
+.profile-dropdown a:hover, .profile-dropdown button:hover { background: var(--bg-card-hover); }
+.profile-dropdown .danger { color: var(--accent-red); }
+.profile-dropdown .divider { height: 1px; background: var(--border-default); margin: 4px 0; }
+
+/* Theme toggle inside profile dropdown */
+.theme-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 9px 12px;
+  font-size: 13px;
+  color: var(--text-primary);
+}
+.theme-row .seg {
+  display: inline-flex;
+  background: var(--bg-base);
+  border-radius: 999px;
+  padding: 2px;
+  gap: 1px;
+}
+.theme-row .seg button {
+  padding: 4px 10px;
+  font-size: 11px;
+  border: 0;
+  background: transparent;
+  color: var(--text-muted);
+  border-radius: 999px;
+  cursor: pointer;
+  font-family: inherit;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.theme-row .seg button.on { background: var(--bg-card-hover); color: var(--text-primary); box-shadow: 0 1px 2px rgba(0,0,0,0.2); }
+.theme-row .seg i { width: 13px; height: 13px; }
+
+/* v5: generic segmented control "on" highlight (used in the Paramètres utilisateur
+   tile on profil.html — the theme picker that moved out of the old dropdown). */
+.seg button.on { background: var(--bg-card-hover); color: var(--text-primary); box-shadow: 0 1px 2px rgba(0,0,0,0.2); }
+
+/* v5 polish round 2: expandable loss-category rows in Paramètres → Catégories de pertes. */
+.loss-cats .loss-cat-row { cursor: pointer; }
+.loss-cats .loss-cat-row:hover { background: var(--bg-card-hover); }
+.loss-cats .loss-chev { width: 12px; height: 12px; color: var(--text-muted); transition: transform 0.18s; margin-right: 2px; vertical-align: -1px; }
+.loss-cats .loss-type-row { background: var(--bg-base); }
+.loss-cats .loss-type-row td { font-size: 12.5px; }
+
+/* ============ MAIN AREA ============ */
+
+.main-area { display: flex; flex-direction: column; min-width: 0; }
+
+.topbar {
+  background: var(--bg-elevated);
+  border-bottom: 1px solid var(--border-subtle);
+  padding: 14px 28px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+}
+.topbar-meta {
+  text-align: right;
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+.topbar-meta .plant { color: var(--text-primary); font-weight: 500; }
+
+/* Centrale tabs (top of content area when in a per-centrale section) */
+.centrale-tabs {
+  display: flex;
+  gap: 0;
+  padding: 0 28px;
+  border-bottom: 1px solid var(--border-subtle);
+  background: var(--bg-elevated);
+  overflow-x: auto;
+}
+.centrale-tab {
+  padding: 12px 16px 10px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-muted);
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  white-space: nowrap;
+  text-decoration: none;
+  margin-bottom: -1px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  transition: all 0.15s;
+}
+.centrale-tab:hover { color: var(--text-primary); }
+.centrale-tab.active {
+  color: var(--brand-cyan);
+  font-weight: 600;
+  /* Keep the layout-reserving border on the original tab transparent — the gradient
+     would otherwise paint over it. Draw the underline as a 2 px inset box-shadow,
+     which renders on top of the gradient background and the parent's border. */
+  border-bottom-color: transparent;
+  background: linear-gradient(180deg, rgba(56,189,248,0.04), rgba(56,189,248,0.12));
+  box-shadow: inset 0 -2px 0 0 var(--brand-cyan);
+  position: relative;
+  z-index: 1;
+}
+.centrale-tab.active .cap { color: var(--brand-cyan); opacity: 0.8; }
+:root[data-theme="light"] .centrale-tab.active {
+  background: linear-gradient(180deg, rgba(8,145,178,0.04), rgba(8,145,178,0.10));
+  box-shadow: inset 0 -2px 0 0 var(--brand-cyan);
+}
+.centrale-tab.all { font-weight: 600; }
+.centrale-tab .cap { color: var(--text-subtle); font-size: 11px; font-weight: 400; }
+
+/* Page header + content */
+.page-header { padding: 22px 28px 16px; }
+.page-title-row { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; }
+.page-eyebrow {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--brand-cyan);
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.page-title { font-size: 26px; font-weight: 600; letter-spacing: -0.02em; color: var(--text-primary); }
+.page-sub { color: var(--text-muted); font-size: 13px; margin-top: 4px; }
+
+.page-content { padding: 16px 28px 48px; }
+
+/* ============ CARDS ============ */
+
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  box-shadow: var(--shadow-card);
+}
+.card-head {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.card-head-title { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+.card-head-sub { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+.card-body { padding: 18px 20px; }
+
+/* KPI cards */
+.kpi-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  padding: 16px 18px;
+  transition: border-color 0.18s;
+}
+.kpi-card:hover { border-color: var(--border-default); }
+.kpi-label { font-size: 11px; font-weight: 600; letter-spacing: 0.04em; color: var(--text-muted); text-transform: uppercase; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+.kpi-value { font-size: 26px; font-weight: 600; letter-spacing: -0.02em; color: var(--text-primary); font-variant-numeric: tabular-nums; }
+.kpi-delta { font-size: 12px; margin-top: 6px; display: flex; align-items: center; gap: 4px; }
+.kpi-delta.up { color: var(--accent-green); }
+.kpi-delta.down { color: var(--accent-red); }
+.kpi-delta i { width: 13px; height: 13px; }
+
+.kpi-card.feature {
+  background: linear-gradient(135deg, #1e293b, #15233f);
+  border-color: rgba(56,189,248,0.2);
+}
+
+/* ============ BUTTONS ============ */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: 13px;
+  transition: all 0.15s;
+  cursor: pointer;
+  border: 1px solid transparent;
+  white-space: nowrap;
+  text-decoration: none;
+  font-family: inherit;
+}
+.btn i { width: 14px; height: 14px; }
+.btn-primary { background: var(--brand-blue-strong); color: white; }
+.btn-primary:hover { background: var(--brand-blue); }
+.btn-secondary { background: var(--bg-card-hover); color: var(--text-primary); border-color: var(--border-default); }
+.btn-secondary:hover { background: var(--bg-active); border-color: var(--border-strong); }
+.btn-ghost { background: transparent; color: var(--text-muted); }
+.btn-ghost:hover { background: rgba(255,255,255,0.04); color: var(--text-primary); }
+.btn-cyan { background: var(--brand-cyan-strong); color: white; }
+.btn-cyan:hover { background: var(--brand-cyan); }
+.btn-sm { padding: 5px 10px; font-size: 12px; }
+.btn-block { width: 100%; }
+
+/* ============ INPUTS ============ */
+
+.input, .select, textarea.input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid var(--border-default);
+  border-radius: 8px;
+  font-size: 13px;
+  background: var(--bg-input);
+  color: var(--text-primary);
+  font-family: inherit;
+}
+.input:focus, .select:focus { outline: none; border-color: var(--brand-cyan); box-shadow: 0 0 0 3px var(--brand-cyan-soft); }
+.input::placeholder { color: var(--text-subtle); }
+.select {
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  padding-right: 30px;
+}
+
+/* ============ BADGES ============ */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 9px;
+  font-size: 11px;
+  font-weight: 500;
+  border-radius: 999px;
+  letter-spacing: 0.01em;
+}
+.badge i { width: 11px; height: 11px; }
+.badge-blue { background: rgba(59,130,246,0.18); color: #93c5fd; }
+.badge-cyan { background: rgba(56,189,248,0.18); color: #7dd3fc; }
+.badge-green { background: rgba(132,204,22,0.18); color: #bef264; }
+.badge-amber { background: rgba(251,191,36,0.18); color: #fcd34d; }
+.badge-purple { background: rgba(167,139,250,0.18); color: #c4b5fd; }
+.badge-red { background: rgba(248,113,113,0.18); color: #fca5a5; }
+.badge-slate { background: rgba(148,163,184,0.18); color: #cbd5e1; }
+.badge-v2 { background: rgba(217,119,6,0.18); color: var(--accent-amber); border: 1px solid rgba(251,191,36,0.35); font-weight: 600; font-size: 10px; letter-spacing: 0.04em; }
+
+:root[data-theme="light"] .badge-blue { background: #dbeafe; color: #1e40af; }
+:root[data-theme="light"] .badge-cyan { background: #cffafe; color: #0e7490; }
+:root[data-theme="light"] .badge-green { background: #dcfce7; color: #15803d; }
+:root[data-theme="light"] .badge-amber { background: #fef3c7; color: #92400e; }
+:root[data-theme="light"] .badge-purple { background: #ede9fe; color: #5b21b6; }
+:root[data-theme="light"] .badge-red { background: #fee2e2; color: #991b1b; }
+:root[data-theme="light"] .badge-slate { background: #e2e8f0; color: #475569; }
+
+.tier-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 999px;
+}
+.tier-silver { background: rgba(148,163,184,0.22); color: #e2e8f0; }
+.tier-gold { background: rgba(251,191,36,0.22); color: #fcd34d; }
+
+.points-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  background: rgba(132,204,22,0.16);
+  border: 1px solid rgba(132,204,22,0.4);
+  border-radius: 999px;
+  font-weight: 600;
+  color: #bef264;
+  font-size: 13px;
+}
+.points-pill i { width: 14px; height: 14px; color: #a3e635; }
+:root[data-theme="light"] .points-pill {
+  background: linear-gradient(135deg, #ecfeff, #f0fdf4);
+  border-color: #a7f3d0;
+  color: #0f172a;
+}
+
+.org-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 12px 4px 4px;
+  background: var(--bg-card-hover);
+  border: 1px solid var(--border-subtle);
+  border-radius: 999px;
+  font-size: 13px;
+  color: var(--text-primary);
+}
+.avatar { width: 22px; height: 22px; border-radius: 50%; background: linear-gradient(135deg, var(--brand-cyan), var(--brand-blue-strong)); color: white; display: inline-flex; align-items: center; justify-content: center; font-weight: 600; font-size: 10px; flex-shrink: 0; }
+
+/* ============ TABLES ============ */
+
+table.data-table { width: 100%; border-collapse: collapse; }
+.data-table th {
+  text-align: left;
+  padding: 10px 16px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border-subtle);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  background: var(--bg-elevated);
+}
+.data-table td { padding: 12px 16px; font-size: 13px; border-bottom: 1px solid var(--border-subtle); color: var(--text-primary); }
+.data-table tr:last-child td { border-bottom: 0; }
+.data-table tr:hover { background: var(--bg-card-hover); }
+.data-table .num { font-variant-numeric: tabular-nums; }
+
+/* ============ TILES ============ */
+
+.tile {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: all 0.18s;
+}
+.tile:hover {
+  border-color: var(--brand-cyan);
+  box-shadow: 0 8px 24px -8px rgba(56,189,248,0.2);
+}
+.tile-head { display: flex; justify-content: space-between; align-items: start; gap: 10px; }
+.tile-title { font-size: 14px; font-weight: 600; }
+.tile-desc { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
+.tile-foot { display: flex; justify-content: space-between; align-items: center; margin-top: auto; padding-top: 6px; }
+.tile-points { font-weight: 600; color: var(--accent-green); font-size: 13px; }
+.tile-points.minus { color: var(--accent-red); }
+.tile-cost { display: inline-flex; align-items: center; gap: 4px; font-weight: 600; color: var(--text-primary); font-size: 13px; }
+.tile-cost i { color: var(--accent-green); width: 13px; height: 13px; }
+
+/* ============ ACTIVITY FEED ============ */
+
+.activity-row {
+  display: flex;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.activity-row:last-child { border-bottom: 0; }
+.activity-icon { width: 34px; height: 34px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.activity-icon i { width: 17px; height: 17px; }
+.activity-main { flex: 1; min-width: 0; }
+.activity-title { font-size: 13px; font-weight: 500; }
+.activity-meta { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+.activity-points { font-weight: 600; color: var(--accent-green); font-size: 13px; font-variant-numeric: tabular-nums; }
+.activity-points.minus { color: var(--accent-red); }
+
+/* ============ ARTICLE CARDS ============ */
+
+.article-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.18s;
+  text-decoration: none;
+  color: inherit;
+}
+.article-card:hover { border-color: var(--brand-cyan); box-shadow: 0 8px 24px -8px rgba(56,189,248,0.18); }
+.article-cover { height: 120px; background: linear-gradient(135deg,#1e3a8a,#0c4a6e,#0a1326); position: relative; padding: 12px; display: flex; align-items: end; }
+.article-cover.v-amber { background: linear-gradient(135deg,#7c2d12,#b45309,#78350f); }
+.article-cover.v-green { background: linear-gradient(135deg,#14532d,#15803d,#064e3b); }
+.article-cover.v-purple { background: linear-gradient(135deg,#3b0764,#5b21b6,#312e81); }
+.article-cover.v-rose { background: linear-gradient(135deg,#7f1d1d,#9f1239,#4c0519); }
+.article-program-tag {
+  position: absolute; top: 12px; left: 12px;
+  background: rgba(255,255,255,0.92);
+  color: #0f172a;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 3px 9px;
+  border-radius: 999px;
+  letter-spacing: 0.02em;
+}
+.article-body { padding: 12px 16px 14px; flex: 1; display: flex; flex-direction: column; gap: 5px; }
+.article-title { font-size: 14px; font-weight: 600; line-height: 1.35; }
+.article-excerpt { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
+.article-meta { font-size: 11px; color: var(--text-subtle); margin-top: auto; padding-top: 6px; display: flex; gap: 10px; }
+.article-meta span { display: inline-flex; align-items: center; gap: 4px; }
+.article-meta i { width: 11px; height: 11px; }
+
+/* ============ AGENDA ============ */
+
+.agenda-row {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  padding: 14px 16px;
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.agenda-date { width: 60px; text-align: center; flex-shrink: 0; border-right: 1px solid var(--border-subtle); padding-right: 12px; }
+.agenda-date .day { font-size: 24px; font-weight: 700; line-height: 1; color: var(--text-primary); }
+.agenda-date .month { font-size: 10px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-top: 4px; }
+.agenda-body { flex: 1; min-width: 0; }
+.agenda-title { font-weight: 600; font-size: 14px; }
+.agenda-meta { font-size: 12px; color: var(--text-muted); margin-top: 4px; display: flex; gap: 14px; }
+.agenda-meta span { display: inline-flex; align-items: center; gap: 4px; }
+.agenda-meta i { width: 12px; height: 12px; }
+
+/* ============ MODAL ============ */
+
+.overlay {
+  position: fixed; inset: 0;
+  background: rgba(2,6,20,0.7);
+  backdrop-filter: blur(2px);
+  z-index: 50;
+  display: none;
+  align-items: center; justify-content: center;
+  padding: 20px;
+  animation: fadeIn 0.15s ease;
+}
+.overlay.open { display: flex; }
+.modal {
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
+  border-radius: 14px;
+  padding: 24px;
+  width: 100%;
+  max-width: 520px;
+  box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+  animation: slideUp 0.2s ease;
+  max-height: 90vh; overflow-y: auto;
+}
+.modal-lg { max-width: 760px; }
+.modal-title { font-size: 17px; font-weight: 600; }
+.modal-subtitle { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+
+/* ============ CHART ============ */
+
+.chart-container { position: relative; min-height: 240px; }
+
+/* ============ CHART PANELS (left Indicateurs + right Légende, per dev.app.naiahydro.com) ============ */
+
+/* The grid columns shift based on the open/collapsed state of each side:
+   data-ind="open"      → left column is 240px (the panel)
+   data-ind="collapsed" → left column shrinks to 32px (the strip)
+   Same for data-leg. */
+.chart-with-panel {
+  display: grid;
+  grid-template-columns: 240px 1fr 220px;
+  gap: 0;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.indicateurs-panel {
+  padding: 16px 14px;
+  border-right: 1px solid var(--border-subtle);
+  background: var(--bg-card);
+}
+.indicateurs-panel-title {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  margin-bottom: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.indicateurs-panel-title .collapse {
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 14px;
+}
+.ind-headers {
+  display: grid;
+  grid-template-columns: 1fr repeat(4, 28px);
+  gap: 0 4px;
+  padding: 4px 0 6px 0;
+  border-bottom: 1px solid var(--border-subtle);
+  font-size: 10px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 8px;
+}
+.ind-headers > span:not(:first-child) { text-align: center; }
+.ind-section { margin-bottom: 14px; }
+.ind-section-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.ind-section-title::after { content: " :"; color: var(--text-muted); font-weight: 400; }
+.ind-row {
+  display: grid;
+  grid-template-columns: 1fr repeat(4, 28px);
+  gap: 0 4px;
+  align-items: center;
+  padding: 4px 0;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+.ind-row .swatch {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+.ind-row label {
+  display: flex;
+  align-items: center;
+}
+.ind-row input[type="checkbox"] {
+  width: 14px; height: 14px;
+  margin: 0 auto;
+  display: block;
+  accent-color: var(--brand-blue);
+  cursor: pointer;
+}
+.ind-row .ind-cell { display: flex; justify-content: center; }
+.indicateurs-panel-foot {
+  display: flex;
+  gap: 0;
+  border-top: 1px solid var(--border-subtle);
+  margin: 14px -14px -16px -14px;
+  background: var(--bg-elevated);
+}
+.indicateurs-panel-foot .pf-tab {
+  padding: 10px 14px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-muted);
+  background: transparent;
+  border: 0;
+  border-right: 1px solid var(--border-subtle);
+  cursor: pointer;
+  font-family: inherit;
+}
+.indicateurs-panel-foot .pf-tab.active {
+  background: var(--brand-blue-strong);
+  color: white;
+}
+
+/* v5 polish round 4 — collapsed-state shifts the grid columns and swaps the
+   panel for a thin vertical strip on each side. */
+.chart-with-panel[data-ind="open"][data-leg="open"]           { grid-template-columns: 240px 1fr 220px; }
+.chart-with-panel[data-ind="collapsed"][data-leg="open"]      { grid-template-columns: 32px  1fr 220px; }
+.chart-with-panel[data-ind="open"][data-leg="collapsed"]      { grid-template-columns: 240px 1fr 32px;  }
+.chart-with-panel[data-ind="collapsed"][data-leg="collapsed"] { grid-template-columns: 32px  1fr 32px;  }
+
+.chart-with-panel[data-ind="open"]      .indicateurs-panel { display: block; }
+.chart-with-panel[data-ind="collapsed"] .indicateurs-panel { display: none; }
+.chart-with-panel[data-ind="open"]      .panel-strip-left  { display: none; }
+.chart-with-panel[data-ind="collapsed"] .panel-strip-left  { display: flex; }
+
+.chart-with-panel[data-leg="open"]      .legende-panel    { display: block; }
+.chart-with-panel[data-leg="collapsed"] .legende-panel    { display: none; }
+.chart-with-panel[data-leg="open"]      .panel-strip-right { display: none; }
+.chart-with-panel[data-leg="collapsed"] .panel-strip-right { display: flex; }
+
+/* ============ LÉGENDE PANEL (right of chart) ============ */
+.legende-panel {
+  padding: 16px 14px;
+  border-left: 1px solid var(--border-subtle);
+  background: var(--bg-card);
+}
+.legende-panel-title {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  margin-bottom: 14px;
+  display: flex;
+  justify-content: flex-end; /* collapse button on the LEFT of the title */
+  align-items: center;
+  gap: 8px;
+}
+.legende-panel-title > span { margin-left: auto; }
+.legende-panel-title .collapse {
+  width: 22px; height: 22px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border: 0; background: transparent; border-radius: 5px;
+  cursor: pointer; color: var(--text-muted); font-family: inherit; padding: 0;
+}
+.legende-panel-title .collapse:hover { background: var(--bg-card-hover); color: var(--brand-cyan); }
+.legende-panel-title .collapse i { width: 14px; height: 14px; }
+.legende-items { display: flex; flex-direction: column; gap: 8px; }
+.legende-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12.5px;
+  color: var(--text-primary);
+}
+.legende-item .dot {
+  width: 9px; height: 9px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* ============ COLLAPSED STRIPS (thin vertical tabs with rotated label) ============ */
+.panel-strip {
+  display: none; /* visibility driven by data-attribute selectors above */
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0;
+  width: 32px;
+  background: var(--bg-card);
+  border: 0;
+  cursor: pointer;
+  font-family: inherit;
+  color: var(--text-muted);
+}
+.panel-strip-left  { border-right: 1px solid var(--border-subtle); }
+.panel-strip-right { border-left:  1px solid var(--border-subtle); }
+.panel-strip:hover { background: var(--bg-card-hover); color: var(--brand-cyan); }
+.panel-strip .strip-chev { width: 14px; height: 14px; flex-shrink: 0; }
+.panel-strip .strip-label {
+  writing-mode: vertical-rl;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.panel-strip-left  .strip-label { transform: rotate(180deg); /* read bottom-to-top */ }
+
+/* ============ BOTTOM OVERLAYS ON THE CHART ============ */
+/* Quick comparator pills, bottom-left of chart */
+.quick-comparators {
+  position: absolute;
+  bottom: 14px;
+  left: 18px;
+  display: flex;
+  gap: 6px;
+  z-index: 2;
+}
+.qc-pill {
+  padding: 4px 12px;
+  font-size: 11.5px;
+  font-weight: 600;
+  border-radius: 999px;
+  border: 1px solid var(--border-default);
+  background: var(--bg-elevated);
+  color: var(--text-muted);
+  cursor: pointer;
+  font-family: inherit;
+}
+.qc-pill:hover { color: var(--text-primary); border-color: var(--brand-cyan); }
+.qc-pill.active {
+  background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+  border-color: transparent;
+  color: white;
+  box-shadow: 0 4px 12px -3px rgba(139,92,246,0.45);
+}
+
+/* Discrete wrench config icon, bottom-right of chart */
+.chart-config-wrench {
+  position: absolute;
+  bottom: 14px;
+  right: 18px;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: 0;
+  background: transparent;
+  color: var(--text-subtle);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: inherit;
+  z-index: 2;
+}
+.chart-config-wrench:hover { color: var(--brand-cyan); background: var(--bg-card-hover); }
+.chart-config-wrench i { width: 15px; height: 15px; }
+
+/* ============ ANIMATIONS ============ */
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slideUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ============ V2-STUB BANNER ============ */
+
+.v2-banner {
+  background: rgba(217,119,6,0.10);
+  border: 1px solid rgba(251,191,36,0.32);
+  border-radius: 10px;
+  padding: 14px 18px;
+  font-size: 13px;
+  color: #fcd34d;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 18px;
+}
+.v2-banner i { width: 18px; height: 18px; flex-shrink: 0; }
+:root[data-theme="light"] .v2-banner { background: #fef3c7; color: #78350f; border-color: #fbbf24; }
+
+/* ============ V5 — MVP-tier toggle (conference demo) ============ */
+
+/* Fixed top-right segmented switch. The "Vue conférence" label is dimmed and
+   only visible on wide screens so the chip stays compact on narrow ones. */
+.mvp-toggle {
+  position: fixed;
+  top: 12px;
+  right: 16px;
+  z-index: 1000;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 5px 8px 5px 12px;
+  background: rgba(15, 26, 50, 0.92);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid var(--border-default);
+  border-radius: 999px;
+  box-shadow: 0 6px 18px -6px rgba(0,0,0,0.55);
+  font-family: inherit;
+}
+:root[data-theme="light"] .mvp-toggle { background: rgba(255,255,255,0.92); }
+.mvp-toggle .mvp-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+@media (max-width: 980px) {
+  .mvp-toggle .mvp-label { display: none; }
+}
+.mvp-toggle .mvp-seg {
+  display: inline-flex;
+  background: var(--bg-input);
+  border-radius: 999px;
+  padding: 2px;
+  gap: 1px;
+}
+.mvp-toggle .mvp-seg button {
+  padding: 4px 10px;
+  font-size: 11.5px;
+  font-weight: 600;
+  border: 0;
+  background: transparent;
+  color: var(--text-muted);
+  border-radius: 999px;
+  cursor: pointer;
+  font-family: inherit;
+}
+.mvp-toggle .mvp-seg button.on {
+  background: var(--brand-blue-strong);
+  color: white;
+  box-shadow: 0 2px 6px -2px rgba(59,130,246,0.5);
+}
+.mvp-toggle .mvp-seg button:not(.on):hover { color: var(--text-primary); }
+
+/* Hide all MVP1-only elements when the body is in MVP 0.9 mode.
+   Tag elements with data-mvp="1" to mark them as MVP1-exclusive. */
+body[data-mvp="0.9"] [data-mvp="1"] { display: none !important; }
+
+/* Inverse: items only meaningful in MVP 0.9 (banners, fallback messages) */
+body[data-mvp="1"]   [data-mvp="0.9"] { display: none !important; }
+
+/* MVP 0.9 banner: shown when the user lands on an MVP1-only page in 0.9 mode */
+.mvp09-fallback {
+  margin: 22px auto;
+  max-width: 560px;
+  padding: 22px 28px;
+  background: linear-gradient(180deg, rgba(56,189,248,0.06), transparent 60%);
+  border: 1px solid var(--border-default);
+  border-radius: 14px;
+  text-align: center;
+}
+.mvp09-fallback .ico {
+  width: 48px; height: 48px;
+  border-radius: 50%;
+  background: rgba(56,189,248,0.12);
+  color: var(--brand-cyan);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+.mvp09-fallback .ico i { width: 22px; height: 22px; }
+.mvp09-fallback .title { font-size: 16px; font-weight: 600; margin-bottom: 6px; }
+.mvp09-fallback .desc  { font-size: 13px; color: var(--text-muted); line-height: 1.5; margin-bottom: 14px; }
+
+/* ============ V5 — TIME PILLS (Intraday / 30 jours / 12 mois / Années) ============ */
+
+.time-pills {
+  display: inline-flex;
+  background: var(--bg-input);
+  border: 1px solid var(--border-default);
+  border-radius: 999px;
+  padding: 3px;
+  gap: 1px;
+}
+.time-pills button {
+  padding: 6px 14px;
+  font-size: 12.5px;
+  border: 0;
+  background: transparent;
+  color: var(--text-muted);
+  border-radius: 999px;
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  position: relative;
+}
+.time-pills button:hover { color: var(--text-primary); }
+.time-pills button.on {
+  background: var(--brand-blue-strong);
+  color: white;
+}
+/* WhatsApp / maintenance status dot inside a time-pill */
+.time-pills .pill-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--accent-green);
+  box-shadow: 0 0 0 2px rgba(132,204,22,0.18);
+  display: inline-block;
+}
+.time-pills .pill-dot.amber  { background: var(--accent-amber); box-shadow: 0 0 0 2px rgba(251,191,36,0.18); }
+.time-pills .pill-dot.red    { background: var(--accent-red);   box-shadow: 0 0 0 2px rgba(248,113,113,0.18); }
+
+/* Conference/demo fix: the fixed top-right dev toggles (.mvp-toggle / .access-toggle)
+   overlapped the topbar-right time-pills on production & revenue. Center the time-pills
+   in the topbar and pin the breadcrumbs to the left, so the pills clear the toggle stack
+   while the toggle stays top-right. Scoped to these two pages so other topbars are
+   unaffected. */
+body[data-page="production"] .topbar,
+body[data-page="revenue"]    .topbar { justify-content: center; position: relative; }
+body[data-page="production"] .topbar > .crumbs,
+body[data-page="revenue"]    .topbar > .crumbs {
+  position: absolute;
+  left: 28px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+/* ============ V5 — BREADCRUMBS ============ */
+
+.crumbs {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+.crumbs a {
+  color: var(--text-muted);
+  text-decoration: none;
+  transition: color 0.15s;
+}
+.crumbs a:hover { color: var(--brand-cyan); }
+.crumbs .sep {
+  color: var(--text-subtle);
+  font-size: 10px;
+  opacity: 0.7;
+}
+.crumbs .current {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+/* ============ V5 — DISCRETE ICON ACTIONS (Config / Export) ============ */
+
+.icon-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+}
+.icon-action:hover {
+  background: var(--bg-card-hover);
+  color: var(--brand-cyan);
+  border-color: var(--border-subtle);
+}
+.icon-action i { width: 15px; height: 15px; }
+
+/* Right-axis toggle arrow (toggles axis between rain / flow) */
+.axis-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-muted);
+  background: transparent;
+  border: 1px dashed var(--border-default);
+  border-radius: 6px;
+  padding: 3px 8px;
+  cursor: pointer;
+  font-family: inherit;
+}
+.axis-toggle:hover { color: var(--brand-cyan); border-color: var(--brand-cyan); }
+.axis-toggle i { width: 12px; height: 12px; }
+
+/* v5 polish round 4: in-panel collapse button (was a literal "«" in v4).
+   Lives inside .indicateurs-panel-title — only visible when the panel is expanded. */
+.indicateurs-panel-title .collapse {
+  width: 22px; height: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  background: transparent;
+  border-radius: 5px;
+  cursor: pointer;
+  color: var(--text-muted);
+  font-family: inherit;
+  padding: 0;
+}
+.indicateurs-panel-title .collapse:hover { background: var(--bg-card-hover); color: var(--brand-cyan); }
+.indicateurs-panel-title .collapse i { width: 14px; height: 14px; }
+
+/* v5 polish round 2: Right-axis toggle floats above the chart's right axis label.
+   A small pill that swaps the right axis between Pluie and Débit. */
+.right-axis-toggle {
+  position: absolute;
+  top: 10px;
+  right: 24px;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-default);
+  border-radius: 999px;
+  padding: 3px 9px 3px 10px;
+  cursor: pointer;
+  font-family: inherit;
+  box-shadow: 0 2px 6px -2px rgba(0,0,0,0.3);
+}
+.right-axis-toggle:hover { color: var(--brand-cyan); border-color: var(--brand-cyan); }
+.right-axis-toggle i { width: 11px; height: 11px; }
+
+/* Indicateurs arrows (left/right cyclers — replace "Indicateurs" toggle button) */
+.ind-cycler {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12.5px;
+  color: var(--text-primary);
+  background: var(--bg-input);
+  border: 1px solid var(--border-default);
+  border-radius: 8px;
+  padding: 4px 4px 4px 12px;
+  font-family: inherit;
+}
+.ind-cycler .ind-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-primary);
+}
+.ind-cycler .ind-swatch { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+.ind-cycler .arrow {
+  width: 24px; height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  border: 0;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-family: inherit;
+}
+.ind-cycler .arrow:hover { background: var(--bg-card-hover); color: var(--brand-cyan); }
+.ind-cycler .arrow i { width: 14px; height: 14px; }
+
+/* WhatsApp maintenance dot — shown on the time-pill matching the granularity */
+.wa-dot {
+  display: inline-block;
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--accent-green);
+  margin-left: 4px;
+  vertical-align: middle;
+  box-shadow: 0 0 0 2px rgba(132,204,22,0.20);
+}
+
+/* WhatsApp event marker for intraday chart annotations */
+.wa-event {
+  position: absolute;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  cursor: pointer;
+  color: var(--accent-green);
+  font-size: 10px;
+  font-weight: 500;
+}
+.wa-event:hover { color: white; }
+.wa-event .wa-pin {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: var(--accent-green);
+  border: 2px solid var(--bg-base);
+  box-shadow: 0 0 0 2px rgba(132,204,22,0.25);
+}
+
+/* WhatsApp event banner shown above the chart (intraday only) */
+.wa-strip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px;
+  background: rgba(132,204,22,0.08);
+  border: 1px solid rgba(132,204,22,0.25);
+  border-radius: 8px;
+  font-size: 12.5px;
+  color: var(--text-primary);
+  margin-bottom: 10px;
+}
+.wa-strip i { color: var(--accent-green); width: 16px; height: 16px; }
+.wa-strip .wa-meta { color: var(--text-muted); font-size: 11.5px; }
+.wa-strip .wa-link {
+  margin-left: auto;
+  color: var(--brand-cyan);
+  font-size: 12px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+/* ============ V5 — INSCRIPTION/RAPPORT BUTTON ON DASHBOARD ============ */
+
+.dash-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  font-size: 13px;
+  font-weight: 600;
+  background: linear-gradient(180deg, var(--brand-blue), var(--brand-blue-strong));
+  color: white;
+  border: 0;
+  border-radius: 10px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px -4px rgba(59,130,246,0.45);
+  font-family: inherit;
+  transition: transform 0.15s, box-shadow 0.15s;
+  text-decoration: none;
+}
+.dash-cta:hover { transform: translateY(-1px); box-shadow: 0 6px 16px -4px rgba(59,130,246,0.55); }
+.dash-cta i { width: 16px; height: 16px; }
+
+/* ============ V5 — PRÉVISUALISATION TABLE (data upload preview) ============ */
+
+.preview-card {
+  margin-top: 12px;
+  border: 1px solid var(--brand-cyan-soft);
+  background: linear-gradient(180deg, rgba(56,189,248,0.04), transparent 60%);
+  border-radius: 10px;
+  padding: 14px 16px;
+}
+.preview-card .pv-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+.preview-card .pv-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+}
+.preview-card .pv-title i { color: var(--brand-cyan); width: 16px; height: 16px; }
+.preview-card .pv-meta { font-size: 11.5px; color: var(--text-muted); }
+.preview-card .pv-actions { display: inline-flex; gap: 6px; }
+
+/* Évènementiel | Fréquentiel toggle on the upload row */
+.freq-toggle {
+  display: inline-flex;
+  background: var(--bg-input);
+  border: 1px solid var(--border-default);
+  border-radius: 999px;
+  padding: 3px;
+  gap: 1px;
+  margin-left: auto;
+}
+.freq-toggle button {
+  padding: 5px 12px;
+  font-size: 12px;
+  border: 0;
+  background: transparent;
+  color: var(--text-muted);
+  border-radius: 999px;
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 500;
+}
+.freq-toggle button.on {
+  background: var(--brand-blue-strong);
+  color: white;
+}
+
+/* ============ V5 — FLUX DE PRODUCTION (Paramètres modal/section) ============ */
+
+.flux-formula {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: var(--bg-input);
+  border: 1px solid var(--border-default);
+  border-radius: 8px;
+  font-family: ui-monospace, "JetBrains Mono", monospace;
+  font-size: 13px;
+  color: var(--brand-cyan);
+  font-weight: 600;
+}
+.flux-row {
+  display: grid;
+  grid-template-columns: 24px 1fr 90px 90px auto;
+  gap: 10px;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px dashed var(--border-subtle);
+}
+.flux-row:last-child { border-bottom: 0; }
+.flux-row .var {
+  width: 24px; height: 24px;
+  border-radius: 6px;
+  background: var(--brand-cyan-soft);
+  color: var(--brand-cyan);
+  font-weight: 700;
+  font-size: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Mandatory asterisk for required fields */
+.req::after {
+  content: " *";
+  color: var(--accent-red);
+  font-weight: 600;
+}
+
+/* Info tooltip helper next to a field label */
+.info-i {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  background: var(--bg-input);
+  color: var(--text-muted);
+  font-size: 10px;
+  margin-left: 4px;
+  cursor: help;
+  border: 1px solid var(--border-default);
+}
+.info-i:hover { color: var(--brand-cyan); border-color: var(--brand-cyan); }
+
+/* ============ V5 — LOCKED INSIGHT STATE (magic-link community-only lead) ============ */
+
+/* Funnel decision 2026-05-31 (platform#647 / Q2): a conference lead can log in with a
+   magic link and has community points, but NO connected plant and NO subscription yet.
+   On the Insight pages (Production / Revenus) the chart is shown greyed + blurred behind
+   a locked overlay with a "Connectez votre centrale" CTA → plaquette.
+
+   Driven by body[data-access]:
+     - data-access="lead"      → locked overlay shown, chart blurred  (the funnel state)
+     - data-access="connected" → normal page (paying customer with data)
+   Tag the lockable card with .locked-wrap and put the overlay inside as .lock-overlay.
+   A small fixed toggle (injected by app.js, mirroring the MVP toggle) lets reviewers
+   flip personas. Mirrors the existing data-mvp / data-show-v2 attribute pattern. */
+
+.locked-wrap { position: relative; }
+
+/* Blur + desaturate the real content underneath only in the lead state. */
+body[data-access="lead"] .locked-wrap > .locked-content {
+  filter: blur(3px) grayscale(0.85) opacity(0.55);
+  pointer-events: none;
+  user-select: none;
+}
+
+/* The overlay itself — hidden for connected customers, shown for leads. */
+.lock-overlay { display: none; }
+body[data-access="lead"] .lock-overlay {
+  display: flex;
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: linear-gradient(180deg, rgba(10,19,38,0.35), rgba(10,19,38,0.72));
+  backdrop-filter: blur(1px);
+  border-radius: 12px;
+}
+:root[data-theme="light"] body[data-access="lead"] .lock-overlay {
+  background: linear-gradient(180deg, rgba(246,248,252,0.45), rgba(246,248,252,0.82));
+}
+
+.lock-card {
+  max-width: 440px;
+  text-align: center;
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
+  border-radius: 14px;
+  padding: 26px 28px;
+  box-shadow: var(--shadow-pop);
+}
+.lock-card .lock-ico {
+  width: 48px; height: 48px;
+  border-radius: 50%;
+  background: var(--brand-cyan-soft);
+  color: var(--brand-cyan);
+  display: inline-flex; align-items: center; justify-content: center;
+  margin-bottom: 12px;
+}
+.lock-card .lock-ico i { width: 22px; height: 22px; }
+.lock-card .lock-title { font-size: 17px; font-weight: 600; color: var(--text-primary); margin-bottom: 6px; }
+.lock-card .lock-desc { font-size: 13px; color: var(--text-muted); line-height: 1.55; margin-bottom: 18px; }
+.lock-card .lock-points {
+  display: inline-flex; align-items: center; gap: 6px;
+  margin-bottom: 16px;
+  padding: 4px 12px;
+  background: rgba(132,204,22,0.16);
+  border: 1px solid rgba(132,204,22,0.4);
+  border-radius: 999px;
+  font-size: 12px; font-weight: 600; color: #bef264;
+}
+:root[data-theme="light"] .lock-card .lock-points { color: #15803d; background: #dcfce7; border-color: #a7f3d0; }
+
+/* Persona/access toggle chip — sits just under the MVP toggle (top:12 + height).
+   Same visual language as .mvp-toggle so the two stack cleanly. */
+.access-toggle {
+  position: fixed;
+  top: 56px;
+  right: 16px;
+  z-index: 1000;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 5px 8px 5px 12px;
+  background: rgba(15, 26, 50, 0.92);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid var(--border-default);
+  border-radius: 999px;
+  box-shadow: 0 6px 18px -6px rgba(0,0,0,0.55);
+  font-family: inherit;
+}
+:root[data-theme="light"] .access-toggle { background: rgba(255,255,255,0.92); }
+.access-toggle .access-label {
+  font-size: 11px; font-weight: 600; color: var(--text-muted);
+  letter-spacing: 0.04em; text-transform: uppercase;
+}
+@media (max-width: 980px) { .access-toggle .access-label { display: none; } }
+.access-toggle .access-seg { display: inline-flex; background: var(--bg-input); border-radius: 999px; padding: 2px; gap: 1px; }
+.access-toggle .access-seg button {
+  padding: 4px 10px; font-size: 11.5px; font-weight: 600;
+  border: 0; background: transparent; color: var(--text-muted);
+  border-radius: 999px; cursor: pointer; font-family: inherit;
+}
+.access-toggle .access-seg button.on {
+  background: var(--brand-blue-strong); color: white;
+  box-shadow: 0 2px 6px -2px rgba(59,130,246,0.5);
+}
+.access-toggle .access-seg button:not(.on):hover { color: var(--text-primary); }
+
+/* ============ RESPONSIVE ============ */
+
+@media (max-width: 1024px) {
+  .app-shell { grid-template-columns: 220px 1fr; }
+  .page-header, .page-content, .centrale-tabs { padding-left: 20px; padding-right: 20px; }
+}
+@media (max-width: 768px) {
+  .app-shell { grid-template-columns: 1fr; }
+  .sidebar { position: relative; height: auto; }
+}
+
+</style><script src="https://cdn.tailwindcss.com"></script>
+<style>
+  /* Type de données segmented control (3 pills per v5) */
+  .type-seg { display: inline-flex; background: var(--bg-input); border: 1px solid var(--border-default); border-radius: 999px; padding: 3px; gap: 1px; }
+  .type-seg button { padding: 6px 14px; font-size: 13px; border: 0; background: transparent; color: var(--text-muted); border-radius: 999px; cursor: pointer; font-family: inherit; font-weight: 500; }
+  .type-seg button.on { background: var(--brand-blue-strong); color: white; }
+  .dropzone {
+    border: 2px dashed var(--border-default);
+    border-radius: 12px;
+    padding: 36px 24px;
+    text-align: center;
+    background: var(--bg-base);
+    transition: all 0.15s;
+  }
+  .dropzone:hover { border-color: var(--brand-cyan); background: var(--bg-card-hover); }
+  .dropzone i { color: var(--text-muted); }
+
+  /* --- additions BL : libellés, ligne source+unité, 2e ligne commune (format + mode) --- */
+  .seg-label, .mini-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; margin-bottom: 6px; }
+  .ctrl-line { display: flex; gap: 18px; align-items: end; flex-wrap: wrap; }
+  .unit-inline { padding-bottom: 8px; font-size: 13px; color: var(--text-muted); }
+  .unit-inline .unit-val { color: var(--text-primary); font-weight: 600; }
+  .unit-inline .unit-note { font-size: 11.5px; }
+  .common-row { display: flex; gap: 20px; align-items: end; flex-wrap: wrap; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border-subtle); }
+  .fmt-select { min-width: 260px; }
+
+  /* "?" d'aide + bulle au survol (texte fréquentiel / événementiel) */
+  .help-tip { position: relative; display: inline-flex; align-items: center; cursor: help; color: var(--text-muted); outline: none; }
+  .help-tip:hover, .help-tip:focus { color: var(--brand-cyan); }
+  .help-tip .q { width: 17px; height: 17px; border-radius: 50%; border: 1px solid currentColor; display: inline-flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; line-height: 1; }
+  .help-bubble {
+    position: absolute; top: calc(100% + 8px); right: 0; left: auto;
+    width: 320px; max-width: 78vw;
+    background: var(--bg-card); border: 1px solid var(--border-default);
+    border-radius: 10px; padding: 12px 14px; box-shadow: var(--shadow-card);
+    font-size: 12px; color: var(--text-muted); line-height: 1.55;
+    text-transform: none; letter-spacing: normal; font-weight: 400; text-align: left;
+    opacity: 0; visibility: hidden; transition: opacity 0.15s; z-index: 60;
+  }
+  .help-tip:hover .help-bubble, .help-tip:focus .help-bubble { opacity: 1; visibility: visible; }
+  .help-bubble p { margin: 0 0 6px; }
+  .help-bubble b { color: var(--text-primary); font-weight: 600; }
+  .help-bubble ul { margin: 4px 0 0; padding-left: 16px; }
+  .help-bubble li { margin-bottom: 2px; }
+</style>
+</head>
+<body data-page="data" data-section="data" data-centrale="moulins">
+<div class="app-shell">
+  <aside class="sidebar"></aside>
+  <main class="main-area">
+    <header class="topbar">
+      <div>
+        <div class="page-eyebrow">Données · <span style="color:var(--brand-cyan)">brouillon BL</span></div>
+        <div style="font-size:18px; font-weight:600">Importer &amp; gérer vos flux</div>
+      </div>
+      <div class="topbar-meta"><div class="plant" data-centrale-name>Centrale des Moulins</div><div>Dernier upload : il y a 2 h</div></div>
+    </header>
+
+    <!-- Centrales as tabs -->
+    <div class="centrale-tabs">
+      <a class="centrale-tab" href="ingestion-donnees.html" data-centrale="all"><span>Toutes · santé des flux</span></a>
+      <a class="centrale-tab active" data-centrale="moulins" onclick="switchCentrale(event, 'moulins')"><span>Centrale des Moulins</span><span class="cap">450 kW</span></a>
+      <a class="centrale-tab" data-centrale="bocq" onclick="switchCentrale(event, 'bocq')"><span>Moulin du Bocq</span><span class="cap">210 kW</span></a>
+      <a class="centrale-tab" data-centrale="ariege" onclick="switchCentrale(event, 'ariege')"><span>Centrale d'Ariège</span><span class="cap">780 kW</span></a>
+      <a class="centrale-tab" data-centrale="lesse" onclick="switchCentrale(event, 'lesse')"><span>Moulin de la Lesse</span><span class="cap">320 kW</span></a>
+    </div>
+
+    <div class="page-content">
+
+      <!-- ============ Carte : Type de données (retravaillée BL) ============ -->
+      <div class="card" style="margin-bottom:14px">
+        <div class="card-body" style="padding:18px 20px">
+
+          <div class="seg-label">Type de données</div>
+          <div class="type-seg" style="margin-bottom:16px">
+            <button class="on" data-type="electricite" onclick="switchType('electricite')">Électricité</button>
+            <button data-type="indcomp" onclick="switchType('indcomp')">Indicateur</button>
+            <button data-type="prix"    onclick="switchType('prix')">Prix d'Électricité</button>
+          </div>
+
+          <!-- Ligne 1 — Électricité : Source de données + unité (définie, non modifiable) -->
+          <div id="elec-controls" class="ctrl-line">
+            <div>
+              <span class="mini-label" style="display:block">Source de données</span>
+              <select class="select" id="elec-compteur" onchange="updateUnite()" style="min-width:260px">
+                <option data-unite="kWh">MOU-PRINC · principal</option>
+                <option data-unite="kWh">MOU-AUX · auxiliaires</option>
+                <option data-unite="MWh">MOU-GROUPE · agrégat</option>
+              </select>
+            </div>
+            <div class="unit-inline">
+              <span class="mini-label" style="display:block">Unité (définie)</span>
+              <span class="unit-val" id="elec-unite">kWh</span>
+              <span class="unit-note muted">· définie dans Paramètres → Compteurs · non modifiable</span>
+            </div>
+          </div>
+
+          <!-- Ligne 1 — Indicateur -->
+          <div id="indcomp-controls" class="ctrl-line" style="display:none">
+            <div>
+              <span class="mini-label" style="display:block">Source de données</span>
+              <select class="select" id="indcomp-select" onchange="updateIndUnite()" style="min-width:300px">
+                <option data-unite="mm">Pluie · Bergerac (Météo)</option>
+                <option data-unite="m³/s">Débit · Dordogne (Hydro)</option>
+                <option data-unite="m">Niveau · Dordogne (Hydro)</option>
+              </select>
+            </div>
+            <div class="unit-inline">
+              <span class="mini-label" style="display:block">Unité (définie)</span>
+              <span class="unit-val" id="indcomp-unite">mm</span>
+              <span class="unit-note muted">· définie dans Paramètres → Indicateurs · non modifiable</span>
+            </div>
+          </div>
+
+          <!-- Ligne 1 — Prix d'Électricité -->
+          <div id="prix-controls" class="ctrl-line" style="display:none">
+            <div>
+              <span class="mini-label" style="display:block">Source de données</span>
+              <select class="select" style="min-width:260px">
+                <option selected>EPEX SPOT FR · base load</option>
+                <option>EPEX SPOT FR · peak load</option>
+                <option>Belpex BE · base load</option>
+                <option>Tarif d'obligation d'achat</option>
+              </select>
+            </div>
+            <div class="unit-inline">
+              <span class="mini-label" style="display:block">Unité (définie)</span>
+              <span class="unit-val">€/MWh</span>
+              <span class="unit-note muted">· définie dans Paramètres → Marchés · non modifiable</span>
+            </div>
+          </div>
+
+          <!-- Ligne 2 commune — Format timestamp + Mode d'enregistrement (remonté ici) -->
+          <div class="common-row">
+            <div>
+              <span class="mini-label" style="display:block">Format timestamp</span>
+              <select class="select fmt-select" id="fmt-select" onchange="refreshContext()">
+                <option selected>ISO 8601 — 2026-04-01 14:30</option>
+                <option>JJ/MM/AA HH:MM — 01/04/26 14:30</option>
+                <option>MM/JJ/AA HH:MM — 04/01/26 14:30</option>
+                <option>XLS — n° de série Excel (45383,60)</option>
+              </select>
+            </div>
+            <div>
+              <span class="mini-label" style="display:block">Mode d'enregistrement</span>
+              <div style="display:flex; align-items:center; gap:8px">
+                <div class="freq-toggle" role="tablist" aria-label="Mode d'enregistrement">
+                  <button data-freq="frequentiel">Fréquentiel</button>
+                  <button class="on" data-freq="evenementiel">Évènementiel</button>
+                </div>
+                <span class="help-tip" tabindex="0" aria-label="Aide : fréquentiel / événementiel">
+                  <span class="q">?</span>
+                  <span class="help-bubble" role="tooltip">
+                    <p><b>Fréquentielle</b> — Données à pas de temps régulier (toutes les 5 min, 15 min, etc.).</p>
+                    <p><b>Événementielle</b> — Données à pas de temps variable : un nouveau point uniquement quand la valeur change.</p>
+                    <p style="margin-bottom:2px">Entre deux points consécutifs, le calcul dépend du type de donnée :</p>
+                    <ul>
+                      <li><b>Électricité, indicateurs</b> → interpolation linéaire entre les 2 points</li>
+                      <li><b>Prix</b> → valeur constante jusqu'au prochain point (escalier)</li>
+                    </ul>
+                  </span>
+                </span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Upload card (le toggle Évènementiel/Fréquentiel a été remonté dans la carte ci-dessus) -->
+      <div class="card" style="margin-bottom:14px">
+        <div class="card-head">
+          <div>
+            <div class="card-head-title">Charger un fichier</div>
+            <div class="card-head-sub" id="upload-context">Électricité pour <b data-centrale-name>Centrale des Moulins</b> · source MOU-PRINC · unité kWh</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="dropzone" onclick="simulateUpload()">
+            <i data-lucide="upload-cloud" style="width:36px; height:36px"></i>
+            <div style="font-size:14px; color:var(--text-primary); margin-top:10px; font-weight:500">Glissez-déposez un fichier ici</div>
+            <div style="font-size:12px; color:var(--text-muted); margin-top:4px">max 50 Mo · 1 an</div>
+            <button class="btn btn-secondary" style="margin-top:14px" onclick="event.stopPropagation(); simulateUpload()"><i data-lucide="folder-open"></i> Parcourir</button>
+          </div>
+          <div style="display:flex; gap:8px; align-items:center; margin-top:12px; font-size:12px; color:var(--text-muted)">
+            <i data-lucide="info" style="width:13px; height:13px"></i>
+            Les doublons (mêmes horodatages) seront remplacés.
+          </div>
+
+          <div class="preview-card" id="preview-card" style="display:none">
+            <div class="pv-head">
+              <div class="pv-title"><i data-lucide="eye"></i> Prévisualisation · <span id="pv-filename">production_mou-princ_avril.csv</span></div>
+              <div class="pv-actions">
+                <button class="btn btn-ghost btn-sm" onclick="hidePreview()">Annuler</button>
+                <button class="btn btn-primary btn-sm" onclick="confirmImport()"><i data-lucide="check"></i> Confirmer l'import</button>
+              </div>
+            </div>
+            <div class="pv-meta" style="margin-bottom:8px">2 880 lignes détectées · pas 15 min · 1–30 avr. 2026 · 2 trous (1 h cumulée)</div>
+            <table class="data-table" style="font-size:12.5px">
+              <thead>
+                <tr><th>Horodatage</th><th class="num" style="text-align:right">Valeur</th><th>Statut</th></tr>
+              </thead>
+              <tbody>
+                <tr><td class="tabular">2026-04-01 00:00</td><td class="num" style="text-align:right">42,8</td><td><span class="badge badge-green">OK</span></td></tr>
+                <tr><td class="tabular">2026-04-01 00:15</td><td class="num" style="text-align:right">41,2</td><td><span class="badge badge-green">OK</span></td></tr>
+                <tr><td class="tabular">2026-04-01 00:30</td><td class="num" style="text-align:right">39,7</td><td><span class="badge badge-green">OK</span></td></tr>
+                <tr><td class="tabular">2026-04-01 00:45</td><td class="num" style="text-align:right">—</td><td><span class="badge badge-amber">trou</span></td></tr>
+                <tr><td class="tabular">2026-04-01 01:00</td><td class="num" style="text-align:right">40,1</td><td><span class="badge badge-green">OK</span></td></tr>
+                <tr><td class="tabular">…</td><td class="num" style="text-align:right">…</td><td class="muted">2 875 lignes supplémentaires</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent uploads (this centrale) -->
+      <div class="card" style="margin-bottom:14px">
+        <div class="card-head"><div class="card-head-title">Imports récents · <span data-centrale-name>Centrale des Moulins</span></div><a href="#" class="link" style="font-size:12px">Voir tout l'historique →</a></div>
+        <table class="data-table">
+          <thead><tr><th>Date</th><th>Source de données</th><th>Type</th><th>Période</th><th>Lignes</th><th>Statut</th></tr></thead>
+          <tbody>
+            <tr><td class="tabular">23 avr. 14:23</td><td>MOU-PRINC</td><td><span class="badge badge-blue">Électricité · SCADA</span></td><td>auto · 1–22 avr.</td><td class="num">8 640</td><td><span class="badge badge-green">Validé</span></td></tr>
+            <tr><td class="tabular">22 avr. 09:12</td><td>Pluie · Bergerac</td><td><span class="badge badge-cyan">Indicateur · Météo</span></td><td>1–22 avr.</td><td class="num">22</td><td><span class="badge badge-green">Validé</span></td></tr>
+            <tr><td class="tabular">10 avr. 16:48</td><td>MOU-PRINC</td><td><span class="badge badge-blue">Électricité · CSV</span></td><td>1–9 avr.</td><td class="num">864</td><td><span class="badge badge-amber">2 trous détectés</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Sources health (compact) -->
+      <div class="card">
+        <div class="card-head"><div class="card-head-title">Sources automatisées</div></div>
+        <table class="data-table">
+          <thead><tr><th>Source</th><th>Type</th><th>Dernière maj.</th><th>Fréquence</th><th>Statut</th></tr></thead>
+          <tbody>
+            <tr><td>SCADA · MOU-PRINC</td><td>Électricité</td><td>il y a 2 h</td><td>quart-horaire</td><td><span class="badge badge-green">OK</span></td></tr>
+            <tr><td>Enedis R63 · MOU-PRINC</td><td>Électricité · backup</td><td>hier</td><td>quotidien</td><td><span class="badge badge-green">OK</span></td></tr>
+            <tr><td>Météo France · Bergerac</td><td>Indicateur · pluie</td><td>il y a 35 min</td><td>quotidien</td><td><span class="badge badge-green">OK</span></td></tr>
+            <tr><td>SCHAPI · Dordogne</td><td>Indicateur · débit</td><td>il y a 14 min</td><td>quart-horaire</td><td><span class="badge badge-green">OK</span></td></tr>
+            <tr><td>EPEX SPOT FR · base load</td><td>Prix d'électricité</td><td>il y a 1 h</td><td>horaire</td><td><span class="badge badge-green">OK</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<script src="https://unpkg.com/lucide@latest"></script>
+<script>
+// Naia v5 — integrated app mockup shell
+// Sidebar uses a flat structure per the May 2026 team-meeting review:
+//   - "Pilotage" section groups Tableau de bord / Production / Revenus / Paramètres
+//     (no per-centrale fold — centrales appear as tabs at the top of each page)
+//   - "Communauté" section groups Inbox + the V1 community topics
+//   - No more "Rapports" entry — the generator lives on the Tableau de bord
+
+const CENTRALES = [
+  { slug: "moulins",  label: "Centrale des Moulins", capacity: "450 kW", country: "FR" },
+  { slug: "bocq",     label: "Moulin du Bocq",       capacity: "210 kW", country: "BE" },
+  { slug: "ariege",   label: "Centrale d'Ariège",    capacity: "780 kW", country: "FR" },
+  { slug: "lesse",    label: "Moulin de la Lesse",   capacity: "320 kW", country: "BE" },
+];
+
+const COMMUNITY_TOPICS = [
+  { slug: "earn",         label: "Gagner des points",    icon: "zap",         href: "community-earn.html",      tier: "v1" },
+  { slug: "rewards",      label: "Récompenses",          icon: "gift",        href: "community-rewards.html",   tier: "v1" },
+  { slug: "intelligence", label: "Intelligence",         icon: "lightbulb",   href: "community-intelligence.html", tier: "v1" },
+  { slug: "market",       label: "Mises à jour marché",  icon: "trending-up", href: "community-market.html",    tier: "v1" },
+  // 2026-05-27 PO descope for the 10-11 June conference V1: Agenda (D6)
+  // is deferred to V2 along with Surveys (D5) and the F3 LinkedIn module.
+  // The page itself stays for V2 demo via the "Voir V2 (mockup)" toggle.
+  { slug: "agenda",       label: "Agenda",               icon: "calendar",    href: "community-agenda.html",    tier: "v2" },
+  { slug: "leaderboard",  label: "Classement",           icon: "trophy",      href: "#",                        tier: "v2" },
+  { slug: "visits",       label: "Visites de centrales", icon: "map-pin",     href: "#",                        tier: "v2" },
+  { slug: "opportunities",label: "Opportunités",         icon: "rocket",      href: "#",                        tier: "v2" },
+  { slug: "forum",        label: "Forum & annuaire",     icon: "users",       href: "#",                        tier: "v2" },
+];
+
+// 2026-05-25 PO decision: the sidebar's "Administration" entry is now
+// a flat link straight to admin.html (no submenu, no chevron). All
+// admin pages are reachable from the Raccourcis cards on admin.html,
+// so a sidebar submenu would just duplicate them. If a power-user
+// pattern emerges (e.g. reps living in admin-leads all day), revisit
+// and add a pinned-shortcut affordance then.
+
+// ---- THEME ----
+function getTheme() { return localStorage.getItem("naia-theme") || "dark"; }
+function setTheme(t) { localStorage.setItem("naia-theme", t); document.documentElement.setAttribute("data-theme", t); refreshThemeButtons(); }
+function refreshThemeButtons() {
+  const t = getTheme();
+  document.querySelectorAll("[data-theme-btn]").forEach(btn => {
+    btn.classList.toggle("on", btn.dataset.themeBtn === t);
+  });
+}
+
+// ---- V2 toggle ----
+function getShowV2() { return localStorage.getItem("naia-show-v2") === "true"; }
+function setShowV2(v) { localStorage.setItem("naia-show-v2", v ? "true" : "false"); document.body.dataset.showV2 = v ? "true" : "false"; }
+
+// ---- MVP-tier toggle (v5 add — for the June 2026 conference demo) ----
+// MVP 0.9 is the strict-minimum surface shipped for the conference:
+//   Production · Revenus · Paramètres · Profil (user data only)
+// MVP 1 is the full v5 mockup. The toggle hides MVP1-only items via CSS
+// (any element with data-mvp="1" disappears when body[data-mvp="0.9"]).
+function getMvpTier() { return localStorage.getItem("naia-mvp-tier") || "1"; }
+function setMvpTier(t) {
+  localStorage.setItem("naia-mvp-tier", t);
+  document.body.dataset.mvp = t;
+  refreshMvpButtons();
+}
+function refreshMvpButtons() {
+  const t = getMvpTier();
+  document.querySelectorAll("[data-mvp-btn]").forEach(btn => {
+    btn.classList.toggle("on", btn.dataset.mvpBtn === t);
+  });
+}
+function injectMvpToggle() {
+  if (document.getElementById("mvp-toggle")) return;
+  const wrap = document.createElement("div");
+  wrap.id = "mvp-toggle";
+  wrap.className = "mvp-toggle";
+  wrap.innerHTML = `
+    <span class="mvp-label">Vue conférence</span>
+    <span class="mvp-seg">
+      <button data-mvp-btn="0.9" onclick="setMvpTier('0.9')">MVP 0.9</button>
+      <button data-mvp-btn="1"   onclick="setMvpTier('1')">MVP 1</button>
+    </span>
+  `;
+  document.body.appendChild(wrap);
+  refreshMvpButtons();
+}
+
+// ---- ACCESS-persona toggle (v5 add — funnel decision 2026-05-31, platform#647) ----
+// "lead"      = logged-in conference lead: has community points, but NO connected plant
+//               and NO subscription. Insight pages (Production/Revenus) show a locked
+//               overlay with a "Connectez votre centrale" CTA → plaquette.
+// "connected" = paying customer with a connected plant and real data (the normal view).
+// Only injected on pages that carry a .lock-overlay element, so it doesn't appear
+// everywhere. Mirrors the MVP-tier toggle pattern above.
+function getAccess() { return localStorage.getItem("naia-access") || "lead"; }
+function setAccess(a) {
+  localStorage.setItem("naia-access", a);
+  document.body.dataset.access = a;
+  refreshAccessButtons();
+}
+function refreshAccessButtons() {
+  const a = getAccess();
+  document.querySelectorAll("[data-access-btn]").forEach(btn => {
+    btn.classList.toggle("on", btn.dataset.accessBtn === a);
+  });
+}
+function injectAccessToggle() {
+  // Only relevant on pages that declare a lockable region.
+  if (!document.querySelector(".lock-overlay")) return;
+  if (document.getElementById("access-toggle")) return;
+  const wrap = document.createElement("div");
+  wrap.id = "access-toggle";
+  wrap.className = "access-toggle";
+  wrap.innerHTML = `
+    <span class="access-label">Accès</span>
+    <span class="access-seg">
+      <button data-access-btn="lead"      onclick="setAccess('lead')">Lead</button>
+      <button data-access-btn="connected" onclick="setAccess('connected')">Client</button>
+    </span>
+  `;
+  document.body.appendChild(wrap);
+  refreshAccessButtons();
+}
+
+// ---- SIDEBAR BUILD ----
+function buildSidebar() {
+  const aside = document.querySelector("aside.sidebar");
+  if (!aside) return;
+  const page = document.body.dataset.page || "";
+  const section = document.body.dataset.section || ""; // production / revenue / community / parametres / admin
+  const centrale = document.body.dataset.centrale || "all";
+
+  // Determine which fold-outs default to open. v5: only Communauté still folds —
+  // the Pilotage block (Production / Revenus / Paramètres) is flat now since
+  // per-centrale views are reached via top tabs on each page.
+  const open = {
+    community: section === "community" || section === "inbox",
+    admin:     section === "admin",
+  };
+
+  // Inbox sits under Communauté now (v5 team-meeting move). It's still its own
+  // page but folded into the community group rather than the Pilotage group.
+  const communityItems = `
+    <a href="inbox.html" class="subnav-item ${section === 'inbox' ? 'active' : ''}">
+      <span>Inbox</span>
+      <span class="badge-mini" style="margin-left:auto">3</span>
+    </a>
+    ${COMMUNITY_TOPICS.map(t => {
+      const activeClass = (page === t.slug) ? "active" : "";
+      const v2Class = t.tier === "v2" ? "v2" : "";
+      const v2Pill = t.tier === "v2" ? `<span class="v2-pill">V2</span>` : "";
+      const onclick = t.href === "#" ? `onclick="event.preventDefault(); alert('${t.label} — V2 (mockée)')"` : "";
+      return `<a href="${t.href}" class="subnav-item ${activeClass} ${v2Class}" ${onclick}>
+        <span>${t.label}</span>
+        ${v2Pill}
+      </a>`;
+    }).join("")}
+  `;
+
+  aside.innerHTML = `
+    <a href="index.html" class="sidebar-brand" style="text-decoration:none">
+      <img src="img/logo.png" alt="Naia hydro" style="width:100%; max-width:184px; height:auto; display:block">
+    </a>
+
+    <nav class="sidebar-nav">
+
+      <div class="sidebar-section-title">Pilotage</div>
+
+      <a href="index.html" class="sidebar-item ${section === '' && page === 'home' ? 'active' : ''}" data-mvp="1">
+        <i data-lucide="layout-dashboard"></i>
+        <span>Tableau de bord</span>
+      </a>
+
+      <a href="production.html" class="sidebar-item ${section === 'production' ? 'active' : ''}">
+        <i data-lucide="zap"></i>
+        <span>Production</span>
+      </a>
+
+      <a href="revenue.html" class="sidebar-item ${section === 'revenue' ? 'active' : ''}">
+        <i data-lucide="euro"></i>
+        <span>Revenus</span>
+      </a>
+
+      <a href="data.html" class="sidebar-item ${section === 'data' ? 'active' : ''}">
+        <i data-lucide="upload"></i>
+        <span>Données</span>
+      </a>
+
+      <a href="parametres.html" class="sidebar-item ${section === 'parametres' ? 'active' : ''}">
+        <i data-lucide="settings"></i>
+        <span>Paramètres</span>
+      </a>
+
+      <a href="simulateur.html" class="sidebar-item ${section === 'simulateur' ? 'active' : ''}" data-mvp="1">
+        <i data-lucide="cpu"></i>
+        <span>Simulateur</span>
+        <span class="badge-mini" style="background:rgba(217,119,6,0.3); color:#fcd34d; border:1px solid rgba(251,191,36,0.4)">V2</span>
+      </a>
+
+      <div class="sidebar-section-title" data-mvp="1">Communauté</div>
+
+      <a href="community-earn.html" class="sidebar-item ${section === 'community' || section === 'inbox' ? 'active' : ''}" aria-expanded="${open.community}" data-mvp="1">
+        <i data-lucide="users"></i>
+        <span>Communauté</span>
+        <i data-lucide="chevron-right" class="chev" onclick="event.preventDefault(); event.stopPropagation(); toggleFoldByLink(this)"></i>
+      </a>
+      <div class="subnav" data-open="${open.community}" data-mvp="1">
+        ${communityItems}
+      </div>
+
+      <a href="admin.html" class="sidebar-item ${section === 'admin' ? 'active' : ''}" data-mvp="1">
+        <i data-lucide="shield"></i>
+        <span>Administration</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-foot">
+      <a class="sidebar-item" href="#" onclick="event.preventDefault(); openHelp()">
+        <i data-lucide="life-buoy"></i>
+        <span>Aide &amp; support</span>
+      </a>
+    </div>
+
+    <div id="profile-container">
+      <!-- v5 update: this button no longer opens a dropdown — it navigates directly to
+           profil.html where Mon profil / Mon abonnement / Mes factures / Mes jetons sit
+           as tabs and a User Settings tile hosts language, theme and security. -->
+      <a id="profile-trigger" class="profile-trigger" href="profil.html">
+        <div class="avatar" style="width:30px; height:30px; font-size:11px">MD</div>
+        <div style="flex:1; min-width:0">
+          <div style="color:white; font-size:13px; font-weight:500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis">Marc Dupont</div>
+          <div style="color:rgba(255,255,255,0.55); font-size:11px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis">Moulin du Bocq · BE</div>
+        </div>
+        <i data-lucide="chevron-right" style="width:14px; height:14px; color:rgba(255,255,255,0.55)"></i>
+      </a>
+    </div>
+  `;
+}
+
+function sectionLabel(slug) {
+  return ({production: "Production", revenue: "Revenus", parametres: "Paramètres"})[slug] || slug;
+}
+
+// Toggle fold state when clicking the chevron on a sidebar parent <a>
+// (the <a> itself navigates; chevron just expands without navigating)
+function toggleFoldByLink(chevEl) {
+  const link = chevEl.closest(".sidebar-item");
+  if (!link) return;
+  const subnav = link.nextElementSibling;
+  if (!subnav || !subnav.classList.contains("subnav")) return;
+  const open = subnav.dataset.open === "true";
+  subnav.dataset.open = open ? "false" : "true";
+  link.setAttribute("aria-expanded", open ? "false" : "true");
+}
+
+// ---- PROFILE BUTTON ----
+// v5 update: the bottom-left profile button no longer opens a dropdown.
+// It navigates directly to profil.html, where:
+//   - Identité tab hosts user identity, badges, and a User Settings tile
+//     (Sécurité / MFA, Langue, Thème)
+//   - Mon abonnement / Mes factures / Mes jetons are the other tabs (MVP1)
+// The Sécurité and Mes badges tabs are removed (badges sit on Identité; security
+// moved into the settings tile).
+
+// V2-content visibility helper kept for any future toggle surface (e.g. an
+// admin power-user pref). Currently no UI control flips it — call setShowV2(true)
+// from the console to preview V2 community items.
+function refreshV2Buttons() {
+  const v = getShowV2();
+  document.querySelectorAll("[data-v2-btn]").forEach(b => b.classList.toggle("on", b.dataset.v2Btn === String(v)));
+}
+
+// ---- CENTRALE TABS (top of page when applicable) ----
+// Tabs use URL hash (#all, #moulins, #bocq, ...). Clicking a tab updates
+// the hash, the active tab, and the page contents that depend on the
+// selected centrale (title, KPIs, chart). One page handles all centrales.
+function buildCentraleTabs() {
+  const host = document.getElementById("centrale-tabs");
+  if (!host) return;
+  const section = document.body.dataset.section || "";
+  const active = currentCentrale();
+
+  const items = [
+    { slug: "all", label: "Tous", capacity: "1.76 MW · 4 centrales" },
+    ...CENTRALES.map(c => ({ slug: c.slug, label: c.label, capacity: c.capacity })),
+  ];
+
+  host.innerHTML = items.map(c => {
+    const activeClass = active === c.slug ? "active" : "";
+    const allClass = c.slug === "all" ? "all" : "";
+    return `<a href="#${c.slug}" data-centrale="${c.slug}" class="centrale-tab ${activeClass} ${allClass}" onclick="onCentraleTabClick(event, '${c.slug}')">
+      <span>${c.label}</span>
+      <span class="cap">${c.capacity}</span>
+    </a>`;
+  }).join("");
+}
+function currentCentrale() {
+  const hash = (window.location.hash || "").replace("#", "").trim();
+  if (!hash) return document.body.dataset.centrale || "all";
+  return hash;
+}
+function onCentraleTabClick(e, slug) {
+  e.preventDefault();
+  window.location.hash = "#" + slug;
+  applyCentrale(slug);
+}
+function applyCentrale(slug) {
+  document.body.dataset.centrale = slug;
+  // Update active class on tabs.
+  // Scope to tabs that actually carry data-centrale so we don't fight other
+  // .centrale-tab consumers (e.g. admin-audit.html reuses the visual class
+  // but uses data-audit-tab — its active state is owned by selectAuditScope).
+  document.querySelectorAll(".centrale-tab[data-centrale]").forEach(t => t.classList.toggle("active", t.dataset.centrale === slug));
+  // Update centrale-aware texts in the page
+  const c = CENTRALES.find(x => x.slug === slug);
+  document.querySelectorAll("[data-centrale-name]").forEach(el => {
+    el.textContent = slug === "all" ? "Vue agrégée · 4 centrales" : (c ? c.label : "—");
+  });
+  document.querySelectorAll("[data-centrale-capacity]").forEach(el => {
+    el.textContent = slug === "all" ? "Total · 1 760 kW" : (c ? c.capacity : "—");
+  });
+  // Refresh chart with the right scaling factor
+  if (typeof rebuildProductionChart === "function") rebuildProductionChart();
+}
+window.addEventListener("hashchange", () => applyCentrale(currentCentrale()));
+
+// ---- MODAL ----
+function openOverlay(id) { const el = document.getElementById(id); if (el) { el.classList.add("open"); document.body.style.overflow = "hidden"; } }
+function closeOverlay(id) { const el = document.getElementById(id); if (el) { el.classList.remove("open"); document.body.style.overflow = ""; } }
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") {
+    document.querySelectorAll(".overlay.open").forEach(el => el.classList.remove("open"));
+    document.body.style.overflow = "";
+  }
+});
+
+// ---- ICONS ----
+function initIcons() {
+  if (window.lucide && typeof lucide.createIcons === "function") {
+    lucide.createIcons({ attrs: { "stroke-width": 1.75 } });
+  }
+}
+
+// ---- CHART (Naia-style) ----
+const NAIA_CHART_PALETTE = {
+  dark:  { bar: "#38bdf8", bar2: "#6ee7b7", line: "#a3e635", grid: "rgba(255,255,255,0.05)", axis: "rgba(255,255,255,0.45)", tooltipBg: "#0f1a32", tooltipFg: "#e2e8f0" },
+  light: { bar: "#2563eb", bar2: "#16a34a", line: "#65a30d", grid: "#eef1f6",                  axis: "#5c6b85",                tooltipBg: "#0f172a", tooltipFg: "#f8fafc" },
+};
+function chartColors() { return NAIA_CHART_PALETTE[getTheme()] || NAIA_CHART_PALETTE.dark; }
+
+function buildHomeChart() {
+  const c = document.getElementById("home-chart");
+  if (!c || !window.Chart) return;
+  const colors = chartColors();
+  const months = ["Mai","Juin","Juil","Août","Sept","Oct","Nov","Déc","Jan","Fév","Mars","Avr"];
+  const monthlyMWh = [142, 168, 159, 124, 110, 92, 88, 124, 198, 215, 245, 196];
+  const cumulative = monthlyMWh.reduce((a, v, i) => { a.push((i ? a[i-1] : 0) + v); return a; }, []);
+  return new Chart(c.getContext("2d"), {
+    type: "bar",
+    data: {
+      labels: months,
+      datasets: [
+        { label: "Production mensuelle (MWh)", data: monthlyMWh, backgroundColor: colors.bar, borderRadius: 4, categoryPercentage: 0.78, barPercentage: 0.86 },
+        { label: "Production cumulée (MWh)", type: "line", data: cumulative, borderColor: colors.line, backgroundColor: "transparent", borderWidth: 2.5, tension: 0.3, pointRadius: 3, pointBackgroundColor: colors.line, yAxisID: "y2" }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      interaction: { intersect: false, mode: "index" },
+      scales: {
+        x: { grid: { display: false }, ticks: { color: colors.axis, font: { size: 11 } } },
+        y: { grid: { color: colors.grid }, ticks: { color: colors.axis, font: { size: 11 } }, title: { display: true, text: "MWh / mois", color: colors.axis } },
+        y2: { position: "right", grid: { display: false }, ticks: { color: colors.axis, font: { size: 11 } }, title: { display: true, text: "Cumulé MWh", color: colors.axis } }
+      },
+      plugins: {
+        legend: { display: true, position: "bottom", labels: { color: colors.axis, font: { size: 11 } } },
+        tooltip: { backgroundColor: colors.tooltipBg, titleColor: colors.tooltipFg, bodyColor: colors.tooltipFg, padding: 10, cornerRadius: 8 }
+      }
+    }
+  });
+}
+
+// ---- PRODUCTION CHART (Naia platform style: rain bars hanging from top, production
+// bars from bottom with optional MDA comparator overlay, flow line in the middle)
+// Inspired by hydro-software/game/.screenshots/a4-chart.png + indicateurs.png.
+let _productionChartInstance = null;
+
+function rebuildProductionChart() {
+  if (_productionChartInstance) {
+    _productionChartInstance.destroy();
+    _productionChartInstance = null;
+  }
+  buildProductionChart();
+}
+
+function centraleScale() {
+  const slug = currentCentrale();
+  // Roughly proportional to the centrale's installed capacity (kW)
+  const scale = ({ all: 1.0, moulins: 0.26, bocq: 0.12, ariege: 0.44, lesse: 0.18 })[slug] || 1.0;
+  return scale;
+}
+
+function buildProductionChart() {
+  const c = document.getElementById("production-chart");
+  if (!c || !window.Chart) return;
+  const colors = chartColors();
+  const scale = centraleScale();
+
+  const days = Array.from({ length: 31 }, (_, i) => `${i + 1}`);
+  // Production (dark blue bars, primary value, kWh/day)
+  const production = days.map((_, i) => {
+    const seasonal = 1100 + Math.sin(i / 6) * 300;
+    const noise = (Math.sin(i * 0.7) + Math.cos(i * 0.3)) * 80;
+    let v = seasonal + noise;
+    if (i === 12 || i === 13) v *= 0.55;
+    return Math.round(Math.max(80, v) * scale);
+  });
+  // Comparator AGG DAILY MDA (lighter blue overlay on top of production)
+  const compMda = production.map(v => Math.round(v * 0.85 + 60));
+  // Flow / débit (m³/s) — green line, middle
+  const flow = days.map((_, i) => 3.2 + Math.sin(i / 9) * 1.0 + (Math.cos(i * 0.4) * 0.25) + (i === 12 ? 1.6 : 0) + (i === 13 ? 1.4 : 0));
+  // Rain (mm/day) — bars hanging from top: render as negative on a rain-only axis
+  const rain = days.map((_, i) => {
+    let r = 0;
+    if (i === 9 || i === 10) r = 12 + Math.random() * 4;
+    if (i === 11) r = 28 + Math.random() * 4;
+    if ([21, 24, 25, 26, 28, 29, 30].includes(i)) r = 6 + Math.random() * 6;
+    return r;
+  });
+
+  // Visual layering per Jan's preference (different from the game's "rain + flow share
+  // upper band" pattern — Jan wants the flow line in the middle band, not at the top):
+  //
+  //   top of canvas ────────────────────────
+  //                 ╔═╗   ╔═╗   ╔═╗            ← rain bars      (top ~25%)
+  //                 ╚═╝   ╚═╝   ╚═╝
+  //                 ─── flow line ───              ← flow line   (middle ~30-50%)
+  //                 ┌─┐ ┌─┐ ┌─┐                ← production    (bottom ~33%)
+  //                 │ │ │ │ │ │
+  //   bottom ──────┴─┴─┴─┴─┴─┴───────────
+  //
+  // Three separate axes, NO axis-stacking conflict:
+  //   - kwh    (left, normal)              → max = peak × 3 → bottom ~33%
+  //   - yFlow  (right inner, NORMAL)       → max = peak × 2 → values land in middle
+  //   - yRain  (right outer, reversed)     → max = peak × 4 → bars hang from top
+  //
+  // The flow axis is normal direction (NOT reversed). Setting max ≈ 2×peak parks the
+  // peak value at 50% canvas height — middle band. This avoids the Chart.js "two
+  // reversed y-axes on same side" rendering quirk that scrambled the previous
+  // attempts.
+  //
+  // Both peaks closed over before chart construction. Skill's gotcha #1.
+
+  const productionPeak = Math.max(1, ...compMda, ...production);
+  const rainPeak = Math.max(1, ...rain);
+  const flowPeak = Math.max(1, ...flow);
+
+  const kwhMax = Math.ceil((productionPeak * 3) / 500) * 500;
+
+  _productionChartInstance = new Chart(c.getContext("2d"), {
+    type: "bar",
+    data: {
+      labels: days,
+      datasets: [
+        { label: "AGG DAILY MDA",      data: compMda,    backgroundColor: "#7dd3fc", borderRadius: 2, categoryPercentage: 0.85, barPercentage: 0.92, order: 4, yAxisID: "y" },
+        { label: "Production (kWh)",   data: production, backgroundColor: "#1d4ed8", borderRadius: 2, categoryPercentage: 0.85, barPercentage: 0.46, order: 3, yAxisID: "y" },
+        { label: "Débit (m³/s)",       data: flow,       type: "line", borderColor: colors.line, borderWidth: 2.2, tension: 0.35, pointRadius: 0, pointHoverRadius: 4, yAxisID: "yFlow", fill: false, order: 1 },
+        { label: "Météo · pluie (mm)", data: rain,       backgroundColor: "#60a5fa", borderRadius: 2, categoryPercentage: 0.85, barPercentage: 0.55, yAxisID: "yRain", order: 2 }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      interaction: { intersect: false, mode: "index" },
+      scales: {
+        x: { grid: { display: false }, ticks: { color: colors.axis, font: { size: 10 }, maxTicksLimit: 31 } },
+
+        // Production axis (left, normal). Max = peak × 3 → bars fill bottom ~33%.
+        y: {
+          position: "left",
+          min: 0,
+          max: kwhMax,
+          grid: { color: colors.grid, drawTicks: false },
+          ticks: {
+            color: colors.axis, font: { size: 11 },
+            callback: function(v) { return v <= productionPeak * 1.05 ? v : ""; }
+          },
+          title: { display: true, text: "kWh", color: colors.axis }
+        },
+
+        // Flow axis (right inner, NORMAL direction). Max = peak × 2 → line peaks at
+        // 50% canvas height. Values 3–5 land between 30% and 50% from bottom — i.e.
+        // immediately above the production band, in the middle of the canvas.
+        yFlow: {
+          position: "right",
+          min: 0,
+          max: flowPeak * 2,
+          grid: { display: false },
+          ticks: {
+            color: colors.axis, font: { size: 11 },
+            // Show ticks only within the realistic flow range (0..1.1×peak)
+            callback: function(v) { return v <= flowPeak * 1.1 ? v : ""; }
+          },
+          title: { display: true, text: "m³/s", color: colors.axis }
+        },
+
+        // Rain axis (right outer, REVERSED). 0 at top of canvas, max at bottom →
+        // bars hang from top edge. Max = peak × 4 → bars peak at ~25% from top.
+        yRain: {
+          position: "right",
+          reverse: true,
+          min: 0,
+          max: rainPeak * 4,
+          grid: { display: false },
+          ticks: {
+            color: "#60a5fa", font: { size: 10 },
+            callback: function(v) { return v <= rainPeak * 1.1 ? v : ""; }
+          },
+          title: { display: true, text: "mm", color: "#60a5fa" }
+        }
+      },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: colors.tooltipBg, titleColor: colors.tooltipFg, bodyColor: colors.tooltipFg, padding: 10, cornerRadius: 8,
+          callbacks: {
+            label: function(ctx) {
+              const ds = ctx.dataset.label;
+              if (ds === "Météo · pluie (mm)") return `Pluie : ${ctx.parsed.y.toFixed(1)} mm`;
+              if (ds === "Débit (m³/s)")       return `Débit : ${ctx.parsed.y.toFixed(2)} m³/s`;
+              if (ds === "AGG DAILY MDA")       return `MDA : ${ctx.parsed.y} kWh`;
+              return `${ds} : ${ctx.parsed.y} kWh`;
+            }
+          }
+        }
+      }
+    }
+  });
+  return _productionChartInstance;
+}
+
+// ---- POINTS CHART (community) ----
+function buildPointsChart() {
+  const c = document.getElementById("points-chart");
+  if (!c || !window.Chart) return;
+  const colors = chartColors();
+  const labels = ["Sem 1","Sem 2","Sem 3","Sem 4","Sem 5","Sem 6","Sem 7","Sem 8","Sem 9","Sem 10","Sem 11","Sem 12"];
+  const earned = [80, 120, 100, 220, 140, 280, 180, 200, 250, 320, 240, 380];
+  const spent = [0, 0, 100, 0, 0, 250, 0, 200, 0, 0, 250, 0];
+  const balance = earned.reduce((acc, v, i) => { acc.push((i ? acc[i-1] : 1800) + v - spent[i]); return acc; }, []);
+  return new Chart(c.getContext("2d"), {
+    type: "bar",
+    data: {
+      labels,
+      datasets: [
+        { label: "Gagnés", data: earned, backgroundColor: "#84cc16", borderRadius: 4, categoryPercentage: 0.75 },
+        { label: "Dépensés", data: spent.map(v => -v), backgroundColor: "#fbbf24", borderRadius: 4, categoryPercentage: 0.75 },
+        { label: "Solde", type: "line", data: balance, borderColor: "#38bdf8", borderWidth: 2.5, tension: 0.3, pointRadius: 3, pointBackgroundColor: "#38bdf8", yAxisID: "y2", fill: false }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      interaction: { intersect: false, mode: "index" },
+      scales: {
+        x: { grid: { display: false }, ticks: { color: colors.axis, font: { size: 11 } } },
+        y: { grid: { color: colors.grid }, ticks: { color: colors.axis, font: { size: 11 } } },
+        y2: { position: "right", grid: { display: false }, ticks: { color: colors.axis, font: { size: 11 } } }
+      },
+      plugins: {
+        legend: { display: false },
+        tooltip: { backgroundColor: colors.tooltipBg, titleColor: colors.tooltipFg, bodyColor: colors.tooltipFg, padding: 10, cornerRadius: 8 }
+      }
+    }
+  });
+}
+
+// ---- BELPEX CHART ----
+function buildBelpexChart() {
+  const c = document.getElementById("belpex-chart");
+  if (!c || !window.Chart) return;
+  const colors = chartColors();
+  const days = Array.from({ length: 14 }, (_, i) => `${i + 17}/04`);
+  const baseload = [78, 85, 92, 88, 75, 70, 68, 82, 90, 105, 115, 95, 88, 92];
+  const peakload = [110, 125, 140, 130, 105, 95, 90, 120, 135, 165, 180, 145, 130, 138];
+  return new Chart(c.getContext("2d"), {
+    type: "line",
+    data: {
+      labels: days,
+      datasets: [
+        { label: "Base load (€/MWh)", data: baseload, borderColor: "#38bdf8", backgroundColor: "rgba(56,189,248,0.10)", borderWidth: 2, tension: 0.35, pointRadius: 0, fill: true },
+        { label: "Peak load (€/MWh)", data: peakload, borderColor: "#f87171", borderWidth: 2, tension: 0.35, pointRadius: 0, borderDash: [4, 4], fill: false }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      scales: {
+        x: { grid: { display: false }, ticks: { color: colors.axis, font: { size: 11 } } },
+        y: { grid: { color: colors.grid }, ticks: { color: colors.axis, font: { size: 11 } }, title: { display: true, text: "€/MWh", color: colors.axis } }
+      },
+      plugins: {
+        legend: { display: true, position: "bottom", labels: { color: colors.axis, font: { size: 11 } } },
+        tooltip: { backgroundColor: colors.tooltipBg, titleColor: colors.tooltipFg, bodyColor: colors.tooltipFg, padding: 10, cornerRadius: 8 }
+      }
+    }
+  });
+}
+
+// ---- HELP PANEL (#8) ----
+// Reachable from two places (no floating button — Jan rejected that):
+//   1. Sidebar item "Aide & support" just above the profile area
+//   2. Profile dropdown entry "Aide & support"
+// Both call openHelp() which shows the help modal.
+function injectHelpModal() {
+  if (document.getElementById("help-overlay")) return;
+  const overlay = document.createElement("div");
+  overlay.id = "help-overlay";
+  overlay.className = "overlay";
+  overlay.onclick = (e) => { if (e.target === overlay) closeOverlay("help-overlay"); };
+  overlay.innerHTML = `
+    <div class="modal modal-lg">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px">
+        <div>
+          <div class="modal-title">Aide &amp; support</div>
+          <div class="modal-subtitle">Documentation, raccourcis et contact direct avec l'équipe Naia.</div>
+        </div>
+        <button class="btn btn-ghost" onclick="closeOverlay('help-overlay')"><i data-lucide="x"></i></button>
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px">
+        <a class="tile" href="#" onclick="event.preventDefault(); alert('Manuels Naia — à lier (PDF / wiki interne)')"><div class="tile-head"><span class="badge badge-blue"><i data-lucide="book-open"></i> Documentation</span></div><div class="tile-title">Manuels &amp; guides</div><div class="tile-desc">Premiers pas, ingestion, indicateurs, comparateurs, pertes, rapports.</div></a>
+        <a class="tile" href="#" onclick="event.preventDefault(); alert('Lien vers la formation vidéo — à venir')"><div class="tile-head"><span class="badge badge-purple"><i data-lucide="video"></i> Formation</span></div><div class="tile-title">Vidéos &amp; webinaires</div><div class="tile-desc">Capsules courtes pour découvrir une fonctionnalité.</div></a>
+        <a class="tile" href="#" onclick="event.preventDefault(); alert('Mailto support@naia.energy avec contexte préempli (page courante, version, organisation)')"><div class="tile-head"><span class="badge badge-green"><i data-lucide="message-circle"></i> Contact</span></div><div class="tile-title">Envoyer un message</div><div class="tile-desc">Direct à l'équipe Naia. Réponse sous 24 h ouvrées.</div></a>
+        <a class="tile" href="#" onclick="event.preventDefault(); alert('Raccourcis clavier — à documenter')"><div class="tile-head"><span class="badge badge-slate"><i data-lucide="keyboard"></i> Raccourcis</span></div><div class="tile-title">Raccourcis clavier</div><div class="tile-desc">Naviguer plus vite : ?, /, g d, g p, g r…</div></a>
+      </div>
+      <div class="muted" style="font-size:11px; margin-top:14px; padding-top:12px; border-top:1px solid var(--border-subtle)">
+        Naia v0.9 · build 2026-05-03 · <a href="#" class="link">notes de version</a> · <a href="#" class="link">statut de la plateforme</a>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+}
+
+function openHelp() {
+  // Close profile dropdown if open
+  const dd = document.getElementById("profile-dropdown");
+  if (dd && dd.classList.contains("open")) {
+    dd.classList.remove("open");
+    const trigger = document.getElementById("profile-trigger");
+    if (trigger) trigger.setAttribute("data-open", "false");
+  }
+  openOverlay("help-overlay");
+  initIcons();
+}
+
+// ---- INIT ----
+document.addEventListener("DOMContentLoaded", () => {
+  document.documentElement.setAttribute("data-theme", getTheme());
+  setShowV2(getShowV2());
+  document.body.dataset.mvp = getMvpTier();
+  document.body.dataset.access = getAccess();
+  buildSidebar();
+  buildCentraleTabs();
+  // Apply current centrale (from hash if present) on first paint so titles + chart match
+  applyCentrale(currentCentrale());
+  injectHelpModal();
+  injectMvpToggle();
+  injectAccessToggle();
+  initIcons();
+  setTimeout(() => {
+    buildHomeChart();
+    buildProductionChart();
+    buildPointsChart();
+    buildBelpexChart();
+  }, 0);
+});
+
+</script>
+<script>
+// force la vue MVP 0.9 (le toggle de la maquette lit le localStorage ; on impose 0.9 après le build)
+window.addEventListener('DOMContentLoaded', () => { document.body.dataset.mvp = '0.9'; refreshContext(); });
+
+function switchType(type) {
+  document.querySelectorAll(".type-seg button").forEach(b => b.classList.toggle("on", b.dataset.type === type));
+  const elec    = document.getElementById("elec-controls");
+  const indcomp = document.getElementById("indcomp-controls");
+  const prix    = document.getElementById("prix-controls");
+  elec.style.display    = type === "electricite" ? "flex" : "none";
+  indcomp.style.display = type === "indcomp"     ? "flex" : "none";
+  prix.style.display    = type === "prix"        ? "flex" : "none";
+
+  const ctx = document.getElementById("upload-context");
+  const centrale = document.querySelector('[data-centrale-name]')?.textContent || "Centrale des Moulins";
+  if (type === "electricite") {
+    const sel = document.getElementById("elec-compteur");
+    const opt = sel.options[sel.selectedIndex];
+    ctx.innerHTML = `Électricité pour <b>${centrale}</b> · source ${opt.text.split(' ·')[0]} · unité ${opt.dataset.unite}${ctxSuffix()}`;
+  } else if (type === "indcomp") {
+    const sel = document.getElementById("indcomp-select");
+    const opt = sel.options[sel.selectedIndex];
+    ctx.innerHTML = `Indicateur — <b>${sel.value}</b> sur <b>${centrale}</b> · unité ${opt.dataset.unite}${ctxSuffix()}`;
+  } else {
+    ctx.innerHTML = `Prix d'électricité sur <b>${centrale}</b> · unité €/MWh${ctxSuffix()}`;
+  }
+}
+
+// Suffixe du contexte d'upload : format timestamp + mode d'enregistrement (remontés dans la carte du haut)
+function currentType() { return document.querySelector('.type-seg button.on')?.dataset.type || 'electricite'; }
+function ctxSuffix() {
+  const fmt = document.getElementById('fmt-select');
+  const fmtLabel = fmt ? fmt.options[fmt.selectedIndex].text.split(' —')[0] : '';
+  const freqBtn = document.querySelector('.freq-toggle button.on');
+  const freqLabel = freqBtn ? freqBtn.textContent.trim() : '';
+  return ` · format ${fmtLabel} · ${freqLabel}`;
+}
+function refreshContext() { switchType(currentType()); }
+
+function updateUnite() {
+  const sel = document.getElementById("elec-compteur");
+  const opt = sel.options[sel.selectedIndex];
+  document.getElementById("elec-unite").textContent = opt.dataset.unite;
+  switchType("electricite");
+}
+
+function updateIndUnite() {
+  const sel = document.getElementById("indcomp-select");
+  const opt = sel.options[sel.selectedIndex];
+  document.getElementById("indcomp-unite").textContent = opt.dataset.unite;
+  switchType("indcomp");
+}
+
+document.querySelectorAll(".freq-toggle button").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".freq-toggle button").forEach(b => b.classList.remove("on"));
+    btn.classList.add("on");
+    refreshContext();
+  });
+});
+
+function simulateUpload() {
+  document.getElementById("preview-card").style.display = "block";
+  setTimeout(() => { if (window.lucide) lucide.createIcons({ attrs: { "stroke-width": 1.75 } }); }, 0);
+}
+function hidePreview() { document.getElementById("preview-card").style.display = "none"; }
+function confirmImport() { alert("Import confirmé (démo)"); hidePreview(); }
+
+function switchCentrale(e, slug) {
+  if (e) e.preventDefault();
+  document.querySelectorAll(".centrale-tab").forEach(t => t.classList.toggle("active", t.dataset.centrale === slug));
+  const map = {
+    moulins: "Centrale des Moulins",
+    bocq:    "Moulin du Bocq",
+    ariege:  "Centrale d'Ariège",
+    lesse:   "Moulin de la Lesse",
+  };
+  const name = map[slug] || "Centrale";
+  document.querySelectorAll('[data-centrale-name]').forEach(el => el.textContent = name);
+  document.body.dataset.centrale = slug;
+}
+</script>
+</body></html>
