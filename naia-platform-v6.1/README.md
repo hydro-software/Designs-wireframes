@@ -1,12 +1,29 @@
-# Naia v6 — post-Bernard integrated mockup
+# Naia v6.1 — canonical post-Bernard mockup
 
-**Live prototype: https://hydro-software.github.io/Designs-wireframes/naia-platform-v6/**
+**Live prototype: https://hydro-software.github.io/Designs-wireframes/naia-platform-v6.1/**
 
-Iteration of [`naia-platform-v5/`](../naia-platform-v5/) that folds in Bernard's full design rework documented in [Designs-wireframes#1](https://github.com/hydro-software/Designs-wireframes/issues/1) (originally drafted under `bl_draft/`).
+`v6.1` is the **only reference wireframe** now — it folds in Bernard's full Paramètres rework (Designs-wireframes#1 + the v6.1 follow-up on `bl/parametres-v6-1`) plus everything that was already in v6.
 
-`naia-platform-v5/` is kept untouched as the comparison reference for the conference-scope discussion in [platform#599](https://github.com/hydro-software/platform/issues/599).
+`naia-platform-v5/` is kept untouched as the **comparison reference** for the conference-scope discussion in [platform#599](https://github.com/hydro-software/platform/issues/599). All other intermediate versions (v5b, v5c, v6) have been collapsed.
 
-## Changelog · v5 → v6
+## Changelog · v6 → v6.1
+
+Only `parametres.html` changes vs. v6. Everything else (sidebar, Tableau de bord, Production, Revenus, Données, Profil, MVP 0.9 toggle, all chart surfaces) is identical to v6.
+
+### Paramètres — Bernard's v6.1 polish round
+
+- **Dev-annotation layer** — floating bottom-right toggle "Annotations dev" reveals 10 in-page markers (👤 rôle / 💡 conseil / 🟡! attention) with hover bubbles, so reviewers can leave notes directly on the mockup.
+- **Compteurs — Enedis validation flow** — a new `compteur-verif` modal explains the validation process (Naia checks emails / Enedis mandate before allowing connection to a meter that isn't yours). The status column is rebranded `Actif / Non actif` → `Validé / —` (Naia Box & Manuel show "—" with a tooltip explaining no validation is needed). Explanatory alert-triangle next to the section title. `Status` → `Statut` typo fix.
+- **Utilisateurs & rôles — 5 roles + functional invite/edit modals.** New `invite-user` and `edit-user` modals (v6 had placeholder buttons). 5 role types: Administrateur · Opérateur de centrale · Éditeur · Lecteur · Finance. User rows carry data-attrs so the edit modal binds correctly. "Retirer l'utilisateur" red action.
+- **Topbar actions wired to real modals.** "Supprimer" now opens `supprimer-centrale` (was no handler). "Ajouter" in the centrale tab strip opens `ajouter-centrale` (was an alert placeholder). "Partager l'accès" topbar button removed.
+- **Tarifs** — section renamed from "Tarification" to "Tarifs" (subtitle dropped "1 actif"). Row 1 tariff reshaped (OA + complément is now Manuel · Import sur Naia), row 2 swapped to "Prix Spot EPEX" Automatique · EPEX FR base load.
+- **Partage de données** — section renamed from "Partage d'accès" to "Partage de données". Content fully replaced by a "Fonction à venir" teaser with a "Ça m'intéresse" interest-capture button. The `edit-share` modal removed (per Bernard: "je remets ça à plus tard pour le faire proprement").
+
+### Integration notes
+
+- Bernard's standalone (`bl_draft/parametres-v6-1-standalone.html`) referenced `../naia-platform-v6/css/style.css` and skipped `js/app.js` (to avoid sidebar reconstruction in his isolated review page). In v6.1 the path is fixed to `css/style.css` and `js/app.js` is restored — that gives us the sidebar, centrale-tab routing, MVP 0.9 toggle, and the openOverlay / closeOverlay / initIcons helpers in one place.
+
+## Changelog · v5 → v6 (carried into v6.1)
 
 Three pages changed vs. v5: `parametres.html`, `data.html`, and the chart-config overlay in `production.html`. Everything else (sidebar, Tableau de bord, Production chart body, Revenus, Profil, MVP 0.9 toggle, Légende side panels…) is identical to v5.
 
@@ -72,4 +89,4 @@ Feedback lands as commit-by-commit edits on this folder. Each push auto-rebuilds
 - [`hydro-software/naia-community`](https://github.com/hydro-software/naia-community) — Community PRD (specification only)
 - [`hydro-software/subscription-system`](https://github.com/hydro-software/subscription-system) — Subscription PRD (specification only)
 - Earlier versions kept for comparison: [`naia-v4/`](../naia-v4/) · [`naia-platform-v5/`](../naia-platform-v5/)
-- Bernard's original drafts (superseded by v6, kept for history): [`bl_draft/`](../bl_draft/)
+- Bernard's original drafts (superseded by v6.1, kept for history): [`bl_draft/`](../bl_draft/)

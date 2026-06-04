@@ -92,9 +92,73 @@
   .rev-flux-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding: 10px 0; border-bottom: 1px dashed var(--border-subtle); }
   .rev-flux-label { font-size: 14px; font-weight: 600; color: var(--text-primary); font-family: ui-monospace, monospace; white-space: nowrap; }
   .rev-times { font-size: 15px; font-weight: 600; color: var(--text-muted); font-family: ui-monospace, monospace; }
+  /* Compteurs — petite case "en cours" au-dessus de la date de fin (brouillon BL) */
+  .encours-lbl { display: flex; align-items: center; gap: 4px; font-size: 11px; color: var(--text-secondary); margin-bottom: 3px; cursor: pointer; white-space: nowrap; }
+  .encours-lbl input { width: 13px; height: 13px; margin: 0; cursor: pointer; }
+  /* Compteurs — pastille de statut de VALIDATION (posée par Naia, lecture seule côté client) */
+  .cpt-status { display: inline-flex; align-items: center; gap: 5px; padding: 3px 9px; border-radius: 999px; font-size: 11.5px; font-weight: 600; white-space: nowrap; }
+  .cpt-status::before { content: ""; width: 7px; height: 7px; border-radius: 50%; flex: none; }
+  .cpt-status.valide  { background: rgba(34,197,94,0.12);  color: #4ade80; }
+  .cpt-status.valide::before  { background: #22c55e; }
+  .cpt-status.encours { background: rgba(245,197,24,0.12); color: #f5c518; }
+  .cpt-status.encours::before { background: #f5c518; }
+  .cpt-status.refuse  { background: rgba(239,68,68,0.12);  color: #f87171; cursor: help; }
+  .cpt-status.refuse::before  { background: #ef4444; }
+  .cpt-status.na      { background: rgba(148,163,184,0.10); color: var(--text-muted); }
+  .cpt-status.na::before      { background: var(--text-subtle); }
+  /* ===== STANDALONE v6.1 (brouillon BL) — Annotations dev (style "commentaire Word") =====
+     Un seul marqueur jaune "!" par champ ; au survol une bulle avec la remarque libre.
+     Masqué par défaut ; le bouton flottant ajoute la classe body.dev-notes-on pour tout afficher.
+     Pas de catégories : la remarque (qui peut éditer) est dans le texte de la bulle. */
+  .dev-note { display: none; }
+  body.dev-notes-on .dev-note {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 18px; height: 18px; margin-left: 6px; vertical-align: middle;
+    font-size: 13px; line-height: 1; cursor: help; position: relative;
+  }
+  /* trois types de marqueur — le symbole porte le sens (rôle / attention / conseil) */
+  body.dev-notes-on .dev-note::before { content: "👤"; }                         /* défaut = rôle */
+  body.dev-notes-on .dev-note[data-type="role"]::before { content: "👤"; }
+  body.dev-notes-on .dev-note[data-type="conseil"]::before { content: "💡"; }
+  /* attention = pastille JAUNE avec un "!" (bien visible, pas l'emoji rouge) */
+  body.dev-notes-on .dev-note[data-type="attention"] {
+    background: #f5c518; color: #1a1100; border-radius: 50%;
+    font-weight: 800; font-size: 12px; box-shadow: 0 0 0 2px rgba(245,197,24,0.25);
+  }
+  body.dev-notes-on .dev-note[data-type="attention"]::before { content: "!"; }
+  /* bulle au survol (style commentaire Word) — multi-ligne pour les textes longs */
+  .dev-note::after {
+    content: attr(data-note);
+    position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%);
+    width: max-content; max-width: 280px; white-space: normal; text-align: left;
+    background: #0e1626; color: var(--text-primary); border: 1px solid var(--border-default);
+    padding: 8px 11px; border-radius: 8px; font-size: 12px; font-weight: 500; line-height: 1.45;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.45);
+    opacity: 0; pointer-events: none; transition: opacity 0.12s; z-index: 200;
+  }
+  .dev-note:hover { z-index: 200; }
+  .dev-note:hover::after { opacity: 1; }
+  /* la bulle peut sortir d'une carte repliée (.pd-section a overflow:hidden) — on relâche le clip
+     uniquement pour les sections qui portent une annotation, et seulement en mode annotations */
+  body.dev-notes-on .pd-section:has(.dev-note),
+  body.dev-notes-on .pd-sub:has(.dev-note) { overflow: visible; }
+  #dev-notes-toggle {
+    position: fixed; right: 18px; bottom: 18px; z-index: 70;
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--bg-card); border: 1px solid var(--border-default);
+    color: var(--text-primary); border-radius: 999px; padding: 9px 15px;
+    font-size: 12.5px; font-weight: 600; cursor: pointer; font-family: inherit;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.35);
+  }
+  #dev-notes-toggle:hover { background: var(--bg-card-hover); }
+  #dev-notes-toggle .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--text-muted); }
+  body.dev-notes-on #dev-notes-toggle { border-color: #f5c518; }
+  body.dev-notes-on #dev-notes-toggle .dot { background: #f5c518; }
 </style>
 </head>
 <body data-page="parametres" data-section="parametres" data-centrale="moulins">
+<!-- STANDALONE v6.1 (brouillon BL) — bouton afficher/masquer les remarques pour le dev -->
+<button id="dev-notes-toggle" onclick="document.body.classList.toggle('dev-notes-on')" title="Afficher / masquer les remarques pour le dev"><span class="dot"></span><span class="lbl">Annotations dev</span></button>
 <div class="app-shell">
   <aside class="sidebar"></aside>
   <main class="main-area">
@@ -104,9 +168,9 @@
         <div class="page-eyebrow">Paramètres</div>
         <div style="font-size:18px; font-weight:600" id="parametres-title">Centrale des Moulins</div>
       </div>
-      <div style="display:flex; gap:8px" id="parametres-actions">
-        <button class="btn btn-secondary btn-sm"><i data-lucide="share-2"></i> Partager l'accès</button>
-        <button class="btn btn-secondary btn-sm" style="color:var(--accent-red)"><i data-lucide="trash-2"></i> Supprimer</button>
+      <div style="display:flex; gap:8px; align-items:center" id="parametres-actions">
+        <button class="btn btn-secondary btn-sm" style="color:var(--accent-red)" onclick="openOverlay('supprimer-centrale')"><i data-lucide="trash-2"></i> Supprimer</button>
+        <span class="dev-note" data-type="attention" data-note="Stp regarde — c'est un choix technique. En plus, ce bouton est visible uniquement pour support et admin."></span>
       </div>
     </header>
 
@@ -117,7 +181,8 @@
       <a href="#bocq"    data-tab="bocq"    onclick="switchParametresTab(event, 'bocq')"    class="centrale-tab"><span>Moulin du Bocq</span><span class="cap">210 kW</span></a>
       <a href="#ariege"  data-tab="ariege"  onclick="switchParametresTab(event, 'ariege')"  class="centrale-tab"><span>Centrale d'Ariège</span><span class="cap">780 kW</span></a>
       <a href="#lesse"   data-tab="lesse"   onclick="switchParametresTab(event, 'lesse')"   class="centrale-tab"><span>Moulin de la Lesse</span><span class="cap">320 kW</span></a>
-      <a href="#" onclick="event.preventDefault(); alert('Wizard d\\'ajout — 4 étapes : Info → Compteurs+données → Indicateurs → Récap (#261, sub-issue #271)')" class="centrale-tab" style="margin-left:auto; color:var(--brand-cyan)"><i data-lucide="plus" style="width:13px; height:13px"></i> Ajouter</a>
+      <a href="#" onclick="event.preventDefault(); openOverlay('ajouter-centrale')" class="centrale-tab" style="margin-left:auto; color:var(--brand-cyan)"><i data-lucide="plus" style="width:13px; height:13px"></i> Ajouter</a>
+      <span class="dev-note" data-type="attention" data-note="Stp regarde — ça simplifie. Aussi, ce bouton sera visible uniquement pour support et admin." style="align-self:center"></span>
     </div>
 
     <!-- Per-centrale settings — single view, no Général tab in v5.
@@ -135,10 +200,10 @@
 
           <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px">
             <div>
-              <div class="fld"><label class="req">Nom</label><input type="text" value="Centrale des Moulins" data-pd-name-input></div>
-              <div class="fld"><label class="req">Alias court</label><input type="text" value="MOU" data-pd-alias-input></div>
+              <div class="fld"><label class="req">Nom<span class="dev-note" data-type="role" data-note="Grisé, sauf pour admin"></span></label><input type="text" value="Centrale des Moulins" data-pd-name-input></div>
+              <div class="fld"><label class="req">Alias court<span class="dev-note" data-type="role" data-note="Grisé uniquement pour le viewer"></span></label><input type="text" value="MOU" data-pd-alias-input></div>
               <div class="fld">
-                <label class="req">Pays</label>
+                <label class="req">Pays<span class="dev-note" data-type="role" data-note="Grisé, sauf pour support"></span></label>
                 <select>
                   <option selected>France</option>
                   <option>Belgique</option>
@@ -164,8 +229,8 @@
               </div>
             </div>
             <div>
-              <div class="fld"><label class="req">Code postal</label><input type="text" value="24100" placeholder="ex. 24100"></div>
-              <div class="fld"><label class="req">Fuseau horaire</label><select><option>Europe/Paris</option><option>Europe/Brussels</option></select></div>
+              <div class="fld"><label class="req">Code postal<span class="dev-note" data-type="role" data-note="Grisé, sauf pour support"></span></label><input type="text" value="24100" placeholder="ex. 24100"></div>
+              <div class="fld"><label class="req">Fuseau horaire<span class="dev-note" data-type="role" data-note="Grisé, sauf pour support"></span></label><select><option>Europe/Paris</option><option>Europe/Brussels</option></select></div>
             </div>
           </div>
           <div style="margin-top:10px"><button class="btn btn-primary btn-sm"><i data-lucide="save"></i> Enregistrer</button></div>
@@ -175,7 +240,7 @@
       <!-- ============================ Section 2 — Informations détaillées (new in v5) ============================ -->
       <div class="pd-section" data-open="false">
         <div class="pd-section-head" onclick="this.parentElement.dataset.open = this.parentElement.dataset.open === 'true' ? 'false' : 'true'">
-          <div class="pd-section-title"><i data-lucide="ruler" style="width:16px; height:16px; color:var(--brand-cyan)"></i> Informations détaillées</div>
+          <div class="pd-section-title"><i data-lucide="ruler" style="width:16px; height:16px; color:var(--brand-cyan)"></i> Informations détaillées<span class="dev-note" data-type="conseil" onclick="event.stopPropagation()" data-note="Conseil : ne te fatigue pas à ranger ça au bon endroit pour l'instant. Enregistre tout dans un jsonb lié à l'id de la centrale, non ? On fera la plomberie après. Pour le moment ça ne sert pas à l'appli, donc pas de perte de temps avant la conférence à mon avis."></span></div>
           <i data-lucide="chevron-down" class="pd-chev"></i>
         </div>
         <div class="pd-section-body">
@@ -320,7 +385,7 @@
            loss TYPES (indented sub-rows). Columns: Label | Type (default) | Display (checkbox). -->
       <div class="pd-section" data-open="false">
         <div class="pd-section-head" onclick="this.parentElement.dataset.open = this.parentElement.dataset.open === 'true' ? 'false' : 'true'">
-          <div class="pd-section-title"><i data-lucide="alert-triangle" style="width:16px; height:16px; color:var(--brand-cyan)"></i> Catégories de pertes <span class="muted" style="font-size:12px; font-weight:400">6 catégories · 12 types</span></div>
+          <div class="pd-section-title"><i data-lucide="alert-triangle" style="width:16px; height:16px; color:var(--brand-cyan)"></i> Catégories de pertes <span class="muted" id="loss-count" style="font-size:12px; font-weight:400">6 catégories · 12 types</span><span class="dev-note" data-type="conseil" data-note="Conseil : si pas le temps, laisse comme maintenant — on pourra changer plus tard."></span></div>
           <i data-lucide="chevron-down" class="pd-chev"></i>
         </div>
         <div class="pd-section-body">
@@ -339,6 +404,7 @@
               <tr class="loss-type-row" hidden><td style="padding-left:32px">Maintenance planifiée</td><td></td><td style="text-align:center"><input type="radio" name="loss-sub-maintenance" checked title="Sous-type par défaut"></td><td style="text-align:center"><input type="checkbox" checked></td></tr>
               <tr class="loss-type-row" hidden><td style="padding-left:32px">Inspection</td><td></td><td style="text-align:center"><input type="radio" name="loss-sub-maintenance"></td><td style="text-align:center"><input type="checkbox" checked></td></tr>
               <tr class="loss-type-row" hidden><td style="padding-left:32px">Nettoyage grille</td><td></td><td style="text-align:center"><input type="radio" name="loss-sub-maintenance"></td><td style="text-align:center"><input type="checkbox" checked></td></tr>
+              <tr class="loss-type-row loss-addsub" hidden><td style="padding-left:32px"><button class="btn btn-ghost btn-sm" onclick="addLossSubtype(this,'maintenance')"><i data-lucide="plus" style="width:13px;height:13px"></i> Ajouter un sous-type</button></td><td></td><td></td><td></td></tr>
 
               <!-- Panne -->
               <tr class="loss-cat-row" onclick="toggleLossCat(this)" data-open="false">
@@ -349,6 +415,7 @@
               </tr>
               <tr class="loss-type-row" hidden><td style="padding-left:32px">Défaut électrique</td><td></td><td style="text-align:center"><input type="radio" name="loss-sub-panne" checked title="Sous-type par défaut"></td><td style="text-align:center"><input type="checkbox" checked></td></tr>
               <tr class="loss-type-row" hidden><td style="padding-left:32px">Défaut mécanique</td><td></td><td style="text-align:center"><input type="radio" name="loss-sub-panne"></td><td style="text-align:center"><input type="checkbox" checked></td></tr>
+              <tr class="loss-type-row loss-addsub" hidden><td style="padding-left:32px"><button class="btn btn-ghost btn-sm" onclick="addLossSubtype(this,'panne')"><i data-lucide="plus" style="width:13px;height:13px"></i> Ajouter un sous-type</button></td><td></td><td></td><td></td></tr>
 
               <!-- Environnement -->
               <tr class="loss-cat-row" onclick="toggleLossCat(this)" data-open="false">
@@ -359,6 +426,7 @@
               </tr>
               <tr class="loss-type-row" hidden><td style="padding-left:32px">Crue</td><td></td><td style="text-align:center"><input type="radio" name="loss-sub-environnement" checked title="Sous-type par défaut"></td><td style="text-align:center"><input type="checkbox" checked></td></tr>
               <tr class="loss-type-row" hidden><td style="padding-left:32px">Étiage</td><td></td><td style="text-align:center"><input type="radio" name="loss-sub-environnement"></td><td style="text-align:center"><input type="checkbox" checked></td></tr>
+              <tr class="loss-type-row loss-addsub" hidden><td style="padding-left:32px"><button class="btn btn-ghost btn-sm" onclick="addLossSubtype(this,'environnement')"><i data-lucide="plus" style="width:13px;height:13px"></i> Ajouter un sous-type</button></td><td></td><td></td><td></td></tr>
 
               <!-- Opérationnel -->
               <tr class="loss-cat-row" onclick="toggleLossCat(this)" data-open="false">
@@ -368,6 +436,7 @@
                 <td style="text-align:center"><input type="checkbox" checked onclick="event.stopPropagation()"></td>
               </tr>
               <tr class="loss-type-row" hidden><td style="padding-left:32px">Arrêt manuel</td><td></td><td style="text-align:center"><input type="radio" name="loss-sub-operationnel" checked title="Sous-type par défaut"></td><td style="text-align:center"><input type="checkbox" checked></td></tr>
+              <tr class="loss-type-row loss-addsub" hidden><td style="padding-left:32px"><button class="btn btn-ghost btn-sm" onclick="addLossSubtype(this,'operationnel')"><i data-lucide="plus" style="width:13px;height:13px"></i> Ajouter un sous-type</button></td><td></td><td></td><td></td></tr>
 
               <!-- Réseau / Contrainte -->
               <tr class="loss-cat-row" onclick="toggleLossCat(this)" data-open="false">
@@ -378,6 +447,7 @@
               </tr>
               <tr class="loss-type-row" hidden><td style="padding-left:32px">Contrainte réseau</td><td></td><td style="text-align:center"><input type="radio" name="loss-sub-reseau" checked title="Sous-type par défaut"></td><td style="text-align:center"><input type="checkbox" checked></td></tr>
               <tr class="loss-type-row" hidden><td style="padding-left:32px">Effacement contractuel</td><td></td><td style="text-align:center"><input type="radio" name="loss-sub-reseau"></td><td style="text-align:center"><input type="checkbox" checked></td></tr>
+              <tr class="loss-type-row loss-addsub" hidden><td style="padding-left:32px"><button class="btn btn-ghost btn-sm" onclick="addLossSubtype(this,'reseau')"><i data-lucide="plus" style="width:13px;height:13px"></i> Ajouter un sous-type</button></td><td></td><td></td><td></td></tr>
 
               <!-- Données -->
               <tr class="loss-cat-row" onclick="toggleLossCat(this)" data-open="false">
@@ -387,11 +457,12 @@
                 <td style="text-align:center"><input type="checkbox" onclick="event.stopPropagation()"></td>
               </tr>
               <tr class="loss-type-row" hidden><td style="padding-left:32px">Capteur défaillant</td><td></td><td style="text-align:center"><input type="radio" name="loss-sub-donnees" checked title="Sous-type par défaut"></td><td style="text-align:center"><input type="checkbox"></td></tr>
+              <tr class="loss-type-row loss-addsub" hidden><td style="padding-left:32px"><button class="btn btn-ghost btn-sm" onclick="addLossSubtype(this,'donnees')"><i data-lucide="plus" style="width:13px;height:13px"></i> Ajouter un sous-type</button></td><td></td><td></td><td></td></tr>
 
             </tbody>
           </table>
           <div style="margin-top:14px; display:flex; gap:8px">
-            <button class="btn btn-secondary btn-sm"><i data-lucide="plus"></i> Ajouter une catégorie</button>
+            <button class="btn btn-secondary btn-sm" onclick="addLossCategory()"><i data-lucide="plus"></i> Ajouter une catégorie</button>
           </div>
           <script>
             function toggleLossCat(row) {
@@ -406,6 +477,71 @@
                 n = n.nextElementSibling;
               }
             }
+
+            // --- Ajout de sous-types / catégories (brouillon BL) ---
+            const _lossInput = "padding:5px 8px; background:var(--bg-input); border:1px solid var(--border-default); border-radius:6px; color:var(--text-primary); font-size:13px; font-family:inherit; width:200px";
+            function lossSubtypeRow(catKey) {
+              const tr = document.createElement("tr");
+              tr.className = "loss-type-row";
+              tr.hidden = false;
+              tr.innerHTML =
+                '<td style="padding-left:32px"><input type="text" placeholder="Nouveau sous-type" style="' + _lossInput + '"></td>' +
+                '<td></td>' +
+                '<td style="text-align:center"><input type="radio" name="loss-sub-' + catKey + '" title="Sous-type par défaut"></td>' +
+                '<td style="text-align:center; white-space:nowrap"><input type="checkbox" checked> <button class="icon-action" title="Supprimer le sous-type" onclick="removeLossRow(this)"><i data-lucide="trash-2"></i></button></td>';
+              return tr;
+            }
+            function addLossSubtype(btn, catKey) {
+              const addRow = btn.closest("tr");           // la ligne "Ajouter un sous-type"
+              addRow.parentNode.insertBefore(lossSubtypeRow(catKey), addRow);
+              updateLossCount();
+              if (typeof initIcons === "function") initIcons();
+            }
+            let _lossCatSeq = 0;
+            function addLossCategory() {
+              _lossCatSeq += 1;
+              const key = "custom" + _lossCatSeq;
+              const tbody = document.querySelector(".loss-cats tbody");
+              const cat = document.createElement("tr");
+              cat.className = "loss-cat-row";
+              cat.dataset.open = "true";
+              cat.setAttribute("onclick", "toggleLossCat(this)");
+              cat.innerHTML =
+                '<td><i data-lucide="chevron-right" class="loss-chev" style="transform:rotate(90deg)"></i> <input type="text" placeholder="Nouvelle catégorie" onclick="event.stopPropagation()" style="' + _lossInput + '; font-weight:600"></td>' +
+                '<td style="text-align:center"><input type="radio" name="loss-default-type" onclick="event.stopPropagation()" title="Catégorie par défaut"></td>' +
+                '<td></td>' +
+                '<td style="text-align:center; white-space:nowrap"><input type="checkbox" checked onclick="event.stopPropagation()"> <button class="icon-action" title="Supprimer la catégorie" onclick="event.stopPropagation(); removeLossCategory(this)"><i data-lucide="trash-2"></i></button></td>';
+              tbody.appendChild(cat);
+              tbody.appendChild(lossSubtypeRow(key));
+              const addRow = document.createElement("tr");
+              addRow.className = "loss-type-row loss-addsub";
+              addRow.hidden = false;
+              addRow.innerHTML = '<td style="padding-left:32px"><button class="btn btn-ghost btn-sm" onclick="addLossSubtype(this,\'' + key + '\')"><i data-lucide="plus" style="width:13px;height:13px"></i> Ajouter un sous-type</button></td><td></td><td></td><td></td>';
+              tbody.appendChild(addRow);
+              updateLossCount();
+              if (typeof initIcons === "function") initIcons();
+            }
+            function removeLossRow(btn) {
+              btn.closest("tr").remove();
+              updateLossCount();
+            }
+            function removeLossCategory(btn) {
+              let row = btn.closest("tr");
+              let n = row.nextElementSibling;
+              row.remove();
+              while (n && n.classList.contains("loss-type-row")) {
+                const next = n.nextElementSibling;
+                n.remove();
+                n = next;
+              }
+              updateLossCount();
+            }
+            function updateLossCount() {
+              const cats = document.querySelectorAll(".loss-cats .loss-cat-row").length;
+              const types = document.querySelectorAll(".loss-cats .loss-type-row:not(.loss-addsub)").length;
+              const el = document.getElementById("loss-count");
+              if (el) el.textContent = cats + " catégorie" + (cats > 1 ? "s" : "") + " · " + types + " type" + (types > 1 ? "s" : "");
+            }
           </script>
         </div>
       </div>
@@ -413,21 +549,21 @@
       <!-- ============================ Section 3 — Compteurs Électriques (redesigned in v5) ============================ -->
       <div class="pd-section" data-open="true">
         <div class="pd-section-head" onclick="this.parentElement.dataset.open = this.parentElement.dataset.open === 'true' ? 'false' : 'true'">
-          <div class="pd-section-title"><i data-lucide="cpu" style="width:16px; height:16px; color:var(--brand-cyan)"></i> Compteurs Électriques</div>
+          <div class="pd-section-title"><i data-lucide="cpu" style="width:16px; height:16px; color:var(--brand-cyan)"></i> Compteurs Électriques <i data-lucide="alert-triangle" style="width:15px; height:15px; vertical-align:-2px; color:var(--accent-amber, #f59e0b); cursor:help" title="Se connecter à un compteur réseau (Enedis) demande une validation par Naia : cela évite qu'un utilisateur aille se brancher sur un compteur qui n'est pas le sien. Même principe pour les compteurs Naia Box et partenaires."></i></div>
           <i data-lucide="chevron-down" class="pd-chev"></i>
         </div>
         <div class="pd-section-body">
           <!-- Tableau d'AFFICHAGE (lecture seule, aucun déroulant). L'édition se fait via le popup "compteurs-edit".
                Type de données retiré de l'affichage (conservé dans le popup). Ajout : Unité + Status. -->
           <table class="data-table">
-            <thead><tr><th>Compteur</th><th>Origine des données</th><th>Code compteur</th><th>Unité</th><th>Status</th><th>Remarques</th><th></th></tr></thead>
+            <thead><tr><th>Compteur</th><th>Origine des données</th><th>Code compteur</th><th>Unité</th><th>Statut</th><th>Remarques</th><th></th></tr></thead>
             <tbody>
               <tr>
                 <td><b><span data-pd-alias>MOU</span>-PRINC</b><br><span class="muted" style="font-size:11px">Production principale</span></td>
                 <td>GDR</td>
                 <td class="tabular">25130200000123 <span class="muted" style="font-size:11px">(PRM)</span></td>
                 <td class="tabular">kWh</td>
-                <td><span class="badge badge-green">Actif</span></td>
+                <td><span class="cpt-status valide">Validé</span></td>
                 <td>Principal Enedis</td>
                 <td><button class="btn btn-secondary btn-sm" onclick="openOverlay('compteurs-edit')"><i data-lucide="edit-3"></i> Éditer</button></td>
               </tr>
@@ -436,7 +572,7 @@
                 <td>Naia Box</td>
                 <td class="tabular">NX-2104-A</td>
                 <td class="tabular">kW</td>
-                <td><span class="badge badge-green">Actif</span></td>
+                <td><span class="cpt-status na" title="Compteur Naia Box — pas de validation d'accès nécessaire">—</span></td>
                 <td>Naia Box installée 03/2025</td>
                 <td><button class="btn btn-secondary btn-sm" onclick="openOverlay('compteurs-edit')"><i data-lucide="edit-3"></i> Éditer</button></td>
               </tr>
@@ -445,7 +581,7 @@
                 <td>Manuel</td>
                 <td class="muted" style="font-size:12px">—</td>
                 <td class="tabular">kWh</td>
-                <td><span class="badge badge-slate">Non actif</span></td>
+                <td><span class="cpt-status na" title="Compteur manuel — pas de validation d'accès nécessaire">—</span></td>
                 <td>Relève hebdomadaire</td>
                 <td><button class="btn btn-secondary btn-sm" onclick="openOverlay('compteurs-edit')"><i data-lucide="edit-3"></i> Éditer</button></td>
               </tr>
@@ -461,7 +597,7 @@
            "Ajouter un tarif" opens a form (modal): Nom | Type (manuel | automatique) | Source | Unité | Note. -->
       <div class="pd-section" data-open="false">
         <div class="pd-section-head" onclick="this.parentElement.dataset.open = this.parentElement.dataset.open === 'true' ? 'false' : 'true'">
-          <div class="pd-section-title"><i data-lucide="euro" style="width:16px; height:16px; color:var(--brand-cyan)"></i> Tarification <span class="muted" style="font-size:12px; font-weight:400">2 tarifs · 1 actif</span></div>
+          <div class="pd-section-title"><i data-lucide="euro" style="width:16px; height:16px; color:var(--brand-cyan)"></i> Tarifs <span class="muted" style="font-size:12px; font-weight:400">2 tarifs</span></div>
           <i data-lucide="chevron-down" class="pd-chev"></i>
         </div>
         <div class="pd-section-body">
@@ -470,18 +606,18 @@
             <tbody>
               <tr>
                 <td><b>OA + complément</b></td>
-                <td><span class="badge badge-blue">Automatique</span></td>
-                <td>Spot Belpex FR</td>
+                <td><span class="badge badge-slate">Manuel</span></td>
+                <td>Import sur Naia</td>
                 <td class="tabular">€/MWh</td>
                 <td class="muted" style="font-size:12px">Contrat OA jusqu'en 2037</td>
                 <td><a class="link" style="font-size:12px">Modifier</a></td>
               </tr>
               <tr>
-                <td>Tarif fixe annuel 2025</td>
-                <td><span class="badge badge-slate">Manuel</span></td>
-                <td>Saisi par PO</td>
-                <td class="tabular">€/MWh</td>
-                <td class="muted" style="font-size:12px">Référence historique</td>
+                <td><b>Prix Spot EPEX</b></td>
+                <td><span class="badge badge-blue">Automatique</span></td>
+                <td>Spot EPEX FR · base load</td>
+                <td class="muted" style="font-size:12px">via la source</td>
+                <td class="muted" style="font-size:12px">Marché spot — prix horaire</td>
                 <td><a class="link" style="font-size:12px">Modifier</a></td>
               </tr>
             </tbody>
@@ -551,7 +687,7 @@
                       <div class="src-group-title"><span class="swatch" style="background:#7dd3fc"></span> Données composites <span class="src-group-max">(max 5)</span></div>
                       <div class="src-list">
                         <div class="src-row" data-name="Moyenne pondérée bassin" data-meta="Composite · 3 sources" data-op="somme" onclick="toggleSrcRow(this)"><div class="src-row-main"><span class="src-name">Moyenne pondérée bassin</span><button class="src-detail-btn" onclick="srcDetail(event,this)">Détail</button></div><div class="src-detail" hidden>Composite · 3 sources</div></div>
-                        <div class="src-row" data-name="Pluie corrigée altitude" data-meta="Composite · modèle Naia" data-op="produit" onclick="toggleSrcRow(this)"><div class="src-row-main"><span class="src-name">Pluie corrigée altitude</span><button class="src-detail-btn" onclick="srcDetail(event,this)">Détail</button></div><div class="src-detail" hidden>Composite · modèle Naia</div></div>
+                        <div class="src-row" data-name="Pluie corrigée altitude" data-meta="Composite · modèle Naia" data-op="somme" onclick="toggleSrcRow(this)"><div class="src-row-main"><span class="src-name">Pluie corrigée altitude</span><button class="src-detail-btn" onclick="srcDetail(event,this)">Détail</button></div><div class="src-detail" hidden>Composite · modèle Naia</div></div>
                       </div>
                       <button class="src-create" onclick="openComposite(this)"><i data-lucide="plus"></i> Créer une source</button>
                     </div>
@@ -941,31 +1077,21 @@
            v5 polish round 2: add a remove-access icon on each row. -->
       <div class="pd-section" data-open="false">
         <div class="pd-section-head" onclick="this.parentElement.dataset.open = this.parentElement.dataset.open === 'true' ? 'false' : 'true'">
-          <div class="pd-section-title"><i data-lucide="share-2" style="width:16px; height:16px; color:var(--brand-cyan)"></i> Partage d'accès <span class="muted" style="font-size:12px; font-weight:400">2 accès partagés</span></div>
+          <div class="pd-section-title"><i data-lucide="share-2" style="width:16px; height:16px; color:var(--brand-cyan)"></i> Partage de données</div>
           <i data-lucide="chevron-down" class="pd-chev"></i>
         </div>
         <div class="pd-section-body">
-          <p class="muted" style="font-size:13px; margin:0 0 12px">Inviter un autre opérateur (comparateur), une banque (lecture seule), un assureur, etc. — sans les ajouter à votre organisation.</p>
-          <table class="data-table">
-            <thead><tr><th>Personne / org.</th><th>Rôle</th><th>Type</th><th>Depuis</th><th></th></tr></thead>
-            <tbody>
-              <tr>
-                <td>Sophie Legrand · Centrale de la Semois</td>
-                <td><span class="badge badge-cyan">Comparateur</span></td>
-                <td>Lecture agrégée</td>
-                <td class="muted">12 mars</td>
-                <td><a class="link" style="font-size:12px" onclick="openOverlay('edit-share')">Modifier</a></td>
-              </tr>
-              <tr>
-                <td>Crédit Agricole Sud-Ouest</td>
-                <td><span class="badge badge-blue">Banque</span></td>
-                <td>Rapport mensuel</td>
-                <td class="muted">8 mars</td>
-                <td><a class="link" style="font-size:12px" onclick="openOverlay('edit-share')">Modifier</a></td>
-              </tr>
-            </tbody>
-          </table>
-          <div style="margin-top:14px"><button class="btn btn-secondary btn-sm"><i data-lucide="user-plus"></i> Inviter</button></div>
+          <!-- Teaser : partage d'un flux de données avec ses contacts (fonction à venir, capture d'intérêt) — brouillon BL -->
+          <div style="background:var(--bg-base); border:1px dashed var(--border-default); border-radius:10px; padding:14px 16px">
+            <div style="display:flex; align-items:flex-start; gap:10px">
+              <i data-lucide="sparkles" style="width:18px; height:18px; color:var(--brand-cyan); flex:0 0 auto; margin-top:1px"></i>
+              <div style="flex:1">
+                <div style="font-size:13.5px; font-weight:600; color:var(--text-primary); margin-bottom:4px">Partager un flux de données avec vos contacts <span class="badge badge-amber" style="font-size:10px; vertical-align:1px">Fonction à venir</span></div>
+                <p class="muted" style="font-size:12.5px; line-height:1.55; margin:0 0 10px">Bientôt, vous pourrez partager un flux de données (production, pluie…) directement avec vos contacts. Appuyez sur « Ça m'intéresse » si cette fonctionnalité vous intéresse — merci pour votre contribution, ça nous aide à la prioriser.</p>
+                <button id="share-flux-interest-btn" class="btn btn-secondary btn-sm" onclick="shareFluxInterest(this)"><i data-lucide="sparkles"></i> Ça m'intéresse</button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -977,15 +1103,15 @@
         </div>
         <div class="pd-section-body">
           <p class="muted" style="font-size:13px; margin:0 0 14px">v5 : la gestion des utilisateurs est désormais <b>par centrale</b> (et non plus globale à l'organisation).</p>
-          <table class="data-table">
+          <table class="data-table" id="users-table">
             <thead><tr><th>Nom</th><th>Email</th><th>Rôle (sur cette centrale)</th><th>2FA</th><th></th></tr></thead>
             <tbody>
-              <tr><td><b>Marc Dupont</b><br><span class="muted" style="font-size:11px">vous</span></td><td>marc.dupont@moulin.be</td><td><span class="badge badge-purple">Admin</span></td><td><span class="badge badge-green">✓</span></td><td><a class="link" style="font-size:12px">Modifier</a></td></tr>
-              <tr><td><b>Sophie Legrand</b></td><td>sophie@moulin.be</td><td><span class="badge badge-blue">Opérateur</span></td><td><span class="badge badge-amber">à activer</span></td><td><a class="link" style="font-size:12px">Modifier</a></td></tr>
+              <tr data-self="true" data-name="Marc Dupont" data-email="marc.dupont@moulin.be" data-role="Administrateur"><td><b>Marc Dupont</b><br><span class="muted" style="font-size:11px">vous</span></td><td>marc.dupont@moulin.be</td><td><span class="badge badge-purple">Admin</span></td><td><span class="badge badge-green">✓</span></td><td><a class="link" style="font-size:12px" onclick="openEditUser(this)">Modifier</a></td></tr>
+              <tr data-name="Sophie Legrand" data-email="sophie@moulin.be" data-role="Opérateur de centrale"><td><b>Sophie Legrand</b></td><td>sophie@moulin.be</td><td><span class="badge badge-blue">Opérateur</span></td><td><span class="badge badge-amber">à activer</span></td><td><a class="link" style="font-size:12px" onclick="openEditUser(this)">Modifier</a></td></tr>
             </tbody>
           </table>
           <div style="display:flex; gap:8px; margin-top:14px">
-            <button class="btn btn-primary btn-sm"><i data-lucide="user-plus"></i> Inviter un utilisateur</button>
+            <button class="btn btn-primary btn-sm" onclick="openOverlay('invite-user')"><i data-lucide="user-plus"></i> Inviter un utilisateur</button>
           </div>
         </div>
       </div>
@@ -998,6 +1124,66 @@
 <!-- ============================ Compteurs — popup d'édition (brouillon BL) ============================
      Reprend tout le tableau des compteurs en version 100 % éditable :
      Origine · Type de données (conservé ici) · Unité (kW/W/kWh/Wh) · Code · Status (actif/non actif) · Date début/fin · Remarques. -->
+<!-- ============================ Supprimer la centrale (brouillon BL) ============================
+     Visible seulement par admin + support. Pour l'admin : pas de suppression directe — la demande
+     part vers l'équipe Naia avec une raison obligatoire (opération manuelle côté Naia). -->
+<div id="supprimer-centrale" class="overlay" onclick="if(event.target===this) closeOverlay('supprimer-centrale')">
+  <div class="modal">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px">
+      <div>
+        <div class="modal-title"><i data-lucide="trash-2" style="width:16px; height:16px; vertical-align:-2px; color:var(--accent-red)"></i> Supprimer la centrale</div>
+        <div class="modal-subtitle">Cette opération doit se faire manuellement par notre équipe.</div>
+      </div>
+      <button class="btn btn-ghost" onclick="closeOverlay('supprimer-centrale')"><i data-lucide="x"></i></button>
+    </div>
+    <div class="fld">
+      <label class="req">Raison de la suppression</label>
+      <textarea rows="4" placeholder="Merci de préciser ci-dessous la raison de cette suppression…"></textarea>
+    </div>
+    <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:18px; padding-top:14px; border-top:1px solid var(--border-subtle)">
+      <button class="btn btn-ghost" onclick="closeOverlay('supprimer-centrale')">Annuler</button>
+      <button class="btn btn-primary" onclick="alert('Demande de suppression envoyée à l\'équipe Naia (démo)'); closeOverlay('supprimer-centrale')"><i data-lucide="send"></i> Envoyer la demande</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================ Ajouter une centrale (brouillon BL) ============================
+     Visible seulement par admin + support. Pour l'admin : pas de création directe — demande de contrat
+     avec vérification humaine. L'admin renseigne l'identité de la centrale + les compteurs Enedis. -->
+<div id="ajouter-centrale" class="overlay" onclick="if(event.target===this) closeOverlay('ajouter-centrale')">
+  <div class="modal">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px">
+      <div>
+        <div class="modal-title"><i data-lucide="plus-circle" style="width:16px; height:16px; vertical-align:-2px; color:var(--brand-cyan)"></i> Ajouter une centrale</div>
+        <div class="modal-subtitle">Vérification humaine requise — demande de contrat.</div>
+      </div>
+      <button class="btn btn-ghost" onclick="closeOverlay('ajouter-centrale')"><i data-lucide="x"></i></button>
+    </div>
+    <div class="muted" style="font-size:12.5px; line-height:1.55; margin-bottom:16px; background:var(--bg-base); border:1px solid var(--border-subtle); border-radius:10px; padding:12px 14px">
+      Pour des raisons de sécurité de vos données, cette opération nécessite une vérification humaine.
+      Veuillez renseigner ci-dessous le nom, l'alias, le pays, le code postal et le fuseau horaire de la centrale,
+      ainsi que les compteurs Enedis dont vous avez le droit. Nous préparerons le contrat dans les plus brefs délais
+      et procéderons aux vérifications nécessaires. Ce processus peut prendre quelques jours — merci de votre compréhension.
+      Vous pouvez aussi nous contacter à <a class="link" href="mailto:support@naiahydro.com">support@naiahydro.com</a>.
+    </div>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px">
+      <div class="fld"><label class="req">Nom</label><input type="text" placeholder="ex. Centrale des Moulins"></div>
+      <div class="fld"><label class="req">Alias court</label><input type="text" placeholder="ex. MOU"></div>
+      <div class="fld"><label class="req">Pays</label><input type="text" placeholder="ex. France"></div>
+      <div class="fld"><label class="req">Code postal</label><input type="text" placeholder="ex. 24100"></div>
+      <div class="fld"><label class="req">Fuseau horaire</label><input type="text" placeholder="ex. Europe/Paris"></div>
+    </div>
+    <div class="fld" style="margin-top:4px">
+      <label class="req">Compteurs Enedis dont vous avez le droit</label>
+      <textarea rows="3" placeholder="ex. n° PRM / PDL des compteurs concernés…"></textarea>
+    </div>
+    <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:18px; padding-top:14px; border-top:1px solid var(--border-subtle)">
+      <button class="btn btn-ghost" onclick="closeOverlay('ajouter-centrale')">Annuler</button>
+      <button class="btn btn-primary" onclick="alert('Demande envoyée à l\'équipe Naia (démo)'); closeOverlay('ajouter-centrale')"><i data-lucide="send"></i> Envoyer la demande</button>
+    </div>
+  </div>
+</div>
+
 <div id="compteurs-edit" class="overlay" onclick="if(event.target===this) closeOverlay('compteurs-edit')">
   <div class="modal modal-lg" style="max-width:1040px">
     <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px">
@@ -1011,43 +1197,52 @@
     <div style="overflow-x:auto">
       <table class="data-table" style="min-width:980px">
         <thead><tr>
-          <th>Compteur</th><th>Origine</th><th>Type de données</th><th>Unité</th><th>Code compteur</th><th>Status</th><th>Date début</th><th>Date fin</th><th>Remarques</th><th style="width:38px"></th>
+          <th>Compteur</th><th>Origine</th><th>Type de données</th><th>Unité</th><th>Code compteur</th><th>Date début</th><th>Date fin</th><th>Statut<span class="dev-note" data-type="role" data-note="Statut de VALIDATION, posé par Naia (support) uniquement — le client le voit mais ne le modifie pas. Ne concerne que les compteurs réseau (origine GDR / Enedis), car y accéder demande un mandat à vérifier. Naia Box / Manuel = rien à valider."></span><span class="dev-note" data-type="attention" data-note="À regarder — un compteur Enedis nouveau OU dont on modifie le code repasse en « en cours de validation ». Le bouton Enregistrer déclenche la vérification humaine."></span></th><th>Remarques</th><th style="width:38px"></th>
         </tr></thead>
         <tbody id="compteurs-edit-body">
           <tr>
-            <td><input type="text" class="select" style="font-size:12.5px; width:120px" value="MOU-PRINC"></td>
-            <td><select class="select" style="font-size:12.5px"><option selected>GDR</option><option>Naia Box</option><option>Manuel</option></select></td>
+            <td><input type="text" class="input" style="font-size:12.5px; width:120px" value="MOU-PRINC"></td>
+            <td><select class="select" style="font-size:12.5px" onchange="updateCptStatusFromOrigin(this)"><option selected>GDR</option><option>Naia Box</option><option>Partenaire</option><option>Manuel</option></select><select class="select cpt-partner" style="font-size:12.5px; margin-top:5px; display:none"><option>Hydrosight</option></select></td>
             <td><select class="select" style="font-size:12.5px"><option selected>Énergie sur pas de temps</option><option>Puissance instantanée</option><option>Index énergie</option><option>Autre</option></select></td>
             <td><select class="select" style="font-size:12.5px"><option>kW</option><option>W</option><option selected>kWh</option><option>Wh</option></select></td>
-            <td><input type="text" class="select" style="font-size:12.5px; width:140px" value="25130200000123"></td>
-            <td><select class="select" style="font-size:12.5px"><option selected>Actif</option><option>Non actif</option></select></td>
-            <td><input type="text" class="select" style="font-size:12.5px; width:96px" value="01/01/2018" placeholder="jj/mm/aaaa"></td>
-            <td><input type="text" class="select" style="font-size:12.5px; width:96px" placeholder="jj/mm/aaaa"></td>
-            <td><input type="text" class="select" style="font-size:12.5px; width:150px" value="Principal Enedis"></td>
+            <td><input type="text" class="input" style="font-size:12.5px; width:140px" value="25130200000123" oninput="markCptNeedsValidation(this)"></td>
+            <td><input type="date" class="input" style="font-size:12.5px; width:130px" value="2018-01-01"></td>
+            <td>
+              <label class="encours-lbl"><input type="checkbox" onchange="toggleEnCours(this)" checked> en cours</label>
+              <input type="date" class="input" style="font-size:12.5px; width:130px" disabled>
+            </td>
+            <td><span class="cpt-status valide">Validé</span></td>
+            <td><input type="text" class="input" style="font-size:12.5px; width:150px" value="Principal Enedis"></td>
             <td><button class="icon-action" title="Supprimer" onclick="this.closest('tr').remove()"><i data-lucide="trash-2"></i></button></td>
           </tr>
           <tr>
-            <td><input type="text" class="select" style="font-size:12.5px; width:120px" value="MOU-AUX"></td>
-            <td><select class="select" style="font-size:12.5px"><option>GDR</option><option selected>Naia Box</option><option>Manuel</option></select></td>
+            <td><input type="text" class="input" style="font-size:12.5px; width:120px" value="MOU-AUX"></td>
+            <td><select class="select" style="font-size:12.5px" onchange="updateCptStatusFromOrigin(this)"><option>GDR</option><option selected>Naia Box</option><option>Partenaire</option><option>Manuel</option></select><select class="select cpt-partner" style="font-size:12.5px; margin-top:5px; display:none"><option>Hydrosight</option></select></td>
             <td><select class="select" style="font-size:12.5px"><option>Énergie sur pas de temps</option><option selected>Puissance instantanée</option><option>Index énergie</option><option>Autre</option></select></td>
             <td><select class="select" style="font-size:12.5px"><option selected>kW</option><option>W</option><option>kWh</option><option>Wh</option></select></td>
-            <td><input type="text" class="select" style="font-size:12.5px; width:140px" value="NX-2104-A"></td>
-            <td><select class="select" style="font-size:12.5px"><option selected>Actif</option><option>Non actif</option></select></td>
-            <td><input type="text" class="select" style="font-size:12.5px; width:96px" value="03/2025" placeholder="jj/mm/aaaa"></td>
-            <td><input type="text" class="select" style="font-size:12.5px; width:96px" placeholder="jj/mm/aaaa"></td>
-            <td><input type="text" class="select" style="font-size:12.5px; width:150px" value="Naia Box installée 03/2025"></td>
+            <td><input type="text" class="input" style="font-size:12.5px; width:140px" value="NX-2104-A" oninput="markCptNeedsValidation(this)"></td>
+            <td><input type="date" class="input" style="font-size:12.5px; width:130px" value="2025-03-01"></td>
+            <td>
+              <label class="encours-lbl"><input type="checkbox" onchange="toggleEnCours(this)" checked> en cours</label>
+              <input type="date" class="input" style="font-size:12.5px; width:130px" disabled>
+            </td>
+            <td><span class="cpt-status valide">Validé</span></td>
+            <td><input type="text" class="input" style="font-size:12.5px; width:150px" value="Naia Box installée 03/2025"></td>
             <td><button class="icon-action" title="Supprimer" onclick="this.closest('tr').remove()"><i data-lucide="trash-2"></i></button></td>
           </tr>
           <tr>
-            <td><input type="text" class="select" style="font-size:12.5px; width:120px" value="MOU-MANU"></td>
-            <td><select class="select" style="font-size:12.5px"><option>GDR</option><option>Naia Box</option><option selected>Manuel</option></select></td>
+            <td><input type="text" class="input" style="font-size:12.5px; width:120px" value="MOU-MANU"></td>
+            <td><select class="select" style="font-size:12.5px" onchange="updateCptStatusFromOrigin(this)"><option>GDR</option><option>Naia Box</option><option>Partenaire</option><option selected>Manuel</option></select><select class="select cpt-partner" style="font-size:12.5px; margin-top:5px; display:none"><option>Hydrosight</option></select></td>
             <td><select class="select" style="font-size:12.5px"><option>Énergie sur pas de temps</option><option>Puissance instantanée</option><option selected>Index énergie</option><option>Autre</option></select></td>
             <td><select class="select" style="font-size:12.5px"><option>kW</option><option>W</option><option selected>kWh</option><option>Wh</option></select></td>
-            <td><input type="text" class="select" style="font-size:12.5px; width:140px" placeholder="—"></td>
-            <td><select class="select" style="font-size:12.5px"><option>Actif</option><option selected>Non actif</option></select></td>
-            <td><input type="text" class="select" style="font-size:12.5px; width:96px" value="01/01/2010" placeholder="jj/mm/aaaa"></td>
-            <td><input type="text" class="select" style="font-size:12.5px; width:96px" value="31/12/2017" placeholder="jj/mm/aaaa"></td>
-            <td><input type="text" class="select" style="font-size:12.5px; width:150px" value="Relève hebdomadaire"></td>
+            <td><input type="text" class="input" style="font-size:12.5px; width:140px" placeholder="—" oninput="markCptNeedsValidation(this)"></td>
+            <td><input type="date" class="input" style="font-size:12.5px; width:130px" value="2010-01-01"></td>
+            <td>
+              <label class="encours-lbl"><input type="checkbox" onchange="toggleEnCours(this)"> en cours</label>
+              <input type="date" class="input" style="font-size:12.5px; width:130px" value="2017-12-31">
+            </td>
+            <td><span class="cpt-status na" title="Compteur manuel — pas de validation d'accès nécessaire">—</span></td>
+            <td><input type="text" class="input" style="font-size:12.5px; width:150px" value="Relève hebdomadaire"></td>
             <td><button class="icon-action" title="Supprimer" onclick="this.closest('tr').remove()"><i data-lucide="trash-2"></i></button></td>
           </tr>
         </tbody>
@@ -1058,7 +1253,32 @@
 
     <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:18px; padding-top:14px; border-top:1px solid var(--border-subtle)">
       <button class="btn btn-ghost" onclick="closeOverlay('compteurs-edit')">Annuler</button>
-      <button class="btn btn-primary" onclick="alert('Compteurs enregistrés (démo)'); closeOverlay('compteurs-edit')"><i data-lucide="check"></i> Enregistrer</button>
+      <button class="btn btn-primary" onclick="saveCompteurs()"><i data-lucide="check"></i> Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================ Vérification d'accès compteur (brouillon BL) ============================
+     S'ouvre à l'enregistrement s'il y a au moins un compteur réseau (Enedis) en attente de validation.
+     Même esprit que "Ajouter une centrale" : vérification humaine du droit d'accès aux données Enedis. -->
+<div id="compteur-verif" class="overlay" onclick="if(event.target===this) closeOverlay('compteur-verif')">
+  <div class="modal">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px">
+      <div>
+        <div class="modal-title"><i data-lucide="shield-check" style="width:16px; height:16px; vertical-align:-2px; color:var(--brand-cyan)"></i> Vérification d'accès en cours</div>
+        <div class="modal-subtitle">Compteur(s) réseau (Enedis), Naia Box ou partenaire à valider.</div>
+      </div>
+      <button class="btn btn-ghost" onclick="closeOverlay('compteur-verif')"><i data-lucide="x"></i></button>
+    </div>
+    <div class="muted" style="font-size:12.5px; line-height:1.55; margin-bottom:16px; background:var(--bg-base); border:1px solid var(--border-subtle); border-radius:10px; padding:12px 14px">
+      Nous allons faire les vérifications nécessaires pour confirmer que vous avez bien accès à
+      <span id="compteur-verif-count">ce compteur</span> (vérification de vos emails, du mandat Enedis / de votre droit d'accès au compteur…).
+      En attendant, il reste en <strong style="color:#f5c518">« En cours de validation »</strong>.
+      Ce processus peut prendre quelques jours — merci de votre compréhension.
+      Vous pouvez aussi nous contacter à <a class="link" href="mailto:support@naiahydro.com">support@naiahydro.com</a>.
+    </div>
+    <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:4px">
+      <button class="btn btn-primary" onclick="closeOverlay('compteur-verif'); closeOverlay('compteurs-edit')"><i data-lucide="check"></i> J'ai compris</button>
     </div>
   </div>
 </div>
@@ -1085,9 +1305,9 @@
       <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap">
         <input type="text" value="a * compt_a + b * compt_b" style="font-family: ui-monospace, monospace; font-size:15px; padding:10px 12px; min-width:280px">
       </div>
-      <div class="muted" style="font-size:11.5px; line-height:1.7; margin-top:8px">
-        <div><b style="color:var(--text-primary)">puissance ↔ énergie (kW ↔ kWh)</b> : géré automatiquement</div>
-        <div><b style="color:var(--text-primary)">unités W ↔ kW et Wh ↔ kWh</b> : transformation à intégrer dans le coefficient</div>
+      <div class="muted" style="font-size:11.5px; line-height:1.6; margin-top:8px; display:flex; align-items:flex-start; gap:6px; background:var(--bg-base); border:1px solid var(--border-subtle); border-radius:8px; padding:9px 11px">
+        <i data-lucide="wand-sparkles" style="width:13px; height:13px; color:var(--brand-cyan); flex:0 0 auto; margin-top:1px"></i>
+        <span>Les unités sont converties <b style="color:var(--text-primary)">nativement par le système</b> (W ↔ kW, Wh ↔ kWh, puissance ↔ énergie). Pas besoin d'ajouter un coefficient de conversion (1000, 0,001…) dans la formule.</span>
       </div>
     </div>
 
@@ -1119,34 +1339,79 @@
   </div>
 </div>
 
-<!-- ============================ Modifier un accès partagé (brouillon BL) ============================
-     Remplace le bouton "Retirer" : on peut soit changer le rôle, soit supprimer l'accès. -->
-<div id="edit-share" class="overlay" onclick="if(event.target===this) closeOverlay('edit-share')">
+<!-- ============================ Inviter un utilisateur (brouillon BL) ============================
+     Invite un utilisateur sur CETTE centrale, avec un rôle. Ajoute une ligne au tableau. -->
+<div id="invite-user" class="overlay" onclick="if(event.target===this) closeOverlay('invite-user')">
   <div class="modal">
     <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px">
       <div>
-        <div class="modal-title"><i data-lucide="share-2" style="width:16px; height:16px; vertical-align:-2px; color:var(--brand-cyan)"></i> Modifier l'accès partagé</div>
-        <div class="modal-subtitle">Changer le rôle, ou supprimer l'accès.</div>
+        <div class="modal-title"><i data-lucide="user-plus" style="width:16px; height:16px; vertical-align:-2px; color:var(--brand-cyan)"></i> Inviter un utilisateur</div>
+        <div class="modal-subtitle">Sur cette centrale uniquement. Un e-mail d'invitation lui sera envoyé.</div>
       </div>
-      <button class="btn btn-ghost" onclick="closeOverlay('edit-share')"><i data-lucide="x"></i></button>
+      <button class="btn btn-ghost" onclick="closeOverlay('invite-user')"><i data-lucide="x"></i></button>
+    </div>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px">
+      <div class="fld"><label class="req">Nom</label><input id="invite-name" type="text" placeholder="ex. Camille Martin"></div>
+      <div class="fld"><label class="req">Email</label><input id="invite-email" type="text" placeholder="ex. camille@moulin.be"></div>
+    </div>
+    <div class="fld">
+      <label class="req">Rôle sur cette centrale</label>
+      <select id="invite-role" class="select">
+        <option>Administrateur</option>
+        <option selected>Opérateur de centrale</option>
+        <option>Éditeur</option>
+        <option>Lecteur</option>
+        <option>Finance</option>
+      </select>
+      <div class="muted" style="font-size:11.5px; margin-top:6px">Définit ce que cette personne pourra voir et modifier sur la centrale.</div>
+    </div>
+
+    <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:18px; padding-top:14px; border-top:1px solid var(--border-subtle)">
+      <button class="btn btn-ghost" onclick="closeOverlay('invite-user')">Annuler</button>
+      <button class="btn btn-primary" onclick="inviteUser()"><i data-lucide="send"></i> Envoyer l'invitation</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================ Modifier un utilisateur (brouillon BL) ============================
+     Change le rôle d'un utilisateur sur cette centrale, ou le retire. "Retirer" caché pour soi-même. -->
+<div id="edit-user" class="overlay" onclick="if(event.target===this) closeOverlay('edit-user')">
+  <div class="modal">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px">
+      <div>
+        <div class="modal-title"><i data-lucide="user-cog" style="width:16px; height:16px; vertical-align:-2px; color:var(--brand-cyan)"></i> Modifier l'utilisateur</div>
+        <div class="modal-subtitle" id="edit-user-sub">Changer le rôle, ou retirer l'utilisateur.</div>
+      </div>
+      <button class="btn btn-ghost" onclick="closeOverlay('edit-user')"><i data-lucide="x"></i></button>
+    </div>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px">
+      <div class="fld"><label class="req">Nom</label><input id="edit-user-name" type="text" placeholder="ex. Camille Martin"></div>
+      <div class="fld">
+        <label>Email</label>
+        <input id="edit-user-email" type="text" disabled title="L'email ne se modifie pas ici" style="background:var(--bg-base); color:var(--text-muted); cursor:not-allowed; opacity:0.75">
+        <div class="muted" style="font-size:11.5px; margin-top:6px">L'email ne peut pas être modifié ici.</div>
+      </div>
     </div>
 
     <div class="fld">
-      <label class="req">Rôle</label>
-      <select class="select">
-        <option selected>Comparateur — lecture agrégée</option>
-        <option>Banque — rapport mensuel</option>
-        <option>Assureur — lecture seule</option>
-        <option>Lecture seule</option>
+      <label class="req">Rôle sur cette centrale</label>
+      <select id="edit-user-role" class="select">
+        <option>Administrateur</option>
+        <option>Opérateur de centrale</option>
+        <option>Éditeur</option>
+        <option>Lecteur</option>
+        <option>Finance</option>
       </select>
-      <div class="muted" style="font-size:11.5px; margin-top:6px">Définit ce que cette personne / organisation peut voir.</div>
+      <div class="muted" style="font-size:11.5px; margin-top:6px">Définit ce que cette personne peut voir et modifier sur la centrale.</div>
     </div>
 
     <div style="display:flex; gap:8px; justify-content:space-between; align-items:center; margin-top:18px; padding-top:14px; border-top:1px solid var(--border-subtle)">
-      <button class="btn btn-ghost" style="color:var(--accent-red)" onclick="if(confirm('Supprimer cet accès partagé ?')){ alert('Accès supprimé (démo)'); closeOverlay('edit-share'); }"><i data-lucide="user-minus"></i> Supprimer l'accès</button>
+      <button id="edit-user-remove" class="btn btn-ghost" style="color:var(--accent-red)" onclick="removeUser()"><i data-lucide="user-minus"></i> Retirer l'utilisateur</button>
       <div style="display:flex; gap:8px">
-        <button class="btn btn-ghost" onclick="closeOverlay('edit-share')">Annuler</button>
-        <button class="btn btn-primary" onclick="alert('Rôle modifié (démo)'); closeOverlay('edit-share')"><i data-lucide="check"></i> Enregistrer</button>
+        <button class="btn btn-ghost" onclick="closeOverlay('edit-user')">Annuler</button>
+        <button class="btn btn-primary" onclick="saveEditUser()"><i data-lucide="check"></i> Enregistrer</button>
       </div>
     </div>
   </div>
@@ -1205,11 +1470,7 @@
       <button class="btn btn-ghost" onclick="closeOverlay('flux-revenus-modal')"><i data-lucide="x"></i></button>
     </div>
 
-    <div style="display:grid; grid-template-columns: 2fr 1fr 1fr; gap:14px; margin-bottom:18px">
-      <div class="fld"><label class="req">Nom</label><input type="text" placeholder="ex. Flux EDF OA"></div>
-      <div class="fld"><label class="req">De</label><input type="text" placeholder="01/01/2018"></div>
-      <div class="fld"><label>À</label><input type="text" placeholder="— (en cours)"></div>
-    </div>
+    <div class="fld" style="margin-bottom:18px"><label class="req">Nom</label><input type="text" placeholder="ex. Flux EDF OA"></div>
 
     <div style="display:grid; grid-template-columns: 1fr 1fr; gap:14px; margin-bottom:6px">
       <div class="fld">
@@ -1287,17 +1548,19 @@
 
       <div id="tariff-source-row">
         <label style="display:block; font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em; font-weight:600; margin-bottom:6px">Source <span style="color:var(--accent-red)">*</span></label>
-        <input id="tariff-source-manual" class="input" type="text" placeholder="ex. Saisi par PO · contrat 2026">
+        <input id="tariff-source-manual" class="input" type="text" value="Import sur Naia" readonly style="color:var(--text-muted); cursor:not-allowed">
         <select id="tariff-source-auto" class="select" style="display:none">
-          <option>Spot Belpex BE · base load</option>
-          <option>Spot Belpex BE · peak load</option>
           <option>Spot EPEX FR · base load</option>
           <option>Spot EPEX FR · peak load</option>
+          <option>Spot Belpex BE · base load</option>
+          <option>Spot Belpex BE · peak load</option>
           <option>EDF tarif régulé</option>
         </select>
+        <div id="tariff-source-help-manual" class="muted" style="font-size:11px; margin-top:6px; line-height:1.5">Saisie manuelle&nbsp;: les prix sont importés dans Naia. Précisez l'unité ci-dessous.</div>
+        <div id="tariff-source-help-auto" class="muted" style="font-size:11px; margin-top:6px; line-height:1.5; display:none">Flux automatique&nbsp;: l'unité provient de la source, pas besoin de la saisir.</div>
       </div>
 
-      <div>
+      <div id="tariff-unit-row">
         <label style="display:block; font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em; font-weight:600; margin-bottom:6px">Unité <span style="color:var(--accent-red)">*</span></label>
         <select class="select"><option selected>€/MWh</option><option>€/kWh</option><option>cts/kWh</option></select>
       </div>
@@ -1333,11 +1596,6 @@
       </div>
 
       <div>
-        <label style="display:block; font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em; font-weight:600; margin-bottom:6px">Unité <span style="color:var(--accent-red)">*</span></label>
-        <select id="flux-donnee-unite" class="select"><option>mm</option><option>mm/h</option><option>m³/s</option><option>m³</option><option>°C</option><option>m</option><option>kWh</option><option>kW</option><option>%</option><option>Autre</option></select>
-      </div>
-
-      <div>
         <label style="display:block; font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em; font-weight:600; margin-bottom:6px">Type d'ingestion <span style="color:var(--accent-red)">*</span></label>
         <select id="flux-donnee-ingestion" class="select" onchange="fluxDonneeIngestionChange()"><option>Import sur Naia</option><option>API</option><option>NaiaBox</option><option>Partenaire Naia</option></select>
       </div>
@@ -1353,18 +1611,26 @@
         <input class="input" type="text" placeholder="ex. NAIA-7F3A-21">
       </div>
 
-      <div id="fd-partenaire" class="fd-extra" hidden style="display:flex; flex-direction:column; gap:14px">
-        <div>
-          <label style="display:block; font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em; font-weight:600; margin-bottom:6px">Nom du partenaire <span style="color:var(--accent-red)">*</span></label>
-          <select class="select"><option>Hydrosight</option></select>
-        </div>
-        <div>
-          <label style="display:block; font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em; font-weight:600; margin-bottom:6px">Numéro de contrat <span style="color:var(--accent-red)">*</span></label>
-          <input class="input" type="text" placeholder="ex. HS-2026-00482">
-        </div>
-        <div>
-          <label style="display:block; font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em; font-weight:600; margin-bottom:6px">Code capteur <span style="color:var(--accent-red)">*</span></label>
-          <input class="input" type="text" placeholder="ex. HS-CPT-118">
+      <div id="fd-partenaire" class="fd-extra" hidden>
+        <label style="display:block; font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em; font-weight:600; margin-bottom:6px">Code capteur <span style="color:var(--accent-red)">*</span></label>
+        <input class="input" type="text" placeholder="ex. HS-CPT-118">
+        <div class="muted" style="font-size:11px; margin-top:6px; line-height:1.5">Le numéro de contrat sera rattaché automatiquement par notre équipe — pas besoin de le saisir ici.</div>
+      </div>
+
+      <!-- Unité : placée APRÈS le type d'ingestion. Verrouillée (définie par le capteur) si NaiaBox / Partenaire. -->
+      <div>
+        <label style="display:block; font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em; font-weight:600; margin-bottom:6px">Unité <span style="color:var(--accent-red)">*</span></label>
+        <select id="flux-donnee-unite" class="select" onchange="fluxDonneeUniteChange()"><option>mm/h</option><option>mm/d</option><option>Autre</option></select>
+        <div id="fd-unite-auto-note" class="muted" hidden style="font-size:11px; margin-top:6px; line-height:1.5; display:flex; align-items:center; gap:6px"><i data-lucide="wand-sparkles" style="width:12px; height:12px; color:var(--brand-cyan)"></i> Définie automatiquement par le capteur — rien à saisir.</div>
+      </div>
+
+      <!-- Unité « Autre » → demande à transmettre à l'équipe dev (brouillon BL) -->
+      <div id="fd-unite-autre" hidden>
+        <label style="display:block; font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em; font-weight:600; margin-bottom:6px">Précisez l'unité souhaitée <span style="color:var(--accent-red)">*</span></label>
+        <input class="input" type="text" placeholder="ex. mm/15 min, l/m²…">
+        <div class="muted" style="font-size:11px; margin-top:6px; line-height:1.5; background:var(--bg-base); border:1px solid var(--border-subtle); border-radius:8px; padding:9px 11px">
+          <i data-lucide="hard-hat" style="width:12px; height:12px; vertical-align:-2px; color:var(--brand-amber, #fbbf24)"></i>
+          Veuillez préciser&nbsp;: notre équipe de développeurs regardera si on peut l'intégrer. Cela peut prendre quelques jours.
         </div>
       </div>
     </div>
@@ -1492,25 +1758,28 @@
         <input id="composite-nom" class="input" type="text" placeholder="ex. Moyenne pondérée bassin">
       </div>
 
-      <div>
+      <div id="composite-op-block">
         <label style="display:block; font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em; font-weight:600; margin-bottom:6px">Type d'opération <span style="color:var(--accent-red)">*</span></label>
         <div class="type-seg" style="display:inline-flex; background:var(--bg-input); border-radius:999px; padding:3px; gap:1px">
           <button id="comp-op-somme" class="on" onclick="switchCompositeOp('somme')" style="padding:6px 16px; font-size:13px; border:0; background:var(--brand-blue-strong); color:white; border-radius:999px; cursor:pointer; font-family:inherit; font-weight:500">Somme</button>
           <button id="comp-op-produit" onclick="switchCompositeOp('produit')" style="padding:6px 16px; font-size:13px; border:0; background:transparent; color:var(--text-muted); border-radius:999px; cursor:pointer; font-family:inherit; font-weight:500">Produit</button>
         </div>
+        <div id="composite-op-note" class="muted" style="display:none; font-size:11.5px; margin-top:6px"></div>
       </div>
 
       <div>
         <label class="req" style="display:block; font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em; font-weight:600; margin-bottom:6px">Donnée composite — formule</label>
-        <input id="composite-formula" type="text" readonly value="constante + a * data_A + b * data_B" style="font-family: ui-monospace, monospace; font-size:15px; padding:10px 12px; min-width:280px; width:100%; background:var(--bg-base); border:1px solid var(--border-subtle); border-radius:8px; color:var(--text-primary)">
+        <input id="composite-formula" type="text" readonly value="constante + A * data_A + B * data_B" style="font-family: ui-monospace, monospace; font-size:15px; padding:10px 12px; min-width:280px; width:100%; background:var(--bg-base); border:1px solid var(--border-subtle); border-radius:8px; color:var(--text-primary)">
         <div class="muted" style="font-size:11.5px; margin-top:6px">Générée automatiquement à partir des variables ci-dessous et de l'opération choisie.</div>
+        <div class="muted" style="font-size:11.5px; margin-top:3px; display:flex; align-items:center; gap:6px"><i data-lucide="wand-sparkles" style="width:13px; height:13px; color:var(--brand-cyan)"></i> Les unités sont gérées automatiquement par le système — pas besoin de les saisir.</div>
       </div>
 
       <div style="background:var(--bg-base); border:1px solid var(--border-subtle); border-radius:10px; padding:12px 14px">
         <div style="font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em; font-weight:600; margin-bottom:8px">Variables</div>
         <div id="composite-vars"></div>
-        <div style="margin-top:8px">
+        <div style="margin-top:8px; display:flex; gap:8px; flex-wrap:wrap">
           <button class="btn btn-secondary btn-sm" onclick="compositeAddRow()"><i data-lucide="plus"></i> Ajouter une donnée</button>
+          <button id="composite-add-const" class="btn btn-ghost btn-sm" onclick="compositeAddConst()"><i data-lucide="plus"></i> Ajouter une constante</button>
         </div>
       </div>
     </div>
@@ -1526,21 +1795,34 @@
   function switchTariffType(t) {
     const m = document.getElementById("tariff-type-manual");
     const a = document.getElementById("tariff-type-auto");
-    const ms = document.getElementById("tariff-source-manual");
-    const as = document.getElementById("tariff-source-auto");
+    const ms = document.getElementById("tariff-source-manual");   // manuel : "Import sur Naia" (figé)
+    const as = document.getElementById("tariff-source-auto");     // auto : choix de la source
+    const helpM = document.getElementById("tariff-source-help-manual");
+    const helpA = document.getElementById("tariff-source-help-auto");
+    const unitRow = document.getElementById("tariff-unit-row");   // unité : visible en manuel, cachée en auto
     if (t === "manual") {
       m.style.background = "var(--brand-blue-strong)"; m.style.color = "white";
       a.style.background = "transparent";              a.style.color = "var(--text-muted)";
       ms.style.display = ""; as.style.display = "none";
+      helpM.style.display = ""; helpA.style.display = "none";
+      unitRow.style.display = "";                                 // manuel → on saisit l'unité
     } else {
       a.style.background = "var(--brand-blue-strong)"; a.style.color = "white";
       m.style.background = "transparent";              m.style.color = "var(--text-muted)";
       ms.style.display = "none"; as.style.display = "";
+      helpM.style.display = "none"; helpA.style.display = "";
+      unitRow.style.display = "none";                             // auto → l'unité vient de la source
     }
   }
 </script>
 
 <script src="https://unpkg.com/lucide@latest"></script>
+<!-- v6.1 integration note (Bernard's standalone folded in):
+     The standalone replaced this block with 3 inline helpers because it deliberately
+     skipped app.js (to avoid the sidebar reconstructing itself in his isolated review
+     page). In the integrated v6.1 we load the shared app.js — that gives us the
+     sidebar, the centrale-tab routing, the MVP 0.9 toggle, and the openOverlay /
+     closeOverlay / initIcons helpers Bernard relies on, in one place. -->
 <script src="js/app.js"></script>
 <script>
   const CENTRALES_PARAM = {
@@ -1711,7 +1993,9 @@
     document.getElementById("flux-donnee-cat").textContent = catLabel;
     document.getElementById("flux-donnee-save").innerHTML = '<i data-lucide="check"></i> Créer';
     document.getElementById("flux-donnee-nom").value = "";
+    populateFluxDonneeUnits(fdIndicatorType(btn));   // unités selon l'indicateur (Pluie → mm/h, mm/d, Autre)
     document.getElementById("flux-donnee-unite").selectedIndex = 0;
+    fluxDonneeUniteChange();                          // cache le bloc "Autre"
     document.getElementById("flux-donnee-ingestion").selectedIndex = 0; // "Import sur Naia" par défaut
     fluxDonneeIngestionChange();
     openOverlay("flux-donnee");
@@ -1726,10 +2010,32 @@
       fluxDonneeTarget.querySelector(".src-group-title").textContent.replace(/\(max.*?\)/, "").trim();
     document.getElementById("flux-donnee-save").innerHTML = '<i data-lucide="check"></i> Enregistrer';
     document.getElementById("flux-donnee-nom").value = row.dataset.name || "";
-    setSelectValue(document.getElementById("flux-donnee-unite"), row.dataset.unite || "mm");
+    populateFluxDonneeUnits(fdIndicatorType(row));   // unités selon l'indicateur
+    setSelectValue(document.getElementById("flux-donnee-unite"), row.dataset.unite || "");
+    fluxDonneeUniteChange();
     setSelectValue(document.getElementById("flux-donnee-ingestion"), row.dataset.ingestion || "Import sur Naia");
     fluxDonneeIngestionChange();
     openOverlay("flux-donnee");
+    if (window.lucide) lucide.createIcons();
+  }
+  // Unités proposées selon le type d'indicateur (brouillon BL). Pluie restreint à mm/h, mm/d, Autre.
+  const FD_UNIT_SETS = { "Pluie": ["mm/h", "mm/d", "Autre"] };
+  const FD_UNIT_DEFAULT = ["mm", "mm/h", "m³/s", "m³", "°C", "m", "kWh", "kW", "%", "Autre"];
+  function fdIndicatorType(el) {
+    const sub = el && el.closest(".pd-sub");
+    const t = sub && sub.querySelector(".pd-sub-title");
+    return t ? t.textContent.trim() : null;
+  }
+  function populateFluxDonneeUnits(indicatorType) {
+    const sel = document.getElementById("flux-donnee-unite");
+    const list = FD_UNIT_SETS[indicatorType] || FD_UNIT_DEFAULT;
+    sel.innerHTML = list.map(u => '<option>' + u + '</option>').join("");
+  }
+  // Unité « Autre » → on révèle le champ de précision + le message équipe dev
+  function fluxDonneeUniteChange() {
+    const v = document.getElementById("flux-donnee-unite").value;
+    const box = document.getElementById("fd-unite-autre");
+    if (box) box.hidden = (v !== "Autre");
     if (window.lucide) lucide.createIcons();
   }
   function fluxDonneeIngestionChange() {
@@ -1738,6 +2044,25 @@
     const map = { "API": "fd-api", "NaiaBox": "fd-naiabox", "Partenaire Naia": "fd-partenaire" };
     const id = map[val];
     if (id) document.getElementById(id).hidden = false;
+    fluxDonneeApplyUnitLock();
+  }
+  // NaiaBox / Partenaire : l'unité est définie par le capteur → champ verrouillé (rien à saisir)
+  function fluxDonneeApplyUnitLock() {
+    const val = document.getElementById("flux-donnee-ingestion").value;
+    const locked = (val === "NaiaBox" || val === "Partenaire Naia");
+    const sel = document.getElementById("flux-donnee-unite");
+    const note = document.getElementById("fd-unite-auto-note");
+    sel.disabled = locked;
+    sel.style.opacity = locked ? "0.6" : "";
+    sel.style.cursor = locked ? "not-allowed" : "";
+    if (note) note.hidden = !locked;
+    if (locked) {
+      const autre = document.getElementById("fd-unite-autre");
+      if (autre) autre.hidden = true;   // pas de bloc "Autre" quand l'unité vient du capteur
+    } else {
+      fluxDonneeUniteChange();           // rétablit la logique "Autre" en saisie manuelle
+    }
+    if (window.lucide) lucide.createIcons();
   }
   function saveFluxDonnee() {
     if (!fluxDonneeTarget) return;
@@ -1770,10 +2095,114 @@
     if (window.lucide) lucide.createIcons();
   }
 
+  // Partage d'un flux de données (fonction à venir) : capture d'intérêt → message de remerciement
+  function shareFluxInterest(btn) {
+    btn.outerHTML = '<div style="display:inline-flex; align-items:center; gap:6px; font-size:12.5px; color:#22c55e; font-weight:600"><i data-lucide="check"></i> Merci pour votre contribution — votre intérêt est bien noté.</div>';
+    if (window.lucide) lucide.createIcons();
+  }
+
+  // ============================ Utilisateurs & rôles (brouillon BL) ============================
+  // Rôle long (PRD) -> badge court affiché dans le tableau.
+  const USER_ROLE_BADGE = {
+    "Administrateur":        { label: "Admin",     cls: "badge-purple" },
+    "Opérateur de centrale": { label: "Opérateur", cls: "badge-blue" },
+    "Éditeur":               { label: "Éditeur",   cls: "badge-green" },
+    "Lecteur":               { label: "Lecteur",   cls: "badge-slate" },
+    "Finance":               { label: "Finance",   cls: "badge-amber" },
+  };
+  function userRoleBadgeHTML(role) {
+    const m = USER_ROLE_BADGE[role] || { label: role, cls: "badge-slate" };
+    return '<span class="badge ' + m.cls + '">' + m.label + '</span>';
+  }
+
+  let editUserRow = null; // ligne <tr> en cours d'édition
+
+  function openEditUser(link) {
+    const tr = link.closest("tr");
+    editUserRow = tr;
+    const self = tr.dataset.self === "true";
+    document.getElementById("edit-user-name").value = tr.dataset.name || "";
+    document.getElementById("edit-user-email").value = tr.dataset.email || "";
+    document.getElementById("edit-user-role").value = tr.dataset.role || "Opérateur de centrale";
+    document.getElementById("edit-user-sub").textContent = self
+      ? "Vous modifiez votre propre rôle sur cette centrale."
+      : "Changer le rôle de " + (tr.dataset.name || "cet utilisateur") + ", ou le retirer.";
+    // On ne peut pas se retirer soi-même.
+    document.getElementById("edit-user-remove").style.display = self ? "none" : "";
+    openOverlay("edit-user");
+  }
+
+  function saveEditUser() {
+    if (editUserRow) {
+      const role = document.getElementById("edit-user-role").value;
+      const name = (document.getElementById("edit-user-name").value || "").trim();
+      if (!name) { alert("Merci de renseigner le nom."); return; }
+      editUserRow.dataset.role = role;
+      editUserRow.children[2].innerHTML = userRoleBadgeHTML(role);
+      // Met à jour le nom affiché en gardant la mention « vous » s'il y a lieu.
+      editUserRow.dataset.name = name;
+      const nameCell = editUserRow.children[0];
+      const b = nameCell.querySelector("b");
+      if (b) b.textContent = name;
+    }
+    closeOverlay("edit-user");
+    if (window.lucide) lucide.createIcons();
+  }
+
+  function removeUser() {
+    if (editUserRow) {
+      const name = editUserRow.dataset.name || "cet utilisateur";
+      if (!confirm("Retirer " + name + " de cette centrale ?")) return;
+      editUserRow.remove();
+      editUserRow = null;
+    }
+    closeOverlay("edit-user");
+  }
+
+  function inviteUser() {
+    const name = (document.getElementById("invite-name").value || "").trim();
+    const email = (document.getElementById("invite-email").value || "").trim();
+    const role = document.getElementById("invite-role").value;
+    if (!name || !email) { alert("Merci de renseigner le nom et l'email."); return; }
+    const tbody = document.querySelector("#users-table tbody");
+    const tr = document.createElement("tr");
+    tr.dataset.name = name;
+    tr.dataset.email = email;
+    tr.dataset.role = role;
+    tr.innerHTML =
+      '<td><b>' + name + '</b></td>' +
+      '<td>' + email + '</td>' +
+      '<td>' + userRoleBadgeHTML(role) + '</td>' +
+      '<td><span class="badge badge-amber">à activer</span></td>' +
+      '<td><a class="link" style="font-size:12px" onclick="openEditUser(this)">Modifier</a></td>';
+    tbody.appendChild(tr);
+    // reset + close
+    document.getElementById("invite-name").value = "";
+    document.getElementById("invite-email").value = "";
+    document.getElementById("invite-role").value = "Opérateur de centrale";
+    closeOverlay("invite-user");
+    if (window.lucide) lucide.createIcons();
+  }
+
   // Données composites : popup type "flux de production" — opération Somme / Produit (brouillon BL)
   let compositeTarget = null;
   let compositeEditRow = null;
   let compositeOp = "somme";
+  let compositeNoProduct = false; // Pluie : le produit n'a pas de sens (les précipitations s'additionnent)
+  let compositeAllowFixed = true;  // Compteurs/Tarification proposés seulement pour production/revenus
+  // Affiche/masque l'opération "Produit" selon l'indicateur (caché pour la pluie)
+  function compositeApplyOpMode() {
+    const p = document.getElementById("comp-op-produit");
+    const note = document.getElementById("composite-op-note");
+    if (compositeNoProduct) {
+      switchCompositeOp("somme");
+      if (p) p.style.display = "none";
+      if (note) { note.style.display = ""; note.textContent = "Pour la pluie, seule la somme a du sens — les précipitations s'additionnent."; }
+    } else {
+      if (p) p.style.display = "";
+      if (note) note.style.display = "none";
+    }
+  }
   // Catégories de sources mobilisables dans une composite (jamais "composite" lui-même → pas d'auto-référence)
   // - publique / privee : lues dans les boîtes du picker courant
   // - compteurs / tarification : listes au niveau de la centrale (toujours disponibles, cf. menus dédiés)
@@ -1788,7 +2217,11 @@
   function compositePickerCats() {
     const picker = compositeTarget ? compositeTarget.closest(".picker") : null;
     const groupCats = COMPOSITE_GROUP_CATS.filter(c => picker && picker.querySelector('.src-group[data-cat="' + c.cat + '"]'));
-    const fixedCats = Object.keys(COMPOSITE_FIXED).map(k => ({ cat: k, label: COMPOSITE_FIXED[k].label }));
+    // Compteurs / Tarification n'ont de sens que pour les indicateurs de production / revenus,
+    // pas pour une donnée météo (pluie, courbe) → on les masque hors production/revenus.
+    const fixedCats = compositeAllowFixed
+      ? Object.keys(COMPOSITE_FIXED).map(k => ({ cat: k, label: COMPOSITE_FIXED[k].label }))
+      : [];
     return groupCats.concat(fixedCats);
   }
   // Noms de sources pour une catégorie donnée (boîte du picker, ou liste centrale pour compteurs/tarification)
@@ -1809,7 +2242,7 @@
   function compositeVarRow(letter, coef, dataType, dataName, mandatory) {
     const div = document.createElement("div");
     div.className = "flux-var-row";
-    div.setAttribute("style", "display:flex; align-items:center; gap:14px; flex-wrap:wrap; padding:9px 0; border-bottom:1px dashed var(--border-subtle)");
+    div.setAttribute("style", "display:flex; align-items:center; gap:10px; flex-wrap:wrap; padding:9px 0; border-bottom:1px dashed var(--border-subtle)");
     const picker = compositeTarget ? compositeTarget.closest(".picker") : null;
     const allowShift = picker && picker.dataset.allowShift === "true"; // comparateur : permet "production il y a un an"
     const cats = compositePickerCats();
@@ -1818,12 +2251,11 @@
       ? `<select class="select comp-data-shift" style="min-width:150px" title="Décalage temporel"><option value="0">Aucun décalage</option><option value="m1">Il y a 1 mois</option><option value="y1">Il y a 1 an</option><option value="y2">Il y a 2 ans</option></select>`
       : "";
     div.innerHTML =
-      `<span style="display:inline-flex; align-items:center; gap:8px; white-space:nowrap"><label style="font-size:14px; font-weight:600; color:var(--text-primary); font-family:ui-monospace,monospace">coef ${letter} =</label><input type="text" value="${coef}" style="width:72px; padding:7px 9px; background:var(--bg-input); border:1px solid var(--border-default); border-radius:8px; color:var(--text-primary); font-size:13px; font-family:inherit" oninput="compositeUpdateFormula()"></span>` +
-      `<span style="display:inline-flex; align-items:center; gap:8px; white-space:nowrap; flex-wrap:wrap"><label style="font-size:14px; font-weight:600; color:var(--text-primary); font-family:ui-monospace,monospace">data_${letter} =</label>` +
-        `<select class="select comp-data-type" style="min-width:150px" onchange="compositeFillDataSelect(this)">${typeOpts}</select>` +
-        `<select class="select comp-data-name" style="min-width:170px"></select>` + shiftSel + `</span>` +
-      (mandatory ? "" : `<button class="icon-action" title="Supprimer" style="margin-left:auto" onclick="this.closest('.flux-var-row').remove(); compositeUpdateFormula()"><i data-lucide="trash-2"></i></button>`) +
-      (mandatory ? "" : `<span class="muted" style="font-size:11px; flex-basis:100%; margin:-2px 0 0">Mettez le coefficient à <b>0</b> si votre composite ne dépend que d'une seule donnée.</span>`);
+      `<span style="display:inline-flex; align-items:center; gap:8px; white-space:nowrap"><label style="font-size:14px; font-weight:600; color:var(--text-primary); font-family:ui-monospace,monospace">coef ${letter} =</label><input type="text" value="${coef}" style="width:60px; padding:7px 9px; background:var(--bg-input); border:1px solid var(--border-default); border-radius:8px; color:var(--text-primary); font-size:13px; font-family:inherit" oninput="compositeUpdateFormula()"></span>` +
+      `<span style="display:inline-flex; align-items:center; gap:8px; white-space:nowrap; flex-wrap:nowrap"><label style="font-size:14px; font-weight:600; color:var(--text-primary); font-family:ui-monospace,monospace">data_${letter} =</label>` +
+        `<select class="select comp-data-type" style="min-width:132px" onchange="compositeFillDataSelect(this)">${typeOpts}</select>` +
+        `<select class="select comp-data-name" style="min-width:148px"></select>` + shiftSel + `</span>` +
+      `<button class="icon-action comp-del" title="Supprimer cette donnée" style="margin-left:auto" onclick="compositeRemoveRow(this)"><i data-lucide="trash-2"></i></button>`;
     const typeSel = div.querySelector(".comp-data-type");
     typeSel.value = cats.some(c => c.cat === dataType) ? dataType : (cats[0] ? cats[0].cat : "publique");
     compositeFillDataSelect(typeSel, dataName);
@@ -1832,9 +2264,41 @@
   function compositeBuildVars(rows) {
     const box = document.getElementById("composite-vars");
     box.innerHTML = "";
-    box.appendChild(compositeConstRow("0")); // constante toujours en première ligne (une seule)
-    rows.forEach((r, i) => box.appendChild(compositeVarRow(String.fromCharCode(65 + i), r.coef, r.type, r.data, i === 0)));
+    box.appendChild(compositeConstRow("0")); // constante en tête (une seule) — supprimable
+    rows.forEach((r, i) => box.appendChild(compositeVarRow(String.fromCharCode(65 + i), r.coef, r.type, r.data, false)));
+    compositeRefreshDeletables();
     compositeUpdateFormula();
+  }
+  // Gère la suppressibilité : on ne peut pas supprimer la dernière donnée ; bouton "+ Constante" caché si déjà présente
+  function compositeRemoveRow(btn) {
+    btn.closest(".flux-var-row").remove();
+    compositeRefreshDeletables();
+    compositeUpdateFormula();
+  }
+  function compositeRemoveConst(btn) {
+    btn.closest(".flux-var-row").remove();
+    compositeRefreshDeletables();
+    compositeUpdateFormula();
+  }
+  function compositeAddConst() {
+    const box = document.getElementById("composite-vars");
+    if (box.querySelector('.flux-var-row[data-const]')) return;
+    box.insertBefore(compositeConstRow("0"), box.firstChild);
+    compositeRefreshDeletables();
+    compositeUpdateFormula();
+    if (window.lucide) lucide.createIcons();
+  }
+  function compositeRefreshDeletables() {
+    const dataRows = [...document.querySelectorAll('#composite-vars .flux-var-row:not([data-const])')];
+    dataRows.forEach(r => { const b = r.querySelector(".comp-del"); if (b) b.style.display = dataRows.length <= 1 ? "none" : ""; });
+    const hasConst = !!document.querySelector('#composite-vars .flux-var-row[data-const]');
+    const addConstBtn = document.getElementById("composite-add-const");
+    // Le bouton reste toujours visible en bas ; on le désactive simplement quand une constante existe déjà (une seule)
+    if (addConstBtn) {
+      addConstBtn.disabled = hasConst;
+      addConstBtn.style.opacity = hasConst ? "0.45" : "";
+      addConstBtn.style.cursor = hasConst ? "not-allowed" : "pointer";
+    }
   }
   function compositeUpdateFormula() {
     const rows = [...document.querySelectorAll("#composite-vars .flux-var-row")];
@@ -1843,8 +2307,8 @@
     const dataTerms = [];
     rows.forEach(r => {
       if (r.dataset.const === "true") { hasConst = true; return; }
-      const letter = String.fromCharCode(97 + dataIdx); // a, b, c… (les données seules sont indicées)
-      dataTerms.push(`${letter} * data_${letter.toUpperCase()}`);
+      const letter = String.fromCharCode(65 + dataIdx); // A, B, C… (cohérent avec les libellés "coef A" / "data_A" ci-dessous)
+      dataTerms.push(`${letter} * data_${letter}`);
       dataIdx++;
     });
     const body = dataTerms.join(sep);
@@ -1860,8 +2324,9 @@
     div.setAttribute("style", "display:flex; align-items:center; gap:14px; flex-wrap:wrap; padding:9px 0; border-bottom:1px dashed var(--border-subtle)");
     div.innerHTML =
       `<span style="display:inline-flex; align-items:center; gap:8px; white-space:nowrap"><label style="font-size:14px; font-weight:600; color:var(--text-primary); font-family:ui-monospace,monospace">constante =</label><input type="text" value="${value || "0"}" style="width:90px; padding:7px 9px; background:var(--bg-input); border:1px solid var(--border-default); border-radius:8px; color:var(--text-primary); font-size:13px; font-family:inherit" oninput="compositeUpdateFormula()"></span>` +
-      `<span class="muted" style="font-size:11.5px">valeur fixe en tête de formule (une seule)</span>`;
-    return div; // pas de bouton supprimer : la constante reste toujours
+      `<span class="muted" style="font-size:11.5px">valeur fixe en tête de formule (une seule)</span>` +
+      `<button class="icon-action comp-del" title="Supprimer la constante" style="margin-left:auto" onclick="compositeRemoveConst(this)"><i data-lucide="trash-2"></i></button>`;
+    return div; // constante supprimable ; on peut la rajouter via "+ Constante"
   }
   function switchCompositeOp(op) {
     compositeOp = op;
@@ -1875,6 +2340,7 @@
     const box = document.getElementById("composite-vars");
     const i = box.querySelectorAll(".flux-var-row:not([data-const])").length; // la constante ne compte pas dans l'indice des données
     box.appendChild(compositeVarRow(String.fromCharCode(65 + i), "1.0", "publique", null, false));
+    compositeRefreshDeletables();
     compositeUpdateFormula();
     if (window.lucide) lucide.createIcons();
   }
@@ -1887,10 +2353,14 @@
     }
     compositeTarget = group;
     compositeEditRow = null;
+    var compIndic = fdIndicatorType(btn);
+    compositeNoProduct = (compIndic === "Pluie");
+    compositeAllowFixed = (compIndic === "Vue production" || compIndic === "Vue revenus");
     document.getElementById("composite-title").textContent = "Créer une donnée composite";
     document.getElementById("composite-save").innerHTML = '<i data-lucide="check"></i> Créer';
     document.getElementById("composite-nom").value = "";
     switchCompositeOp("somme");
+    compositeApplyOpMode();
     compositeBuildVars([{ coef: "1.0", type: "publique", data: null }, { coef: "1.0", type: "publique", data: null }]);
     openOverlay("composite-modal");
     if (window.lucide) lucide.createIcons();
@@ -1898,10 +2368,14 @@
   function editComposite(row) {
     compositeTarget = row.closest(".src-group");
     compositeEditRow = row;
+    var compIndicE = fdIndicatorType(row);
+    compositeNoProduct = (compIndicE === "Pluie");
+    compositeAllowFixed = (compIndicE === "Vue production" || compIndicE === "Vue revenus");
     document.getElementById("composite-title").textContent = "Modifier la donnée composite";
     document.getElementById("composite-save").innerHTML = '<i data-lucide="check"></i> Enregistrer';
     document.getElementById("composite-nom").value = row.dataset.name || "";
     switchCompositeOp(row.dataset.op === "produit" ? "produit" : "somme");
+    compositeApplyOpMode();
     compositeBuildVars([{ coef: "1.0", type: "publique", data: null }, { coef: "1.0", type: "publique", data: null }]);
     openOverlay("composite-modal");
     if (window.lucide) lucide.createIcons();
@@ -1957,18 +2431,77 @@
     const tbody = document.getElementById("compteurs-edit-body");
     const tr = document.createElement("tr");
     tr.innerHTML =
-      `<td><input type="text" class="select" style="font-size:12.5px; width:120px" placeholder="ex. MOU-…"></td>` +
-      `<td><select class="select" style="font-size:12.5px"><option>GDR</option><option>Naia Box</option><option>Manuel</option></select></td>` +
+      `<td><input type="text" class="input" style="font-size:12.5px; width:120px" placeholder="ex. MOU-…"></td>` +
+      `<td><select class="select" style="font-size:12.5px" onchange="updateCptStatusFromOrigin(this)"><option>GDR</option><option>Naia Box</option><option>Partenaire</option><option>Manuel</option></select><select class="select cpt-partner" style="font-size:12.5px; margin-top:5px; display:none"><option>Hydrosight</option></select></td>` +
       `<td><select class="select" style="font-size:12.5px"><option>Énergie sur pas de temps</option><option>Puissance instantanée</option><option>Index énergie</option><option>Autre</option></select></td>` +
       `<td><select class="select" style="font-size:12.5px"><option>kW</option><option>W</option><option selected>kWh</option><option>Wh</option></select></td>` +
-      `<td><input type="text" class="select" style="font-size:12.5px; width:140px" placeholder="—"></td>` +
-      `<td><select class="select" style="font-size:12.5px"><option selected>Actif</option><option>Non actif</option></select></td>` +
-      `<td><input type="text" class="select" style="font-size:12.5px; width:96px" placeholder="jj/mm/aaaa"></td>` +
-      `<td><input type="text" class="select" style="font-size:12.5px; width:96px" placeholder="jj/mm/aaaa"></td>` +
-      `<td><input type="text" class="select" style="font-size:12.5px; width:150px" placeholder="—"></td>` +
+      `<td><input type="text" class="input" style="font-size:12.5px; width:140px" placeholder="—" oninput="markCptNeedsValidation(this)"></td>` +
+      `<td><input type="date" class="input" style="font-size:12.5px; width:130px"></td>` +
+      `<td><label class="encours-lbl"><input type="checkbox" onchange="toggleEnCours(this)" checked> en cours</label>` +
+      `<input type="date" class="input" style="font-size:12.5px; width:130px" disabled></td>` +
+      `<td><span class="cpt-status encours">En cours de validation</span></td>` +
+      `<td><input type="text" class="input" style="font-size:12.5px; width:150px" placeholder="—"></td>` +
       `<td><button class="icon-action" title="Supprimer" onclick="this.closest('tr').remove()"><i data-lucide="trash-2"></i></button></td>`;
     tbody.appendChild(tr);
     if (window.lucide) lucide.createIcons();
+  }
+
+  // Compteurs — statut de VALIDATION (posé par Naia côté réel ; ici simulé pour la maquette)
+  // États : valide / encours / refuse / na (pas de validation requise = non-réseau)
+  const _cptStatusLabel = { valide: "Validé", encours: "En cours de validation", refuse: "Refusé", na: "—" };
+  function setCptStatus(badge, state) {
+    if (!badge) return;
+    badge.className = "cpt-status " + state;
+    badge.textContent = _cptStatusLabel[state] || "—";
+    badge.title = state === "refuse" ? "Accès refusé — contactez le support (support@naiahydro.com)"
+      : state === "na" ? "Compteur non-réseau — pas de validation d'accès nécessaire" : "";
+  }
+  // Origines dont l'accès doit être validé par Naia (réseau Enedis, Naia Box, partenaire).
+  // Manuel = aucune validation (on saisit soi-même la donnée).
+  const CPT_VALIDATION_ORIGINS = ["GDR", "Naia Box", "Partenaire"];
+  // Changer l'origine : (dé)masque le choix du partenaire + (re)met le bon statut de validation
+  function updateCptStatusFromOrigin(sel) {
+    const tr = sel.closest("tr");
+    const badge = tr.querySelector(".cpt-status");
+    // Choix du partenaire (Hydrosight…) visible uniquement pour l'origine "Partenaire"
+    const partner = sel.closest("td").querySelector(".cpt-partner");
+    if (partner) partner.style.display = (sel.value === "Partenaire") ? "" : "none";
+    if (!badge) return;
+    if (CPT_VALIDATION_ORIGINS.includes(sel.value)) {
+      // changer d'origine = nouvelle connexion à vérifier → on repasse en attente de validation
+      setCptStatus(badge, "encours");
+    } else {
+      setCptStatus(badge, "na");
+    }
+  }
+  // Modifier le code d'un compteur déjà validé (réseau / Naia Box / partenaire) → repasse en attente
+  function markCptNeedsValidation(input) {
+    const tr = input.closest("tr");
+    const origin = tr.querySelector("select");           // 1re liste = Origine
+    const badge = tr.querySelector(".cpt-status");
+    if (origin && CPT_VALIDATION_ORIGINS.includes(origin.value) && badge && !badge.classList.contains("encours")) {
+      setCptStatus(badge, "encours");
+    }
+  }
+  // Enregistrer : s'il reste des compteurs réseau "en cours de validation", on montre le popup de vérif
+  function saveCompteurs() {
+    const pending = document.querySelectorAll("#compteurs-edit-body .cpt-status.encours").length;
+    if (pending > 0) {
+      const lbl = document.getElementById("compteur-verif-count");
+      if (lbl) lbl.textContent = pending > 1 ? ("ces " + pending + " compteurs") : "ce compteur";
+      openOverlay("compteur-verif");
+    } else {
+      alert("Compteurs enregistrés (démo)");
+      closeOverlay("compteurs-edit");
+    }
+  }
+
+  // Compteurs — bascule "en cours" : coche = pas de date de fin (compteur toujours en service)
+  function toggleEnCours(cb) {
+    const dateInput = cb.closest("td").querySelector('input[type="date"]');
+    if (!dateInput) return;
+    if (cb.checked) { dateInput.value = ""; dateInput.disabled = true; }
+    else { dateInput.disabled = false; }
   }
 
   // Régime de vente (brouillon BL)
