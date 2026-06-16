@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin · Membres communauté — Naia</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="css/style.css" rel="stylesheet"><script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body data-page="admin-membres" data-section="admin">
+<div class="app-shell">
+  <aside class="sidebar"></aside>
+  <main class="main-area">
+    <header class="topbar"><div><div class="page-eyebrow">Administration · Programme communauté</div><div style="font-size:18px; font-weight:600">Membres (vue communauté)</div></div><div class="topbar-meta"><div>Cette vue est <b>scope communauté uniquement</b></div><div>Pour le détail abonnement, voir <a class="link" href="admin-abonnements.html">Clients</a></div></div></header>
+    <div class="page-content">
+      <div class="card">
+        <div class="card-head"><div style="display:flex; gap:8px"><select class="select" style="max-width:160px"><option>Tous les tiers</option><option>Bronze</option><option>Argent</option><option>Or</option><option>Platine</option></select><label style="font-size:12px; color:var(--text-muted); display:flex; gap:6px; align-items:center"><input type="checkbox"> Inclure abonnements résiliés</label></div><button class="btn btn-secondary btn-sm"><i data-lucide="download"></i> Export CSV</button></div>
+        <table class="data-table">
+          <thead><tr><th>Org.</th><th>Tier</th><th class="num" style="text-align:right">Points</th><th class="num" style="text-align:right">Conversions</th><th>Dernière activité</th><th>Approb. en attente</th><th>Filleuls</th><th></th></tr></thead>
+          <tbody>
+            <tr><td><b>Centrale de la Semois</b><br><span class="muted" style="font-size:11px">Sophie Legrand · BE</span></td><td><span class="tier-pill tier-gold">Or</span></td><td class="num" style="text-align:right">8 240</td><td class="num" style="text-align:right">3</td><td class="muted">il y a 2 h</td><td>1</td><td>4</td><td><a href="#" class="link" style="font-size:11px">Détails →<br>Subscription</a></td></tr>
+            <tr><td><b>Centrale d'Ariège</b><br><span class="muted" style="font-size:11px">Claire Rousseau · FR</span></td><td><span class="tier-pill tier-gold">Or</span></td><td class="num" style="text-align:right">7 180</td><td class="num" style="text-align:right">5</td><td class="muted">hier</td><td>0</td><td>2</td><td><a href="#" class="link" style="font-size:11px">Détails</a></td></tr>
+            <tr><td><b>Moulin de Hohenberg</b><br><span class="muted" style="font-size:11px">Thomas Müller · DE</span></td><td><span class="tier-pill tier-silver">Argent</span></td><td class="num" style="text-align:right">6 920</td><td class="num" style="text-align:right">4</td><td class="muted">il y a 3 j</td><td>0</td><td>1</td><td><a href="#" class="link" style="font-size:11px">Détails</a></td></tr>
+            <tr><td><b>Moulin du Bocq</b><br><span class="muted" style="font-size:11px">Marc Dupont · BE</span></td><td><span class="tier-pill tier-silver">Argent</span></td><td class="num" style="text-align:right">3 450</td><td class="num" style="text-align:right">1</td><td class="muted">aujourd'hui</td><td>1</td><td>3</td><td><a href="#" class="link" style="font-size:11px">Détails</a></td></tr>
+            <tr><td><b>Petite centrale du Jura</b><br><span class="muted" style="font-size:11px">Camille Boucher · FR</span></td><td><span class="tier-pill tier-silver">Argent</span></td><td class="num" style="text-align:right">3 720</td><td class="num" style="text-align:right">0</td><td class="muted">il y a 8 j</td><td>0</td><td>0</td><td><a href="#" class="link" style="font-size:11px">Détails</a></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="js/app.js"></script>
+</body></html>

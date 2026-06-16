@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin · Client — Naia</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="css/style.css" rel="stylesheet"><script src="https://cdn.tailwindcss.com"></script>
+<style>
+  .cd-section { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 12px; margin-bottom: 12px; }
+  .cd-section-head { padding: 14px 20px; border-bottom: 1px solid var(--border-subtle); display: flex; justify-content: space-between; align-items: center; }
+  .cd-section-title { font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 10px; }
+  .cd-section-body { padding: 18px 20px; }
+  .cd-info-row { display: flex; justify-content: space-between; gap: 16px; padding: 7px 0; border-bottom: 1px solid var(--border-subtle); font-size: 13px; }
+  .cd-info-row:last-child { border-bottom: 0; }
+  .cd-info-row .lbl { color: var(--text-muted); flex-shrink: 0; }
+  .cd-info-row span:last-child { text-align: right; }
+  .timeline-item { display: flex; gap: 14px; padding: 10px 0; border-bottom: 1px solid var(--border-subtle); }
+  .timeline-item:last-child { border-bottom: 0; }
+  .timeline-dot { width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+  .timeline-dot i { width: 14px; height: 14px; }
+  .timeline-main { flex: 1; min-width: 0; }
+  .timeline-title { font-size: 13px; font-weight: 500; }
+  .timeline-meta { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+  .odoo-card { background: linear-gradient(135deg, rgba(167,139,250,0.10), rgba(56,189,248,0.06)); border: 1px solid rgba(167,139,250,0.30); border-radius: 12px; margin-bottom: 12px; }
+</style>
+</head>
+<body data-page="admin-customer" data-section="admin">
+<div class="app-shell">
+  <aside class="sidebar"></aside>
+  <main class="main-area">
+
+    <header class="topbar">
+      <div>
+        <div class="page-eyebrow"><a class="link" href="admin-abonnements.html">Administration · Clients</a> ·  Convert FMG</div>
+        <div style="font-size:18px; font-weight:600; display:flex; align-items:center; gap:10px">
+          Convert FMG <span class="badge badge-green">Actif</span>
+        </div>
+      </div>
+      <div style="display:flex; gap:8px">
+        <button class="btn btn-secondary btn-sm" onclick="openOverlay('edit-subscription')"><i data-lucide="edit-3"></i> Modifier l'abonnement</button>
+        <button class="btn btn-secondary btn-sm" onclick="openOverlay('change-plan')"><i data-lucide="repeat"></i> Changer de plan</button>
+        <button class="btn btn-secondary btn-sm" style="color:var(--accent-red)" onclick="openOverlay('cancel-subscription')"><i data-lucide="x-circle"></i> Annuler</button>
+      </div>
+    </header>
+
+    <div class="page-content" style="max-width:1100px">
+
+      <!-- Top KPI strip -->
+      <div style="display:grid; gap:14px; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); margin-bottom:18px">
+        <div class="kpi-card"><div class="kpi-label">Statut</div><div class="kpi-value" style="font-size:18px">Actif</div><div class="kpi-delta muted">depuis le 14 sept. 2024</div></div>
+        <div class="kpi-card"><div class="kpi-label">Récurrent</div><div class="kpi-value tabular">740 €</div><div class="kpi-delta muted">/ mois HT</div></div>
+        <div class="kpi-card"><div class="kpi-label">Plan</div><div class="kpi-value" style="font-size:16px">Enterprise</div><div class="kpi-delta muted">11 MW · 9 centrales</div></div>
+        <div class="kpi-card"><div class="kpi-label">Renouvellement</div><div class="kpi-value" style="font-size:16px">22 mai 2026</div><div class="kpi-delta muted">cadence mensuelle</div></div>
+        <div class="kpi-card"><div class="kpi-label">Solde jetons (org.)</div><div class="kpi-value tabular">14</div><div class="kpi-delta muted">ledger V1</div></div>
+      </div>
+
+      <!-- PII isolation notice -->
+      <div style="display:flex; gap:12px; align-items:center; padding:10px 16px; background:var(--bg-input); border:1px solid var(--border-subtle); border-radius:10px; margin-bottom:14px; font-size:12px; color:var(--text-muted)">
+        <i data-lucide="shield-check" style="width:16px; color:var(--brand-cyan); flex-shrink:0"></i>
+        <span>Naia ne conserve que le <b>lien vers le contact Odoo</b> et des champs opérationnels. Le nom légal, le n<sup>o</sup> de TVA, l'adresse, l'e-mail de facturation et le bon de commande sont gérés dans <b>Odoo</b> (source de vérité).</span>
+      </div>
+
+      <!-- Two-column layout -->
+      <div style="display:grid; gap:14px; grid-template-columns: 1.4fr 1fr">
+
+        <!-- LEFT COLUMN -->
+        <div>
+
+          <!-- Section: Odoo source of truth -->
+          <div class="odoo-card">
+            <div class="cd-section-body" style="display:flex; gap:14px; align-items:center; padding:16px 20px">
+              <div style="width:44px; height:44px; background:rgba(167,139,250,0.18); border-radius:12px; display:flex; align-items:center; justify-content:center; color:#c4b5fd; flex-shrink:0"><i data-lucide="building-2"></i></div>
+              <div style="flex:1">
+                <div style="font-weight:600; display:flex; align-items:center; gap:8px">Fiche Odoo <span class="badge badge-purple" style="font-size:10px">res.partner</span></div>
+                <div class="muted" style="font-size:12px; margin-top:2px">Nom légal, n<sup>o</sup> de TVA, adresse, e-mail de facturation et bon de commande (PO) sont gérés dans Odoo. Contact lié : <span class="tabular">#res.partner/4182</span>.</div>
+              </div>
+              <a class="btn btn-secondary btn-sm" href="https://odoo.naiahydro.com/odoo/contacts/4182" target="_blank" rel="noopener"><i data-lucide="external-link"></i> Voir le contact Odoo</a>
+            </div>
+          </div>
+
+          <!-- Section: Operational subscription record -->
+          <div class="cd-section">
+            <div class="cd-section-head">
+              <div class="cd-section-title"><i data-lucide="credit-card" style="width:15px; color:var(--brand-cyan)"></i> Abonnement · champs opérationnels</div>
+              <div style="display:flex; gap:6px">
+                <button class="btn btn-secondary btn-sm" onclick="openOverlay('edit-subscription')"><i data-lucide="edit-3"></i> Modifier</button>
+                <button class="btn btn-secondary btn-sm" onclick="openOverlay('change-plan')"><i data-lucide="repeat"></i> Changer de plan</button>
+              </div>
+            </div>
+            <div class="cd-section-body">
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px">
+                <div>
+                  <div class="cd-info-row"><span class="lbl">Statut</span><span><span class="badge badge-green">Actif</span></span></div>
+                  <div class="cd-info-row"><span class="lbl">Mode de facturation</span><span><span class="badge badge-purple">Enterprise</span></span></div>
+                  <div class="cd-info-row"><span class="lbl">Prix applicable</span><span class="tabular">740 € / mois HT</span></div>
+                  <div class="cd-info-row"><span class="lbl">Version de pricing</span><span><a class="link" href="admin-pricing.html">v01</a> · pinnée</span></div>
+                  <div class="cd-info-row"><span class="lbl">Mode / bracket</span><span>Enterprise · palier 10–25 MW</span></div>
+                </div>
+                <div>
+                  <div class="cd-info-row"><span class="lbl">Date de début</span><span>14 sept. 2024</span></div>
+                  <div class="cd-info-row"><span class="lbl">Durée / terme</span><span>Sans engagement</span></div>
+                  <div class="cd-info-row"><span class="lbl">Cadence de facturation</span><span>Mensuelle</span></div>
+                  <div class="cd-info-row"><span class="lbl">Bon de commande (PO)</span><span class="tabular">PO-2024-0917</span></div>
+                  <div class="cd-info-row"><span class="lbl">Date de renouvellement</span><span>22 mai 2026</span></div>
+                </div>
+              </div>
+              <div style="margin-top:14px; padding:10px 12px; background:var(--bg-input); border-radius:8px; font-size:12px; color:var(--text-muted)">
+                Décomposition : 650 € (palier 10–25 MW) + 9 × 10 € (add-on par centrale) = <b>740 € / mois HT</b>.
+                Le n<sup>o</sup> de bon de commande référencé ci-dessus correspond au PO émis dans Odoo.
+              </div>
+            </div>
+          </div>
+
+          <!-- Section: Plants -->
+          <div class="cd-section">
+            <div class="cd-section-head">
+              <div class="cd-section-title"><i data-lucide="zap" style="width:15px; color:var(--brand-cyan)"></i> Centrales <span class="muted" style="font-weight:400">· 9</span></div>
+              <span class="muted" style="font-size:11px">Mandat DSO signé dans Odoo · lien kDrive (FR-DSO-LINK)</span>
+            </div>
+            <div class="cd-section-body" style="padding:0">
+              <table class="data-table" style="font-size:13px">
+                <thead><tr><th>Centrale</th><th>Région</th><th class="num" style="text-align:right">Capacité</th><th>Mandat DSO signé</th><th></th></tr></thead>
+                <tbody>
+                  <tr><td><b>Centrale du Saux</b></td><td class="muted">Ariège</td><td class="num" style="text-align:right">2,4 MW</td><td><a class="link" href="https://kdrive.infomaniak.com/app/share/naia/mandats/saux.pdf" target="_blank" rel="noopener"><i data-lucide="file-text" style="width:12px; height:12px; vertical-align:-2px"></i> Voir le PDF (kDrive)</a></td><td><a class="link" href="plant-detail.html" style="font-size:11px">Détails →</a></td></tr>
+                  <tr><td><b>Microcentrale du Saux</b></td><td class="muted">Ariège</td><td class="num" style="text-align:right">0,5 MW</td><td><a class="link" href="https://kdrive.infomaniak.com/app/share/naia/mandats/microsaux.pdf" target="_blank" rel="noopener"><i data-lucide="file-text" style="width:12px; height:12px; vertical-align:-2px"></i> Voir le PDF (kDrive)</a></td><td><a class="link" href="plant-detail.html" style="font-size:11px">Détails →</a></td></tr>
+                  <tr><td><b>Barrage de Foix</b></td><td class="muted">Ariège</td><td class="num" style="text-align:right">3,1 MW</td><td><a class="link" href="https://kdrive.infomaniak.com/app/share/naia/mandats/foix.pdf" target="_blank" rel="noopener"><i data-lucide="file-text" style="width:12px; height:12px; vertical-align:-2px"></i> Voir le PDF (kDrive)</a></td><td><a class="link" href="plant-detail.html" style="font-size:11px">Détails →</a></td></tr>
+                  <tr><td><b>Centrale de l'Hers</b></td><td class="muted">Ariège</td><td class="num" style="text-align:right">1,8 MW</td><td><span class="badge badge-amber" style="font-size:10px">Lien manquant</span></td><td><a class="link" href="plant-detail.html" style="font-size:11px">Détails →</a></td></tr>
+                  <tr><td colspan="5" style="padding:10px 16px; font-size:12px; color:var(--text-muted)">+ 5 autres centrales · <a class="link" href="plant-detail.html">voir toutes les centrales →</a></td></tr>
+                </tbody>
+              </table>
+              <div style="padding:10px 16px; border-top:1px solid var(--border-subtle); font-size:12px; color:var(--text-muted)">
+                La signature des mandats DSO est réalisée à 100 % dans Odoo. Naia n'affiche qu'un lien kDrive vers le PDF signé — aucun rendu ni suivi de mandat dans l'application.
+              </div>
+            </div>
+          </div>
+
+          <!-- Section: Invoices (Odoo-hosted) -->
+          <div class="cd-section">
+            <div class="cd-section-head">
+              <div class="cd-section-title"><i data-lucide="receipt" style="width:15px; color:var(--brand-cyan)"></i> Factures <span class="muted" style="font-weight:400">· hébergées par Odoo</span></div>
+              <a class="link" style="font-size:12px" href="https://odoo.naiahydro.com/odoo/account-move?partner=4182" target="_blank" rel="noopener">Toutes les factures Odoo →</a>
+            </div>
+            <div class="cd-section-body" style="padding:0">
+              <table class="data-table" style="font-size:13px">
+                <thead><tr><th>Date</th><th>Numéro</th><th class="num" style="text-align:right">TTC</th><th>Statut</th><th></th></tr></thead>
+                <tbody>
+                  <tr><td class="tabular">1 mai 2026</td><td class="tabular">INV/2026/0518</td><td class="num" style="text-align:right">888,00 €</td><td><span class="badge badge-green">Payée</span></td><td><a class="link" href="https://odoo.naiahydro.com/odoo/account-move/0518" target="_blank" rel="noopener" style="font-size:11px"><i data-lucide="file-text" style="width:12px; height:12px; vertical-align:-2px"></i> Voir la facture (Odoo)</a></td></tr>
+                  <tr><td class="tabular">1 avr. 2026</td><td class="tabular">INV/2026/0414</td><td class="num" style="text-align:right">888,00 €</td><td><span class="badge badge-green">Payée</span></td><td><a class="link" href="https://odoo.naiahydro.com/odoo/account-move/0414" target="_blank" rel="noopener" style="font-size:11px"><i data-lucide="file-text" style="width:12px; height:12px; vertical-align:-2px"></i> Voir la facture (Odoo)</a></td></tr>
+                  <tr><td class="tabular">1 mars 2026</td><td class="tabular">INV/2026/0309</td><td class="num" style="text-align:right">888,00 €</td><td><span class="badge badge-green">Payée</span></td><td><a class="link" href="https://odoo.naiahydro.com/odoo/account-move/0309" target="_blank" rel="noopener" style="font-size:11px"><i data-lucide="file-text" style="width:12px; height:12px; vertical-align:-2px"></i> Voir la facture (Odoo)</a></td></tr>
+                </tbody>
+              </table>
+              <div style="padding:10px 16px; border-top:1px solid var(--border-subtle); font-size:12px; color:var(--text-muted)">
+                Odoo émet chaque facture ainsi que le PDF. Naia ne génère ni ne stocke de PDF — chaque ligne pointe vers la facture hébergée dans Odoo.
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- RIGHT COLUMN -->
+        <div>
+
+          <!-- Section: Naia record (operational, non-PII) -->
+          <div class="cd-section">
+            <div class="cd-section-head"><div class="cd-section-title"><i data-lucide="database" style="width:15px; color:var(--brand-cyan)"></i> Fiche Naia (opérationnelle)</div></div>
+            <div class="cd-section-body">
+              <div class="cd-info-row"><span class="lbl">Nom d'affichage</span><span>Convert FMG</span></div>
+              <div class="cd-info-row"><span class="lbl">Contact Odoo lié</span><span><a class="link" href="https://odoo.naiahydro.com/odoo/contacts/4182" target="_blank" rel="noopener">#res.partner/4182 →</a></span></div>
+              <div class="cd-info-row"><span class="lbl">Pays (opérationnel)</span><span>France</span></div>
+              <div class="cd-info-row"><span class="lbl">Capacité totale</span><span class="tabular">11 MW · 9 centrales</span></div>
+              <div class="cd-info-row"><span class="lbl">Utilisateurs Naia</span><span>3</span></div>
+              <div style="margin-top:12px; padding:9px 11px; background:var(--bg-input); border-radius:8px; font-size:11px; color:var(--text-muted); line-height:1.6">
+                <i data-lucide="info" style="width:12px; height:12px; vertical-align:-2px"></i> Aucune donnée personnelle n'est stockée ici. Pour modifier le nom légal, la TVA, l'adresse ou l'e-mail de facturation, ouvrez la <a class="link" href="https://odoo.naiahydro.com/odoo/contacts/4182" target="_blank" rel="noopener">fiche Odoo</a>.
+              </div>
+            </div>
+          </div>
+
+          <!-- Section: Multi-user -->
+          <div class="cd-section">
+            <div class="cd-section-head">
+              <div class="cd-section-title"><i data-lucide="users" style="width:15px; color:var(--brand-cyan)"></i> Utilisateurs de l'organisation</div>
+              <button class="btn btn-secondary btn-sm" onclick="openOverlay('add-user')"><i data-lucide="user-plus"></i> Ajouter</button>
+            </div>
+            <div class="cd-section-body" style="padding:0">
+              <table class="data-table" style="font-size:13px">
+                <thead><tr><th>Utilisateur</th><th>Rôle</th><th></th></tr></thead>
+                <tbody>
+                  <tr>
+                    <td><b>Pierre Lefebvre</b><br><span class="muted" style="font-size:11px">p.lefebvre@convert-fmg.fr</span></td>
+                    <td><span class="badge badge-cyan">Contact principal</span></td>
+                    <td style="text-align:right"><button class="btn btn-ghost btn-sm" onclick="alert('Définir un autre contact principal — à venir')"><i data-lucide="star" style="width:13px"></i></button></td>
+                  </tr>
+                  <tr>
+                    <td><b>Marie Lambert</b><br><span class="muted" style="font-size:11px">m.lambert@convert-fmg.fr</span></td>
+                    <td><span class="badge badge-slate">Membre</span></td>
+                    <td style="text-align:right"><button class="btn btn-ghost btn-sm" style="color:var(--accent-red)" onclick="if(confirm('Retirer Marie Lambert de l\'organisation ?')) alert('Utilisateur retiré — à venir')"><i data-lucide="user-minus" style="width:13px"></i></button></td>
+                  </tr>
+                  <tr>
+                    <td><b>Julien Roy</b><br><span class="muted" style="font-size:11px">j.roy@convert-fmg.fr</span></td>
+                    <td><span class="badge badge-slate">Membre</span></td>
+                    <td style="text-align:right"><button class="btn btn-ghost btn-sm" style="color:var(--accent-red)" onclick="if(confirm('Retirer Julien Roy de l\'organisation ?')) alert('Utilisateur retiré — à venir')"><i data-lucide="user-minus" style="width:13px"></i></button></td>
+                  </tr>
+                </tbody>
+              </table>
+              <div style="padding:9px 16px; border-top:1px solid var(--border-subtle); font-size:11px; color:var(--text-muted)">Le contact principal reçoit les notifications de facturation et de cycle de vie (FR-CUS-3).</div>
+            </div>
+          </div>
+
+          <!-- Section: Audit timeline (FR-CUS-4) -->
+          <div class="cd-section">
+            <div class="cd-section-head"><div class="cd-section-title"><i data-lucide="history" style="width:15px; color:var(--brand-cyan)"></i> Journal d'activité</div><a class="link" style="font-size:11px" href="admin-audit.html?entity=convert-fmg">Audit complet →</a></div>
+            <div class="cd-section-body">
+
+              <div class="timeline-item">
+                <div class="timeline-dot" style="background:rgba(251,191,36,0.18); color:#fcd34d"><i data-lucide="repeat"></i></div>
+                <div class="timeline-main">
+                  <div class="timeline-title">Plan modifié</div>
+                  <div style="font-family:'JetBrains Mono', monospace; font-size:11px; margin-top:4px">
+                    <span class="muted">mode :</span>
+                    <span style="background:rgba(244,63,94,0.12); color:#fda4af; padding:1px 6px; border-radius:4px; text-decoration:line-through">per_plant</span>
+                    <span class="muted">→</span>
+                    <span style="background:rgba(132,204,22,0.18); color:#bef264; padding:1px 6px; border-radius:4px">enterprise</span>
+                  </div>
+                  <div class="timeline-meta">2 mai 2026 · par Ugo D. · raison : «&nbsp;demande Pierre&nbsp;»</div>
+                </div>
+              </div>
+
+              <div class="timeline-item">
+                <div class="timeline-dot" style="background:rgba(56,189,248,0.18); color:#7dd3fc"><i data-lucide="user-plus"></i></div>
+                <div class="timeline-main">
+                  <div class="timeline-title">Utilisateur ajouté · Marie Lambert</div>
+                  <div style="font-family:'JetBrains Mono', monospace; font-size:11px; margin-top:4px">
+                    <span class="muted">rôle :</span>
+                    <span style="background:rgba(132,204,22,0.18); color:#bef264; padding:1px 6px; border-radius:4px">membre</span>
+                  </div>
+                  <div class="timeline-meta">1 mai 2026 · par Pierre Lefebvre (client)</div>
+                </div>
+              </div>
+
+              <div class="timeline-item">
+                <div class="timeline-dot" style="background:rgba(56,189,248,0.18); color:#7dd3fc"><i data-lucide="building-2"></i></div>
+                <div class="timeline-main">
+                  <div class="timeline-title">Contact Odoo lié mis à jour</div>
+                  <div class="timeline-meta">28 avr. 2026 · synchro Odoo · res.partner #4182</div>
+                </div>
+              </div>
+
+              <div class="timeline-item">
+                <div class="timeline-dot" style="background:rgba(56,189,248,0.18); color:#7dd3fc"><i data-lucide="zap"></i></div>
+                <div class="timeline-main">
+                  <div class="timeline-title">Centrale ajoutée · Microcentrale du Saux</div>
+                  <div style="font-family:'JetBrains Mono', monospace; font-size:11px; margin-top:4px">
+                    <span class="muted">capacité totale :</span>
+                    <span style="background:rgba(244,63,94,0.12); color:#fda4af; padding:1px 6px; border-radius:4px; text-decoration:line-through">10,5 MW · 8 centrales</span>
+                    <span class="muted">→</span>
+                    <span style="background:rgba(132,204,22,0.18); color:#bef264; padding:1px 6px; border-radius:4px">11 MW · 9 centrales</span>
+                  </div>
+                  <div class="timeline-meta">15 mars 2026 · par Ugo D.</div>
+                </div>
+              </div>
+
+              <div class="timeline-item">
+                <div class="timeline-dot" style="background:rgba(132,204,22,0.18); color:#bef264"><i data-lucide="check-circle"></i></div>
+                <div class="timeline-main">
+                  <div class="timeline-title">Client créé (statut <span class="tabular">active</span>)</div>
+                  <div class="timeline-meta">14 sept. 2024 · par Bernard L. · contrat signé dans Odoo au préalable</div>
+                </div>
+              </div>
+
+              <div style="text-align:center; margin-top:10px">
+                <a class="link" style="font-size:11px" href="admin-audit.html?entity=convert-fmg">Voir tous les évènements dans l'audit log →</a>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<!-- ===== Modal: Modifier l'abonnement (operational fields only) ===== -->
+<div class="overlay" id="edit-subscription" onclick="if(event.target===this)closeOverlay('edit-subscription')">
+  <div class="modal">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px">
+      <div>
+        <div class="modal-title">Modifier l'abonnement</div>
+        <div class="modal-subtitle">Champs opérationnels uniquement. Les données légales et de facturation se modifient dans Odoo.</div>
+      </div>
+      <button class="btn btn-ghost" onclick="closeOverlay('edit-subscription')"><i data-lucide="x"></i></button>
+    </div>
+    <div style="display:flex; flex-direction:column; gap:14px">
+      <div>
+        <label class="muted" style="font-size:11px; text-transform:uppercase; letter-spacing:0.06em; font-weight:600">Cadence de facturation</label>
+        <select class="select" style="width:100%; margin-top:4px"><option>Mensuelle</option><option>Trimestrielle</option><option>Annuelle</option></select>
+      </div>
+      <div>
+        <label class="muted" style="font-size:11px; text-transform:uppercase; letter-spacing:0.06em; font-weight:600">Bon de commande (PO)</label>
+        <input class="input" style="width:100%; margin-top:4px" value="PO-2024-0917">
+      </div>
+      <div>
+        <label class="muted" style="font-size:11px; text-transform:uppercase; letter-spacing:0.06em; font-weight:600">Date de renouvellement</label>
+        <input class="input" type="date" style="width:100%; margin-top:4px" value="2026-05-22">
+      </div>
+      <div style="padding:10px 12px; background:rgba(167,139,250,0.10); border:1px solid rgba(167,139,250,0.30); border-radius:8px; font-size:12px; color:var(--text-muted)">
+        <i data-lucide="info" style="width:13px; height:13px; vertical-align:-2px"></i> Le nom légal, la TVA, l'adresse et l'e-mail de facturation se modifient dans la <a class="link" href="https://odoo.naiahydro.com/odoo/contacts/4182" target="_blank" rel="noopener">fiche Odoo</a>.
+      </div>
+    </div>
+    <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:18px; padding-top:14px; border-top:1px solid var(--border-subtle)">
+      <button class="btn btn-secondary" onclick="closeOverlay('edit-subscription')">Annuler</button>
+      <button class="btn btn-primary" onclick="closeOverlay('edit-subscription'); alert('Modifications enregistrées — à venir')"><i data-lucide="check"></i> Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Modal: Changer de plan ===== -->
+<div class="overlay" id="change-plan" onclick="if(event.target===this)closeOverlay('change-plan')">
+  <div class="modal">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px">
+      <div>
+        <div class="modal-title">Changer de plan</div>
+        <div class="modal-subtitle">Plan actuel : Enterprise · palier 10–25 MW · 740 € / mois HT · pricing v01.</div>
+      </div>
+      <button class="btn btn-ghost" onclick="closeOverlay('change-plan')"><i data-lucide="x"></i></button>
+    </div>
+    <div style="display:flex; flex-direction:column; gap:14px">
+      <div>
+        <label class="muted" style="font-size:11px; text-transform:uppercase; letter-spacing:0.06em; font-weight:600">Mode de facturation</label>
+        <select class="select" style="width:100%; margin-top:4px"><option>Enterprise</option><option>Per-plant</option></select>
+      </div>
+      <div>
+        <label class="muted" style="font-size:11px; text-transform:uppercase; letter-spacing:0.06em; font-weight:600">Version de pricing</label>
+        <select class="select" style="width:100%; margin-top:4px"><option>v01 · active (pinnée)</option></select>
+        <div class="muted" style="font-size:11px; margin-top:4px">Les barèmes sont gérés dans <a class="link" href="admin-pricing.html">Pricing schedules</a>.</div>
+      </div>
+      <div>
+        <label class="muted" style="font-size:11px; text-transform:uppercase; letter-spacing:0.06em; font-weight:600">Raison du changement</label>
+        <input class="input" style="width:100%; margin-top:4px" placeholder="ex. demande client, ajout de centrales…">
+      </div>
+    </div>
+    <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:18px; padding-top:14px; border-top:1px solid var(--border-subtle)">
+      <button class="btn btn-secondary" onclick="closeOverlay('change-plan')">Annuler</button>
+      <button class="btn btn-primary" onclick="closeOverlay('change-plan'); alert('Changement de plan appliqué — à venir')"><i data-lucide="repeat"></i> Appliquer le changement</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Modal: Annuler l'abonnement ===== -->
+<div class="overlay" id="cancel-subscription" onclick="if(event.target===this)closeOverlay('cancel-subscription')">
+  <div class="modal">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px">
+      <div>
+        <div class="modal-title">Annuler l'abonnement</div>
+        <div class="modal-subtitle">L'abonnement passera à l'état <span class="tabular">cancelled</span>. La facturation récurrente s'arrête.</div>
+      </div>
+      <button class="btn btn-ghost" onclick="closeOverlay('cancel-subscription')"><i data-lucide="x"></i></button>
+    </div>
+    <div style="display:flex; flex-direction:column; gap:14px">
+      <div style="padding:12px; background:rgba(244,63,94,0.08); border:1px solid rgba(244,63,94,0.25); border-radius:8px; font-size:13px; line-height:1.5">
+        <b>Convert FMG</b> perdra l'accès à la plateforme à la fin de la période en cours (22 mai 2026). Les factures déjà émises dans Odoo ne sont pas affectées.
+      </div>
+      <div>
+        <label class="muted" style="font-size:11px; text-transform:uppercase; letter-spacing:0.06em; font-weight:600">Motif d'annulation</label>
+        <select class="select" style="width:100%; margin-top:4px"><option>Demande du client</option><option>Non-renouvellement</option><option>Migration vers un autre outil</option><option>Autre</option></select>
+      </div>
+      <div>
+        <label class="muted" style="font-size:11px; text-transform:uppercase; letter-spacing:0.06em; font-weight:600">Date d'effet</label>
+        <input class="input" type="date" style="width:100%; margin-top:4px" value="2026-05-22">
+      </div>
+    </div>
+    <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:18px; padding-top:14px; border-top:1px solid var(--border-subtle)">
+      <button class="btn btn-secondary" onclick="closeOverlay('cancel-subscription')">Conserver l'abonnement</button>
+      <button class="btn btn-primary" style="background:var(--accent-red)" onclick="closeOverlay('cancel-subscription'); alert('Abonnement programmé pour annulation — à venir')"><i data-lucide="x-circle"></i> Confirmer l'annulation</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Modal: Ajouter un utilisateur ===== -->
+<div class="overlay" id="add-user" onclick="if(event.target===this)closeOverlay('add-user')">
+  <div class="modal">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px">
+      <div>
+        <div class="modal-title">Ajouter un utilisateur</div>
+        <div class="modal-subtitle">L'utilisateur recevra une invitation par e-mail pour rejoindre l'organisation Convert FMG.</div>
+      </div>
+      <button class="btn btn-ghost" onclick="closeOverlay('add-user')"><i data-lucide="x"></i></button>
+    </div>
+    <div style="display:flex; flex-direction:column; gap:14px">
+      <div>
+        <label class="muted" style="font-size:11px; text-transform:uppercase; letter-spacing:0.06em; font-weight:600">Nom complet</label>
+        <input class="input" style="width:100%; margin-top:4px" placeholder="Prénom Nom">
+      </div>
+      <div>
+        <label class="muted" style="font-size:11px; text-transform:uppercase; letter-spacing:0.06em; font-weight:600">E-mail</label>
+        <input class="input" type="email" style="width:100%; margin-top:4px" placeholder="prenom.nom@convert-fmg.fr">
+      </div>
+      <div>
+        <label class="muted" style="font-size:11px; text-transform:uppercase; letter-spacing:0.06em; font-weight:600">Rôle</label>
+        <select class="select" style="width:100%; margin-top:4px"><option>Membre</option><option>Contact principal</option></select>
+      </div>
+    </div>
+    <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:18px; padding-top:14px; border-top:1px solid var(--border-subtle)">
+      <button class="btn btn-secondary" onclick="closeOverlay('add-user')">Annuler</button>
+      <button class="btn btn-primary" onclick="closeOverlay('add-user'); alert('Invitation envoyée — à venir')"><i data-lucide="send"></i> Envoyer l'invitation</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="js/app.js"></script>
+</body></html>

@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Production — Naia</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="css/style.css" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  /* v5c — styles for the Configuration du panneau popup (Bernard's redesign).
+     The pd-section / pd-chev / fld pieces mirror the styles inlined in
+     parametres.html so the popup feels native to the rest of the platform. */
+  .modal-cfg { max-width: 920px; }
+  #chart-config .pd-section { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 12px; margin-bottom: 12px; overflow: hidden; }
+  #chart-config .pd-section-head { padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none; }
+  #chart-config .pd-section-head:hover { background: var(--bg-card-hover); }
+  #chart-config .pd-section-title { font-size: 15px; font-weight: 600; display: flex; align-items: center; gap: 10px; }
+  #chart-config .pd-section-body { padding: 0 20px 20px; border-top: 1px solid var(--border-subtle); padding-top: 18px; }
+  #chart-config .pd-section[data-open="false"] .pd-section-body { display: none; }
+  #chart-config .pd-section[data-open="false"] .pd-chev { transform: rotate(-90deg); }
+  #chart-config .pd-chev { transition: transform 0.18s; color: var(--text-muted); }
+
+  /* Axis blocks — Min/Max per resolution (Intraday / 30 j / 12 mois / Années) */
+  .axis-half-title { font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-primary); margin: 0; display: flex; align-items: center; gap: 8px; }
+  .axis-half-title .swatch { width: 10px; height: 10px; border-radius: 50%; flex: none; }
+  .axis-block { background: var(--bg-base); border: 1px solid var(--border-subtle); border-radius: 10px; padding: 14px 16px; margin-bottom: 14px; }
+  .axis-head { display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none; gap: 10px; }
+  .axis-head-actions { display: flex; align-items: center; gap: 10px; flex: none; }
+  .axis-reset { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-family: inherit; color: var(--text-muted); background: transparent; border: 1px solid var(--border-default); border-radius: 7px; padding: 4px 9px; cursor: pointer; white-space: nowrap; }
+  .axis-reset:hover { color: var(--text-primary); border-color: var(--brand-cyan); }
+  .axis-reset i { width: 12px; height: 12px; }
+  .axis-chev { width: 16px; height: 16px; transition: transform 0.18s; color: var(--text-muted); flex: none; }
+  .axis-body { padding-top: 14px; }
+  .axis-block[data-open="false"] .axis-body { display: none; }
+  .axis-block[data-open="false"] .axis-chev { transform: rotate(-90deg); }
+  .axis-pick { margin-left: 4px; padding: 4px 24px 4px 9px; font-size: 12px; font-family: inherit; font-weight: 500; text-transform: none; letter-spacing: normal; background: var(--bg-input); color: var(--text-primary); border: 1px solid var(--border-default); border-radius: 7px; appearance: none; cursor: pointer; outline: none; background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 7px center; }
+  .axis-pick:focus { border-color: var(--brand-cyan); }
+  .axis-grid { display: grid; grid-template-columns: 3.5rem repeat(4, 1fr); gap: 10px 12px; align-items: end; }
+  .axis-col-header { font-size: 11.5px; font-weight: 500; color: var(--text-muted); line-height: 1.5; }
+  .axis-row-label { font-size: 11.5px; color: var(--text-muted); font-weight: 500; padding-bottom: 9px; }
+  .axis-unit-select { width: 100%; margin-top: 4px; padding: 6px 26px 6px 10px; font-size: 12.5px; font-family: inherit; background: var(--bg-input); color: var(--text-primary); border: 1px solid var(--border-default); border-radius: 8px; cursor: pointer; appearance: none; outline: none; background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 8px center; }
+  .axis-unit-select:focus { border-color: var(--brand-cyan); }
+  .axis-input { width: 100%; padding: 8px 10px; font-size: 13px; text-align: right; background: var(--bg-input); border: 1px solid var(--border-default); border-radius: 8px; color: var(--text-primary); outline: none; box-sizing: border-box; font-family: inherit; -moz-appearance: textfield; }
+  .axis-input::-webkit-outer-spin-button, .axis-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  .axis-input:focus { border-color: var(--brand-cyan); }
+
+  /* Slot tables (Histogramme inversé / Indicateurs courbes / Comparateur) */
+  .slot-table { width: 100%; border-collapse: collapse; }
+  .slot-table th { text-align: left; font-size: 10.5px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; padding: 0 8px 6px; border-bottom: 1px solid var(--border-default); }
+  .slot-table td { padding: 7px 8px; border-bottom: 1px solid var(--border-subtle); vertical-align: middle; }
+  .slot-table .lab-in { width: 100%; padding: 5px 8px; font-size: 12.5px; background: var(--bg-input); border: 1px solid var(--border-default); border-radius: 8px; color: var(--text-primary); outline: none; box-sizing: border-box; }
+  .slot-table .lab-in:focus, .slot-table .sel:focus { border-color: var(--brand-cyan); }
+  .slot-table .sel { width: 100%; font-size: 12.5px; }
+  .range-cell { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .range-in { width: 4.4rem; padding: 4px 6px; font-size: 12px; text-align: right; background: var(--bg-input); border: 1px solid var(--border-default); border-radius: 8px; color: var(--text-primary); outline: none; -moz-appearance: textfield; }
+  .range-in::-webkit-outer-spin-button, .range-in::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  .range-sep, .range-unit { font-size: 11.5px; color: var(--text-muted); }
+  .clamp-lab { display: inline-flex; align-items: center; gap: 5px; font-size: 11.5px; color: var(--text-muted); cursor: pointer; user-select: none; }
+  .reset-link { font-size: 11.5px; color: var(--brand-cyan); cursor: pointer; }
+  .reset-link:hover { text-decoration: underline; }
+  .col-width-lab { width: 12rem; }
+</style>
+</head>
+<body data-page="production" data-section="production" data-centrale="all">
+
+<div class="app-shell">
+  <aside class="sidebar"></aside>
+  <main class="main-area">
+
+    <!-- v5: top header now hosts breadcrumbs + time pills only.
+         The old left "Production · titre" and right "Total / dates" are gone —
+         centrales tabs directly below carry the contextual info. -->
+    <header class="topbar" style="align-items:center">
+      <div class="crumbs">
+        <a href="index.html"><i data-lucide="home" style="width:12px; height:12px"></i></a>
+        <span class="sep">/</span>
+        <a href="index.html">Pilotage</a>
+        <span class="sep">/</span>
+        <span class="current">Production</span>
+      </div>
+
+      <!-- Time-granularity pills with WhatsApp maintenance status dots.
+           - Année / 12 mois / 30 jours: green dot indicates at least one logged event in the window
+           - Intraday dot is clickable + editable (per #229) -->
+      <div class="time-pills" role="tablist" aria-label="Granularité temporelle">
+        <button class="on" onclick="setTimePill(this, 'intraday')">
+          Intraday
+          <span class="pill-dot" title="2 événements WhatsApp aujourd'hui · cliquer pour éditer" onclick="event.stopPropagation(); openOverlay('wa-events')"></span>
+        </button>
+        <button onclick="setTimePill(this, '30j')">
+          30 jours
+          <span class="pill-dot" title="Maintenance enregistrée ce mois-ci"></span>
+        </button>
+        <button onclick="setTimePill(this, '12m')">
+          12 mois
+          <span class="pill-dot" title="Maintenance enregistrée cette année"></span>
+        </button>
+        <button onclick="setTimePill(this, 'annees')">
+          Années
+          <span class="pill-dot" title="Historique WhatsApp"></span>
+        </button>
+      </div>
+    </header>
+
+    <div id="centrale-tabs" class="centrale-tabs"></div>
+
+    <div class="page-content">
+
+      <!-- v5: KPI tiles removed. Only the graph remains.
+           The configuration of THIS chart (axis config, indicators shown) is reached
+           through a discrete sliders icon on the right of the chart toolbar — it is
+           per-user (defines the production view for this user). -->
+
+      <!-- WhatsApp intraday event strip (visible only on Intraday view) -->
+      <div class="wa-strip" id="wa-strip">
+        <i data-lucide="message-circle"></i>
+        <div>
+          <b>2 événements WhatsApp aujourd'hui</b>
+          <span class="wa-meta"> · 09:42 nettoyage grille (Sophie) · 14:18 inspection vanne (Marc)</span>
+        </div>
+        <span class="wa-link" onclick="openOverlay('wa-events')">Voir / éditer →</span>
+      </div>
+
+      <!-- Funnel state 2026-05-31 (platform#647): when a logged-in conference LEAD
+           (community points, no connected plant, no subscription) lands here via their
+           magic link, the chart is greyed/blurred behind a locked overlay with a
+           "Connectez votre centrale" CTA → plaquette. Toggle persona via the "Accès"
+           chip (top-right). Paying customers ("Client") see the chart normally.
+           The .locked-wrap / .locked-content / .lock-overlay structure is driven by
+           body[data-access] — see css/style.css "LOCKED INSIGHT STATE". -->
+      <div class="locked-wrap" style="margin-bottom:14px">
+
+        <!-- Locked overlay — only visible in data-access="lead" -->
+        <div class="lock-overlay">
+          <div class="lock-card">
+            <div class="lock-ico"><i data-lucide="lock"></i></div>
+            <span class="lock-points"><i data-lucide="sparkles" style="width:13px;height:13px"></i> 187 points gagnés au jeu Naia</span>
+            <div class="lock-title">Connectez votre centrale pour voir votre production</div>
+            <div class="lock-desc">
+              Vous êtes connecté, mais aucune centrale n'est encore reliée à votre compte.
+              Activez votre abonnement Naia pour brancher vos données et débloquer l'analyse
+              de production, des pertes et des revenus.
+            </div>
+            <a class="btn btn-primary" href="inscription.html">
+              <i data-lucide="plug-zap"></i> Connectez votre centrale
+            </a>
+            <div class="muted" style="font-size:11px; margin-top:12px">
+              Vos points restent acquis et seront transférés à votre organisation à l'activation.
+            </div>
+          </div>
+        </div>
+
+        <!-- Chart card (v5 polish round 4, matching dev.app.naiahydro.com screenshots from PO):
+             - LEFT slide-out: Indicateurs contextuels (checkbox grid Int./30j/12m/Ann.)
+             - RIGHT slide-out: Légende (loss/event categories with coloured dots)
+             - Each side collapses into a thin vertical strip with rotated label + chevron at top
+             - Bottom-left: MDA / Hydro… quick-comparator pills
+             - Bottom-right: small floating wrench icon for chart configuration
+             - Right-axis toggle stays as a floating pill above the right axis. -->
+      <div class="card locked-content" style="padding:0; overflow:hidden">
+
+        <div class="chart-with-panel" id="chart-with-panel" data-ind="open" data-leg="open">
+
+          <!-- ============== LEFT: Indicateurs contextuels (expanded) ============== -->
+          <div class="indicateurs-panel" id="indicateurs-panel">
+            <div class="indicateurs-panel-title">
+              <span>Indicateurs contextuels</span>
+              <button class="collapse" onclick="toggleIndicateursPanel()" title="Réduire le panneau" aria-label="Réduire"><i data-lucide="chevron-left"></i></button>
+            </div>
+
+            <div class="ind-headers">
+              <span></span><span>Int.</span><span>30j</span><span>12m</span><span>Ann.</span>
+            </div>
+
+            <div class="ind-section">
+              <div class="ind-section-title">Indicateurs inversés</div>
+              <div class="ind-row">
+                <label><span class="swatch" style="background:#60a5fa"></span>Météo</label>
+                <span class="ind-cell"><input type="checkbox" checked></span>
+                <span class="ind-cell"><input type="checkbox" checked></span>
+                <span class="ind-cell"><input type="checkbox" checked></span>
+                <span class="ind-cell"><input type="checkbox" checked></span>
+              </div>
+            </div>
+
+            <div class="ind-section">
+              <div class="ind-section-title">Indicateurs courbes</div>
+              <div class="ind-row">
+                <label><span class="swatch" style="background:#a3e635"></span>Débit</label>
+                <span class="ind-cell"><input type="checkbox" checked></span>
+                <span class="ind-cell"><input type="checkbox" checked></span>
+                <span class="ind-cell"><input type="checkbox" checked></span>
+                <span class="ind-cell"><input type="checkbox" checked></span>
+              </div>
+              <div class="ind-row">
+                <label><span class="swatch" style="background:#c4b5fd"></span>Prix spot de l'électricité</label>
+                <span class="ind-cell"><input type="checkbox"></span>
+                <span class="ind-cell"><input type="checkbox"></span>
+                <span class="ind-cell"><input type="checkbox"></span>
+                <span class="ind-cell"><input type="checkbox"></span>
+              </div>
+            </div>
+
+            <div class="ind-section">
+              <div class="ind-section-title">Comparateurs</div>
+              <div class="ind-row">
+                <label><span class="swatch" style="background:#7dd3fc"></span>AGG DAILY MDA</label>
+                <span class="ind-cell"><input type="checkbox" checked></span>
+                <span class="ind-cell"><input type="checkbox" checked></span>
+                <span class="ind-cell"><input type="checkbox" checked></span>
+                <span class="ind-cell"><input type="checkbox" checked></span>
+              </div>
+              <div class="ind-row">
+                <label><span class="swatch" style="background:#a5b4fc"></span>Centrale ref.</label>
+                <span class="ind-cell"><input type="checkbox"></span>
+                <span class="ind-cell"><input type="checkbox"></span>
+                <span class="ind-cell"><input type="checkbox"></span>
+                <span class="ind-cell"><input type="checkbox"></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- ============== LEFT collapsed strip (shown when indicateurs is collapsed) ============== -->
+          <button class="panel-strip panel-strip-left" id="indicateurs-strip" onclick="toggleIndicateursPanel()" aria-label="Afficher Indicateurs contextuels">
+            <i data-lucide="chevrons-right" class="strip-chev"></i>
+            <span class="strip-label">Indicateurs contextuels</span>
+          </button>
+
+          <!-- ============== CHART AREA ============== -->
+          <div class="chart-area" style="position:relative; height:480px; padding:14px">
+            <button class="right-axis-toggle" id="right-axis-toggle" onclick="toggleRightAxis()" title="Basculer l'axe droit entre Pluie et Débit">
+              <span id="right-axis-label">Pluie (mm)</span>
+              <i data-lucide="arrow-left-right"></i>
+            </button>
+            <div class="chart-container" style="height:100%"><canvas id="production-chart"></canvas></div>
+
+            <!-- Bottom-left: quick comparator pills (MDA = active, Hydro… secondary) -->
+            <div class="quick-comparators">
+              <button class="qc-pill active" title="Comparateur MDA (AGG DAILY)">MDA</button>
+              <button class="qc-pill" title="Comparateur Hydro régional" onclick="alert('Comparateur Hydro régional (démo)')">Hydro…</button>
+            </div>
+
+            <!-- Bottom-right: discrete wrench icon for chart settings -->
+            <button class="chart-config-wrench" onclick="openOverlay('chart-config')" title="Configurer ce graphique"><i data-lucide="wrench"></i></button>
+          </div>
+
+          <!-- ============== RIGHT collapsed strip (shown when légende is collapsed) ============== -->
+          <button class="panel-strip panel-strip-right" id="legende-strip" onclick="toggleLegende()" aria-label="Afficher la Légende">
+            <i data-lucide="chevrons-left" class="strip-chev"></i>
+            <span class="strip-label">Légende</span>
+          </button>
+
+          <!-- ============== RIGHT: Légende (expanded) ============== -->
+          <div class="legende-panel" id="legende-panel">
+            <div class="legende-panel-title">
+              <button class="collapse" onclick="toggleLegende()" title="Réduire le panneau" aria-label="Réduire"><i data-lucide="chevron-right"></i></button>
+              <span>Légende</span>
+            </div>
+            <div class="legende-items">
+              <div class="legende-item"><span class="dot" style="background:#3b82f6"></span>Production</div>
+              <div class="legende-item"><span class="dot" style="background:#ef4444"></span>Pannes</div>
+              <div class="legende-item"><span class="dot" style="background:#10b981"></span>Maintenance</div>
+              <div class="legende-item"><span class="dot" style="background:#a855f7"></span>Environnement</div>
+              <div class="legende-item"><span class="dot" style="background:#ec4899"></span>Exploitation</div>
+              <div class="legende-item"><span class="dot" style="background:#eab308"></span>Structurel</div>
+              <div class="legende-item"><span class="dot" style="background:#94a3b8"></span>Contraintes</div>
+              <div class="legende-item"><span class="dot" style="background:#dc2626"></span>Données manquantes</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+      </div><!-- /.locked-wrap -->
+
+      <!-- v5: "Pertes détectées · top 5" table removed from this page.
+           It now lives as one of the report types in "Générer un rapport"
+           (see Tableau de bord). -->
+      <div class="muted" style="font-size:12.5px; padding:10px 14px; border:1px dashed var(--border-subtle); border-radius:8px; display:flex; gap:10px; align-items:center">
+        <i data-lucide="info" style="width:14px; height:14px"></i>
+        Le <b>top 5 des pertes détectées</b> est désormais disponible depuis
+        <a href="index.html" class="link">Tableau de bord → Générer un rapport</a>.
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<!-- ============================== OVERLAYS ============================== -->
+
+<!-- Chart configuration overlay (per-user) — Bernard's redesign (Designs-wireframes#1).
+     Per-resolution axis Min/Max + units, Histogramme inversé / Indicateurs courbes
+     slot tables, Comparateur slot table with %-of-axis range + scale factor,
+     and a WhatsApp section placeholder. Reached from the bottom-right wrench icon
+     and from the icon-action sliders button. -->
+<div id="chart-config" class="overlay" onclick="if(event.target===this) closeOverlay('chart-config')">
+  <div class="modal modal-lg modal-cfg">
+
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:18px">
+      <div>
+        <div class="modal-title"><i data-lucide="sliders-horizontal" style="width:17px; height:17px; vertical-align:-3px; color:var(--brand-cyan)"></i> Configuration du panneau</div>
+        <div class="modal-subtitle">
+          Définit la vue <b>Production</b> pour <b>Marc Dupont</b> uniquement.
+          Les autres utilisateurs gardent leur propre configuration.
+        </div>
+      </div>
+      <button class="btn btn-ghost" onclick="closeOverlay('chart-config')"><i data-lucide="x"></i></button>
+    </div>
+
+    <!-- ============ Axe ============ -->
+    <div class="pd-section" data-open="true">
+      <div class="pd-section-head" onclick="toggleCfgSec(this)">
+        <div class="pd-section-title"><i data-lucide="ruler" style="width:16px; height:16px; color:var(--brand-cyan)"></i> Axe</div>
+        <i data-lucide="chevron-down" class="pd-chev"></i>
+      </div>
+      <div class="pd-section-body">
+
+        <!-- Axe gauche -->
+        <div class="axis-block" data-open="true">
+          <div class="axis-head" onclick="toggleCfgAxis(this)">
+            <div class="axis-half-title"><span class="swatch" style="background:#1d4ed8"></span>Axe gauche — Puissance / Énergie</div>
+            <div class="axis-head-actions">
+              <button class="axis-reset" onclick="resetCfgAxis(event, this)"><i data-lucide="rotate-ccw"></i> Réinitialiser</button>
+              <i data-lucide="chevron-down" class="axis-chev"></i>
+            </div>
+          </div>
+          <div class="axis-body">
+            <div class="axis-grid">
+              <div></div>
+              <div class="axis-col-header">Intraday<br><select class="axis-unit-select"><option>kW</option><option>MW</option></select></div>
+              <div class="axis-col-header">30 jours<br><select class="axis-unit-select"><option>kWh</option><option selected>MWh</option><option>GWh</option></select></div>
+              <div class="axis-col-header">12 mois<br><select class="axis-unit-select"><option selected>MWh</option><option>GWh</option></select></div>
+              <div class="axis-col-header">Années<br><select class="axis-unit-select"><option selected>MWh</option><option>GWh</option></select></div>
+
+              <div class="axis-row-label">Min</div>
+              <input class="axis-input" type="number" value="0"><input class="axis-input" type="number" value="0"><input class="axis-input" type="number" value="0"><input class="axis-input" type="number" value="0">
+
+              <div class="axis-row-label">Max</div>
+              <input class="axis-input" type="number" value="450"><input class="axis-input" type="number" value="120"><input class="axis-input" type="number" value="1200"><input class="axis-input" type="number" value="9000">
+            </div>
+          </div>
+        </div>
+
+        <!-- Axe droit 1 — Pluie -->
+        <div class="axis-block" data-open="true">
+          <div class="axis-head" onclick="toggleCfgAxis(this)">
+            <div class="axis-half-title"><span class="swatch" style="background:var(--accent-amber)"></span>Axe droit 1 — Pluie</div>
+            <div class="axis-head-actions">
+              <button class="axis-reset" onclick="resetCfgAxis(event, this)"><i data-lucide="rotate-ccw"></i> Réinitialiser</button>
+              <i data-lucide="chevron-down" class="axis-chev"></i>
+            </div>
+          </div>
+          <div class="axis-body">
+            <div class="axis-grid">
+              <div></div>
+              <div class="axis-col-header">Intraday<br><select class="axis-unit-select"><option selected>mm</option><option>cm</option><option>m</option></select></div>
+              <div class="axis-col-header">30 jours<br><select class="axis-unit-select"><option selected>mm</option><option>cm</option><option>m</option></select></div>
+              <div class="axis-col-header">12 mois<br><select class="axis-unit-select"><option selected>mm</option><option>cm</option><option>m</option></select></div>
+              <div class="axis-col-header">Années<br><select class="axis-unit-select"><option selected>mm</option><option>cm</option><option>m</option></select></div>
+
+              <div class="axis-row-label">Min</div>
+              <input class="axis-input" type="number" value="0"><input class="axis-input" type="number" value="0"><input class="axis-input" type="number" value="0"><input class="axis-input" type="number" value="0">
+
+              <div class="axis-row-label">Max</div>
+              <input class="axis-input" type="number" value="40"><input class="axis-input" type="number" value="120"><input class="axis-input" type="number" value="300"><input class="axis-input" type="number" value="1500">
+            </div>
+          </div>
+        </div>
+
+        <!-- Axe droit 2 — indicateur au choix -->
+        <div class="axis-block" data-open="true">
+          <div class="axis-head" onclick="toggleCfgAxis(this)">
+            <div class="axis-half-title"><span class="swatch" style="background:#a78bfa"></span>Axe droit 2 —<select class="axis-pick" onclick="event.stopPropagation()">
+              <option selected>Débit rivière (m³/s)</option>
+              <option>Spot Belpex (€/MWh)</option>
+              <option>Niveau rivière (m)</option>
+              <option>Température (°C)</option>
+            </select></div>
+            <div class="axis-head-actions">
+              <button class="axis-reset" onclick="resetCfgAxis(event, this)"><i data-lucide="rotate-ccw"></i> Réinitialiser</button>
+              <i data-lucide="chevron-down" class="axis-chev"></i>
+            </div>
+          </div>
+          <div class="axis-body">
+            <div class="axis-grid">
+              <div></div>
+              <div class="axis-col-header">Intraday<br><select class="axis-unit-select"><option selected>m³/s</option></select></div>
+              <div class="axis-col-header">30 jours<br><select class="axis-unit-select"><option selected>m³/s</option></select></div>
+              <div class="axis-col-header">12 mois<br><select class="axis-unit-select"><option selected>m³/s</option></select></div>
+              <div class="axis-col-header">Années<br><select class="axis-unit-select"><option selected>m³/s</option></select></div>
+
+              <div class="axis-row-label">Min</div>
+              <input class="axis-input" type="number" value="0"><input class="axis-input" type="number" value="0"><input class="axis-input" type="number" value="0"><input class="axis-input" type="number" value="0">
+
+              <div class="axis-row-label">Max</div>
+              <input class="axis-input" type="number" value="20"><input class="axis-input" type="number" value="20"><input class="axis-input" type="number" value="20"><input class="axis-input" type="number" value="20">
+            </div>
+          </div>
+        </div>
+
+        <p class="muted" style="font-size:12px; margin:4px 0 0">
+          <i data-lucide="info" style="width:12px; height:12px; vertical-align:-1px"></i>
+          Bornes définies <b>par résolution</b> (Intraday / 30 j / 12 mois / Années). Laisser à 0 = échelle automatique côté backend.
+        </p>
+      </div>
+    </div>
+
+    <!-- ============ Indicateurs contextuels ============ -->
+    <div class="pd-section" data-open="true">
+      <div class="pd-section-head" onclick="toggleCfgSec(this)">
+        <div class="pd-section-title"><i data-lucide="activity" style="width:16px; height:16px; color:var(--brand-cyan)"></i> Indicateurs contextuels</div>
+        <i data-lucide="chevron-down" class="pd-chev"></i>
+      </div>
+      <div class="pd-section-body">
+
+        <!-- Histogramme inversé (slots 1-2) -->
+        <div class="axis-block" data-open="true">
+          <div class="axis-head" onclick="toggleCfgAxis(this)">
+            <div class="axis-half-title"><i data-lucide="bar-chart-3" style="width:13px; height:13px; transform:scaleY(-1)"></i>Histogramme inversé</div>
+            <i data-lucide="chevron-down" class="axis-chev"></i>
+          </div>
+          <div class="axis-body">
+            <table class="slot-table">
+              <thead><tr><th class="col-width-lab">Étiquette</th><th>Source de données</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td><input class="lab-in" type="text" value="Pluie bassin"></td>
+                  <td><select class="select sel"><option>—</option><option selected>Pluie bassin versant (mm)</option><option>Pluie radar (mm)</option></select></td>
+                </tr>
+                <tr>
+                  <td><input class="lab-in" type="text" placeholder="Précipitations 2"></td>
+                  <td><select class="select sel"><option selected>—</option><option>Pluie station Météo-France</option></select></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Indicateurs courbes (slots 3-5) -->
+        <div class="axis-block" data-open="true">
+          <div class="axis-head" onclick="toggleCfgAxis(this)">
+            <div class="axis-half-title"><i data-lucide="trending-up" style="width:13px; height:13px"></i>Indicateurs courbes</div>
+            <i data-lucide="chevron-down" class="axis-chev"></i>
+          </div>
+          <div class="axis-body">
+            <table class="slot-table">
+              <thead><tr><th class="col-width-lab">Étiquette</th><th>Source de données</th><th>Plage visible</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td><input class="lab-in" type="text" value="Débit rivière"></td>
+                  <td><select class="select sel"><option>—</option><option selected>Débit rivière (m³/s)</option><option>Niveau rivière (m)</option><option>Production théorique (kW)</option></select></td>
+                  <td>
+                    <div class="range-cell">
+                      <input class="range-in" type="number" value="2"><span class="range-sep">—</span><input class="range-in" type="number" value="18">
+                      <span class="range-unit">m³/s</span>
+                      <label class="clamp-lab"><input type="checkbox"> Rogner</label>
+                      <span class="reset-link">Réinit.</span>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td><input class="lab-in" type="text" value="Spot Belpex"></td>
+                  <td><select class="select sel"><option>—</option><option selected>Spot Belpex (€/MWh)</option><option>Niveau rivière (m)</option></select></td>
+                  <td>
+                    <div class="range-cell">
+                      <input class="range-in" type="number" value="-20"><span class="range-sep">—</span><input class="range-in" type="number" value="180">
+                      <span class="range-unit">€/MWh</span>
+                      <label class="clamp-lab"><input type="checkbox" checked> Rogner</label>
+                      <span class="reset-link">Réinit.</span>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td><input class="lab-in" type="text" placeholder="Courbe 3"></td>
+                  <td><select class="select sel"><option selected>—</option><option>Température (°C)</option><option>Production théorique (kW)</option></select></td>
+                  <td>
+                    <div class="range-cell">
+                      <input class="range-in" type="number" placeholder="Min" disabled><span class="range-sep">—</span><input class="range-in" type="number" placeholder="Max" disabled>
+                      <label class="clamp-lab" style="opacity:.45"><input type="checkbox" disabled> Rogner</label>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ Comparateur ============ -->
+    <div class="pd-section" data-open="true">
+      <div class="pd-section-head" onclick="toggleCfgSec(this)">
+        <div class="pd-section-title"><i data-lucide="git-compare" style="width:16px; height:16px; color:var(--brand-cyan)"></i> Comparateur</div>
+        <i data-lucide="chevron-down" class="pd-chev"></i>
+      </div>
+      <div class="pd-section-body">
+        <table class="slot-table">
+          <thead><tr><th class="col-width-lab">Étiquette</th><th>Source de données</th><th>Plage visible (% de l'axe)</th><th>Facteur d'échelle</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><input class="lab-in" type="text" value="AGG DAILY MDA"></td>
+              <td><select class="select sel"><option>—</option><option selected>Benchmark régional (AGG DAILY)</option><option>Production N-1</option><option>Centrale amie · La Cassagne</option></select></td>
+              <td>
+                <div class="range-cell">
+                  <input class="range-in" type="number" value="100"><span class="range-unit">%</span>
+                  <label class="clamp-lab"><input type="checkbox" checked> Rogner</label>
+                  <span class="reset-link">Réinit.</span>
+                </div>
+              </td>
+              <td><div class="range-cell"><input class="range-in" type="number" step="0.01" value="1.00"><span class="reset-link">Réinit.</span></div></td>
+            </tr>
+            <tr>
+              <td><input class="lab-in" type="text" placeholder="Comparateur 2"></td>
+              <td><select class="select sel"><option selected>—</option><option>Production N-1</option><option>Centrale amie · La Cassagne</option></select></td>
+              <td>
+                <div class="range-cell">
+                  <input class="range-in" type="number" placeholder="100" disabled><span class="range-unit">%</span>
+                  <label class="clamp-lab" style="opacity:.45"><input type="checkbox" disabled> Rogner</label>
+                </div>
+              </td>
+              <td><div class="range-cell"><input class="range-in" type="number" step="0.01" placeholder="—" disabled></div></td>
+            </tr>
+          </tbody>
+        </table>
+        <p class="muted" style="font-size:12px; margin:12px 0 0">
+          <i data-lucide="info" style="width:12px; height:12px; vertical-align:-1px"></i>
+          La plage est exprimée en <b>% de l'axe de production</b> ; le facteur d'échelle ajuste la mise à l'échelle de la série comparée.
+        </p>
+      </div>
+    </div>
+
+    <!-- ============ Message WhatsApp ============ -->
+    <div class="pd-section" data-open="false">
+      <div class="pd-section-head" onclick="toggleCfgSec(this)">
+        <div class="pd-section-title"><i data-lucide="message-circle" style="width:16px; height:16px; color:var(--brand-cyan)"></i> Message WhatsApp</div>
+        <i data-lucide="chevron-down" class="pd-chev"></i>
+      </div>
+      <div class="pd-section-body">
+        <div style="display:flex; align-items:center; gap:10px; padding:18px; justify-content:center; color:var(--text-muted); font-size:13px; background:var(--bg-base); border:1px dashed var(--border-default); border-radius:10px">
+          <i data-lucide="hard-hat" style="width:16px; height:16px"></i> En cours de construction
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex; gap:8px; justify-content:flex-end; align-items:center; margin-top:18px; padding-top:14px; border-top:1px solid var(--border-subtle)">
+      <button class="btn btn-ghost" onclick="closeOverlay('chart-config')">Annuler</button>
+      <button class="btn btn-primary" onclick="alert('Vue enregistrée pour Marc Dupont (démo)'); closeOverlay('chart-config')"><i data-lucide="check"></i> Enregistrer ma vue</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // v5c — Bernard's chart-config popup interactions (Designs-wireframes#1).
+  function toggleCfgSec(head)  { const s = head.parentElement; s.dataset.open = s.dataset.open === 'true' ? 'false' : 'true'; }
+  function toggleCfgAxis(head) { const b = head.parentElement; b.dataset.open = b.dataset.open === 'true' ? 'false' : 'true'; }
+  function resetCfgAxis(e, btn){ e.stopPropagation(); btn.closest('.axis-block').querySelectorAll('.axis-input').forEach(i => i.value = 0); }
+</script>
+
+<!-- WhatsApp events overlay — intraday dot is clickable + editable per #229 -->
+<div id="wa-events" class="overlay" onclick="if(event.target===this) closeOverlay('wa-events')">
+  <div class="modal">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px">
+      <div>
+        <div class="modal-title"><i data-lucide="message-circle" style="width:16px; height:16px; vertical-align:-2px; color:var(--accent-green)"></i> Événements WhatsApp · aujourd'hui</div>
+        <div class="modal-subtitle">
+          Maintenance et inspections poussées depuis le groupe WhatsApp de la centrale.
+          Cf. <a href="https://github.com/hydro-software/platform/issues/229" class="link" target="_blank">issue #229</a>.
+        </div>
+      </div>
+      <button class="btn btn-ghost" onclick="closeOverlay('wa-events')"><i data-lucide="x"></i></button>
+    </div>
+
+    <table class="data-table" style="margin-bottom:14px">
+      <thead><tr><th>Heure</th><th>Auteur</th><th>Catégorie</th><th>Note</th><th></th></tr></thead>
+      <tbody>
+        <tr>
+          <td class="tabular">09:42</td>
+          <td>Sophie Legrand</td>
+          <td><span class="badge badge-amber">Maintenance</span></td>
+          <td>Nettoyage grille amont · 25 min</td>
+          <td><a class="link" style="font-size:12px">Éditer</a></td>
+        </tr>
+        <tr>
+          <td class="tabular">14:18</td>
+          <td>Marc Dupont</td>
+          <td><span class="badge badge-cyan">Inspection</span></td>
+          <td>Vanne secondaire — RAS</td>
+          <td><a class="link" style="font-size:12px">Éditer</a></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div style="display:flex; gap:8px; justify-content:space-between; align-items:center; padding-top:12px; border-top:1px solid var(--border-subtle)">
+      <button class="btn btn-secondary btn-sm"><i data-lucide="plus"></i> Ajouter un événement</button>
+      <button class="btn btn-primary btn-sm" onclick="closeOverlay('wa-events')">Fermer</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="js/app.js"></script>
+
+<script>
+  // ---- Time-pill granularity ----
+  let currentPill = "intraday";
+  function setTimePill(btn, pill) {
+    document.querySelectorAll(".time-pills button").forEach(b => b.classList.remove("on"));
+    btn.classList.add("on");
+    currentPill = pill;
+    // Show / hide the intraday-only WhatsApp event strip
+    const strip = document.getElementById("wa-strip");
+    if (strip) strip.style.display = pill === "intraday" ? "" : "none";
+  }
+
+  // ---- Side panels (Indicateurs contextuels + Légende) ----
+  // Match dev.app.naiahydro.com: each panel collapses into a thin vertical strip with
+  // a rotated label + chevron at top. The strip click re-expands the panel.
+  // Container has two data attributes: data-ind="open|collapsed" and data-leg="open|collapsed".
+  function toggleIndicateursPanel() { _flipPanel("ind"); }
+  function toggleLegende()          { _flipPanel("leg"); }
+  function _flipPanel(side) {
+    const wrap = document.getElementById("chart-with-panel");
+    const cur = wrap.dataset[side === "ind" ? "ind" : "leg"];
+    const next = cur === "open" ? "collapsed" : "open";
+    if (side === "ind") wrap.dataset.ind = next;
+    else                wrap.dataset.leg = next;
+  }
+
+  // ---- Right-axis toggle (moved to a floating chip above the right axis) ----
+  let rightAxis = "pluie";
+  function toggleRightAxis() {
+    rightAxis = rightAxis === "pluie" ? "debit" : "pluie";
+    document.getElementById("right-axis-label").textContent = rightAxis === "pluie" ? "Pluie (mm)" : "Débit (m³/s)";
+  }
+</script>
+</body>
+</html>

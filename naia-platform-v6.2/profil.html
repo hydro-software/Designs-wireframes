@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mon profil — Naia</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="css/style.css" rel="stylesheet"><script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body data-page="profil" data-section="profil">
+<div class="app-shell">
+  <aside class="sidebar"></aside>
+  <main class="main-area">
+    <header class="topbar"><div><div class="page-eyebrow">Profil</div><div style="font-size:18px; font-weight:600">Mon profil</div></div></header>
+
+    <!-- Profile sub-tabs.
+         v5 update: Sécurité tab removed (moved into the Paramètres utilisateur tile on Identité).
+         Mes badges tab removed (badges live on the Identité page directly).
+         MVP toggle: subscription tabs (Mon abonnement, Mes factures, Mes jetons)
+         carry data-mvp="1" — hidden in MVP 0.9. -->
+    <div class="centrale-tabs">
+      <a class="centrale-tab active" href="profil.html"><span>Identité</span></a>
+      <a class="centrale-tab" href="profil-abonnement.html" data-mvp="1"><span>Mon abonnement</span></a>
+      <a class="centrale-tab" href="profil-factures.html"   data-mvp="1"><span>Mes factures</span></a>
+      <a class="centrale-tab" href="profil-jetons.html"     data-mvp="1"><span>Mes jetons</span></a>
+    </div>
+
+    <div class="page-content">
+
+      <!-- v5: flex layout so the Mon organisation card collapses cleanly in MVP 0.9
+           (when hidden via data-mvp="1") and the two remaining cards split the row. -->
+      <div style="display:flex; flex-wrap:wrap; gap:14px; align-items:stretch">
+
+        <div class="card" style="flex: 2 1 380px">
+          <div class="card-head"><div class="card-head-title">Identité</div><button class="btn btn-secondary btn-sm"><i data-lucide="edit-3"></i> Modifier</button></div>
+          <div class="card-body">
+            <div style="display:flex; gap:14px; align-items:center; padding-bottom:14px; border-bottom:1px solid var(--border-subtle); margin-bottom:14px">
+              <div class="avatar" style="width:54px; height:54px; font-size:18px">MD</div>
+              <div>
+                <div style="font-weight:600; font-size:18px">Marc Dupont</div>
+                <div class="muted" style="font-size:13px">marc.dupont@moulin.be</div>
+                <div style="margin-top:6px; display:flex; gap:6px" data-mvp="1"><span class="badge badge-purple"><i data-lucide="shield"></i> Pionnier hydro</span><span class="badge badge-green"><i data-lucide="flame"></i> Série 30 j</span></div>
+              </div>
+            </div>
+
+            <div style="display:flex; flex-direction:column; gap:0">
+              <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--border-subtle)"><span class="muted">Organisation</span><span>Moulin du Bocq</span></div>
+              <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--border-subtle)"><span class="muted">Pays</span><span>Belgique</span></div>
+              <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--border-subtle)"><span class="muted">Rôle organisation</span><span>Owner-operator</span></div>
+              <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--border-subtle)"><span class="muted">Membre depuis</span><span>mars 2024</span></div>
+              <div style="display:flex; justify-content:space-between; padding:8px 0" data-mvp="1"><span class="muted">Code parrainage org.</span><span style="font-family: monospace">MB-2026</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mon organisation — read-only summary.
+             v6.2 descope: legal details (raison sociale, TVA, adresse, email de facturation)
+             are the source of truth in Odoo (res.partner). Naia shows a read-only mirror only;
+             editing happens in Odoo. Member / primary-contact management stays in Naia (FR-CUS-3).
+             Community points/tier are unchanged. -->
+        <div class="card" style="flex: 1.4 1 300px">
+          <div class="card-head"><div class="card-head-title">Mon organisation</div></div>
+          <div class="card-body">
+            <div style="display:flex; gap:14px; align-items:center; padding-bottom:14px; border-bottom:1px solid var(--border-subtle); margin-bottom:14px">
+              <div class="avatar" style="width:48px; height:48px; font-size:16px">MB</div>
+              <div><div style="font-weight:600">Moulin du Bocq</div><div class="muted" style="font-size:12px">2 utilisateurs · 1 centrale</div></div>
+            </div>
+
+            <!-- Read-only legal summary mirrored from Odoo -->
+            <div style="display:flex; align-items:flex-start; gap:8px; padding:10px 12px; background:rgba(56,189,248,0.06); border:1px solid rgba(56,189,248,0.18); border-radius:8px; margin-bottom:12px">
+              <i data-lucide="info" style="width:14px; height:14px; color:var(--brand-cyan); flex-shrink:0; margin-top:2px"></i>
+              <div class="muted" style="font-size:11.5px; line-height:1.5">Les informations légales (raison sociale, TVA, adresse, email de facturation) sont gérées dans <b>Odoo</b>, notre source de référence. Naia en affiche un résumé en lecture seule.</div>
+            </div>
+            <div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid var(--border-subtle)"><span class="muted">Raison sociale</span><span>Moulin du Bocq SRL</span></div>
+            <div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid var(--border-subtle)"><span class="muted">N<sup>o</sup> TVA</span><span class="tabular">BE0123.456.789</span></div>
+            <div style="display:flex; justify-content:space-between; gap:14px; padding:6px 0; border-bottom:1px solid var(--border-subtle)"><span class="muted">Adresse</span><span style="text-align:right; font-size:13px">Rue du Bocq 12<br>5530 Yvoir, Belgique</span></div>
+            <div style="display:flex; justify-content:space-between; padding:6px 0"><span class="muted">Email de facturation</span><span style="font-size:12px">compta@moulin.be</span></div>
+
+            <!-- Community points / tier — unchanged -->
+            <div style="display:flex; justify-content:space-between; padding:6px 0; border-top:1px solid var(--border-subtle); margin-top:12px" data-mvp="1"><span class="muted">Naia points (org.)</span><span class="points-pill"><i data-lucide="sparkles"></i><span class="tabular">3 450</span></span></div>
+            <div style="display:flex; justify-content:space-between; padding:6px 0" data-mvp="1"><span class="muted">Tier</span><span class="tier-pill tier-silver">Argent</span></div>
+            <div style="display:flex; justify-content:space-between; padding:6px 0" data-mvp="1"><span class="muted">Plan d'abonnement</span><span>Per-plant · 210 kW</span></div>
+
+            <a href="profil-abonnement.html" class="btn btn-secondary btn-block" style="margin-top:14px" data-mvp="1">Gérer l'abonnement</a>
+          </div>
+        </div>
+
+        <!-- v5: Paramètres utilisateur tile.
+             Replaces the old Sécurité tab + the theme/language entries that used to live
+             in the profile dropdown. Always visible in both MVP 0.9 and MVP 1. -->
+        <div class="card" style="flex: 1 1 260px">
+          <div class="card-head"><div class="card-head-title">Paramètres utilisateur</div></div>
+          <div class="card-body" style="display:flex; flex-direction:column; gap:14px">
+
+            <!-- Sécurité / MFA -->
+            <div>
+              <div style="font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em; font-weight:600; margin-bottom:6px"><i data-lucide="shield" style="width:12px; height:12px; vertical-align:-1px"></i> Sécurité</div>
+              <div style="display:flex; justify-content:space-between; align-items:center; gap:10px">
+                <div>
+                  <div style="font-size:13px; font-weight:500">Authentification à deux facteurs (MFA)</div>
+                  <div class="muted" style="font-size:11.5px">Application TOTP (Google Authenticator, 1Password, etc.)</div>
+                </div>
+                <span class="badge badge-amber">À activer</span>
+              </div>
+              <button class="btn btn-secondary btn-sm" style="margin-top:8px"><i data-lucide="key"></i> Configurer MFA</button>
+            </div>
+
+            <div style="height:1px; background:var(--border-subtle)"></div>
+
+            <!-- Langue -->
+            <div>
+              <div style="font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em; font-weight:600; margin-bottom:6px"><i data-lucide="globe" style="width:12px; height:12px; vertical-align:-1px"></i> Langue</div>
+              <select class="select"><option selected>Français</option><option>Nederlands</option><option>English</option><option>Deutsch</option></select>
+            </div>
+
+            <div style="height:1px; background:var(--border-subtle)"></div>
+
+            <!-- Thème -->
+            <div>
+              <div style="font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em; font-weight:600; margin-bottom:6px"><i data-lucide="palette" style="width:12px; height:12px; vertical-align:-1px"></i> Thème</div>
+              <div class="seg" style="display:inline-flex; background:var(--bg-input); border-radius:8px; padding:3px; gap:1px">
+                <button data-theme-btn="dark" onclick="setTheme('dark')" style="padding:5px 12px; font-size:12px; border:0; background:transparent; color:var(--text-muted); border-radius:6px; cursor:pointer; font-family:inherit"><i data-lucide="moon" style="width:13px; height:13px; vertical-align:-2px; margin-right:4px"></i>Sombre</button>
+                <button data-theme-btn="light" onclick="setTheme('light')" style="padding:5px 12px; font-size:12px; border:0; background:transparent; color:var(--text-muted); border-radius:6px; cursor:pointer; font-family:inherit"><i data-lucide="sun" style="width:13px; height:13px; vertical-align:-2px; margin-right:4px"></i>Clair</button>
+              </div>
+            </div>
+
+            <div style="height:1px; background:var(--border-subtle); margin-top:auto"></div>
+
+            <button class="btn btn-secondary btn-sm" style="color:var(--accent-red)" onclick="alert('Déconnexion (démo)')"><i data-lucide="log-out"></i> Se déconnecter</button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- v6.2 (FR-CUS-3): multi-user / membres + primary-contact management — kept in Naia.
+           Naia owns operational user accounts; the legal billing contact lives in Odoo. -->
+      <div class="card" style="margin-top:14px">
+        <div class="card-head">
+          <div class="card-head-title">Utilisateurs de l'organisation</div>
+          <button class="btn btn-primary btn-sm" onclick="openOverlay('invite-user')"><i data-lucide="user-plus"></i> Inviter un utilisateur</button>
+        </div>
+        <table class="data-table">
+          <thead><tr><th>Utilisateur</th><th>Email</th><th>Rôle</th><th>Contact principal</th><th>Dernière connexion</th><th></th></tr></thead>
+          <tbody>
+            <tr>
+              <td><div style="display:flex; gap:10px; align-items:center"><div class="avatar" style="width:30px; height:30px; font-size:12px">MD</div><b>Marc Dupont</b></div></td>
+              <td class="muted" style="font-size:12px">marc.dupont@moulin.be</td>
+              <td><span class="badge badge-blue">Administrateur</span></td>
+              <td><span class="badge badge-green"><i data-lucide="star"></i> Contact principal</span></td>
+              <td class="muted">aujourd'hui</td>
+              <td><button class="btn btn-ghost btn-sm" onclick="alert('Gestion de l\'utilisateur — à venir')"><i data-lucide="settings-2"></i></button></td>
+            </tr>
+            <tr>
+              <td><div style="display:flex; gap:10px; align-items:center"><div class="avatar" style="width:30px; height:30px; font-size:12px">SL</div><b>Sophie Laurent</b></div></td>
+              <td class="muted" style="font-size:12px">sophie.laurent@moulin.be</td>
+              <td><span class="badge badge-slate">Membre</span></td>
+              <td><button class="btn btn-ghost btn-sm" onclick="alert('Définir Sophie Laurent comme contact principal — à venir')"><i data-lucide="star"></i> Définir</button></td>
+              <td class="muted">il y a 3 j</td>
+              <td><button class="btn btn-ghost btn-sm" onclick="alert('Gestion de l\'utilisateur — à venir')"><i data-lucide="settings-2"></i></button></td>
+            </tr>
+          </tbody>
+        </table>
+        <div style="padding:12px 18px; border-top:1px solid var(--border-subtle); font-size:12px" class="muted">
+          Le <b>contact principal</b> reçoit les notifications opérationnelles de Naia. L'email de facturation, lui, est géré dans Odoo.
+        </div>
+      </div>
+
+      <h3 style="font-size:13px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em; font-weight:600; margin: 22px 0 10px" data-mvp="1">Mes badges (Marc)</h3>
+      <div style="display:grid; gap:14px; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr))" data-mvp="1">
+        <div class="card" style="text-align:center; padding:18px">
+          <div style="width:56px; height:56px; margin:0 auto 10px; background:linear-gradient(135deg,#8b5cf6,#6d28d9); border-radius:50%; display:flex; align-items:center; justify-content:center; color:white; box-shadow:0 6px 16px -4px rgba(139,92,246,0.4)"><i data-lucide="shield" style="width:24px; height:24px"></i></div>
+          <div style="font-weight:600; font-size:13px">Pionnier hydro</div>
+          <div class="muted" style="font-size:11px; margin-top:4px">100 premiers membres</div>
+        </div>
+        <div class="card" style="text-align:center; padding:18px">
+          <div style="width:56px; height:56px; margin:0 auto 10px; background:linear-gradient(135deg,#f59e0b,#d97706); border-radius:50%; display:flex; align-items:center; justify-content:center; color:white"><i data-lucide="flame" style="width:24px; height:24px"></i></div>
+          <div style="font-weight:600; font-size:13px">Série de 30 jours</div>
+          <div class="muted" style="font-size:11px; margin-top:4px">Connexion quotidienne</div>
+        </div>
+        <div class="card" style="text-align:center; padding:18px; opacity:0.5">
+          <div style="width:56px; height:56px; margin:0 auto 10px; background:rgba(255,255,255,0.06); border-radius:50%; display:flex; align-items:center; justify-content:center"><i data-lucide="lock" style="width:22px; height:22px; color: var(--text-subtle)"></i></div>
+          <div style="font-weight:600; font-size:13px">Game Master</div>
+          <div class="muted" style="font-size:11px; margin-top:4px">Top 10 % au jeu Naia</div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<!-- Invite user modal (FR-CUS-3) -->
+<div class="overlay" id="invite-user">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-head">
+      <div>
+        <div class="page-eyebrow">Mon organisation</div>
+        <div style="font-size:16px; font-weight:600">Inviter un utilisateur</div>
+      </div>
+      <button class="icon-btn" onclick="closeOverlay('invite-user')"><i data-lucide="x"></i></button>
+    </div>
+    <div class="modal-body">
+      <p class="muted" style="font-size:13px; margin-bottom:14px; line-height:1.6">L'invité recevra un email pour créer son compte et rejoindre <b>Moulin du Bocq</b>. Il aura accès aux données de l'organisation selon son rôle.</p>
+      <div style="display:flex; flex-direction:column; gap:14px">
+        <div>
+          <label class="muted" style="font-size:11px; text-transform:uppercase; letter-spacing:0.06em; font-weight:600">Email de l'invité</label>
+          <input class="input" type="email" placeholder="prenom.nom@moulin.be" style="width:100%; margin-top:4px">
+        </div>
+        <div>
+          <label class="muted" style="font-size:11px; text-transform:uppercase; letter-spacing:0.06em; font-weight:600">Rôle</label>
+          <select class="select" style="margin-top:4px"><option>Membre</option><option>Administrateur</option></select>
+          <div class="muted" style="font-size:11px; margin-top:4px">Un administrateur peut gérer les utilisateurs et l'abonnement ; un membre consulte et utilise les données.</div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-secondary" onclick="closeOverlay('invite-user')">Annuler</button>
+      <button class="btn btn-primary" onclick="closeOverlay('invite-user'); alert('Invitation envoyée (démo)')"><i data-lucide="send"></i> Envoyer l'invitation</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="js/app.js"></script>
+</body></html>
