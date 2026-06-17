@@ -11,6 +11,7 @@ Interactive HTML wireframes / clickable prototypes for **Naia** (hydro-software)
 | | v5 | Reference (conference scope) | https://hydro-software.github.io/Designs-wireframes/naia-platform/v5/ |
 | | v4 | Reference (first integrated) | https://hydro-software.github.io/Designs-wireframes/naia-platform/v4/ |
 | | v3 | Reference (settings redesign) | https://hydro-software.github.io/Designs-wireframes/naia-platform/v3/ |
+| | v0 | Archive (first wireframe doc, 2025) | https://hydro-software.github.io/Designs-wireframes/naia-platform/v0/ |
 | **Community** (standalone, archived) | v1 | Archived — folded into platform | https://hydro-software.github.io/Designs-wireframes/naia-community/v1/ |
 | | v2 | Archived (partial) | https://hydro-software.github.io/Designs-wireframes/naia-community/v2/ |
 | **Conference game** | — | Separate artifact | https://hydro-software.github.io/Designs-wireframes/conference-game/ |
@@ -22,11 +23,11 @@ The integrated app is the **`naia-platform/`** lineage (Insight / Pilotage · Co
 ```
 Designs-wireframes/
 ├── README.md             this file — index + changelog
-├── naia-platform/        integrated app: v3 v4 v5 v6.1 v6.2  (v6.2 = current)
-│   └── v5/bl_draft/       Bernard's original Paramètres drafts
+├── naia-platform/        integrated app: v0 v3 v4 v5 v6.1 v6.2  (v6.2 = current)
+│   ├── v0/               first wireframe document (2025, static screenshots)
+│   └── v5/bl_draft/      Bernard's original Paramètres drafts
 ├── naia-community/        standalone community/loyalty wireframes (archived): v1 v2
-├── conference-game/       separate game artifact
-└── wireframe-img/         shared image assets
+└── conference-game/       separate game artifact
 ```
 
 `naia-platform/` and `naia-community/` each have an `index.html` that redirects to the current version.
@@ -78,6 +79,10 @@ Canonical mockup after the April 2026 review and ADR-001 (one integrated app, th
 ## v3 — settings redesign prototype *(reference)*
 
 First working HTML prototype, for the settings redesign ([platform#261](https://github.com/hydro-software/platform/issues/261) v3): dashboard with KPIs + 30-day chart + configuration panel drawer, plant list, plant detail with type-aware indicator/comparator modals, and the data-import picker + CSV drop zone.
+
+## v0 — first wireframe document *(archive, 2025)*
+
+The original 2025 wireframe document — **static screenshots** (not interactive HTML) of the very first Naia home views: day / intraday / month charts, legends, loss details & interpretation, indicator editing, and statistics. Kept as the historical starting point of the design; viewable as a gallery at [`naia-platform/v0/`](https://hydro-software.github.io/Designs-wireframes/naia-platform/v0/).
 
 ---
 

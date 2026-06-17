@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Naia — v0 · document de wireframe (2025)</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{ --navy:#0a1326; --card:#13203b; --border:rgba(255,255,255,0.10); --text:#e8eefb; --muted:#9fb0cc; --cyan:#38bdf8; --amber:#fbbf24; }
+  *{box-sizing:border-box}
+  body{ margin:0; font-family:Inter,system-ui,sans-serif; background:
+      radial-gradient(1100px 600px at 80% -10%, rgba(56,189,248,0.10), transparent 60%), var(--navy);
+    color:var(--text); -webkit-font-smoothing:antialiased; padding:44px 22px 72px; }
+  .wrap{max-width:1040px; margin:0 auto}
+  header{display:flex; align-items:center; gap:18px; margin-bottom:10px}
+  header img{height:48px; width:auto}
+  .eyebrow{font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--cyan); font-weight:600}
+  h1{font-size:26px; margin:6px 0 0; font-weight:700; letter-spacing:-0.01em}
+  .note{display:flex; gap:10px; align-items:flex-start; margin:18px 0 6px; padding:12px 14px;
+    background:rgba(251,191,36,0.10); border:1px solid rgba(251,191,36,0.30); border-radius:10px;
+    font-size:13px; color:var(--text); line-height:1.55; max-width:80ch}
+  .note b{color:var(--amber)}
+  .back{display:inline-block; margin-top:14px; font-size:13px; color:var(--cyan); text-decoration:none}
+  .back:hover{text-decoration:underline}
+  h2{font-size:13px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); font-weight:600;
+    margin:38px 0 14px; padding-bottom:8px; border-bottom:1px solid var(--border)}
+  figure{margin:0 0 22px; background:var(--card); border:1px solid var(--border); border-radius:12px; overflow:hidden}
+  figure img{display:block; width:100%; height:auto}
+  figcaption{font-size:12.5px; color:var(--muted); padding:10px 14px; border-top:1px solid var(--border)}
+  footer{margin-top:40px; padding-top:18px; border-top:1px solid var(--border); color:var(--muted); font-size:12px}
+  footer a{color:var(--cyan); text-decoration:none}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <img src="LOGO.png" alt="Naia">
+      <div>
+        <div class="eyebrow">naia-platform · v0</div>
+        <h1>Document de wireframe — 2025</h1>
+      </div>
+    </header>
+
+    <div class="note">
+      <span><b>Archive.</b> Tout premier document de wireframe de Naia (2025), antérieur aux maquettes interactives. Ce sont des <b>captures statiques</b> (pas de HTML interactif). Conservé comme référence historique&nbsp;; la version courante est <a href="../v6.2/" style="color:var(--cyan)">naia-platform/v6.2</a>.</span>
+    </div>
+    <a class="back" href="../../">← Toutes les maquettes</a>
+
+    <h2>Accueil · vue jour</h2>
+    <figure><img src="HOME_day.png" alt="Accueil — vue jour" loading="lazy"><figcaption>Accueil · vue jour</figcaption></figure>
+
+    <h2>Accueil · vue intraday</h2>
+    <figure><img src="HOME_intraday.png" alt="Accueil — vue intraday" loading="lazy"><figcaption>Accueil · vue intraday</figcaption></figure>
+    <figure><img src="HOME_intraday_curve.png" alt="Intraday — courbe" loading="lazy"><figcaption>Intraday · courbe</figcaption></figure>
+    <figure><img src="HOME_intraday_curve_save.png" alt="Intraday — courbe (enregistrement)" loading="lazy"><figcaption>Intraday · courbe (enregistrement)</figcaption></figure>
+    <figure><img src="HOME_intraday_legend.png" alt="Intraday — légende" loading="lazy"><figcaption>Intraday · légende</figcaption></figure>
+    <figure><img src="HOME_intraday_polyline.png" alt="Intraday — polyligne" loading="lazy"><figcaption>Intraday · polyligne</figcaption></figure>
+    <figure><img src="HOME_intraday_point_1.png" alt="Intraday — point 1" loading="lazy"><figcaption>Intraday · point (1)</figcaption></figure>
+    <figure><img src="HOME_intraday_point_3.png" alt="Intraday — point 3" loading="lazy"><figcaption>Intraday · point (3)</figcaption></figure>
+    <figure><img src="HOME_intraday_loss_details.png" alt="Intraday — détails des pertes" loading="lazy"><figcaption>Intraday · détails des pertes</figcaption></figure>
+    <figure><img src="HOME_intraday_loss_interpretation.png" alt="Intraday — interprétation des pertes" loading="lazy"><figcaption>Intraday · interprétation des pertes</figcaption></figure>
+    <figure><img src="HOME_intraday_loss_undefined.png" alt="Intraday — perte non définie" loading="lazy"><figcaption>Intraday · perte non définie</figcaption></figure>
+
+    <h2>Accueil · vue mois</h2>
+    <figure><img src="HOME_month.png" alt="Accueil — vue mois" loading="lazy"><figcaption>Accueil · vue mois</figcaption></figure>
+    <figure><img src="HOME_month_indicator.png" alt="Mois — indicateur" loading="lazy"><figcaption>Mois · indicateur</figcaption></figure>
+    <figure><img src="HOME_month_indicator_mod.png" alt="Mois — indicateur (modification)" loading="lazy"><figcaption>Mois · indicateur (modification)</figcaption></figure>
+    <figure><img src="HOME_month_indicator_post_mod.png" alt="Mois — indicateur (après modification)" loading="lazy"><figcaption>Mois · indicateur (après modification)</figcaption></figure>
+    <figure><img src="HOME_month_legend.png" alt="Mois — légende" loading="lazy"><figcaption>Mois · légende</figcaption></figure>
+    <figure><img src="HOME_month_legend_mod.png" alt="Mois — légende (modification)" loading="lazy"><figcaption>Mois · légende (modification)</figcaption></figure>
+
+    <h2>Statistiques</h2>
+    <figure><img src="Statistics.png" alt="Statistiques" loading="lazy"><figcaption>Statistiques</figcaption></figure>
+
+    <footer>
+      Naia — premier document de wireframe (2025) · archive. Maquette courante&nbsp;: <a href="../v6.2/">naia-platform/v6.2</a> · <a href="../../">index</a>
+    </footer>
+  </div>
+</body>
+</html>
