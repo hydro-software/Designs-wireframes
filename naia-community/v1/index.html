@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tableau de bord — Naia Points</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body data-portal="member" data-page="dashboard" data-title="Bonjour, Marc 👋" data-subtitle="Voici votre activité Naia Points pour cette semaine">
+  <section id="page-content">
+
+    <!-- Hero KPIs -->
+    <div class="grid gap-4 mb-6" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr))">
+      <div class="kpi-card feature">
+        <div class="kpi-label">Solde actuel</div>
+        <div class="kpi-value tabular">3 450 <span style="font-size:14px; font-weight:500; color:rgba(255,255,255,0.6)">pts</span></div>
+        <div class="kpi-delta up"><i data-lucide="trending-up" style="width:14px;height:14px"></i> +380 cette semaine</div>
+      </div>
+      <div class="kpi-card">
+        <div class="flex justify-between items-start">
+          <div class="flex-1">
+            <div class="kpi-label">Niveau</div>
+            <div class="kpi-value" style="font-size:22px">Argent</div>
+            <div class="kpi-delta muted" style="color:var(--naia-text-muted)">Plus que <b class="tabular">550 pts</b> vers Or</div>
+          </div>
+          <div class="kpi-icon" style="background:#fef3c7; color:#92400e">
+            <i data-lucide="award" style="width:20px;height:20px"></i>
+          </div>
+        </div>
+        <div class="progress mt-3"><div class="progress-fill" style="width:72%"></div></div>
+      </div>
+      <div class="kpi-card">
+        <div class="flex justify-between items-start">
+          <div>
+            <div class="kpi-label">Rang communauté</div>
+            <div class="kpi-value">#14</div>
+            <div class="kpi-delta up"><i data-lucide="arrow-up" style="width:14px;height:14px"></i> +3 places</div>
+          </div>
+          <div class="kpi-icon" style="background:#dcfce7; color:#15803d">
+            <i data-lucide="trophy" style="width:20px;height:20px"></i>
+          </div>
+        </div>
+      </div>
+      <div class="kpi-card">
+        <div class="flex justify-between items-start">
+          <div>
+            <div class="kpi-label">Série de connexion</div>
+            <div class="kpi-value">23 <span style="font-size:14px; font-weight:500; color:var(--naia-text-muted)">jours</span></div>
+            <div class="kpi-delta up"><i data-lucide="flame" style="width:14px;height:14px; color:#f97316"></i> Record personnel</div>
+          </div>
+          <div class="kpi-icon" style="background:#ffedd5; color:#ea580c">
+            <i data-lucide="calendar-check" style="width:20px;height:20px"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chart + Activity feed -->
+    <div class="grid gap-4 mb-6" style="grid-template-columns: 2fr 1fr">
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <div class="card-head-title">Évolution de vos points</div>
+            <div class="text-sm muted">12 dernières semaines</div>
+          </div>
+          <div class="flex items-center gap-4 text-xs muted">
+            <span class="flex items-center gap-2"><span class="dot" style="width:10px;height:10px;border-radius:50%;background:#8DC63F;display:inline-block"></span>Gagnés</span>
+            <span class="flex items-center gap-2"><span class="dot" style="width:10px;height:10px;border-radius:50%;background:#f59e0b;display:inline-block"></span>Dépensés</span>
+            <span class="flex items-center gap-2"><span class="dot" style="width:10px;height:10px;border-radius:50%;background:#00B4D8;display:inline-block"></span>Solde</span>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="chart-container" style="min-height:320px">
+            <canvas id="points-chart"></canvas>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <div class="card-head-title">Activité récente</div>
+          <a class="link text-xs">Tout voir</a>
+        </div>
+        <div class="card-body" style="padding-top:6px; padding-bottom:6px">
+          <div class="activity-item">
+            <div class="activity-icon" style="background:#cffafe; color:#0e7490"><i data-lucide="bar-chart-3"></i></div>
+            <div class="activity-main">
+              <div class="activity-title">Analyse des pertes générée</div>
+              <div class="activity-meta">Aujourd'hui, 14:23 · Centrale du Bocq</div>
+            </div>
+            <div class="activity-points">+100</div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-icon" style="background:#dcfce7; color:#15803d"><i data-lucide="users"></i></div>
+            <div class="activity-main">
+              <div class="activity-title">Réponse forum approuvée</div>
+              <div class="activity-meta">Hier, 09:12</div>
+            </div>
+            <div class="activity-points">+50</div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-icon" style="background:#ede9fe; color:#5b21b6"><i data-lucide="book-open"></i></div>
+            <div class="activity-main">
+              <div class="activity-title">Newsletter d'avril lue</div>
+              <div class="activity-meta">16 avril</div>
+            </div>
+            <div class="activity-points">+25</div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-icon" style="background:#fef3c7; color:#92400e"><i data-lucide="gift"></i></div>
+            <div class="activity-main">
+              <div class="activity-title">Échange : session expert marché</div>
+              <div class="activity-meta">12 avril · Approuvé</div>
+            </div>
+            <div class="activity-points negative">−500</div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-icon" style="background:#cffafe; color:#0e7490"><i data-lucide="activity"></i></div>
+            <div class="activity-main">
+              <div class="activity-title">Série de 30 j données complètes</div>
+              <div class="activity-meta">10 avril · Centrale du Bocq</div>
+            </div>
+            <div class="activity-points">+200</div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-icon" style="background:#fce7f3; color:#9d174d"><i data-lucide="user-plus"></i></div>
+            <div class="activity-main">
+              <div class="activity-title">Filleul activé : P. Renard</div>
+              <div class="activity-meta">8 avril · Parrainage</div>
+            </div>
+            <div class="activity-points">+100</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick actions + Upcoming -->
+    <div class="grid gap-4" style="grid-template-columns: 1.5fr 1fr">
+      <div class="card">
+        <div class="card-head">
+          <div class="card-head-title">Actions rapides</div>
+          <span class="text-xs muted">Gagnez des points dès aujourd'hui</span>
+        </div>
+        <div class="card-body grid gap-3" style="grid-template-columns: repeat(2, 1fr)">
+          <a href="earn.html" class="tile">
+            <div class="tile-head">
+              <span class="badge badge-cat-platform"><i data-lucide="bar-chart-3"></i> Plateforme</span>
+              <span class="activity-points">+100</span>
+            </div>
+            <div class="tile-title">Lancer une analyse de pertes</div>
+            <div class="tile-desc">Générez un rapport sur Naia Insight pour identifier vos gisements de performance.</div>
+          </a>
+          <a href="visits.html" class="tile">
+            <div class="tile-head">
+              <span class="badge badge-cat-community"><i data-lucide="map-pin"></i> Communauté</span>
+              <span class="activity-points">+500</span>
+            </div>
+            <div class="tile-title">Proposer une visite de centrale</div>
+            <div class="tile-desc">Ouvrez votre centrale à d'autres opérateurs et partagez votre retour d'expérience.</div>
+          </a>
+          <a href="community.html" class="tile">
+            <div class="tile-head">
+              <span class="badge badge-cat-community"><i data-lucide="message-square"></i> Communauté</span>
+              <span class="activity-points">+150</span>
+            </div>
+            <div class="tile-title">Publier un article de connaissance</div>
+            <div class="tile-desc">Partagez une astuce ou un retour d'expérience avec la communauté.</div>
+          </a>
+          <a href="earn.html" class="tile">
+            <div class="tile-head">
+              <span class="badge badge-cat-referral"><i data-lucide="user-plus"></i> Parrainage</span>
+              <span class="activity-points">+1 000</span>
+            </div>
+            <div class="tile-title">Inviter un nouvel opérateur</div>
+            <div class="tile-desc">Parrainez un abonné Naia Insight et gagnez 1 000 points à son activation.</div>
+          </a>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <div class="card-head-title">Prochaine visite</div>
+          <a href="visits.html" class="link text-xs">Voir toutes les visites</a>
+        </div>
+        <div class="card-body" style="padding:0">
+          <div class="visit-image v2" style="border-radius:0">
+            <div class="visit-date-stamp">
+              <div class="d">06</div>
+              <div class="m">Mai</div>
+            </div>
+          </div>
+          <div style="padding:16px 20px 18px">
+            <div class="visit-title">Centrale de Marche-les-Dames</div>
+            <div class="visit-meta mt-2">
+              <span><i data-lucide="map-pin"></i> Namur, BE</span>
+              <span><i data-lucide="zap"></i> 480 kW</span>
+              <span><i data-lucide="users"></i> 6 places</span>
+            </div>
+            <p class="text-sm muted mt-3" style="line-height:1.5">Visite technique d'une centrale basse chute rénovée en 2024. Focus sur la turbine Kaplan et l'instrumentation.</p>
+            <div class="flex items-center justify-between mt-4">
+              <span class="activity-points">+200 à l'inscription</span>
+              <button class="btn btn-primary btn-sm" onclick="alert('Demande d\'inscription envoyée — en attente d\'approbation par l\'hôte')">
+                <i data-lucide="calendar-plus"></i> S'inscrire
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

@@ -46,17 +46,17 @@ function buildSidebar() {
     </div>
 
     <nav class="px-3 flex-1 flex flex-col gap-1 mt-2 overflow-y-auto">
-      <a href="../naia-v3/index.html" class="sidebar-item">
+      <a href="../../naia-platform/v3/index.html" class="sidebar-item">
         <i data-lucide="layout-dashboard"></i> Tableau de bord
       </a>
-      <a href="../naia-v3/data-import.html" class="sidebar-item">
+      <a href="../../naia-platform/v3/data-import.html" class="sidebar-item">
         <i data-lucide="upload"></i> Données
       </a>
 
       <div class="sidebar-section-title">Communauté</div>
       <div class="subnav-wrap" id="community-subnav"></div>
 
-      <a href="../naia-v3/settings.html" class="sidebar-item" style="margin-top:6px">
+      <a href="../../naia-platform/v3/settings.html" class="sidebar-item" style="margin-top:6px">
         <i data-lucide="settings"></i> Paramètres
       </a>
     </nav>

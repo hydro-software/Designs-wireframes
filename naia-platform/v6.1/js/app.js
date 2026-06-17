@@ -655,7 +655,7 @@ function injectSupersededBanner() {
   document.head.appendChild(s);
   var b = document.createElement("div");
   b.id = "superseded-banner";
-  b.innerHTML = "<span><b>Maquette v6.1</b> — remplacée par la <b>v6.2</b> (descope abonnement V2.0)</span> <a href=\"../naia-platform-v6.2/index.html\">Ouvrir la v6.2 →</a>";
+  b.innerHTML = "<span><b>Maquette v6.1</b> — remplacée par la <b>v6.2</b> (descope abonnement V2.0)</span> <a href=\"../v6.2/index.html\">Ouvrir la v6.2 →</a>";
   document.body.appendChild(b);
 }
 

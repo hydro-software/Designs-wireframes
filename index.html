@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Naia — wireframes & prototypes</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#0a1326; --navy-2:#0f1a32; --card:#13203b; --border:rgba(255,255,255,0.10);
+    --text:#e8eefb; --muted:#9fb0cc; --cyan:#38bdf8; --lime:#a3e635; --amber:#fbbf24;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; font-family:Inter,system-ui,sans-serif; background:
+      radial-gradient(1100px 600px at 80% -10%, rgba(56,189,248,0.12), transparent 60%),
+      radial-gradient(900px 500px at 0% 0%, rgba(163,230,53,0.06), transparent 55%), var(--navy);
+    color:var(--text); -webkit-font-smoothing:antialiased; min-height:100vh;
+    font-feature-settings:"cv11","ss01"; padding:48px 22px 64px;
+  }
+  .wrap{max-width:960px; margin:0 auto}
+  header{margin-bottom:36px}
+  .eyebrow{font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--cyan); font-weight:600}
+  h1{font-size:30px; margin:8px 0 6px; font-weight:700; letter-spacing:-0.01em}
+  .sub{color:var(--muted); font-size:15px; max-width:62ch; line-height:1.55}
+  h2{font-size:13px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); font-weight:600; margin:34px 0 14px}
+  .grid{display:grid; gap:14px; grid-template-columns:repeat(auto-fill,minmax(220px,1fr))}
+  a.card{
+    display:block; text-decoration:none; color:inherit; background:var(--card);
+    border:1px solid var(--border); border-radius:14px; padding:18px 18px 16px;
+    transition:border-color .16s, transform .16s, box-shadow .16s;
+  }
+  a.card:hover{border-color:var(--cyan); transform:translateY(-2px); box-shadow:0 14px 30px -18px rgba(0,0,0,.7)}
+  .card .v{font-size:18px; font-weight:700}
+  .card .d{color:var(--muted); font-size:12.5px; margin-top:4px; line-height:1.5}
+  .pill{display:inline-block; font-size:10.5px; font-weight:700; letter-spacing:.04em; padding:2px 8px; border-radius:999px; margin-bottom:10px}
+  .pill.active{background:rgba(163,230,53,0.16); color:var(--lime); border:1px solid rgba(163,230,53,0.35)}
+  .pill.ref{background:rgba(159,176,204,0.12); color:var(--muted); border:1px solid var(--border)}
+  .pill.arch{background:rgba(251,191,36,0.14); color:var(--amber); border:1px solid rgba(251,191,36,0.35)}
+  .feature{grid-column:1/-1; background:
+    linear-gradient(120deg, rgba(56,189,248,0.10), transparent 55%), var(--card);
+    border-color:rgba(56,189,248,0.30)}
+  .feature .v{font-size:22px}
+  .row{display:flex; flex-wrap:wrap; gap:10px}
+  a.mini{
+    text-decoration:none; color:var(--muted); font-size:13px; font-weight:500;
+    background:var(--navy-2); border:1px solid var(--border); border-radius:999px; padding:7px 14px;
+    transition:color .15s, border-color .15s;
+  }
+  a.mini:hover{color:var(--text); border-color:var(--cyan)}
+  footer{margin-top:42px; padding-top:18px; border-top:1px solid var(--border); color:var(--muted); font-size:12px; line-height:1.6}
+  footer a{color:var(--cyan); text-decoration:none}
+  code{background:var(--navy-2); border:1px solid var(--border); border-radius:5px; padding:1px 5px; font-size:12px}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="eyebrow">hydro-software · Designs-wireframes</div>
+      <h1>Naia — wireframes &amp; prototypes</h1>
+      <p class="sub">Clickable HTML prototypes for the Naia integrated app, the standalone community wireframes, and the conference game. Static, no build step — pick a prototype below.</p>
+    </header>
+
+    <h2>Platform — integrated app</h2>
+    <div class="grid">
+      <a class="card feature" href="naia-platform/v6.2/">
+        <span class="pill active">Active</span>
+        <div class="v">v6.2 — current</div>
+        <div class="d">Subscription descoped to PRD v2.0. The version under active iteration. See the <a href="naia-platform/README.md" style="color:var(--cyan)">consolidated changelog</a> for the full history.</div>
+      </a>
+      <a class="card" href="naia-platform/v6.1/"><span class="pill ref">Reference</span><div class="v">v6.1</div><div class="d">Pre-descope (Bernard's Paramètres rework).</div></a>
+      <a class="card" href="naia-platform/v5/"><span class="pill ref">Reference</span><div class="v">v5</div><div class="d">Post May-2026 team review (conference scope).</div></a>
+      <a class="card" href="naia-platform/v4/"><span class="pill ref">Reference</span><div class="v">v4</div><div class="d">First integrated mockup (ADR-001).</div></a>
+      <a class="card" href="naia-platform/v3/"><span class="pill ref">Reference</span><div class="v">v3</div><div class="d">Settings redesign prototype (#261).</div></a>
+    </div>
+
+    <h2>Community — standalone (archived)</h2>
+    <div class="grid">
+      <a class="card" href="naia-community/v1/"><span class="pill arch">Archived</span><div class="v">Naia Points v1</div><div class="d">Full member + admin portal. Folded into the platform.</div></a>
+      <a class="card" href="naia-community/v2/"><span class="pill arch">Archived</span><div class="v">Naia Points v2</div><div class="d">Partial (5 of 9 pages). Superseded.</div></a>
+    </div>
+
+    <h2>Other</h2>
+    <div class="row">
+      <a class="mini" href="conference-game/">🎮 Conference game</a>
+      <a class="mini" href="bl_draft/">📝 bl_draft (Paramètres drafts)</a>
+    </div>
+
+    <footer>
+      Edit a folder, push to <code>main</code> → GitHub Pages rebuilds in ~60 s. Only <code>naia-platform/v6.2/</code> is actively edited; older folders are frozen references.
+      <br>Repo: <a href="https://github.com/hydro-software/Designs-wireframes">hydro-software/Designs-wireframes</a> · Changelog: <a href="naia-platform/README.md">naia-platform/README.md</a>
+    </footer>
+  </div>
+</body>
+</html>

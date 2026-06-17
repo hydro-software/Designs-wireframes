@@ -5,7 +5,7 @@
 <title>Données (ingestion) — BL draft · MVP 0.9</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <!-- copie du MVP 0.9 — on réutilise EXACTEMENT la feuille de style + le JS de la maquette v5 de Jan -->
-<link href="../naia-platform-v5/css/style.css" rel="stylesheet"><script src="https://cdn.tailwindcss.com"></script>
+<link href="../naia-platform/v5/css/style.css" rel="stylesheet"><script src="https://cdn.tailwindcss.com"></script>
 <style>
   /* Type de données segmented control (3 pills per v5) */
   .type-seg { display: inline-flex; background: var(--bg-input); border: 1px solid var(--border-default); border-radius: 999px; padding: 3px; gap: 1px; }
@@ -253,7 +253,7 @@
 </div>
 
 <script src="https://unpkg.com/lucide@latest"></script>
-<script src="../naia-platform-v5/js/app.js"></script>
+<script src="../naia-platform/v5/js/app.js"></script>
 <script>
 // force la vue MVP 0.9 (le toggle de la maquette lit le localStorage ; on impose 0.9 après le build)
 window.addEventListener('DOMContentLoaded', () => { document.body.dataset.mvp = '0.9'; refreshContext(); });
