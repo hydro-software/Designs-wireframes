@@ -38,6 +38,10 @@ Deleted pages: `admin-leads`, `admin-lead`, `admin-lead-create` (leads pipeline)
 
 All Insight pages (Tableau de bord, Production, Revenus, Données, Paramètres, Simulateur, plant detail, Reports), all Communauté pages, and the Subscription pages already in scope (`admin-pricing.html`, the `admin-audit.html` Communauté panel, `admin-membres.html`, `admin-programme.html`).
 
+### Later edits (within v6.2)
+
+- **2026-06-17** — Removed the **MVP 0.9 / MVP 1 conference toggle** and all the 0.9-hiding machinery: the `data-mvp` attributes, the `body[data-mvp=…]` CSS hide rules, the `.mvp09-fallback` "Tableau de bord — MVP 1" banner on `index.html`, and the forced 0.9 view on `parametres.html`. MVP 0.9 is now implemented in the platform, so the demo switch is no longer needed and every page shows the full surface. The Prospect / Abonné access toggle moves up into the top-right slot the MVP toggle vacated.
+
 ## Tech stack
 
 Static multi-page site, no build step: Tailwind (Play CDN), Inter, Lucide icons, Chart.js, one shared `css/style.css` (dark + light tokens), one shared `js/app.js` (sidebar, centrale tabs, theme/access toggles, chart helpers). The public sign-up + thank-you pages are standalone (no sidebar/app.js) by design.
