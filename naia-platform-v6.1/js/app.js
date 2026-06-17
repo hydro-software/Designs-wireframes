@@ -646,6 +646,19 @@ function openHelp() {
   initIcons();
 }
 
+// ---- SUPERSEDED BANNER (v6.1 -> v6.2) ----
+// Big fixed top label on every app-shell page pointing to the current mockup (v6.2).
+function injectSupersededBanner() {
+  if (document.getElementById("superseded-banner")) return;
+  var s = document.createElement("style");
+  s.textContent = "body{padding-top:40px}#superseded-banner{position:fixed;top:0;left:0;right:0;z-index:10000;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:12px;min-height:40px;padding:6px 16px;background:linear-gradient(90deg,#d97706,#f59e0b);color:#1a1205;font:600 13px/1.3 'Inter',system-ui,sans-serif;text-align:center;box-shadow:0 2px 10px rgba(0,0,0,.35)}#superseded-banner a{background:#1a1205;color:#fde68a;text-decoration:none;padding:5px 12px;border-radius:6px;white-space:nowrap}#superseded-banner a:hover{background:#000}";
+  document.head.appendChild(s);
+  var b = document.createElement("div");
+  b.id = "superseded-banner";
+  b.innerHTML = "<span><b>Maquette v6.1</b> — remplacée par la <b>v6.2</b> (descope abonnement V2.0)</span> <a href=\"../naia-platform-v6.2/index.html\">Ouvrir la v6.2 →</a>";
+  document.body.appendChild(b);
+}
+
 // ---- INIT ----
 document.addEventListener("DOMContentLoaded", () => {
   document.documentElement.setAttribute("data-theme", getTheme());
@@ -659,6 +672,7 @@ document.addEventListener("DOMContentLoaded", () => {
   injectHelpModal();
   injectMvpToggle();
   injectAccessToggle();
+  injectSupersededBanner();
   initIcons();
   setTimeout(() => {
     buildHomeChart();

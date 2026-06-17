@@ -1,8 +1,10 @@
-# Naia v6.1 — canonical post-Bernard mockup
+# Naia v6.1 — post-Bernard mockup (SUPERSEDED by v6.2)
 
-**Live prototype: https://hydro-software.github.io/Designs-wireframes/naia-platform-v6.1/**
+> **SUPERSEDED — see v6.2.** This v6.1 mockup is replaced by **[`naia-platform-v6.2`](../naia-platform-v6.2/)** — live: <https://hydro-software.github.io/Designs-wireframes/naia-platform-v6.2/>. v6.2 reworks the Subscription surfaces to **Subscription PRD v2.0** (the descope re-baseline). v6.1 is retained only as the **pre-descope comparison reference**.
 
-`v6.1` is the **only reference wireframe** now — it folds in Bernard's full Paramètres rework (Designs-wireframes#1 + the v6.1 follow-up on `bl/parametres-v6-1`) plus everything that was already in v6.
+**Live prototype (v6.1, historical): https://hydro-software.github.io/Designs-wireframes/naia-platform-v6.1/**
+
+`v6.1` **was** the reference wireframe — it folds in Bernard's full Paramètres rework (Designs-wireframes#1 + the v6.1 follow-up on `bl/parametres-v6-1`) plus everything that was already in v6. **It is now superseded by [v6.2](../naia-platform-v6.2/)** (see the banner above).
 
 `naia-platform-v5/` is kept untouched as the **comparison reference** for the conference-scope discussion in [platform#599](https://github.com/hydro-software/platform/issues/599). All other intermediate versions (v5b, v5c, v6) have been collapsed.
 
