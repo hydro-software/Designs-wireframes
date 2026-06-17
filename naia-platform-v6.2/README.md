@@ -40,7 +40,7 @@ All Insight pages (Tableau de bord, Production, Revenus, Données, Paramètres, 
 
 ## Tech stack
 
-Static multi-page site, no build step: Tailwind (Play CDN), Inter, Lucide icons, Chart.js, one shared `css/style.css` (dark + light tokens), one shared `js/app.js` (sidebar, centrale tabs, theme/MVP/access toggles, chart helpers). The public sign-up + thank-you pages are standalone (no sidebar/app.js) by design.
+Static multi-page site, no build step: Tailwind (Play CDN), Inter, Lucide icons, Chart.js, one shared `css/style.css` (dark + light tokens), one shared `js/app.js` (sidebar, centrale tabs, theme/access toggles, chart helpers). The public sign-up + thank-you pages are standalone (no sidebar/app.js) by design.
 
 ## Iteration
 

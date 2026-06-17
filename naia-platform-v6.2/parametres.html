@@ -1821,7 +1821,7 @@
      The standalone replaced this block with 3 inline helpers because it deliberately
      skipped app.js (to avoid the sidebar reconstructing itself in his isolated review
      page). In the integrated v6.1 we load the shared app.js — that gives us the
-     sidebar, the centrale-tab routing, the MVP 0.9 toggle, and the openOverlay /
+     sidebar, the centrale-tab routing, and the openOverlay /
      closeOverlay / initIcons helpers Bernard relies on, in one place. -->
 <script src="js/app.js"></script>
 <script>
@@ -2549,7 +2549,6 @@
   }
 
   document.addEventListener("DOMContentLoaded", () => {
-    document.body.dataset.mvp = "0.9"; // brouillon BL — force la vue MVP 0.9
     const tab = (location.hash || "#moulins").replace("#", "");
     const valid = Object.keys(CENTRALES_PARAM).includes(tab) ? tab : "moulins";
     switchParametresTab(null, valid);

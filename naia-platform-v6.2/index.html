@@ -28,22 +28,14 @@
     </header>
 
     <!-- v5: centrales tabs at top (sum/All first, like Production) -->
-    <div id="centrale-tabs" class="centrale-tabs" data-mvp="1"></div>
+    <div id="centrale-tabs" class="centrale-tabs"></div>
 
     <div class="page-content">
 
-      <!-- MVP 0.9 fallback: Tableau de bord is MVP1-only. -->
-      <div class="mvp09-fallback" data-mvp="0.9">
-        <div class="ico"><i data-lucide="info"></i></div>
-        <div class="title">Tableau de bord — MVP 1</div>
-        <div class="desc">Cette page n'est pas livrée pour la conférence (MVP 0.9). Elle arrivera dans MVP 1.</div>
-        <a class="btn btn-primary" href="production.html"><i data-lucide="zap"></i> Aller à Production</a>
-      </div>
-
-      <!-- MVP1 dashboard content. KPIs per #261: production this month / YTD / vs last year, facteur de charge.
+      <!-- Dashboard KPIs per #261: production this month / YTD / vs last year, facteur de charge.
            v5: these tiles live ONLY here on the Tableau de bord. Production and Revenus
            pages drop them to focus on the chart. -->
-      <div data-mvp="1" style="display:grid; gap:14px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); margin-bottom:18px">
+      <div style="display:grid; gap:14px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); margin-bottom:18px">
         <div class="kpi-card feature">
           <div class="kpi-label"><i data-lucide="zap" style="width:13px;height:13px"></i> Production · ce mois</div>
           <div class="kpi-value tabular">196 <span style="font-size:14px; color:var(--text-muted)">MWh</span></div>
@@ -67,7 +59,7 @@
       </div>
 
       <!-- Main monthly chart with cumulative line -->
-      <div class="card" data-mvp="1" style="margin-bottom:18px">
+      <div class="card" style="margin-bottom:18px">
         <div class="card-head">
           <div>
             <div class="card-head-title">Production mensuelle &amp; cumul</div>
@@ -84,7 +76,7 @@
       <!-- v5: report generator promoted from a sidebar entry to a CTA on the Tableau de bord.
            Old "Par centrale · ce mois" table at the bottom is gone — centrales tabs at the top
            replace that role. -->
-      <div class="card" data-mvp="1" style="display:flex; align-items:center; gap:18px; padding:18px 22px">
+      <div class="card" style="display:flex; align-items:center; gap:18px; padding:18px 22px">
         <div style="width:42px; height:42px; border-radius:10px; background:rgba(56,189,248,0.16); color:var(--brand-cyan); display:flex; align-items:center; justify-content:center; flex-shrink:0">
           <i data-lucide="file-plus" style="width:20px; height:20px"></i>
         </div>

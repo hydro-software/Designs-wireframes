@@ -1012,94 +1012,6 @@ table.data-table { width: 100%; border-collapse: collapse; }
 .v2-banner i { width: 18px; height: 18px; flex-shrink: 0; }
 :root[data-theme="light"] .v2-banner { background: #fef3c7; color: #78350f; border-color: #fbbf24; }
 
-/* ============ V5 — MVP-tier toggle (conference demo) ============ */
-
-/* Fixed top-right segmented switch. The "Vue conférence" label is dimmed and
-   only visible on wide screens so the chip stays compact on narrow ones. */
-.mvp-toggle {
-  position: fixed;
-  top: 12px;
-  right: 16px;
-  z-index: 1000;
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  padding: 5px 8px 5px 12px;
-  background: rgba(15, 26, 50, 0.92);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border: 1px solid var(--border-default);
-  border-radius: 999px;
-  box-shadow: 0 6px 18px -6px rgba(0,0,0,0.55);
-  font-family: inherit;
-}
-:root[data-theme="light"] .mvp-toggle { background: rgba(255,255,255,0.92); }
-.mvp-toggle .mvp-label {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--text-muted);
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-@media (max-width: 980px) {
-  .mvp-toggle .mvp-label { display: none; }
-}
-.mvp-toggle .mvp-seg {
-  display: inline-flex;
-  background: var(--bg-input);
-  border-radius: 999px;
-  padding: 2px;
-  gap: 1px;
-}
-.mvp-toggle .mvp-seg button {
-  padding: 4px 10px;
-  font-size: 11.5px;
-  font-weight: 600;
-  border: 0;
-  background: transparent;
-  color: var(--text-muted);
-  border-radius: 999px;
-  cursor: pointer;
-  font-family: inherit;
-}
-.mvp-toggle .mvp-seg button.on {
-  background: var(--brand-blue-strong);
-  color: white;
-  box-shadow: 0 2px 6px -2px rgba(59,130,246,0.5);
-}
-.mvp-toggle .mvp-seg button:not(.on):hover { color: var(--text-primary); }
-
-/* Hide all MVP1-only elements when the body is in MVP 0.9 mode.
-   Tag elements with data-mvp="1" to mark them as MVP1-exclusive. */
-body[data-mvp="0.9"] [data-mvp="1"] { display: none !important; }
-
-/* Inverse: items only meaningful in MVP 0.9 (banners, fallback messages) */
-body[data-mvp="1"]   [data-mvp="0.9"] { display: none !important; }
-
-/* MVP 0.9 banner: shown when the user lands on an MVP1-only page in 0.9 mode */
-.mvp09-fallback {
-  margin: 22px auto;
-  max-width: 560px;
-  padding: 22px 28px;
-  background: linear-gradient(180deg, rgba(56,189,248,0.06), transparent 60%);
-  border: 1px solid var(--border-default);
-  border-radius: 14px;
-  text-align: center;
-}
-.mvp09-fallback .ico {
-  width: 48px; height: 48px;
-  border-radius: 50%;
-  background: rgba(56,189,248,0.12);
-  color: var(--brand-cyan);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 10px;
-}
-.mvp09-fallback .ico i { width: 22px; height: 22px; }
-.mvp09-fallback .title { font-size: 16px; font-weight: 600; margin-bottom: 6px; }
-.mvp09-fallback .desc  { font-size: 13px; color: var(--text-muted); line-height: 1.5; margin-bottom: 14px; }
-
 /* ============ V5 — TIME PILLS (Intraday / 30 jours / 12 mois / Années) ============ */
 
 .time-pills {
@@ -1141,9 +1053,9 @@ body[data-mvp="1"]   [data-mvp="0.9"] { display: none !important; }
 .time-pills .pill-dot.amber  { background: var(--accent-amber); box-shadow: 0 0 0 2px rgba(251,191,36,0.18); }
 .time-pills .pill-dot.red    { background: var(--accent-red);   box-shadow: 0 0 0 2px rgba(248,113,113,0.18); }
 
-/* Conference/demo fix: the fixed top-right dev toggles (.mvp-toggle / .access-toggle)
+/* Conference/demo fix: the fixed top-right .access-toggle chip
    overlapped the topbar-right time-pills on production & revenue. Center the time-pills
-   in the topbar and pin the breadcrumbs to the left, so the pills clear the toggle stack
+   in the topbar and pin the breadcrumbs to the left, so the pills clear the toggle
    while the toggle stays top-right. Scoped to these two pages so other topbars are
    unaffected. */
 body[data-page="production"] .topbar,
@@ -1499,8 +1411,8 @@ body[data-page="revenue"]    .topbar > .crumbs {
      - data-access="lead"      → locked overlay shown, chart blurred  (the funnel state)
      - data-access="connected" → normal page (paying customer with data)
    Tag the lockable card with .locked-wrap and put the overlay inside as .lock-overlay.
-   A small fixed toggle (injected by app.js, mirroring the MVP toggle) lets reviewers
-   flip personas. Mirrors the existing data-mvp / data-show-v2 attribute pattern. */
+   A small fixed toggle (injected by app.js) lets reviewers flip personas,
+   following the same data-attribute pattern as data-show-v2. */
 
 .locked-wrap { position: relative; }
 
@@ -1560,11 +1472,10 @@ body[data-access="lead"] .lock-overlay {
 }
 :root[data-theme="light"] .lock-card .lock-points { color: #15803d; background: #dcfce7; border-color: #a7f3d0; }
 
-/* Persona/access toggle chip — sits just under the MVP toggle (top:12 + height).
-   Same visual language as .mvp-toggle so the two stack cleanly. */
+/* Persona/access toggle chip — fixed top-right segmented switch (Prospect / Abonné). */
 .access-toggle {
   position: fixed;
-  top: 56px;
+  top: 12px;
   right: 16px;
   z-index: 1000;
   display: inline-flex;

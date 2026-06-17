@@ -14,20 +14,17 @@
 
     <!-- Profile sub-tabs.
          v5 update: Sécurité tab removed (moved into the Paramètres utilisateur tile on Identité).
-         Mes badges tab removed (badges live on the Identité page directly).
-         MVP toggle: subscription tabs (Mon abonnement, Mes factures, Mes jetons)
-         carry data-mvp="1" — hidden in MVP 0.9. -->
+         Mes badges tab removed (badges live on the Identité page directly). -->
     <div class="centrale-tabs">
       <a class="centrale-tab active" href="profil.html"><span>Identité</span></a>
-      <a class="centrale-tab" href="profil-abonnement.html" data-mvp="1"><span>Mon abonnement</span></a>
-      <a class="centrale-tab" href="profil-factures.html"   data-mvp="1"><span>Mes factures</span></a>
-      <a class="centrale-tab" href="profil-jetons.html"     data-mvp="1"><span>Mes jetons</span></a>
+      <a class="centrale-tab" href="profil-abonnement.html"><span>Mon abonnement</span></a>
+      <a class="centrale-tab" href="profil-factures.html"  ><span>Mes factures</span></a>
+      <a class="centrale-tab" href="profil-jetons.html"    ><span>Mes jetons</span></a>
     </div>
 
     <div class="page-content">
 
-      <!-- v5: flex layout so the Mon organisation card collapses cleanly in MVP 0.9
-           (when hidden via data-mvp="1") and the two remaining cards split the row. -->
+      <!-- v5: flex layout so the cards split the row cleanly. -->
       <div style="display:flex; flex-wrap:wrap; gap:14px; align-items:stretch">
 
         <div class="card" style="flex: 2 1 380px">
@@ -38,7 +35,7 @@
               <div>
                 <div style="font-weight:600; font-size:18px">Marc Dupont</div>
                 <div class="muted" style="font-size:13px">marc.dupont@moulin.be</div>
-                <div style="margin-top:6px; display:flex; gap:6px" data-mvp="1"><span class="badge badge-purple"><i data-lucide="shield"></i> Pionnier hydro</span><span class="badge badge-green"><i data-lucide="flame"></i> Série 30 j</span></div>
+                <div style="margin-top:6px; display:flex; gap:6px"><span class="badge badge-purple"><i data-lucide="shield"></i> Pionnier hydro</span><span class="badge badge-green"><i data-lucide="flame"></i> Série 30 j</span></div>
               </div>
             </div>
 
@@ -47,7 +44,7 @@
               <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--border-subtle)"><span class="muted">Pays</span><span>Belgique</span></div>
               <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--border-subtle)"><span class="muted">Rôle organisation</span><span>Owner-operator</span></div>
               <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--border-subtle)"><span class="muted">Membre depuis</span><span>mars 2024</span></div>
-              <div style="display:flex; justify-content:space-between; padding:8px 0" data-mvp="1"><span class="muted">Code parrainage org.</span><span style="font-family: monospace">MB-2026</span></div>
+              <div style="display:flex; justify-content:space-between; padding:8px 0"><span class="muted">Code parrainage org.</span><span style="font-family: monospace">MB-2026</span></div>
             </div>
           </div>
         </div>
@@ -76,17 +73,17 @@
             <div style="display:flex; justify-content:space-between; padding:6px 0"><span class="muted">Email de facturation</span><span style="font-size:12px">compta@moulin.be</span></div>
 
             <!-- Community points / tier — unchanged -->
-            <div style="display:flex; justify-content:space-between; padding:6px 0; border-top:1px solid var(--border-subtle); margin-top:12px" data-mvp="1"><span class="muted">Naia points (org.)</span><span class="points-pill"><i data-lucide="sparkles"></i><span class="tabular">3 450</span></span></div>
-            <div style="display:flex; justify-content:space-between; padding:6px 0" data-mvp="1"><span class="muted">Tier</span><span class="tier-pill tier-silver">Argent</span></div>
-            <div style="display:flex; justify-content:space-between; padding:6px 0" data-mvp="1"><span class="muted">Plan d'abonnement</span><span>Per-plant · 210 kW</span></div>
+            <div style="display:flex; justify-content:space-between; padding:6px 0; border-top:1px solid var(--border-subtle); margin-top:12px"><span class="muted">Naia points (org.)</span><span class="points-pill"><i data-lucide="sparkles"></i><span class="tabular">3 450</span></span></div>
+            <div style="display:flex; justify-content:space-between; padding:6px 0"><span class="muted">Tier</span><span class="tier-pill tier-silver">Argent</span></div>
+            <div style="display:flex; justify-content:space-between; padding:6px 0"><span class="muted">Plan d'abonnement</span><span>Per-plant · 210 kW</span></div>
 
-            <a href="profil-abonnement.html" class="btn btn-secondary btn-block" style="margin-top:14px" data-mvp="1">Gérer l'abonnement</a>
+            <a href="profil-abonnement.html" class="btn btn-secondary btn-block" style="margin-top:14px">Gérer l'abonnement</a>
           </div>
         </div>
 
         <!-- v5: Paramètres utilisateur tile.
              Replaces the old Sécurité tab + the theme/language entries that used to live
-             in the profile dropdown. Always visible in both MVP 0.9 and MVP 1. -->
+             in the profile dropdown. -->
         <div class="card" style="flex: 1 1 260px">
           <div class="card-head"><div class="card-head-title">Paramètres utilisateur</div></div>
           <div class="card-body" style="display:flex; flex-direction:column; gap:14px">
@@ -164,8 +161,8 @@
         </div>
       </div>
 
-      <h3 style="font-size:13px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em; font-weight:600; margin: 22px 0 10px" data-mvp="1">Mes badges (Marc)</h3>
-      <div style="display:grid; gap:14px; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr))" data-mvp="1">
+      <h3 style="font-size:13px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em; font-weight:600; margin: 22px 0 10px">Mes badges (Marc)</h3>
+      <div style="display:grid; gap:14px; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr))">
         <div class="card" style="text-align:center; padding:18px">
           <div style="width:56px; height:56px; margin:0 auto 10px; background:linear-gradient(135deg,#8b5cf6,#6d28d9); border-radius:50%; display:flex; align-items:center; justify-content:center; color:white; box-shadow:0 6px 16px -4px rgba(139,92,246,0.4)"><i data-lucide="shield" style="width:24px; height:24px"></i></div>
           <div style="font-weight:600; font-size:13px">Pionnier hydro</div>

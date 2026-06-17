@@ -48,46 +48,13 @@ function refreshThemeButtons() {
 function getShowV2() { return localStorage.getItem("naia-show-v2") === "true"; }
 function setShowV2(v) { localStorage.setItem("naia-show-v2", v ? "true" : "false"); document.body.dataset.showV2 = v ? "true" : "false"; }
 
-// ---- MVP-tier toggle (v5 add — for the June 2026 conference demo) ----
-// MVP 0.9 is the strict-minimum surface shipped for the conference:
-//   Production · Revenus · Paramètres · Profil (user data only)
-// MVP 1 is the full v5 mockup. The toggle hides MVP1-only items via CSS
-// (any element with data-mvp="1" disappears when body[data-mvp="0.9"]).
-function getMvpTier() { return localStorage.getItem("naia-mvp-tier") || "1"; }
-function setMvpTier(t) {
-  localStorage.setItem("naia-mvp-tier", t);
-  document.body.dataset.mvp = t;
-  refreshMvpButtons();
-}
-function refreshMvpButtons() {
-  const t = getMvpTier();
-  document.querySelectorAll("[data-mvp-btn]").forEach(btn => {
-    btn.classList.toggle("on", btn.dataset.mvpBtn === t);
-  });
-}
-function injectMvpToggle() {
-  if (document.getElementById("mvp-toggle")) return;
-  const wrap = document.createElement("div");
-  wrap.id = "mvp-toggle";
-  wrap.className = "mvp-toggle";
-  wrap.innerHTML = `
-    <span class="mvp-label">Vue conférence</span>
-    <span class="mvp-seg">
-      <button data-mvp-btn="0.9" onclick="setMvpTier('0.9')">MVP 0.9</button>
-      <button data-mvp-btn="1"   onclick="setMvpTier('1')">MVP 1</button>
-    </span>
-  `;
-  document.body.appendChild(wrap);
-  refreshMvpButtons();
-}
-
 // ---- ACCESS-persona toggle (v5 add — funnel decision 2026-05-31, platform#647) ----
 // "lead"      = logged-in conference lead: has community points, but NO connected plant
 //               and NO subscription. Insight pages (Production/Revenus) show a locked
 //               overlay with a "Connectez votre centrale" CTA → plaquette.
 // "connected" = paying customer with a connected plant and real data (the normal view).
 // Only injected on pages that carry a .lock-overlay element, so it doesn't appear
-// everywhere. Mirrors the MVP-tier toggle pattern above.
+// everywhere.
 function getAccess() { return localStorage.getItem("naia-access") || "lead"; }
 function setAccess(a) {
   localStorage.setItem("naia-access", a);
@@ -162,7 +129,7 @@ function buildSidebar() {
 
       <div class="sidebar-section-title">Pilotage</div>
 
-      <a href="index.html" class="sidebar-item ${section === '' && page === 'home' ? 'active' : ''}" data-mvp="1">
+      <a href="index.html" class="sidebar-item ${section === '' && page === 'home' ? 'active' : ''}">
         <i data-lucide="layout-dashboard"></i>
         <span>Tableau de bord</span>
       </a>
@@ -187,24 +154,24 @@ function buildSidebar() {
         <span>Paramètres</span>
       </a>
 
-      <a href="simulateur.html" class="sidebar-item ${section === 'simulateur' ? 'active' : ''}" data-mvp="1">
+      <a href="simulateur.html" class="sidebar-item ${section === 'simulateur' ? 'active' : ''}">
         <i data-lucide="cpu"></i>
         <span>Simulateur</span>
         <span class="badge-mini" style="background:rgba(217,119,6,0.3); color:#fcd34d; border:1px solid rgba(251,191,36,0.4)">V2</span>
       </a>
 
-      <div class="sidebar-section-title" data-mvp="1">Communauté</div>
+      <div class="sidebar-section-title">Communauté</div>
 
-      <a href="community-earn.html" class="sidebar-item ${section === 'community' || section === 'inbox' ? 'active' : ''}" aria-expanded="${open.community}" data-mvp="1">
+      <a href="community-earn.html" class="sidebar-item ${section === 'community' || section === 'inbox' ? 'active' : ''}" aria-expanded="${open.community}">
         <i data-lucide="users"></i>
         <span>Communauté</span>
         <i data-lucide="chevron-right" class="chev" onclick="event.preventDefault(); event.stopPropagation(); toggleFoldByLink(this)"></i>
       </a>
-      <div class="subnav" data-open="${open.community}" data-mvp="1">
+      <div class="subnav" data-open="${open.community}">
         ${communityItems}
       </div>
 
-      <a href="admin.html" class="sidebar-item ${section === 'admin' ? 'active' : ''}" data-mvp="1">
+      <a href="admin.html" class="sidebar-item ${section === 'admin' ? 'active' : ''}">
         <i data-lucide="shield"></i>
         <span>Administration</span>
       </a>
@@ -254,7 +221,7 @@ function toggleFoldByLink(chevEl) {
 // It navigates directly to profil.html, where:
 //   - Identité tab hosts user identity, badges, and a User Settings tile
 //     (Sécurité / MFA, Langue, Thème)
-//   - Mon abonnement / Mes factures / Mes jetons are the other tabs (MVP1)
+//   - Mon abonnement / Mes factures / Mes jetons are the other tabs
 // The Sécurité and Mes badges tabs are removed (badges sit on Identité; security
 // moved into the settings tile).
 
@@ -650,14 +617,12 @@ function openHelp() {
 document.addEventListener("DOMContentLoaded", () => {
   document.documentElement.setAttribute("data-theme", getTheme());
   setShowV2(getShowV2());
-  document.body.dataset.mvp = getMvpTier();
   document.body.dataset.access = getAccess();
   buildSidebar();
   buildCentraleTabs();
   // Apply current centrale (from hash if present) on first paint so titles + chart match
   applyCentrale(currentCentrale());
   injectHelpModal();
-  injectMvpToggle();
   injectAccessToggle();
   initIcons();
   setTimeout(() => {
