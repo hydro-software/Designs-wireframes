@@ -74,7 +74,10 @@
                 <div style="font-weight:600; display:flex; align-items:center; gap:8px">Fiche Odoo <span class="badge badge-purple" style="font-size:10px">res.partner</span></div>
                 <div class="muted" style="font-size:12px; margin-top:2px">Nom légal, n<sup>o</sup> de TVA, adresse, e-mail de facturation et bon de commande (PO) sont gérés dans Odoo. Contact lié : <span class="tabular">#res.partner/4182</span>.</div>
               </div>
-              <a class="btn btn-secondary btn-sm" href="https://hydro-software-services.odoo.com/odoo/contacts/4182" target="_blank" rel="noopener"><i data-lucide="external-link"></i> Voir le contact Odoo</a>
+              <div style="display:flex; flex-direction:column; gap:6px; flex-shrink:0">
+                <a class="btn btn-secondary btn-sm" href="https://hydro-software-services.odoo.com/odoo/contacts/4182" target="_blank" rel="noopener"><i data-lucide="external-link"></i> Voir le contact Odoo</a>
+                <button class="btn btn-secondary btn-sm" onclick="openOverlay('edit-odoo-link')"><i data-lucide="edit-3"></i> Modifier le lien</button>
+              </div>
             </div>
           </div>
 
@@ -265,16 +268,16 @@
           <div class="cd-section">
             <div class="cd-section-head">
               <div class="cd-section-title"><i data-lucide="zap" style="width:15px; color:var(--brand-cyan)"></i> Centrales <span class="muted" style="font-weight:400">· 9</span></div>
-              <span class="muted" style="font-size:11px">Mandat DSO signé dans Odoo · lien kDrive (FR-DSO-LINK)</span>
+              <button class="btn btn-secondary btn-sm" onclick="openOverlay('manage-plants')"><i data-lucide="edit-3"></i> Gérer les centrales</button>
             </div>
             <div class="cd-section-body" style="padding:0">
               <table class="data-table" style="font-size:13px">
                 <thead><tr><th>Centrale</th><th>Région</th><th class="num" style="text-align:right">Capacité</th><th>Mandat DSO signé</th><th></th></tr></thead>
                 <tbody>
-                  <tr><td><b>Centrale du Saux</b></td><td class="muted">Ariège</td><td class="num" style="text-align:right">2,4 MW</td><td><a class="link" href="https://kdrive.infomaniak.com/app/share/naia/mandats/saux.pdf" target="_blank" rel="noopener"><i data-lucide="file-text" style="width:12px; height:12px; vertical-align:-2px"></i> Voir le PDF (kDrive)</a></td><td><a class="link" href="plant-detail.html" style="font-size:11px">Détails →</a></td></tr>
-                  <tr><td><b>Microcentrale du Saux</b></td><td class="muted">Ariège</td><td class="num" style="text-align:right">0,5 MW</td><td><a class="link" href="https://kdrive.infomaniak.com/app/share/naia/mandats/microsaux.pdf" target="_blank" rel="noopener"><i data-lucide="file-text" style="width:12px; height:12px; vertical-align:-2px"></i> Voir le PDF (kDrive)</a></td><td><a class="link" href="plant-detail.html" style="font-size:11px">Détails →</a></td></tr>
-                  <tr><td><b>Barrage de Foix</b></td><td class="muted">Ariège</td><td class="num" style="text-align:right">3,1 MW</td><td><a class="link" href="https://kdrive.infomaniak.com/app/share/naia/mandats/foix.pdf" target="_blank" rel="noopener"><i data-lucide="file-text" style="width:12px; height:12px; vertical-align:-2px"></i> Voir le PDF (kDrive)</a></td><td><a class="link" href="plant-detail.html" style="font-size:11px">Détails →</a></td></tr>
-                  <tr><td><b>Centrale de l'Hers</b></td><td class="muted">Ariège</td><td class="num" style="text-align:right">1,8 MW</td><td><span class="badge badge-amber" style="font-size:10px">Lien manquant</span></td><td><a class="link" href="plant-detail.html" style="font-size:11px">Détails →</a></td></tr>
+                  <tr><td><b>Centrale du Saux</b></td><td class="muted">Ariège</td><td class="num" style="text-align:right">2,4 MW</td><td><a class="link" href="https://kdrive.infomaniak.com/app/share/naia/mandats/saux.pdf" target="_blank" rel="noopener"><i data-lucide="file-text" style="width:12px; height:12px; vertical-align:-2px"></i> Voir le PDF</a> <a class="link" href="#" onclick="openOverlay('edit-mandate'); return false;" style="font-size:11px; margin-left:6px"><i data-lucide="edit-3" style="width:11px; height:11px; vertical-align:-2px"></i> Modifier</a></td><td><a class="link" href="plant-detail.html" style="font-size:11px">Détails →</a></td></tr>
+                  <tr><td><b>Microcentrale du Saux</b></td><td class="muted">Ariège</td><td class="num" style="text-align:right">0,5 MW</td><td><a class="link" href="https://kdrive.infomaniak.com/app/share/naia/mandats/microsaux.pdf" target="_blank" rel="noopener"><i data-lucide="file-text" style="width:12px; height:12px; vertical-align:-2px"></i> Voir le PDF</a> <a class="link" href="#" onclick="openOverlay('edit-mandate'); return false;" style="font-size:11px; margin-left:6px"><i data-lucide="edit-3" style="width:11px; height:11px; vertical-align:-2px"></i> Modifier</a></td><td><a class="link" href="plant-detail.html" style="font-size:11px">Détails →</a></td></tr>
+                  <tr><td><b>Barrage de Foix</b></td><td class="muted">Ariège</td><td class="num" style="text-align:right">3,1 MW</td><td><a class="link" href="https://kdrive.infomaniak.com/app/share/naia/mandats/foix.pdf" target="_blank" rel="noopener"><i data-lucide="file-text" style="width:12px; height:12px; vertical-align:-2px"></i> Voir le PDF</a> <a class="link" href="#" onclick="openOverlay('edit-mandate'); return false;" style="font-size:11px; margin-left:6px"><i data-lucide="edit-3" style="width:11px; height:11px; vertical-align:-2px"></i> Modifier</a></td><td><a class="link" href="plant-detail.html" style="font-size:11px">Détails →</a></td></tr>
+                  <tr><td><b>Centrale de l'Hers</b></td><td class="muted">Ariège</td><td class="num" style="text-align:right">1,8 MW</td><td><span class="badge badge-amber" style="font-size:10px">Lien manquant</span> <a class="link" href="#" onclick="openOverlay('edit-mandate'); return false;" style="font-size:11px; margin-left:6px"><i data-lucide="plus" style="width:11px; height:11px; vertical-align:-2px"></i> Ajouter le lien</a></td><td><a class="link" href="plant-detail.html" style="font-size:11px">Détails →</a></td></tr>
                   <tr><td colspan="5" style="padding:10px 16px; font-size:12px; color:var(--text-muted)">+ 5 autres centrales · <a class="link" href="plant-detail.html">voir toutes les centrales →</a></td></tr>
                 </tbody>
               </table>
@@ -312,7 +315,7 @@
 
           <!-- Section: Naia record (operational, non-PII) -->
           <div class="cd-section">
-            <div class="cd-section-head"><div class="cd-section-title"><i data-lucide="database" style="width:15px; color:var(--brand-cyan)"></i> Fiche Naia (opérationnelle)</div></div>
+            <div class="cd-section-head"><div class="cd-section-title"><i data-lucide="database" style="width:15px; color:var(--brand-cyan)"></i> Fiche Naia (opérationnelle)</div><button class="btn btn-secondary btn-sm" onclick="openOverlay('edit-naia-record')"><i data-lucide="edit-3"></i> Modifier</button></div>
             <div class="cd-section-body">
               <div class="cd-info-row"><span class="lbl">Nom d'affichage</span><span>Convert FMG</span></div>
               <div class="cd-info-row"><span class="lbl">Contact Odoo lié</span><span><a class="link" href="https://hydro-software-services.odoo.com/odoo/contacts/4182" target="_blank" rel="noopener">#res.partner/4182 →</a></span></div>
@@ -338,17 +341,17 @@
                   <tr>
                     <td><b>Pierre Lefebvre</b><br><span class="muted" style="font-size:11px">p.lefebvre@convert-fmg.fr</span></td>
                     <td><span class="badge badge-cyan">Contact principal</span></td>
-                    <td style="text-align:right"><button class="btn btn-ghost btn-sm" onclick="alert('Définir un autre contact principal — à venir')"><i data-lucide="star" style="width:13px"></i></button></td>
+                    <td style="text-align:right; white-space:nowrap"><button class="btn btn-ghost btn-sm" title="Modifier le rôle" onclick="openOverlay('edit-user')"><i data-lucide="edit-3" style="width:13px"></i></button><button class="btn btn-ghost btn-sm" title="Déjà contact principal" disabled><i data-lucide="star" style="width:13px; fill:currentColor"></i></button></td>
                   </tr>
                   <tr>
                     <td><b>Marie Lambert</b><br><span class="muted" style="font-size:11px">m.lambert@convert-fmg.fr</span></td>
                     <td><span class="badge badge-slate">Membre</span></td>
-                    <td style="text-align:right"><button class="btn btn-ghost btn-sm" style="color:var(--accent-red)" onclick="if(confirm('Retirer Marie Lambert de l\'organisation ?')) alert('Utilisateur retiré — à venir')"><i data-lucide="user-minus" style="width:13px"></i></button></td>
+                    <td style="text-align:right; white-space:nowrap"><button class="btn btn-ghost btn-sm" title="Modifier le rôle" onclick="openOverlay('edit-user')"><i data-lucide="edit-3" style="width:13px"></i></button><button class="btn btn-ghost btn-sm" title="Définir comme contact principal" onclick="if(confirm('Définir Marie Lambert comme contact principal ?')) alert('Contact principal mis à jour — à venir')"><i data-lucide="star" style="width:13px"></i></button><button class="btn btn-ghost btn-sm" style="color:var(--accent-red)" title="Retirer" onclick="if(confirm('Retirer Marie Lambert de l\'organisation ?')) alert('Utilisateur retiré — à venir')"><i data-lucide="user-minus" style="width:13px"></i></button></td>
                   </tr>
                   <tr>
                     <td><b>Julien Roy</b><br><span class="muted" style="font-size:11px">j.roy@convert-fmg.fr</span></td>
                     <td><span class="badge badge-slate">Membre</span></td>
-                    <td style="text-align:right"><button class="btn btn-ghost btn-sm" style="color:var(--accent-red)" onclick="if(confirm('Retirer Julien Roy de l\'organisation ?')) alert('Utilisateur retiré — à venir')"><i data-lucide="user-minus" style="width:13px"></i></button></td>
+                    <td style="text-align:right; white-space:nowrap"><button class="btn btn-ghost btn-sm" title="Modifier le rôle" onclick="openOverlay('edit-user')"><i data-lucide="edit-3" style="width:13px"></i></button><button class="btn btn-ghost btn-sm" title="Définir comme contact principal" onclick="if(confirm('Définir Julien Roy comme contact principal ?')) alert('Contact principal mis à jour — à venir')"><i data-lucide="star" style="width:13px"></i></button><button class="btn btn-ghost btn-sm" style="color:var(--accent-red)" title="Retirer" onclick="if(confirm('Retirer Julien Roy de l\'organisation ?')) alert('Utilisateur retiré — à venir')"><i data-lucide="user-minus" style="width:13px"></i></button></td>
                   </tr>
                 </tbody>
               </table>
@@ -603,6 +606,152 @@
     <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:18px; padding-top:14px; border-top:1px solid var(--border-subtle)">
       <button class="btn btn-secondary" onclick="closeOverlay('adjust-health')">Annuler</button>
       <button class="btn btn-primary" onclick="if(!document.getElementById('override-reason').value.trim()){alert('La raison de l\'override est obligatoire.');return;} closeOverlay('adjust-health'); alert('Override du score enregistré (expire dans 30 jours) — à venir')"><i data-lucide="check"></i> Appliquer l'override</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Modal: Modifier le lien Odoo ===== -->
+<div class="overlay" id="edit-odoo-link" onclick="if(event.target===this)closeOverlay('edit-odoo-link')">
+  <div class="modal">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px">
+      <div>
+        <div class="modal-title">Modifier le lien Odoo</div>
+        <div class="modal-subtitle">Re-pointe ce client vers un autre contact Odoo (res.partner). Ne modifie pas les données dans Odoo.</div>
+      </div>
+      <button class="btn btn-ghost" onclick="closeOverlay('edit-odoo-link')"><i data-lucide="x"></i></button>
+    </div>
+    <div style="display:flex; flex-direction:column; gap:14px">
+      <div>
+        <label class="muted" style="font-size:11px; text-transform:uppercase; letter-spacing:0.06em; font-weight:600">Lien du contact Odoo (URL)</label>
+        <input class="input" style="width:100%; margin-top:4px" value="https://hydro-software-services.odoo.com/odoo/contacts/4182">
+        <div class="muted" style="font-size:11px; margin-top:4px">Format : <span class="tabular">.../odoo/contacts/&lt;id&gt;</span>. Le nom légal, la TVA, l'adresse et l'e-mail de facturation restent gérés dans Odoo.</div>
+      </div>
+    </div>
+    <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:18px; padding-top:14px; border-top:1px solid var(--border-subtle)">
+      <button class="btn btn-secondary" onclick="closeOverlay('edit-odoo-link')">Annuler</button>
+      <button class="btn btn-primary" onclick="closeOverlay('edit-odoo-link'); alert('Lien Odoo mis à jour — à venir')"><i data-lucide="check"></i> Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Modal: Modifier la fiche Naia (operational, non-PII) ===== -->
+<div class="overlay" id="edit-naia-record" onclick="if(event.target===this)closeOverlay('edit-naia-record')">
+  <div class="modal">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px">
+      <div>
+        <div class="modal-title">Modifier la fiche Naia</div>
+        <div class="modal-subtitle">Champs opérationnels gérés par Naia. Les données légales et de facturation restent dans Odoo.</div>
+      </div>
+      <button class="btn btn-ghost" onclick="closeOverlay('edit-naia-record')"><i data-lucide="x"></i></button>
+    </div>
+    <div style="display:flex; flex-direction:column; gap:14px">
+      <div>
+        <label class="muted" style="font-size:11px; text-transform:uppercase; letter-spacing:0.06em; font-weight:600">Nom d'affichage</label>
+        <input class="input" style="width:100%; margin-top:4px" value="Convert FMG">
+      </div>
+      <div>
+        <label class="muted" style="font-size:11px; text-transform:uppercase; letter-spacing:0.06em; font-weight:600">Pays (opérationnel)</label>
+        <select class="select" style="width:100%; margin-top:4px"><option>France</option><option>Belgique</option><option>Autre</option></select>
+      </div>
+      <div>
+        <label class="muted" style="font-size:11px; text-transform:uppercase; letter-spacing:0.06em; font-weight:600">Langue (locale)</label>
+        <select class="select" style="width:100%; margin-top:4px"><option>Français (FR)</option><option>English (EN)</option><option>Deutsch (DE)</option></select>
+      </div>
+      <label style="display:flex; align-items:center; gap:8px; font-size:13px"><input type="checkbox"> Abonné de test (exclu du MRR)</label>
+      <div style="padding:10px 12px; background:rgba(167,139,250,0.10); border:1px solid rgba(167,139,250,0.30); border-radius:8px; font-size:12px; color:var(--text-muted)">
+        <i data-lucide="info" style="width:13px; height:13px; vertical-align:-2px"></i> Le nom légal, la TVA, l'adresse et l'e-mail de facturation se modifient dans la <a class="link" href="https://hydro-software-services.odoo.com/odoo/contacts/4182" target="_blank" rel="noopener">fiche Odoo</a>.
+      </div>
+    </div>
+    <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:18px; padding-top:14px; border-top:1px solid var(--border-subtle)">
+      <button class="btn btn-secondary" onclick="closeOverlay('edit-naia-record')">Annuler</button>
+      <button class="btn btn-primary" onclick="closeOverlay('edit-naia-record'); alert('Fiche Naia mise à jour — à venir')"><i data-lucide="check"></i> Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Modal: Gérer les centrales (add a plant) ===== -->
+<div class="overlay" id="manage-plants" onclick="if(event.target===this)closeOverlay('manage-plants')">
+  <div class="modal">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px">
+      <div>
+        <div class="modal-title">Ajouter une centrale</div>
+        <div class="modal-subtitle">Rattache une centrale à l'abonnement. Le lien de mandat et le retrait se gèrent par ligne dans le tableau.</div>
+      </div>
+      <button class="btn btn-ghost" onclick="closeOverlay('manage-plants')"><i data-lucide="x"></i></button>
+    </div>
+    <div style="display:flex; flex-direction:column; gap:14px">
+      <div>
+        <label class="muted" style="font-size:11px; text-transform:uppercase; letter-spacing:0.06em; font-weight:600">Nom de la centrale</label>
+        <input class="input" style="width:100%; margin-top:4px" placeholder="ex. Centrale du Saux">
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px">
+        <div>
+          <label class="muted" style="font-size:11px; text-transform:uppercase; letter-spacing:0.06em; font-weight:600">Région</label>
+          <input class="input" style="width:100%; margin-top:4px" placeholder="ex. Ariège">
+        </div>
+        <div>
+          <label class="muted" style="font-size:11px; text-transform:uppercase; letter-spacing:0.06em; font-weight:600">Capacité (kW)</label>
+          <input class="input tabular" type="number" style="width:100%; margin-top:4px" placeholder="2400">
+        </div>
+      </div>
+      <div>
+        <label class="muted" style="font-size:11px; text-transform:uppercase; letter-spacing:0.06em; font-weight:600">Lien mandat DSO (kDrive) — optionnel</label>
+        <input class="input" style="width:100%; margin-top:4px" placeholder="https://kdrive.infomaniak.com/app/share/…">
+        <div class="muted" style="font-size:11px; margin-top:4px">La signature du mandat se fait dans Odoo ; collez ici le lien kDrive vers le PDF signé (peut être ajouté plus tard).</div>
+      </div>
+    </div>
+    <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:18px; padding-top:14px; border-top:1px solid var(--border-subtle)">
+      <button class="btn btn-secondary" onclick="closeOverlay('manage-plants')">Annuler</button>
+      <button class="btn btn-primary" onclick="closeOverlay('manage-plants'); alert('Centrale ajoutée — à venir')"><i data-lucide="plus"></i> Ajouter la centrale</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Modal: Lien du mandat DSO (kDrive) — FR-DSL-2 ===== -->
+<div class="overlay" id="edit-mandate" onclick="if(event.target===this)closeOverlay('edit-mandate')">
+  <div class="modal">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px">
+      <div>
+        <div class="modal-title">Lien du mandat DSO (kDrive)</div>
+        <div class="modal-subtitle">La signature du mandat est réalisée à 100 % dans Odoo. Collez ici le lien kDrive vers le PDF signé.</div>
+      </div>
+      <button class="btn btn-ghost" onclick="closeOverlay('edit-mandate')"><i data-lucide="x"></i></button>
+    </div>
+    <div style="display:flex; flex-direction:column; gap:14px">
+      <div>
+        <label class="muted" style="font-size:11px; text-transform:uppercase; letter-spacing:0.06em; font-weight:600">Lien kDrive du PDF signé</label>
+        <input class="input" style="width:100%; margin-top:4px" placeholder="https://kdrive.infomaniak.com/app/share/naia/mandats/…">
+        <div class="muted" style="font-size:11px; margin-top:4px">Lien collé manuellement par l'admin (FR-DSL-2). Naia ne stocke que le lien — aucun rendu ni suivi de mandat dans l'application.</div>
+      </div>
+    </div>
+    <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:18px; padding-top:14px; border-top:1px solid var(--border-subtle)">
+      <button class="btn btn-secondary" onclick="closeOverlay('edit-mandate')">Annuler</button>
+      <button class="btn btn-primary" onclick="closeOverlay('edit-mandate'); alert('Lien de mandat enregistré — à venir')"><i data-lucide="check"></i> Enregistrer le lien</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Modal: Modifier l'utilisateur (role) — FR-CUS-3 ===== -->
+<div class="overlay" id="edit-user" onclick="if(event.target===this)closeOverlay('edit-user')">
+  <div class="modal">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px">
+      <div>
+        <div class="modal-title">Modifier l'utilisateur</div>
+        <div class="modal-subtitle">Le rôle détermine l'accès. Un seul contact principal par organisation (FR-CUS-3).</div>
+      </div>
+      <button class="btn btn-ghost" onclick="closeOverlay('edit-user')"><i data-lucide="x"></i></button>
+    </div>
+    <div style="display:flex; flex-direction:column; gap:14px">
+      <div class="cd-info-row" style="border:0; padding:0"><span class="lbl">Utilisateur</span><span><b>Marie Lambert</b> · m.lambert@convert-fmg.fr</span></div>
+      <div>
+        <label class="muted" style="font-size:11px; text-transform:uppercase; letter-spacing:0.06em; font-weight:600">Rôle</label>
+        <select class="select" style="width:100%; margin-top:4px"><option>Membre</option><option>Contact principal</option></select>
+        <div class="muted" style="font-size:11px; margin-top:4px">Promouvoir au contact principal rétrograde l'actuel contact principal en membre.</div>
+      </div>
+    </div>
+    <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:18px; padding-top:14px; border-top:1px solid var(--border-subtle)">
+      <button class="btn btn-secondary" onclick="closeOverlay('edit-user')">Annuler</button>
+      <button class="btn btn-primary" onclick="closeOverlay('edit-user'); alert('Rôle mis à jour — à venir')"><i data-lucide="check"></i> Enregistrer</button>
     </div>
   </div>
 </div>
