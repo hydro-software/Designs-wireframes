@@ -135,8 +135,58 @@
               </div>
 
               <!-- Activity rollups (FR-USAGE) -->
-              <h4 style="font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em; font-weight:600; margin:0 0 10px">Activité</h4>
-              <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(120px, 1fr)); gap:10px; margin-bottom:18px">
+              <h4 style="font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em; font-weight:600; margin:0 0 10px">Activité &amp; usage</h4>
+
+              <!-- Connexions par période -->
+              <div class="muted" style="font-size:11px; margin-bottom:6px">Connexions à Naia · tous les utilisateurs de l'organisation</div>
+              <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:10px; margin-bottom:14px">
+                <div style="background:var(--bg-input); border:1px solid var(--border-subtle); border-radius:8px; padding:10px 12px">
+                  <div class="muted" style="font-size:10px; text-transform:uppercase; letter-spacing:0.04em">7 derniers jours</div>
+                  <div class="tabular" style="font-size:18px; font-weight:700; margin-top:2px">9</div>
+                  <div style="font-size:11px; color:var(--accent-amber)"><i data-lucide="trending-down" style="width:11px; height:11px; vertical-align:-1px"></i> −25 % vs sem. préc.</div>
+                </div>
+                <div style="background:var(--bg-input); border:1px solid var(--border-subtle); border-radius:8px; padding:10px 12px">
+                  <div class="muted" style="font-size:10px; text-transform:uppercase; letter-spacing:0.04em">30 jours</div>
+                  <div class="tabular" style="font-size:18px; font-weight:700; margin-top:2px">142</div>
+                  <div style="font-size:11px; color:var(--accent-amber)"><i data-lucide="trending-down" style="width:11px; height:11px; vertical-align:-1px"></i> −18 % vs préc.</div>
+                </div>
+                <div style="background:var(--bg-input); border:1px solid var(--border-subtle); border-radius:8px; padding:10px 12px">
+                  <div class="muted" style="font-size:10px; text-transform:uppercase; letter-spacing:0.04em">Trimestre</div>
+                  <div class="tabular" style="font-size:18px; font-weight:700; margin-top:2px">487</div>
+                  <div class="muted" style="font-size:11px">≈ stable</div>
+                </div>
+                <div style="background:var(--bg-input); border:1px solid var(--border-subtle); border-radius:8px; padding:10px 12px">
+                  <div class="muted" style="font-size:10px; text-transform:uppercase; letter-spacing:0.04em">12 mois</div>
+                  <div class="tabular" style="font-size:18px; font-weight:700; margin-top:2px">1 980</div>
+                  <div style="font-size:11px; color:var(--accent-green)"><i data-lucide="trending-up" style="width:11px; height:11px; vertical-align:-1px"></i> +12 % a/a</div>
+                </div>
+              </div>
+
+              <!-- Tendance d'activité (sparkline · 12 dernières semaines) -->
+              <div style="background:var(--bg-input); border:1px solid var(--border-subtle); border-radius:8px; padding:12px; margin-bottom:14px">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px">
+                  <span class="muted" style="font-size:11px; text-transform:uppercase; letter-spacing:0.04em">Tendance d'activité · 12 dernières semaines</span>
+                  <span style="font-size:11px; color:var(--accent-amber); font-weight:600"><i data-lucide="trending-down" style="width:12px; height:12px; vertical-align:-2px"></i> en baisse · −18 % sur 30 j</span>
+                </div>
+                <svg width="100%" height="44" viewBox="0 0 232 44" preserveAspectRatio="none" style="display:block" role="img" aria-label="Connexions hebdomadaires, tendance à la baisse sur les 3 dernières semaines">
+                  <rect x="2"   y="10" width="14" height="30" rx="2" fill="#38bdf8"></rect>
+                  <rect x="20"  y="6"  width="14" height="34" rx="2" fill="#38bdf8"></rect>
+                  <rect x="38"  y="8"  width="14" height="32" rx="2" fill="#38bdf8"></rect>
+                  <rect x="56"  y="4"  width="14" height="36" rx="2" fill="#38bdf8"></rect>
+                  <rect x="74"  y="7"  width="14" height="33" rx="2" fill="#38bdf8"></rect>
+                  <rect x="92"  y="5"  width="14" height="35" rx="2" fill="#38bdf8"></rect>
+                  <rect x="110" y="9"  width="14" height="31" rx="2" fill="#38bdf8"></rect>
+                  <rect x="128" y="6"  width="14" height="34" rx="2" fill="#38bdf8"></rect>
+                  <rect x="146" y="8"  width="14" height="32" rx="2" fill="#38bdf8"></rect>
+                  <rect x="164" y="13" width="14" height="27" rx="2" fill="#fbbf24"></rect>
+                  <rect x="182" y="16" width="14" height="24" rx="2" fill="#fbbf24"></rect>
+                  <rect x="200" y="19" width="14" height="21" rx="2" fill="#fbbf24"></rect>
+                </svg>
+                <div class="muted" style="font-size:10px; margin-top:4px">Connexions hebdomadaires — les 3 dernières semaines (orange) sont sous la moyenne du trimestre.</div>
+              </div>
+
+              <!-- Dernière connexion + jours actifs -->
+              <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(120px, 1fr)); gap:10px; margin-bottom:14px">
                 <div style="background:var(--bg-input); border:1px solid var(--border-subtle); border-radius:8px; padding:10px 12px">
                   <div class="muted" style="font-size:10px; text-transform:uppercase; letter-spacing:0.04em">Dernière connexion</div>
                   <div style="font-size:14px; font-weight:600; margin-top:3px">il y a 2 j</div>
@@ -145,7 +195,7 @@
                 <div style="background:var(--bg-input); border:1px solid var(--border-subtle); border-radius:8px; padding:10px 12px">
                   <div class="muted" style="font-size:10px; text-transform:uppercase; letter-spacing:0.04em">Jours actifs · 30 j</div>
                   <div class="tabular" style="font-size:14px; font-weight:600; margin-top:3px">18 <span class="muted" style="font-size:11px; font-weight:400">/ 30</span></div>
-                  <div style="font-size:11px; color:var(--accent-red)"><i data-lucide="trending-down" style="width:11px; height:11px; vertical-align:-1px"></i> −18 % vs base 90 j</div>
+                  <div style="font-size:11px; color:var(--accent-amber)"><i data-lucide="trending-down" style="width:11px; height:11px; vertical-align:-1px"></i> −18 % vs base 90 j</div>
                 </div>
                 <div style="background:var(--bg-input); border:1px solid var(--border-subtle); border-radius:8px; padding:10px 12px">
                   <div class="muted" style="font-size:10px; text-transform:uppercase; letter-spacing:0.04em">Jours actifs · 90 j</div>
@@ -154,19 +204,28 @@
                 </div>
               </div>
 
-              <!-- Per-feature counters (FR-USAGE) -->
-              <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:10px; margin-bottom:18px">
+              <!-- Utilisation des fonctionnalités (FR-USAGE) -->
+              <div class="muted" style="font-size:11px; margin-bottom:6px">Utilisation des fonctionnalités · 30 j</div>
+              <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(96px, 1fr)); gap:10px; margin-bottom:18px">
                 <div style="background:var(--bg-input); border:1px solid var(--border-subtle); border-radius:8px; padding:10px 12px; text-align:center">
                   <div class="tabular" style="font-size:18px; font-weight:700">142</div>
-                  <div class="muted" style="font-size:11px; margin-top:2px"><i data-lucide="log-in" style="width:11px; height:11px; vertical-align:-1px"></i> Connexions · 30 j</div>
+                  <div class="muted" style="font-size:11px; margin-top:2px"><i data-lucide="log-in" style="width:11px; height:11px; vertical-align:-1px"></i> Connexions</div>
                 </div>
                 <div style="background:var(--bg-input); border:1px solid var(--border-subtle); border-radius:8px; padding:10px 12px; text-align:center">
                   <div class="tabular" style="font-size:18px; font-weight:700">27</div>
-                  <div class="muted" style="font-size:11px; margin-top:2px"><i data-lucide="file-bar-chart" style="width:11px; height:11px; vertical-align:-1px"></i> Rapports générés · 30 j</div>
+                  <div class="muted" style="font-size:11px; margin-top:2px"><i data-lucide="file-bar-chart" style="width:11px; height:11px; vertical-align:-1px"></i> Rapports</div>
                 </div>
                 <div style="background:var(--bg-input); border:1px solid var(--border-subtle); border-radius:8px; padding:10px 12px; text-align:center">
                   <div class="tabular" style="font-size:18px; font-weight:700">9</div>
-                  <div class="muted" style="font-size:11px; margin-top:2px"><i data-lucide="flask-conical" style="width:11px; height:11px; vertical-align:-1px"></i> Simulations · 30 j</div>
+                  <div class="muted" style="font-size:11px; margin-top:2px"><i data-lucide="flask-conical" style="width:11px; height:11px; vertical-align:-1px"></i> Simulations</div>
+                </div>
+                <div style="background:var(--bg-input); border:1px solid var(--border-subtle); border-radius:8px; padding:10px 12px; text-align:center">
+                  <div class="tabular" style="font-size:18px; font-weight:700">14</div>
+                  <div class="muted" style="font-size:11px; margin-top:2px"><i data-lucide="download" style="width:11px; height:11px; vertical-align:-1px"></i> Exports</div>
+                </div>
+                <div style="background:var(--bg-input); border:1px solid var(--border-subtle); border-radius:8px; padding:10px 12px; text-align:center">
+                  <div class="tabular" style="font-size:18px; font-weight:700">6</div>
+                  <div class="muted" style="font-size:11px; margin-top:2px"><i data-lucide="bar-chart-3" style="width:11px; height:11px; vertical-align:-1px"></i> Comparateurs</div>
                 </div>
               </div>
 
