@@ -41,6 +41,7 @@ All Insight pages (Tableau de bord, Production, Revenus, Données, Paramètres, 
 ### Later edits (within v6.2)
 
 - **2026-06-17** — Removed the **MVP 0.9 / MVP 1 conference toggle** and all the 0.9-hiding machinery: the `data-mvp` attributes, the `body[data-mvp=…]` CSS hide rules, the `.mvp09-fallback` "Tableau de bord — MVP 1" banner on `index.html`, and the forced 0.9 view on `parametres.html`. MVP 0.9 is now implemented in the platform, so the demo switch is no longer needed and every page shows the full surface. The Prospect / Abonné access toggle moves up into the top-right slot the MVP toggle vacated.
+- **2026-06-17** — Added **`admin-pricing-create.html`** — a dedicated full-page editor for a new pricing version (clone source / version / effective date / notes + inline-editable per-plant brackets, Enterprise tiers + add-on, hardware, points→jetons conversion). The "Cloner et créer une nouvelle version" modal on `admin-pricing.html` now opens this page; its primary button is **"Créer nouveau pricing"** (was "Créer le brouillon", which only fired a placeholder alert).
 
 ## Tech stack
 
