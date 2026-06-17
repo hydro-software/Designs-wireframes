@@ -36,6 +36,34 @@
         <div class="kpi-card"><div class="kpi-label">Approbations en attente</div><div class="kpi-value tabular">12</div><div class="kpi-delta down">articles, posts LI…</div></div>
       </div>
 
+      <h3 style="font-size:11px; color:var(--brand-cyan); text-transform:uppercase; letter-spacing:0.06em; font-weight:600; margin: 0 0 10px">Engagement &amp; santé des comptes</h3>
+      <div style="display:grid; gap:14px; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); margin-bottom:14px">
+        <div class="kpi-card"><div class="kpi-label">Clients à risque</div><div class="kpi-value tabular">9</div><div class="kpi-delta down">à risque + critique</div></div>
+        <div class="kpi-card"><div class="kpi-label">Connexion &lt; 30 j</div><div class="kpi-value tabular">71</div><div class="kpi-delta muted">sur 87 abonnés actifs</div></div>
+        <div class="kpi-card"><div class="kpi-label">Jours actifs médians · 30 j</div><div class="kpi-value tabular">14</div><div class="kpi-delta up">+2 vs base 90 j</div></div>
+        <div class="kpi-card"><div class="kpi-label">Rapports générés · 30 j</div><div class="kpi-value tabular">1 062</div><div class="kpi-delta up">+9 %</div></div>
+      </div>
+
+      <div class="card" style="margin-bottom:18px">
+        <div class="card-head"><div><div class="card-head-title">Répartition du risque de churn</div><div class="card-head-sub">Score santé 0–100 · 87 abonnés actifs</div></div><a href="admin-abonnements.html" class="btn btn-secondary btn-sm"><i data-lucide="arrow-right"></i> Voir les clients</a></div>
+        <div class="card-body">
+          <div style="display:flex; height:14px; border-radius:7px; overflow:hidden; margin-bottom:14px">
+            <div style="width:69%; background:var(--accent-green)" title="Sain · 60"></div>
+            <div style="width:21%; background:var(--accent-amber)" title="À surveiller · 18"></div>
+            <div style="width:7%; background:#ea580c" title="À risque · 6"></div>
+            <div style="width:3%; background:var(--accent-red-strong)" title="Critique · 3"></div>
+          </div>
+          <div style="display:flex; flex-wrap:wrap; gap:18px; align-items:center">
+            <span style="display:inline-flex; align-items:center; gap:6px; font-size:13px"><span class="badge badge-green">Sain</span> <b class="tabular">60</b></span>
+            <span style="display:inline-flex; align-items:center; gap:6px; font-size:13px"><span class="badge badge-amber">À surveiller</span> <b class="tabular">18</b></span>
+            <span style="display:inline-flex; align-items:center; gap:6px; font-size:13px"><span class="badge badge-red">À risque</span> <b class="tabular">6</b></span>
+            <span style="display:inline-flex; align-items:center; gap:6px; font-size:13px"><span class="badge badge-red">Critique</span> <b class="tabular">3</b></span>
+            <span class="muted" style="font-size:12px; margin-left:auto">Jours actifs médians · 30 j : <b class="tabular">14</b></span>
+          </div>
+          <p class="muted" style="font-size:12px; margin:14px 0 0">Santé = signal informatif ; le blocage d'accès reste une décision manuelle au cas par cas (FR-SUB-3).</p>
+        </div>
+      </div>
+
       <div style="display:grid; gap:14px; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr))">
         <div class="card">
           <div class="card-head"><div class="card-head-title">Raccourcis · programme communauté</div></div>

@@ -267,7 +267,7 @@
       <!-- Filters -->
       <div class="card" style="margin-bottom:14px">
         <div class="card-body" style="padding:14px 18px; display:flex; gap:8px; align-items:center; flex-wrap:wrap">
-          <select class="select" style="max-width:210px"><option>Toutes catégories Abonnements</option><option>Client (CRUD)</option><option>Abonnement (état)</option><option>Centrales (plants)</option><option>Facturation (statut Odoo)</option><option>Jetons (registre)</option><option>Utilisateurs (multi-seat)</option></select>
+          <select class="select" style="max-width:210px"><option>Toutes catégories Abonnements</option><option>Client (CRUD)</option><option>Abonnement (état)</option><option>Centrales (plants)</option><option>Facturation (statut Odoo)</option><option>Jetons (registre)</option><option>Utilisateurs (multi-seat)</option><option>Santé (score / bucket)</option><option>Usage / activité</option></select>
           <select class="select" style="max-width:190px"><option>Tous acteurs</option><option>Bernard L. (admin)</option><option>Ugo D. (admin)</option><option>Jan D. (admin)</option><option>système (webhook Odoo)</option><option>système (cron)</option></select>
           <select class="select" style="max-width:160px"><option>Toute la période</option><option>Aujourd'hui</option><option>7 derniers jours</option><option>30 derniers jours</option><option>Période custom…</option></select>
           <input class="input" placeholder="Recherche entité (client, code, plant)…" style="max-width:260px">
@@ -305,6 +305,21 @@
             </div>
           </div>
           <div class="audit-actor"><b>système (webhook Odoo)</b><br>invoice.overdue</div>
+        </div>
+
+        <div class="audit-row" onclick="openOverlay('audit-detail-subscription')">
+          <div class="audit-when">3 mai · 03:12:04</div>
+          <div class="audit-icon" style="background:rgba(251,191,36,0.18); color:#fcd34d"><i data-lucide="heart-pulse"></i></div>
+          <div class="audit-main">
+            <b>Santé · bucket changé · <a class="link" href="admin-customer.html">Convert FMG</a></b>
+            <div class="audit-diff">
+              <span class="audit-old">« Sain » (78)</span>
+              <span class="audit-arrow">→</span>
+              <span class="audit-new">« À surveiller » (62)</span>
+              <span class="muted">· baisse d'usage 30j (jours actifs 7 / 22 base 90j) · informatif (FR-HLT-6)</span>
+            </div>
+          </div>
+          <div class="audit-actor"><b>système (cron)</b><br>FR-HEALTH recompute</div>
         </div>
 
         <div class="audit-row" onclick="openOverlay('audit-detail-subscription')">
