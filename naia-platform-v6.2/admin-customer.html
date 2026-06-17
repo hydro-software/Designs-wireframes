@@ -61,7 +61,7 @@
       </div>
 
       <!-- Two-column layout -->
-      <div style="display:grid; gap:14px; grid-template-columns: 1.4fr 1fr">
+      <div style="display:grid; gap:14px; grid-template-columns: 1fr 1fr">
 
         <!-- LEFT COLUMN -->
         <div>
@@ -264,6 +264,26 @@
             </div>
           </div>
 
+        </div>
+
+        <!-- RIGHT COLUMN -->
+        <div>
+
+          <!-- Section: Naia record (operational, non-PII) -->
+          <div class="cd-section">
+            <div class="cd-section-head"><div class="cd-section-title"><i data-lucide="database" style="width:15px; color:var(--brand-cyan)"></i> Fiche Naia (opérationnelle)</div><button class="btn btn-secondary btn-sm" onclick="openOverlay('edit-naia-record')"><i data-lucide="edit-3"></i> Modifier</button></div>
+            <div class="cd-section-body">
+              <div class="cd-info-row"><span class="lbl">Nom d'affichage</span><span>Convert FMG</span></div>
+              <div class="cd-info-row"><span class="lbl">Contact Odoo lié</span><span><a class="link" href="https://hydro-software-services.odoo.com/odoo/contacts/4182" target="_blank" rel="noopener">#res.partner/4182 →</a></span></div>
+              <div class="cd-info-row"><span class="lbl">Pays (opérationnel)</span><span>France</span></div>
+              <div class="cd-info-row"><span class="lbl">Capacité totale</span><span class="tabular">11 MW · 9 centrales</span></div>
+              <div class="cd-info-row"><span class="lbl">Utilisateurs Naia</span><span>3</span></div>
+              <div style="margin-top:12px; padding:9px 11px; background:var(--bg-input); border-radius:8px; font-size:11px; color:var(--text-muted); line-height:1.6">
+                <i data-lucide="info" style="width:12px; height:12px; vertical-align:-2px"></i> Aucune donnée personnelle n'est stockée ici. Pour modifier le nom légal, la TVA, l'adresse ou l'e-mail de facturation, ouvrez la <a class="link" href="https://hydro-software-services.odoo.com/odoo/contacts/4182" target="_blank" rel="noopener">fiche Odoo</a>.
+              </div>
+            </div>
+          </div>
+
           <!-- Section: Plants -->
           <div class="cd-section">
             <div class="cd-section-head">
@@ -304,26 +324,6 @@
               </table>
               <div style="padding:10px 16px; border-top:1px solid var(--border-subtle); font-size:12px; color:var(--text-muted)">
                 Odoo émet chaque facture ainsi que le PDF. Naia ne génère ni ne stocke de PDF — chaque ligne pointe vers la facture hébergée dans Odoo.
-              </div>
-            </div>
-          </div>
-
-        </div>
-
-        <!-- RIGHT COLUMN -->
-        <div>
-
-          <!-- Section: Naia record (operational, non-PII) -->
-          <div class="cd-section">
-            <div class="cd-section-head"><div class="cd-section-title"><i data-lucide="database" style="width:15px; color:var(--brand-cyan)"></i> Fiche Naia (opérationnelle)</div><button class="btn btn-secondary btn-sm" onclick="openOverlay('edit-naia-record')"><i data-lucide="edit-3"></i> Modifier</button></div>
-            <div class="cd-section-body">
-              <div class="cd-info-row"><span class="lbl">Nom d'affichage</span><span>Convert FMG</span></div>
-              <div class="cd-info-row"><span class="lbl">Contact Odoo lié</span><span><a class="link" href="https://hydro-software-services.odoo.com/odoo/contacts/4182" target="_blank" rel="noopener">#res.partner/4182 →</a></span></div>
-              <div class="cd-info-row"><span class="lbl">Pays (opérationnel)</span><span>France</span></div>
-              <div class="cd-info-row"><span class="lbl">Capacité totale</span><span class="tabular">11 MW · 9 centrales</span></div>
-              <div class="cd-info-row"><span class="lbl">Utilisateurs Naia</span><span>3</span></div>
-              <div style="margin-top:12px; padding:9px 11px; background:var(--bg-input); border-radius:8px; font-size:11px; color:var(--text-muted); line-height:1.6">
-                <i data-lucide="info" style="width:12px; height:12px; vertical-align:-2px"></i> Aucune donnée personnelle n'est stockée ici. Pour modifier le nom légal, la TVA, l'adresse ou l'e-mail de facturation, ouvrez la <a class="link" href="https://hydro-software-services.odoo.com/odoo/contacts/4182" target="_blank" rel="noopener">fiche Odoo</a>.
               </div>
             </div>
           </div>
