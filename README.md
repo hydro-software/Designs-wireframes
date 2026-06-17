@@ -1,38 +1,92 @@
 # Designs-wireframes
 
-Interactive HTML wireframes / clickable prototypes for **Naia** (hydro-software). Static sites, no build step — published via GitHub Pages.
+Interactive HTML wireframes / clickable prototypes for **Naia** (hydro-software). Static sites, no build step — published via GitHub Pages. This README is the index **and** the changelog.
 
-**Landing page: https://hydro-software.github.io/Designs-wireframes/**
+## Wireframes
 
-## Contents
+| Area | Version | Status | Live URL |
+|---|---|---|---|
+| **Platform** (integrated app) | **v6.2** | **Active** | https://hydro-software.github.io/Designs-wireframes/naia-platform/v6.2/ |
+| | v6.1 | Reference (pre-descope) | https://hydro-software.github.io/Designs-wireframes/naia-platform/v6.1/ |
+| | v5 | Reference (conference scope) | https://hydro-software.github.io/Designs-wireframes/naia-platform/v5/ |
+| | v4 | Reference (first integrated) | https://hydro-software.github.io/Designs-wireframes/naia-platform/v4/ |
+| | v3 | Reference (settings redesign) | https://hydro-software.github.io/Designs-wireframes/naia-platform/v3/ |
+| **Community** (standalone, archived) | v1 | Archived — folded into platform | https://hydro-software.github.io/Designs-wireframes/naia-community/v1/ |
+| | v2 | Archived (partial) | https://hydro-software.github.io/Designs-wireframes/naia-community/v2/ |
+| **Conference game** | — | Separate artifact | https://hydro-software.github.io/Designs-wireframes/conference-game/ |
 
-| Area | What it is | Current live URL |
-|---|---|---|
-| [`naia-platform/`](naia-platform/) | The integrated Naia app mockup (Insight · Community · Subscription). Versioned `v3 → v6.2`; **v6.2 is current**. See [naia-platform/README.md](naia-platform/README.md) for the full all-versions changelog. | [naia-platform/v6.2/](https://hydro-software.github.io/Designs-wireframes/naia-platform/v6.2/) |
-| [`naia-community/`](naia-community/) | The standalone "Naia Points" community/loyalty wireframes (pre-integration). **Archived** — now folded into the platform. | [naia-community/v1/](https://hydro-software.github.io/Designs-wireframes/naia-community/v1/) |
-| [`conference-game/`](conference-game/) | The conference game — a separate artifact, not part of the platform app. | [conference-game/](https://hydro-software.github.io/Designs-wireframes/conference-game/) |
-
-Supporting material: `bl_draft/` (Bernard's original Paramètres drafts, depend on `naia-platform/v5` assets) · `briefs/` · `audits/` · `wireframe-img/`.
+The integrated app is the **`naia-platform/`** lineage (Insight / Pilotage · Community · Subscription, per [ADR-001](https://github.com/hydro-software/platform/blob/dev/product-system/architecture-decisions/001-one-integrated-app.md)). The standalone **`naia-community/`** ("Naia Points") wireframes predate integration and are kept for reference only; the community module now lives inside the platform (`community-*.html`). Bernard's original Paramètres draft standalones live under [`naia-platform/v5/bl_draft/`](naia-platform/v5/bl_draft/).
 
 ## Structure
 
 ```
 Designs-wireframes/
-├── index.html            landing page (links every prototype)
-├── naia-platform/        integrated app — vN folders + the consolidated changelog
-│   ├── v3/ v4/ v5/ v6.1/ v6.2/      (v6.2 = current)
-│   └── README.md         ← single changelog for all platform versions
-├── naia-community/        standalone community/loyalty wireframes (archived)
-│   └── v1/ v2/
+├── README.md             this file — index + changelog
+├── naia-platform/        integrated app: v3 v4 v5 v6.1 v6.2  (v6.2 = current)
+│   └── v5/bl_draft/       Bernard's original Paramètres drafts
+├── naia-community/        standalone community/loyalty wireframes (archived): v1 v2
 ├── conference-game/       separate game artifact
-└── bl_draft/ briefs/ audits/ wireframe-img/    supporting material
+└── wireframe-img/         shared image assets
 ```
 
-> **Note (June 2026 restructure):** version folders were regrouped under `naia-platform/` and `naia-community/` (previously `naia-vN` / `naia-platform-vN` / `naia-points-vN` at the repo root). GitHub Pages does not redirect old sub-paths, so the old **version-landing** URLs are preserved by small redirect stubs; deep links into old paths (e.g. a specific `…/admin-pricing.html`) will not redirect — use the new `naia-platform/vN/…` paths.
+`naia-platform/` and `naia-community/` each have an `index.html` that redirects to the current version.
+
+## Tech stack (shared across versions)
+
+Static multi-page site, no build step: Tailwind (Play CDN), Inter, Lucide icons, Chart.js, one shared `css/style.css` (dark + light tokens), one shared `js/app.js` (sidebar, centrale tabs, theme/access toggles, chart helpers). Dark theme primary (`#0a1326` navy, `#38bdf8` cyan, `#a3e635` lime), light theme available. Public sign-up / thank-you pages are standalone by design.
 
 ## Iteration
 
-Edit files under the relevant folder, commit, and push to `main` — GitHub Pages auto-rebuilds in ~60 seconds. Only the **current** platform version (`naia-platform/v6.2/`) is actively edited; older folders are frozen comparison references.
+Edit the **current** version folder (`naia-platform/v6.2/`), commit, and push to `main` — GitHub Pages auto-rebuilds in ~60 s. Older version folders are frozen comparison references and are not edited.
+
+---
+
+# Changelog
+
+## v6.2 — Subscription descoped to PRD v2.0 *(current)*
+
+`v6.2` is `v6.1` with the **Subscription module reworked to [Subscription PRD v2.0](https://github.com/hydro-software/subscription-system/blob/main/product-requirements.md)** (the post-conference descope re-baseline). Insight (Pilotage) and Communauté are unchanged from v6.1. Subscription V1 is now the **entitlement + billing-state record of truth**; acquisition, contract signing, dunning and onboarding move to **Odoo** or are deferred. PII lives in Odoo (Naia links to the Odoo contact); invoices are issued by Odoo; DSO mandates are signed in Odoo and Naia stores only a **kDrive link**.
+
+**Removed (descope, PRD v2.0 §6):** `admin-leads`, `admin-lead`, `admin-lead-create`, `admin-campaigns`, `admin-promotions`, `admin-onboarding`, `admin-contracts`, `admin-dso`, `admin-game-codes`, `admin-plaquette`, `inscription-abonnement`, `inscription-erreur`, `plaquette`.
+
+**Added:** `admin-customer-create.html` — the single "Ajouter un client" form (FR-CUS-2 / FR-PAD-7) replacing the multi-step sign-up wizard.
+
+**Reworked:** `admin.html` (trimmed to kept Subscription surfaces + Communauté card) · `admin-abonnements.html` (lean state machine Actif/En retard/Annulé; per-row Odoo link) · `admin-customer.html` (thin-PII Odoo-source-of-truth detail; per-plant kDrive mandate links) · `admin-audit.html` Abonnements panel (rebased on v2.0 webhook transitions) · `inscription.html` (public sign-up notification form, nothing persisted) · `merci.html` (simplified) · `profil-abonnement.html` (cancellation request kept; invoices link to Odoo) · `profil-factures.html` (Odoo-hosted PDFs) · `profil.html` (org legal details mirror Odoo; multi-user mgmt) · `profil-jetons.html` (token ledger only) · `production.html`/`revenue.html` (lock-overlay CTA → `inscription.html`; access toggle reads Prospect/Abonné).
+
+**Later edits (within v6.2):**
+- **2026-06-17** — Removed the **MVP 0.9 / MVP 1 conference toggle** and all the 0.9-hiding machinery (`data-mvp` attributes, the `body[data-mvp=…]` CSS hide rules, the `.mvp09-fallback` banner on `index.html`, the forced 0.9 view on `parametres.html`). MVP 0.9 is implemented in the platform, so every page shows the full surface; the Prospect/Abonné access toggle moved into the top-right slot the MVP toggle vacated.
+- **2026-06-17** — Added **`admin-pricing-create.html`** — a full-page editor for a new pricing version. The "Cloner et créer une nouvelle version" modal on `admin-pricing.html` opens it; primary button **"Créer nouveau pricing"**. Removed the redundant "Cloner et créer v02" topbar button (the active-card "Cloner pour modifier" is the single entry point).
+
+## v6.1 — Bernard's Paramètres rework *(reference)*
+
+Only `parametres.html` changes vs. v6 (v5b/v5c/v6 intermediates were collapsed here): dev-annotation layer; Enedis validation flow (`compteur-verif`); 5 roles with `invite-user`/`edit-user` modals; `supprimer-centrale`/`ajouter-centrale` modals; "Tarifs" rename; "Partage de données" teaser. Carried in from **v6**: new section order; new **Flux de revenus** section; composite indicators gain a leading constant; Comparateur "Vue revenus" filled in; Catégories de pertes simplified to 2 radio + 1 checkbox columns; Données "Compteur"→"Source de données"; the `#chart-config` overlay rebuilt into the *Configuration du panneau* structure. (Original Paramètres drafts: [`v5/bl_draft/`](naia-platform/v5/bl_draft/).)
+
+## v5 — post May-2026 team review *(reference)*
+
+- **Sidebar flattened under "Pilotage"**; no per-centrale fold-outs (centrales via top tabs); **Rapports removed** (now a dashboard CTA); **Inbox under Communauté**.
+- **Tableau de bord** — centrales tabs on top ("Tous" first); KPI tiles live ONLY here; "Générer un rapport" CTA with a "Pertes détectées · top 5" report type.
+- **Production / Revenus** — graph-first (no KPI tiles); breadcrumbs + time-granularity pills (Intraday · 30 jours · 12 mois · Années); indicateur arrow-cycler; floating right-axis toggle; discrete config + export icons; left **Indicateurs** + right **Légende** side panels (collapse to vertical strips); WhatsApp maintenance strip/dots on Production ([platform#229](https://github.com/hydro-software/platform/issues/229)).
+- **Données** — pills Électricité / Indicateur-Comparateur / Prix d'Électricité; unit as text; Évènementiel/Fréquentiel toggle; post-upload preview.
+- **Paramètres** — top-tabs only; new Code postal field + mandatory asterisks; new "Informations détaillées" and "Flux de production" sections; "Compteurs Électriques" redesigned.
+- **Profil** — Sécurité + Mes badges tabs removed; new "Paramètres utilisateur" tile; profile button navigates straight to `profil.html`.
+- Introduced the **MVP 0.9 / MVP 1** conference toggle (later removed in v6.2).
+
+## v4 — first integrated app mockup *(reference)*
+
+Canonical mockup after the April 2026 review and ADR-001 (one integrated app, three modules), in the dark theme. Replaced the standalone `naia-points` community mockups and the `naia-v3` settings prototype. Foldable per-centrale sidebar; profile dropdown. Covered Naia core, the profile/subscription surface, the Community module, Administration, and lead-facing pages. Established the 2026-05-27 V1 conference descope (F3 LinkedIn, D5 Surveys, D6 Agenda deferred to V2 behind a toggle).
+
+## v3 — settings redesign prototype *(reference)*
+
+First working HTML prototype, for the settings redesign ([platform#261](https://github.com/hydro-software/platform/issues/261) v3): dashboard with KPIs + 30-day chart + configuration panel drawer, plant list, plant detail with type-aware indicator/comparator modals, and the data-import picker + CSV drop zone.
+
+---
+
+## Community wireframes (archived)
+
+The standalone **"Naia Points"** community/loyalty prototypes, built before the integrated-app decision and now **folded into the platform** (see `community-*.html` under `naia-platform/`). Kept for reference of community UI patterns.
+
+- **v1** — full member + admin portal (17 pages): dashboard, earn (incl. parrainage), rewards, leaderboard, profile, community (forum/annuaire/KB), visits, market intelligence, opportunities; admin portal with member drawer.
+- **v2** — partial (5 of 9 pages), superseded by the integrated mockup.
 
 ## Related
 
