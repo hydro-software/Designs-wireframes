@@ -6,7 +6,8 @@ Interactive HTML wireframes / clickable prototypes for **Naia** (hydro-software)
 
 | Area | Version | Status | Live URL |
 |---|---|---|---|
-| **Platform** (integrated app) | **v6.2** | **Active** | https://hydro-software.github.io/Designs-wireframes/naia-platform/v6.2/ |
+| **Platform** (integrated app) | **v6.3** | **Active** | https://hydro-software.github.io/Designs-wireframes/naia-platform/v6.3/ |
+| | v6.2 | Reference (pre-Paramètres iter) | https://hydro-software.github.io/Designs-wireframes/naia-platform/v6.2/ |
 | | v6.1 | Reference (pre-descope) | https://hydro-software.github.io/Designs-wireframes/naia-platform/v6.1/ |
 | | v5 | Reference (conference scope) | https://hydro-software.github.io/Designs-wireframes/naia-platform/v5/ |
 | | v4 | Reference (first integrated) | https://hydro-software.github.io/Designs-wireframes/naia-platform/v4/ |
@@ -23,7 +24,7 @@ The integrated app is the **`naia-platform/`** lineage (Insight / Pilotage · Co
 ```
 Designs-wireframes/
 ├── README.md             this file — index + changelog
-├── naia-platform/        integrated app: v0 v3 v4 v5 v6.1 v6.2  (v6.2 = current)
+├── naia-platform/        integrated app: v0 v3 v4 v5 v6.1 v6.2 v6.3  (v6.3 = current)
 │   ├── v0/               first wireframe document (2025, static screenshots)
 │   └── v5/bl_draft/      Bernard's original Paramètres drafts
 ├── naia-community/        standalone community/loyalty wireframes (archived): v1 v2
@@ -38,13 +39,22 @@ Static multi-page site, no build step: Tailwind (Play CDN), Inter, Lucide icons,
 
 ## Iteration
 
-Edit the **current** version folder (`naia-platform/v6.2/`), commit, and push to `main` — GitHub Pages auto-rebuilds in ~60 s. Older version folders are frozen comparison references and are not edited.
+Edit the **current** version folder (`naia-platform/v6.3/`), commit, and push to `main` — GitHub Pages auto-rebuilds in ~60 s. Older version folders are frozen comparison references and are not edited.
 
 ---
 
 # Changelog
 
-## v6.2 — Subscription descoped to PRD v2.0 *(current)*
+## v6.3 — Paramètres : versioning des caractéristiques + itérations *(current)*
+
+`v6.3` is `v6.2` with a round of **Paramètres (`parametres.html`) iterations** — porting the platform's plant-characteristics versioning into the wireframe and polishing the form. Insight (Pilotage), Communauté and Subscription surfaces are unchanged from v6.2; only `parametres.html` differs.
+
+- **Versioning des caractéristiques** — version-selector bar above *Informations détaillées* (dropdown of dated versions, "Nouvelle version" modal, "Modifier ▾" → edit validity dates / delete version, validity hint + active-version warning). Ports `PlantDetailsPanel.vue`.
+- **Puissance nominale du site** moved up into *Informations générales* (below *Alias court*) with its "i" tooltip; the right column is now Pays / Code postal / Fuseau horaire.
+- **Form polish** — single grid so rows stay aligned when a label wraps (any DPI); "i" tooltips show on hover **and** click (styled bubble instead of the native `title`); `<select>` fields normalised to match the text inputs (custom chevron, same box).
+- **Catégories de pertes — "Remplir automatiquement" wizard** — pick a predefined model (template dropdown) or copy another plant's categories (plant dropdown), with a live **Aperçu** of the categories as coloured badges.
+
+## v6.2 — Subscription descoped to PRD v2.0 *(reference)*
 
 `v6.2` is `v6.1` with the **Subscription module reworked to [Subscription PRD v2.0](https://github.com/hydro-software/subscription-system/blob/main/product-requirements.md)** (the post-conference descope re-baseline). Insight (Pilotage) and Communauté are unchanged from v6.1. Subscription V1 is now the **entitlement + billing-state record of truth**; acquisition, contract signing, dunning and onboarding move to **Odoo** or are deferred. PII lives in Odoo (Naia links to the Odoo contact); invoices are issued by Odoo; DSO mandates are signed in Odoo and Naia stores only a **kDrive link**.
 
