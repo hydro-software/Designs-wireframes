@@ -6,7 +6,8 @@ Interactive HTML wireframes / clickable prototypes for **Naia** (hydro-software)
 
 | Area | Version | Status | Live URL |
 |---|---|---|---|
-| **Platform** (integrated app) | **v6.3** | **Active** | https://hydro-software.github.io/Designs-wireframes/naia-platform/v6.3/ |
+| **Platform** (integrated app) | **v6.4** | **Active** | https://hydro-software.github.io/Designs-wireframes/naia-platform/v6.4/ |
+| | v6.3 | Reference (Paramètres versioning) | https://hydro-software.github.io/Designs-wireframes/naia-platform/v6.3/ |
 | | v6.2 | Reference (pre-Paramètres iter) | https://hydro-software.github.io/Designs-wireframes/naia-platform/v6.2/ |
 | | v6.1 | Reference (pre-descope) | https://hydro-software.github.io/Designs-wireframes/naia-platform/v6.1/ |
 | | v5 | Reference (conference scope) | https://hydro-software.github.io/Designs-wireframes/naia-platform/v5/ |
@@ -24,7 +25,7 @@ The integrated app is the **`naia-platform/`** lineage (Insight / Pilotage · Co
 ```
 Designs-wireframes/
 ├── README.md             this file — index + changelog
-├── naia-platform/        integrated app: v0 v3 v4 v5 v6.1 v6.2 v6.3  (v6.3 = current)
+├── naia-platform/        integrated app: v0 v3 v4 v5 v6.1 v6.2 v6.3 v6.4  (v6.4 = current)
 │   ├── v0/               first wireframe document (2025, static screenshots)
 │   └── v5/bl_draft/      Bernard's original Paramètres drafts
 ├── naia-community/        standalone community/loyalty wireframes (archived): v1 v2
@@ -39,13 +40,22 @@ Static multi-page site, no build step: Tailwind (Play CDN), Inter, Lucide icons,
 
 ## Iteration
 
-Edit the **current** version folder (`naia-platform/v6.3/`), commit, and push to `main` — GitHub Pages auto-rebuilds in ~60 s. Older version folders are frozen comparison references and are not edited.
+Edit the **current** version folder (`naia-platform/v6.4/`), commit, and push to `main` — GitHub Pages auto-rebuilds in ~60 s. Older version folders are frozen comparison references and are not edited.
 
 ---
 
 # Changelog
 
-## v6.3 — Paramètres : versioning des caractéristiques + itérations *(current)*
+## v6.4 — Subscription PRD v2.6 (team-review re-baseline) *(current)*
+
+`v6.4` is `v6.3` with the **Subscription / admin surfaces reworked to [Subscription PRD v2.6](https://github.com/hydro-software/subscription-system/blob/main/product-requirements.md)** (the 2026-06-17 team-review re-baseline; triage in the subscription repo's `review-feedback-triage.md`). Insight (Pilotage) and Communauté surfaces are unchanged from v6.3.
+
+- **`admin-customer.html` (fiche organisation)** — reframed as an **organisation** with its reference number (`NAIA-00042`); new read-only **Contrats** card sourced from Odoo (FR-CUS-6); the Centrales block now embeds a read-only **centrales + compteurs** view with per-compteur **validation state** (« En validation » / « Validé »), the signed-DSO-mandate **kDrive link** (or « Lien manquant ») and a **Valider** action, plus a missing-mandate alert — replacing the old jump to Paramètres (FR-DSL-3/4/5); per-centrale **blocage / déblocage** for non-paiement (FR-SUB-5); **santé par centrale** breakdown (FR-USE-6 / FR-HLT-1); **utilisateurs de l'organisation** list made read-only — management is done by the client org-admin (FR-AUT-3).
+- **`parametres.html`** — « Ajouter une centrale » now states it **crée un ticket** pour l'équipe Naia (FR-PLT-1 / FR-SUPPORT); « Ajouter un compteur » is client-created in état **« En validation »** (production data shown only once the signed DSO mandate is checked and the compteur validated by Naia, FR-PLT-2 / FR-DSL-3); per-compteur validation badges; « Ajouter une source » requests note the ticket.
+- **`index.html`** — example **« Abonnement non actif »** blocked-centrale panel (FR-SUB-5).
+- **`profil.html`** — removed the community **Naia points** pill from « Mon organisation » (the Jetons portal page is kept; FR-TOKEN unchanged, decision B).
+
+## v6.3 — Paramètres : versioning des caractéristiques + itérations *(reference)*
 
 `v6.3` is `v6.2` with a round of **Paramètres (`parametres.html`) iterations** — porting the platform's plant-characteristics versioning into the wireframe and polishing the form. Insight (Pilotage), Communauté and Subscription surfaces are unchanged from v6.2; only `parametres.html` differs.
 

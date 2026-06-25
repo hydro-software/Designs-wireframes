@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin · Clients — Naia</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="css/style.css" rel="stylesheet"><script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body data-page="admin-abonnements" data-section="admin">
+<div class="app-shell">
+  <aside class="sidebar"></aside>
+  <main class="main-area">
+    <header class="topbar">
+      <div><div class="page-eyebrow">Administration · Abonnements</div><div style="font-size:18px; font-weight:600">Clients</div></div>
+      <div style="display:flex; gap:8px">
+        <button class="btn btn-secondary btn-sm" onclick="alert('Export CSV de la liste clients — à venir.')"><i data-lucide="download"></i> Export</button>
+        <a href="admin-customer-create.html" class="btn btn-primary"><i data-lucide="user-plus"></i> Nouveau client</a>
+      </div>
+    </header>
+
+    <div class="page-content">
+
+      <!-- Sub-tabs by subscription lifecycle state (active → past_due → cancelled) -->
+      <div class="centrale-tabs">
+        <a class="centrale-tab active"><span>Tous les clients</span><span class="cap">87</span></a>
+        <a class="centrale-tab"><span>Actif</span><span class="cap">84</span></a>
+        <a class="centrale-tab"><span>En retard</span><span class="cap">2</span></a>
+        <a class="centrale-tab"><span>Annulé</span><span class="cap">1</span></a>
+      </div>
+
+      <div class="page-content" style="padding:18px 0 0">
+
+        <div style="display:grid; gap:14px; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); margin-bottom:18px">
+          <div class="kpi-card"><div class="kpi-label">Abonnés actifs</div><div class="kpi-value tabular">84</div><div class="kpi-delta up">+11 vs mois dernier</div></div>
+          <div class="kpi-card"><div class="kpi-label">MRR</div><div class="kpi-value tabular">8 240 €</div><div class="kpi-delta up">+12 %</div></div>
+          <div class="kpi-card"><div class="kpi-label">En retard</div><div class="kpi-value tabular">2</div><div class="kpi-delta down">350 € à recouvrer</div></div>
+        </div>
+
+        <div class="card">
+          <div class="card-head">
+            <div style="display:flex; gap:8px; flex-wrap:wrap">
+              <select class="select" style="max-width:150px"><option>Tous statuts</option><option>Actif</option><option>En retard</option><option>Annulé</option></select>
+              <select class="select" style="max-width:160px"><option>Toute santé</option><option>Sain</option><option>À surveiller</option><option>À risque</option><option>Critique</option></select>
+              <select class="select" style="max-width:160px"><option>Toutes versions pricing</option><option>v01</option></select>
+              <select class="select" style="max-width:140px"><option>Tous pays</option><option>FR</option><option>BE</option><option>CH</option><option>DE</option></select>
+              <label style="font-size:12px; color:var(--text-muted); display:flex; gap:6px; align-items:center"><input type="checkbox"> Abonnés de test</label>
+            </div>
+            <input class="input" placeholder="Recherche…" style="max-width:200px">
+          </div>
+          <table class="data-table">
+            <thead><tr><th>Client</th><th>Plan</th><th>Statut</th><th>Dernière connexion</th><th>Santé</th><th>Renouvellement</th><th class="num" style="text-align:right">MRR</th><th></th></tr></thead>
+            <tbody>
+              <tr><td><b>Centrale de la Semois</b><br><span class="muted" style="font-size:11px">BE · Sophie Legrand</span></td><td><span class="badge badge-blue">Per-plant</span> 1 centrale · 540 kW</td><td><span class="badge badge-green">Actif</span></td><td class="muted">il y a 2 j</td><td><span class="badge badge-green">Sain</span> <span class="tabular muted" style="font-size:11px">84</span></td><td class="muted">1 mai</td><td class="num" style="text-align:right">100 €</td><td style="white-space:nowrap"><a href="#" onclick="alert('Ouvre le contact Odoo (res.partner) dans un nouvel onglet — à venir.'); return false;" class="link" title="Voir le contact Odoo" style="font-size:11px; margin-right:10px"><i data-lucide="external-link" style="width:12px; height:12px; display:inline; vertical-align:-1px"></i> Odoo</a><a href="admin-customer.html" class="link" style="font-size:11px">Détails →</a></td></tr>
+              <tr><td><b>Centrale d'Ariège</b><br><span class="muted" style="font-size:11px">FR · Claire Rousseau</span></td><td><span class="badge badge-blue">Per-plant</span> 1 centrale · 780 kW</td><td><span class="badge badge-green">Actif</span></td><td class="muted">il y a 5 j</td><td><span class="badge badge-green">Sain</span> <span class="tabular muted" style="font-size:11px">78</span></td><td class="muted">8 mai</td><td class="num" style="text-align:right">100 €</td><td style="white-space:nowrap"><a href="#" onclick="alert('Ouvre le contact Odoo (res.partner) dans un nouvel onglet — à venir.'); return false;" class="link" title="Voir le contact Odoo" style="font-size:11px; margin-right:10px"><i data-lucide="external-link" style="width:12px; height:12px; display:inline; vertical-align:-1px"></i> Odoo</a><a href="admin-customer.html" class="link" style="font-size:11px">Détails →</a></td></tr>
+              <tr><td><b>Moulin de Hohenberg</b><br><span class="muted" style="font-size:11px">DE · Thomas Müller</span></td><td><span class="badge badge-blue">Per-plant</span> 2 centrales · 850 kW total</td><td><span class="badge badge-green">Actif</span></td><td class="muted">il y a 18 j</td><td><span class="badge badge-amber">À surveiller</span> <span class="tabular muted" style="font-size:11px">64</span></td><td class="muted">15 mai</td><td class="num" style="text-align:right">150 €</td><td style="white-space:nowrap"><a href="#" onclick="alert('Ouvre le contact Odoo (res.partner) dans un nouvel onglet — à venir.'); return false;" class="link" title="Voir le contact Odoo" style="font-size:11px; margin-right:10px"><i data-lucide="external-link" style="width:12px; height:12px; display:inline; vertical-align:-1px"></i> Odoo</a><a href="admin-customer.html" class="link" style="font-size:11px">Détails →</a></td></tr>
+              <tr style="background:rgba(56,189,248,0.04)"><td><b>Convert FMG</b><br><span class="muted" style="font-size:11px">FR · Pierre Lefebvre · 9 centrales</span></td><td><span class="badge badge-purple">Enterprise</span> 11 MW · 9 centrales</td><td><span class="badge badge-green">Actif</span></td><td class="muted">hier</td><td><span class="badge badge-green">Sain</span> <span class="tabular muted" style="font-size:11px">91</span></td><td class="muted">22 mai</td><td class="num" style="text-align:right">740 €</td><td style="white-space:nowrap"><a href="#" onclick="alert('Ouvre le contact Odoo (res.partner) dans un nouvel onglet — à venir.'); return false;" class="link" title="Voir le contact Odoo" style="font-size:11px; margin-right:10px"><i data-lucide="external-link" style="width:12px; height:12px; display:inline; vertical-align:-1px"></i> Odoo</a><a href="admin-customer.html" class="link" style="font-size:11px; font-weight:600">Détails →</a></td></tr>
+              <tr><td><b>Serengeti</b><br><span class="muted" style="font-size:11px">FR · 12 centrales</span></td><td><span class="badge badge-purple">Enterprise</span> 78,9 MW · 12 centrales</td><td><span class="badge badge-green">Actif</span></td><td class="muted">il y a 23 j</td><td><span class="badge badge-amber">À surveiller</span> <span class="tabular muted" style="font-size:11px">58</span></td><td class="muted">5 juin</td><td class="num" style="text-align:right">1 100 €</td><td style="white-space:nowrap"><a href="#" onclick="alert('Ouvre le contact Odoo (res.partner) dans un nouvel onglet — à venir.'); return false;" class="link" title="Voir le contact Odoo" style="font-size:11px; margin-right:10px"><i data-lucide="external-link" style="width:12px; height:12px; display:inline; vertical-align:-1px"></i> Odoo</a><a href="admin-customer.html" class="link" style="font-size:11px">Détails →</a></td></tr>
+              <tr><td><b>Moulin du Bocq</b><br><span class="muted" style="font-size:11px">BE · Marc Dupont</span></td><td><span class="badge badge-blue">Per-plant</span> 1 centrale · 210 kW</td><td><span class="badge badge-green">Actif</span></td><td class="muted">il y a 3 j</td><td><span class="badge badge-green">Sain</span> <span class="tabular muted" style="font-size:11px">80</span></td><td class="muted">1 mai</td><td class="num" style="text-align:right">50 €</td><td style="white-space:nowrap"><a href="#" onclick="alert('Ouvre le contact Odoo (res.partner) dans un nouvel onglet — à venir.'); return false;" class="link" title="Voir le contact Odoo" style="font-size:11px; margin-right:10px"><i data-lucide="external-link" style="width:12px; height:12px; display:inline; vertical-align:-1px"></i> Odoo</a><a href="admin-customer.html" class="link" style="font-size:11px">Détails →</a></td></tr>
+              <tr><td><b>Centrale d'Anjou</b><br><span class="muted" style="font-size:11px">FR · Pierre Lefebvre</span></td><td><span class="badge badge-blue">Per-plant</span> 1 centrale · 320 kW</td><td><span class="badge badge-amber">En retard</span></td><td class="muted">il y a 27 j</td><td><span class="badge badge-red">À risque</span> <span class="tabular muted" style="font-size:11px">38</span></td><td class="muted">3 jours en retard</td><td class="num" style="text-align:right">50 €</td><td style="white-space:nowrap"><a href="#" onclick="alert('Ouvre le contact Odoo (res.partner) dans un nouvel onglet — à venir.'); return false;" class="link" title="Voir le contact Odoo" style="font-size:11px; margin-right:10px"><i data-lucide="external-link" style="width:12px; height:12px; display:inline; vertical-align:-1px"></i> Odoo</a><a href="admin-customer.html" class="link" style="font-size:11px">Détails →</a></td></tr>
+              <tr style="opacity:0.7"><td><b>Microcentrale du Doubs</b><br><span class="muted" style="font-size:11px">FR · Antoine Bertin</span></td><td><span class="badge badge-blue">Per-plant</span> 1 centrale · 240 kW</td><td><span class="badge badge-slate">Annulé</span></td><td class="muted">il y a 68 j</td><td><span class="badge badge-red">Critique</span> <span class="tabular muted" style="font-size:11px">12</span></td><td class="muted">clôturé le 12 avr.</td><td class="num" style="text-align:right; color:var(--text-muted)">— €</td><td style="white-space:nowrap"><a href="#" onclick="alert('Ouvre le contact Odoo (res.partner) dans un nouvel onglet — à venir.'); return false;" class="link" title="Voir le contact Odoo" style="font-size:11px; margin-right:10px"><i data-lucide="external-link" style="width:12px; height:12px; display:inline; vertical-align:-1px"></i> Odoo</a><a href="admin-customer.html" class="link" style="font-size:11px">Détails →</a></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="js/app.js"></script>
+</body></html>
