@@ -186,7 +186,7 @@ function buildSidebar() {
 
     <div id="profile-container">
       <!-- v5 update: this button no longer opens a dropdown — it navigates directly to
-           profil.html where Mon profil / Mon abonnement / Mes factures / Mes jetons sit
+           profil.html where Mon profil / Mon abonnement / Mes factures sit
            as tabs and a User Settings tile hosts language, theme and security. -->
       <a id="profile-trigger" class="profile-trigger" href="profil.html">
         <div class="avatar" style="width:30px; height:30px; font-size:11px">MD</div>
@@ -221,7 +221,7 @@ function toggleFoldByLink(chevEl) {
 // It navigates directly to profil.html, where:
 //   - Identité tab hosts user identity, badges, and a User Settings tile
 //     (Sécurité / MFA, Langue, Thème)
-//   - Mon abonnement / Mes factures / Mes jetons are the other tabs
+//   - Mon abonnement / Mes factures are the other tabs
 // The Sécurité and Mes badges tabs are removed (badges sit on Identité; security
 // moved into the settings tile).
 

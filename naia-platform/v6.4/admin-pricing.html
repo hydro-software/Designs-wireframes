@@ -57,9 +57,7 @@
             </tbody>
           </table>
           <h4 style="font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em; font-weight:600; margin:0 0 8px">Hardware · Box</h4>
-          <p style="font-size:13px; margin:0 0 18px">500 € one-off + 10 € / mois / box</p>
-          <h4 style="font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em; font-weight:600; margin:0 0 8px">Conversion points → jetons</h4>
-          <p style="font-size:13px; margin:0">Taux : <b>1 point = 1 jeton</b> · conversion par <b>lots de 10 points</b></p>
+          <p style="font-size:13px; margin:0">500 € one-off + 10 € / mois / box</p>
         </div>
       </div>
 
@@ -111,13 +109,7 @@
             <h4>Hardware · Box</h4>
             <button class="btn btn-secondary btn-sm" onclick="openOverlay('edit-hardware')"><i data-lucide="edit-3"></i> Modifier</button>
           </div>
-          <p style="font-size:13px; margin:0 0 18px">500 € one-off + 10 € / mois / box</p>
-
-          <div class="pr-sub">
-            <h4>Conversion points → jetons</h4>
-            <button class="btn btn-secondary btn-sm" onclick="openOverlay('edit-conversion')"><i data-lucide="edit-3"></i> Modifier</button>
-          </div>
-          <p style="font-size:13px; margin:0">Taux : <b>1 point = 1 jeton</b> · conversion par <b>lots de 10 points</b></p>
+          <p style="font-size:13px; margin:0">500 € one-off + 10 € / mois / box</p>
         </div>
       </div>
 
@@ -247,33 +239,6 @@
     <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:18px; padding-top:14px; border-top:1px solid var(--border-subtle)">
       <button class="btn btn-secondary" onclick="closeOverlay('edit-hardware')">Annuler</button>
       <button class="btn btn-primary" onclick="closeOverlay('edit-hardware'); alert('Tarifs hardware du brouillon enregistrés — à venir')"><i data-lucide="check"></i> Enregistrer le brouillon</button>
-    </div>
-  </div>
-</div>
-
-<!-- ===== Modal: Modifier la conversion points → jetons (draft) ===== -->
-<div class="overlay" id="edit-conversion" onclick="if(event.target===this)closeOverlay('edit-conversion')">
-  <div class="modal">
-    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px">
-      <div>
-        <div class="modal-title">Modifier la conversion points → jetons · v02 (brouillon)</div>
-        <div class="modal-subtitle">Taux et granularité de conversion (FR-TOKEN-EXCHANGE).</div>
-      </div>
-      <button class="btn btn-ghost" onclick="closeOverlay('edit-conversion')"><i data-lucide="x"></i></button>
-    </div>
-    <div style="display:flex; flex-direction:column; gap:14px">
-      <div>
-        <label class="muted" style="font-size:11px; text-transform:uppercase; letter-spacing:0.06em; font-weight:600">Taux — 1 point =</label>
-        <div style="display:flex; align-items:center; gap:8px; margin-top:4px"><input class="input tabular" type="number" step="0.1" style="width:140px" value="1"><span class="muted">jeton(s)</span></div>
-      </div>
-      <div>
-        <label class="muted" style="font-size:11px; text-transform:uppercase; letter-spacing:0.06em; font-weight:600">Conversion par lots de</label>
-        <div style="display:flex; align-items:center; gap:8px; margin-top:4px"><input class="input tabular" type="number" style="width:140px" value="10"><span class="muted">points</span></div>
-      </div>
-    </div>
-    <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:18px; padding-top:14px; border-top:1px solid var(--border-subtle)">
-      <button class="btn btn-secondary" onclick="closeOverlay('edit-conversion')">Annuler</button>
-      <button class="btn btn-primary" onclick="closeOverlay('edit-conversion'); alert('Taux de conversion du brouillon enregistré — à venir')"><i data-lucide="check"></i> Enregistrer le brouillon</button>
     </div>
   </div>
 </div>

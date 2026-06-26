@@ -19,7 +19,6 @@
       <a class="centrale-tab active" href="profil.html"><span>Identité</span></a>
       <a class="centrale-tab" href="profil-abonnement.html"><span>Mon abonnement</span></a>
       <a class="centrale-tab" href="profil-factures.html"  ><span>Mes factures</span></a>
-      <a class="centrale-tab" href="profil-jetons.html"    ><span>Mes jetons</span></a>
     </div>
 
     <div class="page-content">
@@ -53,8 +52,9 @@
              v6.2 descope: legal details (raison sociale, TVA, adresse, email de facturation)
              are the source of truth in Odoo (res.partner). Naia shows a read-only mirror only;
              editing happens in Odoo. Member / primary-contact management stays in Naia (FR-CUS-3).
-             v6.4 / PRD v2.6 (decision B): community points + tier pill removed to declutter
-             the client surface. The jetons portal link (profil-jetons.html) is unaffected. -->
+             The community Naia-points pill is KEPT here (community points stay).
+             PRD v2.7: tokens (jetons) descoped — the « Mes jetons » tab and the jetons portal
+             (profil-jetons.html) are removed; only subscription tokens are out, not community points. -->
         <div class="card" style="flex: 1.4 1 300px">
           <div class="card-head"><div class="card-head-title">Mon organisation</div></div>
           <div class="card-body">
