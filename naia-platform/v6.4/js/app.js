@@ -282,6 +282,11 @@ function applyCentrale(slug) {
   document.querySelectorAll("[data-centrale-capacity]").forEach(el => {
     el.textContent = slug === "all" ? "Total · 1 760 kW" : (c ? c.capacity : "—");
   });
+  // Centrale-scoped notes: show an element only when the active tab matches its
+  // data-centrale-note value (e.g. the dashboard "centrale non connectée" notices).
+  document.querySelectorAll("[data-centrale-note]").forEach(el => {
+    el.classList.toggle("show", el.dataset.centraleNote === slug);
+  });
   // Refresh chart with the right scaling factor
   if (typeof rebuildProductionChart === "function") rebuildProductionChart();
 }

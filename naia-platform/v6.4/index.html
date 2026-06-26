@@ -32,6 +32,35 @@
 
     <div class="page-content">
 
+      <style>
+        [data-centrale-note]{display:none; margin-bottom:14px; padding:12px 14px; border-radius:10px; background:rgba(251,191,36,0.10); border:1px solid rgba(251,191,36,0.35); font-size:13px; gap:10px; align-items:flex-start; line-height:1.55}
+        [data-centrale-note].show{display:flex}
+        #sub-blocked-view{display:none}
+        body[data-sub="inactive"] #sub-active-view{display:none}
+        body[data-sub="inactive"] #sub-blocked-view{display:block}
+      </style>
+
+      <!-- Démo : bascule Abonnement actif / non actif (FR-SUB-5) — montre la vue client lorsque l'abonnement de l'organisation n'est plus actif. -->
+      <div style="display:flex; align-items:center; gap:10px; margin-bottom:16px; font-size:12.5px">
+        <span class="muted">Démo · Abonnement :</span>
+        <span class="access-seg">
+          <button data-sub-btn="active" class="on" onclick="setSubDemo('active')">Actif</button>
+          <button data-sub-btn="inactive" onclick="setSubDemo('inactive')">Non actif</button>
+        </span>
+      </div>
+
+      <div id="sub-active-view">
+
+      <!-- Centrale non connectée — notes pilotées par l'onglet centrale actif (app.js applyCentrale). -->
+      <div data-centrale-note="all">
+        <i data-lucide="alert-triangle" style="width:16px;height:16px;color:var(--accent-amber);flex-shrink:0;margin-top:2px"></i>
+        <span>La production de la <b>Centrale d'Ariège</b> n'est pas prise en compte dans la vue agrégée — centrale non connectée (un compteur en attente de validation).</span>
+      </div>
+      <div data-centrale-note="ariege">
+        <i data-lucide="alert-triangle" style="width:16px;height:16px;color:var(--accent-amber);flex-shrink:0;margin-top:2px"></i>
+        <span>Un compteur de cette centrale n'est <b>pas validé</b> — ses données ne sont pas prises en compte. Le mandat DSO signé est en attente de validation par l'équipe Naia.</span>
+      </div>
+
       <!-- Dashboard KPIs per #261: production this month / YTD / vs last year, facteur de charge.
            v5: these tiles live ONLY here on the Tableau de bord. Production and Revenus
            pages drop them to focus on the chart. -->
@@ -55,26 +84,6 @@
           <div class="kpi-label"><i data-lucide="euro" style="width:13px;height:13px"></i> Revenus · YTD</div>
           <div class="kpi-value tabular">78 240 €</div>
           <div class="kpi-delta up"><i data-lucide="trending-up"></i> +14 %</div>
-        </div>
-      </div>
-
-      <!-- FR-SUB-5 (PRD v2.6) — blocked-centrale state.
-           The centrale's name still shows in its tab, but selecting it surfaces a
-           suspended-access message instead of data. The centrale tabs + their content
-           are driven by the shared js/app.js (buildCentraleTabs / applyCentrale); wiring
-           a true per-tab blocked view would require editing app.js (out of scope here),
-           so this is a clearly-labelled static example panel showing the exact message. -->
-      <div class="card" style="margin-bottom:18px; border:1px solid var(--accent-red)">
-        <div class="card-head">
-          <div class="card-head-title"><span class="badge badge-amber">Exemple</span> Centrale à accès bloqué</div>
-          <div class="card-head-sub">Aperçu de l'état affiché lorsqu'une centrale (p. ex. « Centrale d'Ariège ») a son abonnement suspendu. Le nom reste visible dans son onglet ; son contenu est remplacé par ce message.</div>
-        </div>
-        <div class="card-body" style="display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; gap:12px; padding:40px 24px">
-          <div style="width:56px; height:56px; border-radius:50%; background:rgba(248,113,113,0.14); color:var(--accent-red); display:flex; align-items:center; justify-content:center">
-            <i data-lucide="lock" style="width:26px; height:26px"></i>
-          </div>
-          <div style="font-size:16px; font-weight:600">Abonnement non actif</div>
-          <div class="muted" style="font-size:13px; max-width:440px; line-height:1.6">Cet accès a été suspendu. Contactez votre administrateur : Jean Dupont (admin de l'organisation).</div>
         </div>
       </div>
 
@@ -111,6 +120,29 @@
           <a href="reports.html" class="btn btn-secondary btn-sm"><i data-lucide="folder-open"></i> Historique</a>
         </div>
       </div>
+
+      </div><!-- /#sub-active-view -->
+
+      <!-- Vue « abonnement non actif » (FR-SUB-5) — affichée via la bascule de démo en haut de page. -->
+      <div id="sub-blocked-view">
+        <div class="card" style="border:1px solid var(--accent-red)">
+          <div class="card-body" style="display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; gap:12px; padding:56px 24px">
+            <div style="width:56px; height:56px; border-radius:50%; background:rgba(248,113,113,0.14); color:var(--accent-red); display:flex; align-items:center; justify-content:center">
+              <i data-lucide="lock" style="width:26px; height:26px"></i>
+            </div>
+            <div style="font-size:18px; font-weight:600">Abonnement non actif</div>
+            <div class="muted" style="font-size:13px; max-width:470px; line-height:1.6">L'abonnement de votre organisation n'est plus actif&#8239;: les données de production de vos centrales ne sont plus accessibles. Le nom de chaque centrale reste visible dans ses onglets. Contactez votre administrateur&#8239;: <b>Jean Dupont</b> (admin de l'organisation) ou l'équipe Naia.</div>
+          </div>
+        </div>
+      </div>
+
+      <script>
+        function setSubDemo(s){
+          document.body.dataset.sub = s;
+          document.querySelectorAll('[data-sub-btn]').forEach(b => b.classList.toggle('on', b.dataset.subBtn === s));
+          if (window.lucide) lucide.createIcons();
+        }
+      </script>
 
     </div>
   </main>
