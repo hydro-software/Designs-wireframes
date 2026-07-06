@@ -262,25 +262,11 @@
                 </div>
               </div>
 
-              <!-- Santé par centrale (FR-USE-6 / FR-HLT-1) -->
-              <h4 style="font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em; font-weight:600; margin:0 0 4px">Santé par centrale</h4>
-              <div class="muted" style="font-size:11px; margin-bottom:10px; line-height:1.5">L'usage se concentre sur <b>une seule</b> centrale&#8239;: les 8 autres sont inactives. Le score global masque cette disparité — d'où le détail ci-dessous.</div>
-              <div style="border:1px solid var(--border-subtle); border-radius:8px; overflow:hidden; margin-bottom:16px">
-                <table class="data-table" style="font-size:13px; margin:0">
-                  <thead><tr><th>Centrale</th><th>Santé</th><th style="text-align:right">Connexions · 30 j</th></tr></thead>
-                  <tbody>
-                    <tr><td><b>Centrale du Moulin</b></td><td><span class="badge badge-green">Sain</span></td><td class="tabular" style="text-align:right">42</td></tr>
-                    <tr><td><b>Barrage de la Sèvre</b></td><td><span class="badge badge-amber">À surveiller</span></td><td class="tabular" style="text-align:right">3</td></tr>
-                    <tr><td><b>Microcentrale de la Sèvre</b></td><td><span class="badge badge-red">À risque</span></td><td class="tabular" style="text-align:right">0</td></tr>
-                    <tr><td><b>Centrale du Saux</b></td><td><span class="badge badge-red">À risque</span></td><td class="tabular" style="text-align:right">0</td></tr>
-                    <tr><td colspan="3" style="padding:9px 16px; font-size:12px; color:var(--text-muted)">+ 5 autres centrales · toutes <span class="badge badge-red" style="font-size:10px">À risque</span> · <span class="tabular">0</span> connexion sur 30&#8239;j</td></tr>
-                  </tbody>
-                </table>
-              </div>
-
-              <!-- Informational framing (FR-HLT-6 / FR-SUB-3) -->
+              <!-- Informational framing (FR-HLT-6 / FR-SUB-3) — PO decision 2026-07-06:
+                   the health score is computed and shown PER CUSTOMER (org aggregate);
+                   no per-centrale breakdown at V1 (aligned with issue #108). -->
               <div style="padding:10px 12px; background:var(--bg-input); border-radius:8px; font-size:12px; color:var(--text-muted); line-height:1.6">
-                <i data-lucide="info" style="width:13px; height:13px; vertical-align:-2px"></i> Le score de santé est <b>informatif</b>. Il alimente le tableau de bord admin et le <b>suivi manuel des impayés</b> (décision d'accès au cas par cas, FR-SUB-3). Il ne déclenche <b>aucun</b> blocage, suspension ou relance automatique.
+                <i data-lucide="info" style="width:13px; height:13px; vertical-align:-2px"></i> Le score de santé est <b>informatif</b> et calculé <b>au niveau du client</b> (agrégat de l'organisation). Il alimente le tableau de bord admin et le <b>suivi manuel des impayés</b> (décision d'accès au cas par cas, FR-SUB-3). Il ne déclenche <b>aucun</b> blocage, suspension ou relance automatique.
               </div>
             </div>
           </div>
@@ -305,10 +291,13 @@
             </div>
           </div>
 
-          <!-- Section: Centrales & compteurs (read-only, embedded) — FR-DSL-3/4/5, FR-SUB-5 -->
+          <!-- Section: Centrales & compteurs — FR-DSL-3/4/5, FR-SUB-5.
+               PO decision 2026-07-06: BOTH the client (portal) and the Naia
+               admin can add a centrale; user management stays client-only. -->
           <div class="cd-section">
             <div class="cd-section-head">
               <div class="cd-section-title"><i data-lucide="zap" style="width:15px; color:var(--brand-cyan)"></i> Centrales &amp; compteurs <span class="muted" style="font-weight:400">· 9 centrales</span></div>
+              <button class="btn btn-secondary btn-sm" onclick="openOverlay('manage-plants')"><i data-lucide="plus"></i> Ajouter une centrale</button>
             </div>
             <div class="cd-section-body">
 
@@ -399,9 +388,9 @@
                 <i data-lucide="lock" style="width:13px; height:13px; vertical-align:-2px"></i> Un blocage masque les données de la centrale côté client&#8239;; l'utilisateur voit «&#8239;Abonnement non actif&#8239;». À utiliser en cas de non-paiement (décision manuelle au cas par cas).
               </div>
 
-              <!-- Read-only caption -->
+              <!-- Admin rights caption (PO decision 2026-07-06) -->
               <div style="margin-top:8px; padding:10px 12px; background:var(--bg-input); border-radius:8px; font-size:12px; color:var(--text-muted); line-height:1.6">
-                <i data-lucide="info" style="width:13px; height:13px; vertical-align:-2px"></i> Vue lecture seule — l'admin Naia ne modifie pas les paramètres du client&#8239;; il valide le mandat par compteur. La signature des mandats DSO est réalisée à 100&#8239;% dans Odoo&#8239;; Naia n'affiche qu'un lien kDrive vers le PDF signé.
+                <i data-lucide="info" style="width:13px; height:13px; vertical-align:-2px"></i> L'admin Naia peut <b>ajouter une centrale</b> et <b>valider le mandat par compteur</b>&#8239;; les autres paramètres du client restent en lecture seule (le client peut aussi ajouter ses centrales depuis son portail). La signature des mandats DSO est réalisée à 100&#8239;% dans Odoo&#8239;; Naia n'affiche qu'un lien kDrive vers le PDF signé.
               </div>
             </div>
           </div>
@@ -427,35 +416,19 @@
             </div>
           </div>
 
-          <!-- Section: Contrats (Odoo) — FR-CUS-6 -->
+          <!-- Section: Contrats (kDrive) — FR-CUS-6 / issue #106.
+               PO decision 2026-07-06: contracts are signed in Odoo, the signed
+               PDFs are archived on kDrive; Naia stores ONE per-customer kDrive
+               folder link (no per-contract rows drawn from Odoo). -->
           <div class="cd-section">
             <div class="cd-section-head">
-              <div class="cd-section-title"><i data-lucide="file-text" style="width:15px; color:var(--brand-cyan)"></i> Contrats <span class="muted" style="font-weight:400">· source : Odoo</span></div>
-              <a class="link" style="font-size:12px" href="https://hydro-software-services.odoo.com/odoo/sale-subscription?partner=4182" target="_blank" rel="noopener">Tous les contrats Odoo →</a>
+              <div class="cd-section-title"><i data-lucide="file-text" style="width:15px; color:var(--brand-cyan)"></i> Contrats <span class="muted" style="font-weight:400">· source : kDrive</span></div>
+              <button class="btn btn-secondary btn-sm" onclick="alert('Modifier le lien kDrive — à venir')"><i data-lucide="edit-3"></i> Modifier le lien</button>
             </div>
-            <div class="cd-section-body" style="padding:0">
-              <table class="data-table" style="font-size:13px">
-                <thead><tr><th>Contrat</th><th>Statut</th><th></th></tr></thead>
-                <tbody>
-                  <tr>
-                    <td><b>Contrat d'abonnement — 2026</b><br><span class="muted tabular" style="font-size:11px">SUB/2026/00042</span></td>
-                    <td><span class="badge badge-green">En cours</span></td>
-                    <td style="text-align:right; white-space:nowrap"><button class="btn btn-secondary btn-sm" onclick="alert('Ouverture dans Odoo… à venir')"><i data-lucide="external-link"></i> Ouvrir dans Odoo</button></td>
-                  </tr>
-                  <tr>
-                    <td><b>Mandat de prélèvement SEPA</b><br><span class="muted tabular" style="font-size:11px">SEPA-2024-0917</span></td>
-                    <td><span class="badge badge-green">Actif</span></td>
-                    <td style="text-align:right; white-space:nowrap"><button class="btn btn-secondary btn-sm" onclick="alert('Ouverture dans Odoo… à venir')"><i data-lucide="external-link"></i> Ouvrir dans Odoo</button></td>
-                  </tr>
-                  <tr>
-                    <td><b>Avenant — ajout de centrale</b><br><span class="muted tabular" style="font-size:11px">ANX/2026/0058</span></td>
-                    <td><span class="badge badge-slate">Signé</span></td>
-                    <td style="text-align:right; white-space:nowrap"><button class="btn btn-secondary btn-sm" onclick="alert('Ouverture dans Odoo… à venir')"><i data-lucide="external-link"></i> Ouvrir dans Odoo</button></td>
-                  </tr>
-                </tbody>
-              </table>
-              <div style="padding:10px 16px; border-top:1px solid var(--border-subtle); font-size:12px; color:var(--text-muted)">
-                Lecture seule — source&#8239;: Odoo. Aucune donnée de contrat n'est stockée dans Naia.
+            <div class="cd-section-body">
+              <div class="cd-info-row"><span class="lbl">Dossier contrats du client</span><span><a class="link" href="https://kdrive.infomaniak.com/app/share/naia/contrats/convert-fmg" target="_blank" rel="noopener"><i data-lucide="folder-open" style="width:13px; height:13px; vertical-align:-2px"></i> kDrive · Contrats — Convert FMG →</a></span></div>
+              <div style="margin-top:12px; padding:10px 12px; background:var(--bg-input); border-radius:8px; font-size:12px; color:var(--text-muted); line-height:1.6">
+                <i data-lucide="info" style="width:13px; height:13px; vertical-align:-2px"></i> La signature des contrats (abonnement, SEPA, avenants) est réalisée à 100&#8239;% dans <b>Odoo</b>&#8239;; les PDF signés sont archivés sur <b>kDrive</b>. Naia ne stocke que ce lien — aucune donnée de contrat dans l'application.
               </div>
             </div>
           </div>
@@ -682,36 +655,9 @@
   </div>
 </div>
 
-<!-- ===== Modal: Ajouter un utilisateur ===== -->
-<div class="overlay" id="add-user" onclick="if(event.target===this)closeOverlay('add-user')">
-  <div class="modal">
-    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px">
-      <div>
-        <div class="modal-title">Ajouter un utilisateur</div>
-        <div class="modal-subtitle">L'utilisateur recevra une invitation par e-mail pour rejoindre l'organisation Convert FMG.</div>
-      </div>
-      <button class="btn btn-ghost" onclick="closeOverlay('add-user')"><i data-lucide="x"></i></button>
-    </div>
-    <div style="display:flex; flex-direction:column; gap:14px">
-      <div>
-        <label class="muted" style="font-size:11px; text-transform:uppercase; letter-spacing:0.06em; font-weight:600">Nom complet</label>
-        <input class="input" style="width:100%; margin-top:4px" placeholder="Prénom Nom">
-      </div>
-      <div>
-        <label class="muted" style="font-size:11px; text-transform:uppercase; letter-spacing:0.06em; font-weight:600">E-mail</label>
-        <input class="input" type="email" style="width:100%; margin-top:4px" placeholder="prenom.nom@convert-fmg.fr">
-      </div>
-      <div>
-        <label class="muted" style="font-size:11px; text-transform:uppercase; letter-spacing:0.06em; font-weight:600">Rôle</label>
-        <select class="select" style="width:100%; margin-top:4px"><option>Membre</option><option>Contact principal</option></select>
-      </div>
-    </div>
-    <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:18px; padding-top:14px; border-top:1px solid var(--border-subtle)">
-      <button class="btn btn-secondary" onclick="closeOverlay('add-user')">Annuler</button>
-      <button class="btn btn-primary" onclick="closeOverlay('add-user'); alert('Invitation envoyée — à venir')"><i data-lucide="send"></i> Envoyer l'invitation</button>
-    </div>
-  </div>
-</div>
+<!-- (Modal « Ajouter un utilisateur » removed — PO decision 2026-07-06:
+     user management is client-side only (FR-AUT-3); the Naia admin is
+     read-only over an organisation's users.) -->
 
 <!-- ===== Modal: Ajuster le score de santé (override) — FR-HLT-5 ===== -->
 <div class="overlay" id="adjust-health" onclick="if(event.target===this)closeOverlay('adjust-health')">
@@ -869,30 +815,9 @@
   </div>
 </div>
 
-<!-- ===== Modal: Modifier l'utilisateur (role) — FR-CUS-3 ===== -->
-<div class="overlay" id="edit-user" onclick="if(event.target===this)closeOverlay('edit-user')">
-  <div class="modal">
-    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px">
-      <div>
-        <div class="modal-title">Modifier l'utilisateur</div>
-        <div class="modal-subtitle">Le rôle détermine l'accès. Un seul contact principal par organisation (FR-CUS-3).</div>
-      </div>
-      <button class="btn btn-ghost" onclick="closeOverlay('edit-user')"><i data-lucide="x"></i></button>
-    </div>
-    <div style="display:flex; flex-direction:column; gap:14px">
-      <div class="cd-info-row" style="border:0; padding:0"><span class="lbl">Utilisateur</span><span><b>Marie Lambert</b> · m.lambert@convert-fmg.fr</span></div>
-      <div>
-        <label class="muted" style="font-size:11px; text-transform:uppercase; letter-spacing:0.06em; font-weight:600">Rôle</label>
-        <select class="select" style="width:100%; margin-top:4px"><option>Membre</option><option>Contact principal</option></select>
-        <div class="muted" style="font-size:11px; margin-top:4px">Promouvoir au contact principal rétrograde l'actuel contact principal en membre.</div>
-      </div>
-    </div>
-    <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:18px; padding-top:14px; border-top:1px solid var(--border-subtle)">
-      <button class="btn btn-secondary" onclick="closeOverlay('edit-user')">Annuler</button>
-      <button class="btn btn-primary" onclick="closeOverlay('edit-user'); alert('Rôle mis à jour — à venir')"><i data-lucide="check"></i> Enregistrer</button>
-    </div>
-  </div>
-</div>
+<!-- (Modal « Modifier l'utilisateur » removed — PO decision 2026-07-06:
+     user management is client-side only (FR-AUT-3); roles are managed by
+     the organisation's own admin in the customer portal.) -->
 
 <!-- ===== Modal: Valider le compteur (mandat kDrive) — FR-DSL-4 ===== -->
 <div class="overlay" id="valider-compteur" onclick="if(event.target===this)closeOverlay('valider-compteur')">

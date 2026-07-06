@@ -56,8 +56,8 @@
               <tr><td>&gt; 100 MW</td><td class="num" style="text-align:right">1 500 €</td></tr>
             </tbody>
           </table>
-          <h4 style="font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em; font-weight:600; margin:0 0 8px">Hardware · Box</h4>
-          <p style="font-size:13px; margin:0">500 € one-off + 10 € / mois / box</p>
+          <!-- (Hardware · Box block removed — FR-HARDWARE stays DEFERRED
+               per PO decision 2026-07-06; see PRD section 6.) -->
         </div>
       </div>
 
@@ -105,11 +105,8 @@
             </tbody>
           </table>
 
-          <div class="pr-sub">
-            <h4>Hardware · Box</h4>
-            <button class="btn btn-secondary btn-sm" onclick="openOverlay('edit-hardware')"><i data-lucide="edit-3"></i> Modifier</button>
-          </div>
-          <p style="font-size:13px; margin:0">500 € one-off + 10 € / mois / box</p>
+          <!-- (Hardware · Box block removed — FR-HARDWARE stays DEFERRED
+               per PO decision 2026-07-06.) -->
         </div>
       </div>
 
@@ -157,7 +154,7 @@
       </div>
       <div>
         <label class="muted" style="font-size:11px; text-transform:uppercase; letter-spacing:0.06em; font-weight:600">Notes</label>
-        <input class="input" style="width:100%; margin-top:4px" placeholder="ex. revalorisation bracket 250 kV–1 MW">
+        <input class="input" style="width:100%; margin-top:4px" placeholder="ex. revalorisation bracket 250 kW–1 MW">
       </div>
     </div>
     <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:18px; padding-top:14px; border-top:1px solid var(--border-subtle)">
@@ -216,32 +213,8 @@
   </div>
 </div>
 
-<!-- ===== Modal: Modifier le hardware (draft) ===== -->
-<div class="overlay" id="edit-hardware" onclick="if(event.target===this)closeOverlay('edit-hardware')">
-  <div class="modal">
-    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px">
-      <div>
-        <div class="modal-title">Modifier le hardware · v02 (brouillon)</div>
-        <div class="modal-subtitle">Box on-prem : prix unique + abonnement mensuel par box.</div>
-      </div>
-      <button class="btn btn-ghost" onclick="closeOverlay('edit-hardware')"><i data-lucide="x"></i></button>
-    </div>
-    <div style="display:flex; flex-direction:column; gap:14px">
-      <div>
-        <label class="muted" style="font-size:11px; text-transform:uppercase; letter-spacing:0.06em; font-weight:600">Prix one-off (par box)</label>
-        <div style="display:flex; align-items:center; gap:8px; margin-top:4px"><input class="input tabular" type="number" style="width:140px" value="500"><span class="muted">€</span></div>
-      </div>
-      <div>
-        <label class="muted" style="font-size:11px; text-transform:uppercase; letter-spacing:0.06em; font-weight:600">Mensuel (par box)</label>
-        <div style="display:flex; align-items:center; gap:8px; margin-top:4px"><input class="input tabular" type="number" style="width:140px" value="10"><span class="muted">€ / mois</span></div>
-      </div>
-    </div>
-    <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:18px; padding-top:14px; border-top:1px solid var(--border-subtle)">
-      <button class="btn btn-secondary" onclick="closeOverlay('edit-hardware')">Annuler</button>
-      <button class="btn btn-primary" onclick="closeOverlay('edit-hardware'); alert('Tarifs hardware du brouillon enregistrés — à venir')"><i data-lucide="check"></i> Enregistrer le brouillon</button>
-    </div>
-  </div>
-</div>
+<!-- (Modal « Modifier le hardware » removed — FR-HARDWARE stays DEFERRED
+     per PO decision 2026-07-06; see PRD section 6.) -->
 
 <script src="https://unpkg.com/lucide@latest"></script>
 <script src="js/app.js"></script>
