@@ -291,9 +291,15 @@
             </div>
           </div>
 
-          <!-- Section: Centrales & compteurs — FR-DSL-3/4/5, FR-SUB-5.
-               PO decision 2026-07-06: BOTH the client (portal) and the Naia
-               admin can add a centrale; user management stays client-only. -->
+          <!-- Section: Centrales & compteurs — FR-DSL-3/4/5, FR-SUB-5, FR-PLT-0/1/2/3.
+               PO decision 2026-07-06, amended 2026-07-16 (PRD v2.17): the
+               subscription module is the SOLE authoring surface — the Naia admin
+               adds BOTH the centrale and the compteur here; nothing is created
+               in the Core. A client can only REQUEST one from its portal (that
+               request emails the naia superadmin; a ticket follows in phase 2).
+               A centrale the Core has not yet imported carries a "Nouvelle"
+               marker, derived from the import lineage — not a stored flag.
+               User management stays client-only. -->
           <div class="cd-section">
             <div class="cd-section-head">
               <div class="cd-section-title"><i data-lucide="zap" style="width:15px; color:var(--brand-cyan)"></i> Centrales &amp; compteurs <span class="muted" style="font-weight:400">· 9 centrales</span></div>
@@ -313,6 +319,7 @@
                   <div style="font-weight:600; font-size:13px; display:flex; align-items:center; gap:8px"><i data-lucide="zap" style="width:14px; height:14px; color:var(--brand-cyan)"></i> Centrale du Moulin <span class="muted" style="font-weight:400; font-size:12px">· Deux-Sèvres · 2,4 MW</span></div>
                   <div id="bloc-c1-controls" style="display:flex; align-items:center; gap:8px">
                     <span id="bloc-c1-badge" class="badge badge-red" style="display:none">Accès bloqué</span>
+                    <button class="btn btn-secondary btn-sm" onclick="openOverlay('ajouter-compteur')" title="Ajouter un compteur à cette centrale (FR-PLT-2)"><i data-lucide="plus"></i> Compteur</button>
                     <button id="bloc-c1-btn" class="btn btn-secondary btn-sm" onclick="toggleBlocCentrale('c1','Centrale du Moulin')"><i data-lucide="lock"></i> Bloquer l'accès</button>
                   </div>
                 </div>
@@ -338,9 +345,15 @@
               <!-- Centrale 2 : Barrage de la Sèvre (1 compteur en validation, lien manquant) -->
               <div style="border:1px solid var(--border-subtle); border-radius:10px; margin-bottom:12px; overflow:hidden">
                 <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; padding:11px 14px; background:var(--bg-input); border-bottom:1px solid var(--border-subtle)">
-                  <div style="font-weight:600; font-size:13px; display:flex; align-items:center; gap:8px"><i data-lucide="zap" style="width:14px; height:14px; color:var(--brand-cyan)"></i> Barrage de la Sèvre <span class="muted" style="font-weight:400; font-size:12px">· Deux-Sèvres · 3,1 MW</span></div>
+                  <div style="font-weight:600; font-size:13px; display:flex; align-items:center; gap:8px"><i data-lucide="zap" style="width:14px; height:14px; color:var(--brand-cyan)"></i> Barrage de la Sèvre <span class="muted" style="font-weight:400; font-size:12px">· Deux-Sèvres · 3,1 MW</span>
+                    <!-- FR-PAD-3 / FR-SEAM-1: shown while the Core has not yet imported the
+                         centrale. Derived from the import lineage (no stored status), so a
+                         stuck import stays visible instead of being masked by a flag. -->
+                    <span class="badge badge-cyan" style="font-size:10px" title="La centrale n'est pas encore reprise dans le Core — le marqueur disparaît dès l'import">Nouvelle</span>
+                  </div>
                   <div id="bloc-c2-controls" style="display:flex; align-items:center; gap:8px">
                     <span id="bloc-c2-badge" class="badge badge-red" style="display:none">Accès bloqué</span>
+                    <button class="btn btn-secondary btn-sm" onclick="openOverlay('ajouter-compteur')" title="Ajouter un compteur à cette centrale (FR-PLT-2)"><i data-lucide="plus"></i> Compteur</button>
                     <button id="bloc-c2-btn" class="btn btn-secondary btn-sm" onclick="toggleBlocCentrale('c2','Barrage de la Sèvre')"><i data-lucide="lock"></i> Bloquer l'accès</button>
                   </div>
                 </div>
@@ -363,6 +376,7 @@
                   <div style="font-weight:600; font-size:13px; display:flex; align-items:center; gap:8px"><i data-lucide="zap" style="width:14px; height:14px; color:var(--brand-cyan)"></i> Microcentrale de la Sèvre <span class="muted" style="font-weight:400; font-size:12px">· Deux-Sèvres · 0,5 MW</span></div>
                   <div id="bloc-c3-controls" style="display:flex; align-items:center; gap:8px">
                     <span id="bloc-c3-badge" class="badge badge-red">Accès bloqué</span>
+                    <button class="btn btn-secondary btn-sm" onclick="openOverlay('ajouter-compteur')" title="Ajouter un compteur à cette centrale (FR-PLT-2)"><i data-lucide="plus"></i> Compteur</button>
                     <button id="bloc-c3-btn" class="btn btn-secondary btn-sm" onclick="toggleBlocCentrale('c3','Microcentrale de la Sèvre')"><i data-lucide="unlock"></i> Débloquer</button>
                   </div>
                 </div>
@@ -388,9 +402,9 @@
                 <i data-lucide="lock" style="width:13px; height:13px; vertical-align:-2px"></i> Un blocage masque les données de la centrale côté client&#8239;; l'utilisateur voit «&#8239;Abonnement non actif&#8239;». À utiliser en cas de non-paiement (décision manuelle au cas par cas).
               </div>
 
-              <!-- Admin rights caption (PO decision 2026-07-06) -->
+              <!-- Admin rights caption (PO decision 2026-07-06, amended 2026-07-16 / PRD v2.17) -->
               <div style="margin-top:8px; padding:10px 12px; background:var(--bg-input); border-radius:8px; font-size:12px; color:var(--text-muted); line-height:1.6">
-                <i data-lucide="info" style="width:13px; height:13px; vertical-align:-2px"></i> L'admin Naia peut <b>ajouter une centrale</b> et <b>valider le mandat par compteur</b>&#8239;; les autres paramètres du client restent en lecture seule (le client peut aussi ajouter ses centrales depuis son portail). La signature des mandats DSO est réalisée à 100&#8239;% dans Odoo&#8239;; Naia n'affiche qu'un lien kDrive vers le PDF signé.
+                <i data-lucide="info" style="width:13px; height:13px; vertical-align:-2px"></i> L'admin Naia peut <b>ajouter une centrale</b>, <b>ajouter un compteur</b> et <b>valider le mandat par compteur</b>&#8239;; les autres paramètres du client restent en lecture seule. C'est <b>ici</b> que centrales et compteurs sont créés&#8239;— jamais dans le Core&#8239;: le Core reprend la centrale depuis l'abonnement, puis le superadmin y complète la configuration de mesure (origine, type de données, unité…). Le client, lui, peut seulement <b>demander</b> l'ajout d'une centrale ou d'un compteur depuis son portail&#8239;: la demande part par e-mail au superadmin Naia (un ticket suivra en phase&#8239;2), elle ne crée rien. La signature des mandats DSO est réalisée à 100&#8239;% dans Odoo&#8239;; Naia n'affiche qu'un lien kDrive vers le PDF signé.
               </div>
             </div>
           </div>
@@ -787,6 +801,53 @@
     <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:18px; padding-top:14px; border-top:1px solid var(--border-subtle)">
       <button class="btn btn-secondary" onclick="closeOverlay('manage-plants')">Annuler</button>
       <button class="btn btn-primary" onclick="closeOverlay('manage-plants'); alert('Centrale ajoutée — à venir')"><i data-lucide="plus"></i> Ajouter la centrale</button>
+    </div>
+  </div>
+</div>
+
+<!-- Ajouter un compteur — FR-PLT-2 / FR-PLT-3 (PRD v2.17).
+     Volontairement limité à l'IDENTITÉ CONTRACTUELLE du compteur (nom + PRM) :
+     c'est ce que l'abonnement possède. La configuration de MESURE (origine,
+     type de données, unité, code compteur, période de validité, remarques)
+     appartient au Core et se complète dans ses paramètres, en édition seule —
+     elle ne traverse pas la frontière (même principe que le fuseau horaire). -->
+<div class="overlay" id="ajouter-compteur" onclick="if(event.target===this)closeOverlay('ajouter-compteur')">
+  <div class="modal">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px">
+      <div>
+        <div class="modal-title">Ajouter un compteur</div>
+        <div class="modal-subtitle">Déclare le compteur sur l'abonnement. Le Core le reprend ensuite&#8239;; le superadmin y complète la configuration de mesure.</div>
+      </div>
+      <button class="btn btn-ghost" onclick="closeOverlay('ajouter-compteur')"><i data-lucide="x"></i></button>
+    </div>
+    <div style="display:flex; flex-direction:column; gap:14px">
+      <div>
+        <label class="muted" style="font-size:11px; text-transform:uppercase; letter-spacing:0.06em; font-weight:600">Centrale</label>
+        <select class="select" style="width:100%; margin-top:4px"><option>Centrale du Moulin</option><option>Barrage de la Sèvre</option><option>Microcentrale de la Sèvre</option></select>
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px">
+        <div>
+          <label class="muted" style="font-size:11px; text-transform:uppercase; letter-spacing:0.06em; font-weight:600">Nom du compteur</label>
+          <input class="input" style="width:100%; margin-top:4px" placeholder="ex. Compteur principal">
+        </div>
+        <div>
+          <label class="muted" style="font-size:11px; text-transform:uppercase; letter-spacing:0.06em; font-weight:600">PRM</label>
+          <input class="input tabular" style="width:100%; margin-top:4px" placeholder="14 chiffres — ex. 14582136987412">
+        </div>
+      </div>
+      <div>
+        <label class="muted" style="font-size:11px; text-transform:uppercase; letter-spacing:0.06em; font-weight:600">Lien mandat DSO (kDrive) — optionnel</label>
+        <input class="input" style="width:100%; margin-top:4px" placeholder="https://kdrive.infomaniak.com/app/share/…">
+        <div class="muted" style="font-size:11px; margin-top:4px">Le compteur démarre «&#8239;En validation&#8239;» : les données ne remontent qu'une fois le mandat validé (FR-DSL-3).</div>
+      </div>
+      <div style="display:flex; gap:9px; align-items:flex-start; padding:10px 12px; background:var(--bg-input); border-radius:8px; font-size:11px; color:var(--text-muted); line-height:1.6">
+        <i data-lucide="info" style="width:13px; height:13px; flex-shrink:0; margin-top:2px"></i>
+        <span>L'origine, le type de données, l'unité et la période de validité se règlent dans le Core une fois le compteur repris — ils ne sont pas demandés ici.</span>
+      </div>
+    </div>
+    <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:18px; padding-top:14px; border-top:1px solid var(--border-subtle)">
+      <button class="btn btn-secondary" onclick="closeOverlay('ajouter-compteur')">Annuler</button>
+      <button class="btn btn-primary" onclick="closeOverlay('ajouter-compteur'); alert('Compteur ajouté — à venir')"><i data-lucide="plus"></i> Ajouter le compteur</button>
     </div>
   </div>
 </div>
