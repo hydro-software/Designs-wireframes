@@ -642,7 +642,7 @@
       <!-- ============================ Section 3 — Compteurs Électriques (redesigned in v5) ============================ -->
       <div class="pd-section" data-open="true">
         <div class="pd-section-head" onclick="this.parentElement.dataset.open = this.parentElement.dataset.open === 'true' ? 'false' : 'true'">
-          <div class="pd-section-title"><i data-lucide="cpu" style="width:16px; height:16px; color:var(--brand-cyan)"></i> Compteurs Électriques <i data-lucide="alert-triangle" style="width:15px; height:15px; vertical-align:-2px; color:var(--accent-amber, #f59e0b); cursor:help" title="Se connecter à un compteur réseau (origine GRD / Enedis) demande une validation par Naia : y accéder passe par un mandat DSO signé, qu'un humain doit vérifier — cela évite aussi qu'un utilisateur aille se brancher sur un compteur qui n'est pas le sien. Naia Box, partenaire et manuel ne passent par aucun mandat : vous les ajoutez vous-même, sans validation."></i></div>
+          <div class="pd-section-title"><i data-lucide="cpu" style="width:16px; height:16px; color:var(--brand-cyan)"></i> Compteurs Électriques <i data-lucide="alert-triangle" style="width:15px; height:15px; vertical-align:-2px; color:var(--accent-amber, #f59e0b); cursor:help" title="Si Naia doit aller chercher la donnée chez un tiers — réseau (GRD : Enedis, Ores…) ou partenaire (Hydrosight…) — cela demande une autorisation, et Naia la vérifie : est-ce bien votre compteur ? Ces compteurs-là passent donc par une validation. Une Naia Box ou un import manuel (CSV) : la source est à vous, il n'y a aucune autorisation à obtenir — vous les ajoutez vous-même, sans validation."></i></div>
           <i data-lucide="chevron-down" class="pd-chev"></i>
         </div>
         <div class="pd-section-body">
@@ -1424,7 +1424,7 @@
     <div style="overflow-x:auto">
       <table class="data-table" style="min-width:980px">
         <thead><tr>
-          <th>Compteur</th><th>Origine</th><th>Type de données</th><th>Unité</th><th>Code compteur</th><th>Date début</th><th>Date fin</th><th>Statut<span class="dev-note" data-type="role" data-note="Statut de VALIDATION, posé par Naia (support) uniquement — le client le voit mais ne le modifie pas. Le client crée le compteur (état « En validation »), mais c'est l'admin Naia qui ajoute le lien kDrive du mandat DSO signé et valide. Ne concerne que les compteurs réseau (origine GRD / Enedis), car y accéder demande un mandat à vérifier. Naia Box / Manuel = rien à valider."></span><span class="dev-note" data-type="attention" data-note="À regarder — un compteur Enedis nouveau OU dont on modifie le code repasse en « En validation ». Le bouton Enregistrer déclenche la vérification humaine ; les données de production restent masquées tant que Naia n'a pas validé."></span></th><th>Remarques</th><th style="width:38px"></th>
+          <th>Compteur</th><th>Origine</th><th>Type de données</th><th>Unité</th><th>Code compteur</th><th>Date début</th><th>Date fin</th><th>Statut<span class="dev-note" data-type="role" data-note="Statut de VALIDATION, posé par Naia (support) uniquement — le client le voit mais ne le modifie pas. Le client crée le compteur (état « En validation »), mais c'est l'admin Naia qui ajoute le lien kDrive du mandat DSO signé et valide. Ne concerne que les compteurs dont Naia va chercher la donnée chez un TIERS — réseau (GRD : Enedis, Ores…) et partenaire (Hydrosight…) — car y accéder demande une autorisation à vérifier. Naia Box / Manuel : le client fournit lui-même la donnée, aucune autorisation à obtenir, rien à valider (PO + Bernard, 2026-07-16)."></span><span class="dev-note" data-type="attention" data-note="À regarder — un compteur à source tierce (GRD / partenaire) nouveau OU dont on modifie le code repasse en « En validation » : un autre code = un autre compteur = une autre autorisation. Le bouton Enregistrer déclenche la vérification humaine ; les données de production restent masquées tant que Naia n'a pas validé. ⚠ Le gating (« pas d'autorisation valide → pas de données ») ne doit s'appliquer QU'AUX sources tierces : un compteur Naia Box / CSV n'aura jamais de ligne d'autorisation, donc le gater le bloquerait pour toujours (Bernard, #1048)."></span></th><th>Remarques</th><th style="width:38px"></th>
         </tr></thead>
         <tbody id="compteurs-edit-body">
           <tr>
@@ -1508,7 +1508,7 @@
     <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px">
       <div>
         <div class="modal-title"><i data-lucide="shield-check" style="width:16px; height:16px; vertical-align:-2px; color:var(--brand-cyan)"></i> Vérification d'accès en cours</div>
-        <div class="modal-subtitle">Compteur(s) réseau (origine GRD / Enedis) à valider — eux seuls passent par un mandat DSO.</div>
+        <div class="modal-subtitle">Compteur(s) dont Naia va chercher la donnée chez un tiers — réseau (GRD) ou partenaire — à valider. Naia Box / Manuel : rien à valider.</div>
       </div>
       <button class="btn btn-ghost" onclick="closeOverlay('compteur-verif')"><i data-lucide="x"></i></button>
     </div>
@@ -2822,15 +2822,21 @@
     badge.className = "cpt-status " + state;
     badge.textContent = _cptStatusLabel[state] || "—";
     badge.title = state === "refuse" ? "Accès refusé — contactez le support (support@naiahydro.com)"
-      : state === "na" ? "Compteur non-réseau — pas de validation d'accès nécessaire" : "";
+      : state === "na" ? "Donnée fournie par le client (Naia Box / manuel) — aucune autorisation à obtenir, donc rien à valider" : "";
   }
-  // Origines dont l'accès doit être validé par Naia : le réseau (GRD / Enedis)
-  // UNIQUEMENT — PO 2026-07-16. La validation existe pour le MANDAT DSO, pas pour
-  // le compteur en soi : accéder aux données d'un PRM demande une autorisation
-  // Enedis signée, qu'un humain doit vérifier. Naia Box / Partenaire / Manuel ne
-  // passent par aucun mandat, donc le client les ajoute lui-même, sans validation
-  // ni e-mail à l'admin.
-  const CPT_VALIDATION_ORIGINS = ["GRD"];
+  // Le critère n'est PAS « y a-t-il un PRM » mais : **la donnée est-elle allée
+  // chercher chez un tiers, ou le client la fournit-il lui-même ?**
+  // (PO + Bernard, 2026-07-16.)
+  //
+  //   Récupérée chez un TIERS  → GRD (Enedis, Ores…) et Partenaire (Hydrosight…).
+  //     Aller chercher la donnée d'un tiers demande une autorisation, et cette
+  //     autorisation doit être vérifiée par un humain : est-ce bien SON compteur ?
+  //     → le compteur passe par l'abonnement, est validé, et obtient sa ligne
+  //       d'autorisation. C'est exactement le rôle de shared_authorizations.
+  //   Fournie par le CLIENT     → Naia Box et Manuel (CSV).
+  //     Le propriétaire possède la source ; aucun mandat auprès d'un tiers, rien
+  //     à vérifier légalement → il l'ajoute lui-même, sans validation ni e-mail.
+  const CPT_VALIDATION_ORIGINS = ["GRD", "Partenaire"];
   // Changer l'origine : (dé)masque le choix du partenaire + (re)met le bon statut de validation
   function updateCptStatusFromOrigin(sel) {
     const tr = sel.closest("tr");
