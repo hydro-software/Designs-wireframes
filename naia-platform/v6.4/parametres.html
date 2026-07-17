@@ -642,7 +642,7 @@
       <!-- ============================ Section 3 — Compteurs Électriques (redesigned in v5) ============================ -->
       <div class="pd-section" data-open="true">
         <div class="pd-section-head" onclick="this.parentElement.dataset.open = this.parentElement.dataset.open === 'true' ? 'false' : 'true'">
-          <div class="pd-section-title"><i data-lucide="cpu" style="width:16px; height:16px; color:var(--brand-cyan)"></i> Compteurs Électriques <i data-lucide="alert-triangle" style="width:15px; height:15px; vertical-align:-2px; color:var(--accent-amber, #f59e0b); cursor:help" title="Se connecter à un compteur réseau (Enedis) demande une validation par Naia : cela évite qu'un utilisateur aille se brancher sur un compteur qui n'est pas le sien. Même principe pour les compteurs Naia Box et partenaires."></i></div>
+          <div class="pd-section-title"><i data-lucide="cpu" style="width:16px; height:16px; color:var(--brand-cyan)"></i> Compteurs Électriques <i data-lucide="alert-triangle" style="width:15px; height:15px; vertical-align:-2px; color:var(--accent-amber, #f59e0b); cursor:help" title="Se connecter à un compteur réseau (origine GRD / Enedis) demande une validation par Naia : y accéder passe par un mandat DSO signé, qu'un humain doit vérifier — cela évite aussi qu'un utilisateur aille se brancher sur un compteur qui n'est pas le sien. Naia Box, partenaire et manuel ne passent par aucun mandat : vous les ajoutez vous-même, sans validation."></i></div>
           <i data-lucide="chevron-down" class="pd-chev"></i>
         </div>
         <div class="pd-section-body">
@@ -653,7 +653,7 @@
             <tbody>
               <tr>
                 <td><b><span data-pd-alias>MOU</span>-PRINC</b><br><span class="muted" style="font-size:11px">Production principale</span></td>
-                <td>GDR</td>
+                <td>GRD</td>
                 <td class="tabular">25130200000123 <span class="muted" style="font-size:11px">(PRM)</span></td>
                 <td class="tabular">kWh</td>
                 <td><span class="cpt-status valide">Validé</span></td>
@@ -662,7 +662,7 @@
               </tr>
               <tr>
                 <td><b><span data-pd-alias>MOU</span>-PROD2</b><br><span class="muted" style="font-size:11px">Production turbine 2</span></td>
-                <td>GDR</td>
+                <td>GRD</td>
                 <td class="tabular">25130200000456 <span class="muted" style="font-size:11px">(PRM)</span></td>
                 <td class="tabular">kWh</td>
                 <td>
@@ -1424,12 +1424,12 @@
     <div style="overflow-x:auto">
       <table class="data-table" style="min-width:980px">
         <thead><tr>
-          <th>Compteur</th><th>Origine</th><th>Type de données</th><th>Unité</th><th>Code compteur</th><th>Date début</th><th>Date fin</th><th>Statut<span class="dev-note" data-type="role" data-note="Statut de VALIDATION, posé par Naia (support) uniquement — le client le voit mais ne le modifie pas. Le client crée le compteur (état « En validation »), mais c'est l'admin Naia qui ajoute le lien kDrive du mandat DSO signé et valide. Ne concerne que les compteurs réseau (origine GDR / Enedis), car y accéder demande un mandat à vérifier. Naia Box / Manuel = rien à valider."></span><span class="dev-note" data-type="attention" data-note="À regarder — un compteur Enedis nouveau OU dont on modifie le code repasse en « En validation ». Le bouton Enregistrer déclenche la vérification humaine ; les données de production restent masquées tant que Naia n'a pas validé."></span></th><th>Remarques</th><th style="width:38px"></th>
+          <th>Compteur</th><th>Origine</th><th>Type de données</th><th>Unité</th><th>Code compteur</th><th>Date début</th><th>Date fin</th><th>Statut<span class="dev-note" data-type="role" data-note="Statut de VALIDATION, posé par Naia (support) uniquement — le client le voit mais ne le modifie pas. Le client crée le compteur (état « En validation »), mais c'est l'admin Naia qui ajoute le lien kDrive du mandat DSO signé et valide. Ne concerne que les compteurs réseau (origine GRD / Enedis), car y accéder demande un mandat à vérifier. Naia Box / Manuel = rien à valider."></span><span class="dev-note" data-type="attention" data-note="À regarder — un compteur Enedis nouveau OU dont on modifie le code repasse en « En validation ». Le bouton Enregistrer déclenche la vérification humaine ; les données de production restent masquées tant que Naia n'a pas validé."></span></th><th>Remarques</th><th style="width:38px"></th>
         </tr></thead>
         <tbody id="compteurs-edit-body">
           <tr>
             <td><input type="text" class="input" style="font-size:12.5px; width:120px" value="MOU-PRINC"></td>
-            <td><select class="select" style="font-size:12.5px" onchange="updateCptStatusFromOrigin(this)"><option selected>GDR</option><option>Naia Box</option><option>Partenaire</option><option>Manuel</option></select><select class="select cpt-partner" style="font-size:12.5px; margin-top:5px; display:none"><option>Hydrosight</option></select></td>
+            <td><select class="select" style="font-size:12.5px" onchange="updateCptStatusFromOrigin(this)"><option selected>GRD</option><option>Naia Box</option><option>Partenaire</option><option>Manuel</option></select><select class="select cpt-partner" style="font-size:12.5px; margin-top:5px; display:none"><option>Hydrosight</option></select></td>
             <td><select class="select" style="font-size:12.5px"><option selected>Énergie sur pas de temps</option><option>Puissance instantanée</option><option>Index énergie</option><option>Autre</option></select></td>
             <td><select class="select" style="font-size:12.5px"><option>kW</option><option>W</option><option selected>kWh</option><option>Wh</option></select></td>
             <td><input type="text" class="input" style="font-size:12.5px; width:140px" value="25130200000123" oninput="markCptNeedsValidation(this)"></td>
@@ -1444,7 +1444,7 @@
           </tr>
           <tr>
             <td><input type="text" class="input" style="font-size:12.5px; width:120px" value="MOU-PROD2"></td>
-            <td><select class="select" style="font-size:12.5px" onchange="updateCptStatusFromOrigin(this)"><option selected>GDR</option><option>Naia Box</option><option>Partenaire</option><option>Manuel</option></select><select class="select cpt-partner" style="font-size:12.5px; margin-top:5px; display:none"><option>Hydrosight</option></select></td>
+            <td><select class="select" style="font-size:12.5px" onchange="updateCptStatusFromOrigin(this)"><option selected>GRD</option><option>Naia Box</option><option>Partenaire</option><option>Manuel</option></select><select class="select cpt-partner" style="font-size:12.5px; margin-top:5px; display:none"><option>Hydrosight</option></select></td>
             <td><select class="select" style="font-size:12.5px"><option selected>Énergie sur pas de temps</option><option>Puissance instantanée</option><option>Index énergie</option><option>Autre</option></select></td>
             <td><select class="select" style="font-size:12.5px"><option>kW</option><option>W</option><option selected>kWh</option><option>Wh</option></select></td>
             <td><input type="text" class="input" style="font-size:12.5px; width:140px" value="25130200000456" oninput="markCptNeedsValidation(this)"></td>
@@ -1459,7 +1459,7 @@
           </tr>
           <tr>
             <td><input type="text" class="input" style="font-size:12.5px; width:120px" value="MOU-AUX"></td>
-            <td><select class="select" style="font-size:12.5px" onchange="updateCptStatusFromOrigin(this)"><option>GDR</option><option selected>Naia Box</option><option>Partenaire</option><option>Manuel</option></select><select class="select cpt-partner" style="font-size:12.5px; margin-top:5px; display:none"><option>Hydrosight</option></select></td>
+            <td><select class="select" style="font-size:12.5px" onchange="updateCptStatusFromOrigin(this)"><option>GRD</option><option selected>Naia Box</option><option>Partenaire</option><option>Manuel</option></select><select class="select cpt-partner" style="font-size:12.5px; margin-top:5px; display:none"><option>Hydrosight</option></select></td>
             <td><select class="select" style="font-size:12.5px"><option>Énergie sur pas de temps</option><option selected>Puissance instantanée</option><option>Index énergie</option><option>Autre</option></select></td>
             <td><select class="select" style="font-size:12.5px"><option selected>kW</option><option>W</option><option>kWh</option><option>Wh</option></select></td>
             <td><input type="text" class="input" style="font-size:12.5px; width:140px" value="NX-2104-A" oninput="markCptNeedsValidation(this)"></td>
@@ -1474,7 +1474,7 @@
           </tr>
           <tr>
             <td><input type="text" class="input" style="font-size:12.5px; width:120px" value="MOU-MANU"></td>
-            <td><select class="select" style="font-size:12.5px" onchange="updateCptStatusFromOrigin(this)"><option>GDR</option><option>Naia Box</option><option>Partenaire</option><option selected>Manuel</option></select><select class="select cpt-partner" style="font-size:12.5px; margin-top:5px; display:none"><option>Hydrosight</option></select></td>
+            <td><select class="select" style="font-size:12.5px" onchange="updateCptStatusFromOrigin(this)"><option>GRD</option><option>Naia Box</option><option>Partenaire</option><option selected>Manuel</option></select><select class="select cpt-partner" style="font-size:12.5px; margin-top:5px; display:none"><option>Hydrosight</option></select></td>
             <td><select class="select" style="font-size:12.5px"><option>Énergie sur pas de temps</option><option>Puissance instantanée</option><option selected>Index énergie</option><option>Autre</option></select></td>
             <td><select class="select" style="font-size:12.5px"><option>kW</option><option>W</option><option selected>kWh</option><option>Wh</option></select></td>
             <td><input type="text" class="input" style="font-size:12.5px; width:140px" placeholder="—" oninput="markCptNeedsValidation(this)"></td>
@@ -1508,7 +1508,7 @@
     <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px">
       <div>
         <div class="modal-title"><i data-lucide="shield-check" style="width:16px; height:16px; vertical-align:-2px; color:var(--brand-cyan)"></i> Vérification d'accès en cours</div>
-        <div class="modal-subtitle">Compteur(s) réseau (Enedis), Naia Box ou partenaire à valider.</div>
+        <div class="modal-subtitle">Compteur(s) réseau (origine GRD / Enedis) à valider — eux seuls passent par un mandat DSO.</div>
       </div>
       <button class="btn btn-ghost" onclick="closeOverlay('compteur-verif')"><i data-lucide="x"></i></button>
     </div>
@@ -2800,7 +2800,7 @@
     const tr = document.createElement("tr");
     tr.innerHTML =
       `<td><input type="text" class="input" style="font-size:12.5px; width:120px" placeholder="ex. MOU-…"></td>` +
-      `<td><select class="select" style="font-size:12.5px" onchange="updateCptStatusFromOrigin(this)"><option>GDR</option><option>Naia Box</option><option>Partenaire</option><option>Manuel</option></select><select class="select cpt-partner" style="font-size:12.5px; margin-top:5px; display:none"><option>Hydrosight</option></select></td>` +
+      `<td><select class="select" style="font-size:12.5px" onchange="updateCptStatusFromOrigin(this)"><option>GRD</option><option>Naia Box</option><option>Partenaire</option><option>Manuel</option></select><select class="select cpt-partner" style="font-size:12.5px; margin-top:5px; display:none"><option>Hydrosight</option></select></td>` +
       `<td><select class="select" style="font-size:12.5px"><option>Énergie sur pas de temps</option><option>Puissance instantanée</option><option>Index énergie</option><option>Autre</option></select></td>` +
       `<td><select class="select" style="font-size:12.5px"><option>kW</option><option>W</option><option selected>kWh</option><option>Wh</option></select></td>` +
       `<td><input type="text" class="input" style="font-size:12.5px; width:140px" placeholder="—" oninput="markCptNeedsValidation(this)"></td>` +
@@ -2824,9 +2824,13 @@
     badge.title = state === "refuse" ? "Accès refusé — contactez le support (support@naiahydro.com)"
       : state === "na" ? "Compteur non-réseau — pas de validation d'accès nécessaire" : "";
   }
-  // Origines dont l'accès doit être validé par Naia (réseau Enedis, Naia Box, partenaire).
-  // Manuel = aucune validation (on saisit soi-même la donnée).
-  const CPT_VALIDATION_ORIGINS = ["GDR", "Naia Box", "Partenaire"];
+  // Origines dont l'accès doit être validé par Naia : le réseau (GRD / Enedis)
+  // UNIQUEMENT — PO 2026-07-16. La validation existe pour le MANDAT DSO, pas pour
+  // le compteur en soi : accéder aux données d'un PRM demande une autorisation
+  // Enedis signée, qu'un humain doit vérifier. Naia Box / Partenaire / Manuel ne
+  // passent par aucun mandat, donc le client les ajoute lui-même, sans validation
+  // ni e-mail à l'admin.
+  const CPT_VALIDATION_ORIGINS = ["GRD"];
   // Changer l'origine : (dé)masque le choix du partenaire + (re)met le bon statut de validation
   function updateCptStatusFromOrigin(sel) {
     const tr = sel.closest("tr");
@@ -2842,7 +2846,8 @@
       setCptStatus(badge, "na");
     }
   }
-  // Modifier le code d'un compteur déjà validé (réseau / Naia Box / partenaire) → repasse en attente
+  // Modifier le code (PRM) d'un compteur réseau déjà validé → repasse en attente :
+  // un autre PRM = un autre compteur = un autre mandat à vérifier.
   function markCptNeedsValidation(input) {
     const tr = input.closest("tr");
     const origin = tr.querySelector("select");           // 1re liste = Origine
