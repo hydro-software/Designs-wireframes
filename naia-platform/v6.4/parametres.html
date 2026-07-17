@@ -168,6 +168,11 @@
   .cpt-status.refuse::before  { background: #ef4444; }
   .cpt-status.na      { background: rgba(148,163,184,0.10); color: var(--text-muted); }
   .cpt-status.na::before      { background: var(--text-subtle); }
+  /* « En configuration » (origine API) : Naia doit brancher l'API du compteur.
+     Distinct de « En validation » (ambre) : il n'y a AUCUN mandat ici — la donnée
+     est celle du client, seule la connexion doit être configurée. */
+  .cpt-status.config  { background: rgba(34,211,238,0.12);  color: #22d3ee; }
+  .cpt-status.config::before  { background: #22d3ee; }
   /* ===== STANDALONE v6.1 (brouillon BL) — Annotations dev (style "commentaire Word") =====
      Un seul marqueur jaune "!" par champ ; au survol une bulle avec la remarque libre.
      Masqué par défaut ; le bouton flottant ajoute la classe body.dev-notes-on pour tout afficher.
@@ -642,7 +647,7 @@
       <!-- ============================ Section 3 — Compteurs Électriques (redesigned in v5) ============================ -->
       <div class="pd-section" data-open="true">
         <div class="pd-section-head" onclick="this.parentElement.dataset.open = this.parentElement.dataset.open === 'true' ? 'false' : 'true'">
-          <div class="pd-section-title"><i data-lucide="cpu" style="width:16px; height:16px; color:var(--brand-cyan)"></i> Compteurs Électriques <i data-lucide="alert-triangle" style="width:15px; height:15px; vertical-align:-2px; color:var(--accent-amber, #f59e0b); cursor:help" title="Si Naia doit aller chercher la donnée chez un tiers — réseau (GRD : Enedis, Ores…) ou partenaire (Hydrosight…) — cela demande une autorisation, et Naia la vérifie : est-ce bien votre compteur ? Ces compteurs-là passent donc par une validation. Une Naia Box ou un import manuel (CSV) : la source est à vous, il n'y a aucune autorisation à obtenir — vous les ajoutez vous-même, sans validation."></i></div>
+          <div class="pd-section-title"><i data-lucide="cpu" style="width:16px; height:16px; color:var(--brand-cyan)"></i> Compteurs Électriques <i data-lucide="alert-triangle" style="width:15px; height:15px; vertical-align:-2px; color:var(--accent-amber, #f59e0b); cursor:help" title="Si Naia doit aller chercher la donnée chez un tiers — réseau (GRD : Enedis, Ores…) ou partenaire (Hydrosight…) — cela demande une autorisation, et Naia la vérifie : est-ce bien votre compteur ? Ces compteurs-là passent par une validation. Origine API : la donnée est la vôtre (c'est votre compteur), il n'y a rien à valider — mais Naia doit brancher l'API, d'où le statut « En configuration ». Naia Box ou import manuel (CSV) : vous les ajoutez vous-même, sans intervention de Naia."></i></div>
           <i data-lucide="chevron-down" class="pd-chev"></i>
         </div>
         <div class="pd-section-body">
@@ -1424,12 +1429,12 @@
     <div style="overflow-x:auto">
       <table class="data-table" style="min-width:980px">
         <thead><tr>
-          <th>Compteur</th><th>Origine</th><th>Type de données</th><th>Unité</th><th>Code compteur</th><th>Date début</th><th>Date fin</th><th>Statut<span class="dev-note" data-type="role" data-note="Statut de VALIDATION, posé par Naia (support) uniquement — le client le voit mais ne le modifie pas. Le client crée le compteur (état « En validation »), mais c'est l'admin Naia qui ajoute le lien kDrive du mandat DSO signé et valide. Ne concerne que les compteurs dont Naia va chercher la donnée chez un TIERS — réseau (GRD : Enedis, Ores…) et partenaire (Hydrosight…) — car y accéder demande une autorisation à vérifier. Naia Box / Manuel : le client fournit lui-même la donnée, aucune autorisation à obtenir, rien à valider (PO + Bernard, 2026-07-16)."></span><span class="dev-note" data-type="attention" data-note="À regarder — un compteur à source tierce (GRD / partenaire) nouveau OU dont on modifie le code repasse en « En validation » : un autre code = un autre compteur = une autre autorisation. Le bouton Enregistrer déclenche la vérification humaine ; les données de production restent masquées tant que Naia n'a pas validé. ⚠ Le gating (« pas d'autorisation valide → pas de données ») ne doit s'appliquer QU'AUX sources tierces : un compteur Naia Box / CSV n'aura jamais de ligne d'autorisation, donc le gater le bloquerait pour toujours (Bernard, #1048)."></span></th><th>Remarques</th><th style="width:38px"></th>
+          <th>Compteur</th><th>Origine</th><th>Type de données</th><th>Unité</th><th>Code compteur</th><th>Date début</th><th>Date fin</th><th>Statut<span class="dev-note" data-type="role" data-note="Statut de VALIDATION, posé par Naia (support) uniquement — le client le voit mais ne le modifie pas. Le client crée le compteur (état « En validation »), mais c'est l'admin Naia qui ajoute le lien kDrive du mandat DSO signé et valide. Ne concerne que les compteurs dont Naia va chercher la donnée chez un TIERS — réseau (GRD : Enedis, Ores…) et partenaire (Hydrosight…) — car y accéder demande une autorisation à vérifier. Naia Box / Manuel : le client fournit lui-même la donnée, aucune autorisation à obtenir, rien à valider (PO + Bernard, 2026-07-16). ⚠ Ne pas confondre « Naia doit intervenir » et « il faut un mandat » : l'origine API déclenche AUSSI un e-mail à l'admin (Naia doit brancher l'API — #907 : compteur connecté exposant son API), mais c'est le compteur DU CLIENT : aucun tiers, aucun mandat, aucune ligne d'autorisation → statut « En configuration », pas « En validation » (PO, 2026-07-16). E-mail à l'admin = GRD + Partenaire + API ; mandat = GRD + Partenaire seulement."></span><span class="dev-note" data-type="attention" data-note="À regarder — un compteur à source tierce (GRD / partenaire) nouveau OU dont on modifie le code repasse en « En validation » : un autre code = un autre compteur = une autre autorisation. Le bouton Enregistrer déclenche la vérification humaine ; les données de production restent masquées tant que Naia n'a pas validé. ⚠ Le gating (« pas d'autorisation valide → pas de données ») ne doit s'appliquer QU'AUX sources tierces : un compteur Naia Box / CSV n'aura jamais de ligne d'autorisation, donc le gater le bloquerait pour toujours (Bernard, #1048)."></span></th><th>Remarques</th><th style="width:38px"></th>
         </tr></thead>
         <tbody id="compteurs-edit-body">
           <tr>
             <td><input type="text" class="input" style="font-size:12.5px; width:120px" value="MOU-PRINC"></td>
-            <td><select class="select" style="font-size:12.5px" onchange="updateCptStatusFromOrigin(this)"><option selected>GRD</option><option>Naia Box</option><option>Partenaire</option><option>Manuel</option></select><select class="select cpt-partner" style="font-size:12.5px; margin-top:5px; display:none"><option>Hydrosight</option></select></td>
+            <td><select class="select" style="font-size:12.5px" onchange="updateCptStatusFromOrigin(this)"><option selected>GRD</option><option>Naia Box</option><option>API</option><option>Partenaire</option><option>Manuel</option></select><select class="select cpt-partner" style="font-size:12.5px; margin-top:5px; display:none"><option>Hydrosight</option></select></td>
             <td><select class="select" style="font-size:12.5px"><option selected>Énergie sur pas de temps</option><option>Puissance instantanée</option><option>Index énergie</option><option>Autre</option></select></td>
             <td><select class="select" style="font-size:12.5px"><option>kW</option><option>W</option><option selected>kWh</option><option>Wh</option></select></td>
             <td><input type="text" class="input" style="font-size:12.5px; width:140px" value="25130200000123" oninput="markCptNeedsValidation(this)"></td>
@@ -1444,7 +1449,7 @@
           </tr>
           <tr>
             <td><input type="text" class="input" style="font-size:12.5px; width:120px" value="MOU-PROD2"></td>
-            <td><select class="select" style="font-size:12.5px" onchange="updateCptStatusFromOrigin(this)"><option selected>GRD</option><option>Naia Box</option><option>Partenaire</option><option>Manuel</option></select><select class="select cpt-partner" style="font-size:12.5px; margin-top:5px; display:none"><option>Hydrosight</option></select></td>
+            <td><select class="select" style="font-size:12.5px" onchange="updateCptStatusFromOrigin(this)"><option selected>GRD</option><option>Naia Box</option><option>API</option><option>Partenaire</option><option>Manuel</option></select><select class="select cpt-partner" style="font-size:12.5px; margin-top:5px; display:none"><option>Hydrosight</option></select></td>
             <td><select class="select" style="font-size:12.5px"><option selected>Énergie sur pas de temps</option><option>Puissance instantanée</option><option>Index énergie</option><option>Autre</option></select></td>
             <td><select class="select" style="font-size:12.5px"><option>kW</option><option>W</option><option selected>kWh</option><option>Wh</option></select></td>
             <td><input type="text" class="input" style="font-size:12.5px; width:140px" value="25130200000456" oninput="markCptNeedsValidation(this)"></td>
@@ -1459,7 +1464,7 @@
           </tr>
           <tr>
             <td><input type="text" class="input" style="font-size:12.5px; width:120px" value="MOU-AUX"></td>
-            <td><select class="select" style="font-size:12.5px" onchange="updateCptStatusFromOrigin(this)"><option>GRD</option><option selected>Naia Box</option><option>Partenaire</option><option>Manuel</option></select><select class="select cpt-partner" style="font-size:12.5px; margin-top:5px; display:none"><option>Hydrosight</option></select></td>
+            <td><select class="select" style="font-size:12.5px" onchange="updateCptStatusFromOrigin(this)"><option>GRD</option><option selected>Naia Box</option><option>API</option><option>Partenaire</option><option>Manuel</option></select><select class="select cpt-partner" style="font-size:12.5px; margin-top:5px; display:none"><option>Hydrosight</option></select></td>
             <td><select class="select" style="font-size:12.5px"><option>Énergie sur pas de temps</option><option selected>Puissance instantanée</option><option>Index énergie</option><option>Autre</option></select></td>
             <td><select class="select" style="font-size:12.5px"><option selected>kW</option><option>W</option><option>kWh</option><option>Wh</option></select></td>
             <td><input type="text" class="input" style="font-size:12.5px; width:140px" value="NX-2104-A" oninput="markCptNeedsValidation(this)"></td>
@@ -1474,7 +1479,7 @@
           </tr>
           <tr>
             <td><input type="text" class="input" style="font-size:12.5px; width:120px" value="MOU-MANU"></td>
-            <td><select class="select" style="font-size:12.5px" onchange="updateCptStatusFromOrigin(this)"><option>GRD</option><option>Naia Box</option><option>Partenaire</option><option selected>Manuel</option></select><select class="select cpt-partner" style="font-size:12.5px; margin-top:5px; display:none"><option>Hydrosight</option></select></td>
+            <td><select class="select" style="font-size:12.5px" onchange="updateCptStatusFromOrigin(this)"><option>GRD</option><option>Naia Box</option><option>API</option><option>Partenaire</option><option selected>Manuel</option></select><select class="select cpt-partner" style="font-size:12.5px; margin-top:5px; display:none"><option>Hydrosight</option></select></td>
             <td><select class="select" style="font-size:12.5px"><option>Énergie sur pas de temps</option><option>Puissance instantanée</option><option selected>Index énergie</option><option>Autre</option></select></td>
             <td><select class="select" style="font-size:12.5px"><option>kW</option><option>W</option><option selected>kWh</option><option>Wh</option></select></td>
             <td><input type="text" class="input" style="font-size:12.5px; width:140px" placeholder="—" oninput="markCptNeedsValidation(this)"></td>
@@ -2800,7 +2805,7 @@
     const tr = document.createElement("tr");
     tr.innerHTML =
       `<td><input type="text" class="input" style="font-size:12.5px; width:120px" placeholder="ex. MOU-…"></td>` +
-      `<td><select class="select" style="font-size:12.5px" onchange="updateCptStatusFromOrigin(this)"><option>GRD</option><option>Naia Box</option><option>Partenaire</option><option>Manuel</option></select><select class="select cpt-partner" style="font-size:12.5px; margin-top:5px; display:none"><option>Hydrosight</option></select></td>` +
+      `<td><select class="select" style="font-size:12.5px" onchange="updateCptStatusFromOrigin(this)"><option>GRD</option><option>Naia Box</option><option>API</option><option>Partenaire</option><option>Manuel</option></select><select class="select cpt-partner" style="font-size:12.5px; margin-top:5px; display:none"><option>Hydrosight</option></select></td>` +
       `<td><select class="select" style="font-size:12.5px"><option>Énergie sur pas de temps</option><option>Puissance instantanée</option><option>Index énergie</option><option>Autre</option></select></td>` +
       `<td><select class="select" style="font-size:12.5px"><option>kW</option><option>W</option><option selected>kWh</option><option>Wh</option></select></td>` +
       `<td><input type="text" class="input" style="font-size:12.5px; width:140px" placeholder="—" oninput="markCptNeedsValidation(this)"></td>` +
@@ -2816,12 +2821,13 @@
 
   // Compteurs — statut de VALIDATION (posé par Naia côté réel ; ici simulé pour la maquette)
   // États : valide / encours / refuse / na (pas de validation requise = non-réseau)
-  const _cptStatusLabel = { valide: "Validé", encours: "En validation", refuse: "Refusé", na: "—" };
+  const _cptStatusLabel = { valide: "Validé", encours: "En validation", refuse: "Refusé", config: "En configuration", na: "—" };
   function setCptStatus(badge, state) {
     if (!badge) return;
     badge.className = "cpt-status " + state;
     badge.textContent = _cptStatusLabel[state] || "—";
     badge.title = state === "refuse" ? "Accès refusé — contactez le support (support@naiahydro.com)"
+      : state === "config" ? "Naia doit brancher l'API de votre compteur. Rien à valider ici : la donnée est la vôtre, il n'y a aucune autorisation à obtenir — seule la connexion doit être configurée."
       : state === "na" ? "Donnée fournie par le client (Naia Box / manuel) — aucune autorisation à obtenir, donc rien à valider" : "";
   }
   // Le critère n'est PAS « y a-t-il un PRM » mais : **la donnée est-elle allée
@@ -2837,6 +2843,19 @@
   //     Le propriétaire possède la source ; aucun mandat auprès d'un tiers, rien
   //     à vérifier légalement → il l'ajoute lui-même, sans validation ni e-mail.
   const CPT_VALIDATION_ORIGINS = ["GRD", "Partenaire"];
+  // ⚠ NE PAS confondre avec ci-dessus : « Naia doit intervenir » n'est PAS
+  // « il faut un mandat ». L'origine API (#907 : « compteur connecté exposant
+  // son API ») est le compteur DU CLIENT — sa donnée lui appartient, il n'y a
+  // aucun tiers, donc aucun mandat et aucune ligne d'autorisation. Mais Naia
+  // doit brancher l'API : d'où un e-mail à l'admin et un statut « En
+  // configuration » (PO, 2026-07-16).
+  const CPT_SETUP_ORIGINS = ["API"];
+  // Origines qui déclenchent un e-mail à l'admin = les deux ensembles réunis.
+  // Conséquence à porter vers #1051 / #931 : le gating (« pas d'autorisation
+  // valide → pas de données ») ne doit s'appliquer QU'À CPT_VALIDATION_ORIGINS.
+  // Un compteur API / Naia Box / CSV n'aura JAMAIS de ligne d'autorisation —
+  // le gater le bloquerait pour toujours (Bernard, #1048).
+  const CPT_ADMIN_EMAIL_ORIGINS = [...CPT_VALIDATION_ORIGINS, ...CPT_SETUP_ORIGINS];
   // Changer l'origine : (dé)masque le choix du partenaire + (re)met le bon statut de validation
   function updateCptStatusFromOrigin(sel) {
     const tr = sel.closest("tr");
@@ -2848,6 +2867,9 @@
     if (CPT_VALIDATION_ORIGINS.includes(sel.value)) {
       // changer d'origine = nouvelle connexion à vérifier → on repasse en attente de validation
       setCptStatus(badge, "encours");
+    } else if (CPT_SETUP_ORIGINS.includes(sel.value)) {
+      // API : rien à valider (donnée du client), mais Naia doit brancher l'API
+      setCptStatus(badge, "config");
     } else {
       setCptStatus(badge, "na");
     }
