@@ -83,7 +83,7 @@
             <button data-type="pluies"       onclick="switchType('pluies')">Pluies</button>
             <button data-type="indicateurs"  onclick="switchType('indicateurs')">Indicateurs</button>
             <button data-type="comparateurs" onclick="switchType('comparateurs')">Comparateurs</button>
-            <button data-type="prix"         onclick="switchType('prix')">Prix de l'électricité</button>
+            <button data-type="prix"         onclick="switchType('prix')">Prix d'Électricité</button>
           </div>
 
           <!-- Ligne 1 — Électricité : Source de données + unité (définie, non modifiable) -->
@@ -197,8 +197,8 @@
                     <p><b>Événementielle</b> — Données à pas de temps variable : un nouveau point uniquement quand la valeur change.</p>
                     <p style="margin-bottom:2px">Entre deux points consécutifs, le calcul dépend du type de donnée :</p>
                     <ul>
-                      <li><b>Électricité, pluies, indicateurs, comparateurs</b> → interpolation linéaire entre les 2 points</li>
-                      <li><b>Prix</b> → valeur constante jusqu'au prochain point (escalier)</li>
+                      <li><b>Indicateurs</b> → interpolation linéaire entre les 2 points</li>
+                      <li><b>Électricité, pluies, comparateurs, prix</b> → valeur constante jusqu'au prochain point (escalier)</li>
                     </ul>
                   </span>
                 </span>
@@ -279,7 +279,7 @@
             <tr><td>Météo France · Bergerac</td><td>Pluies · Météo France</td><td>il y a 35 min</td><td>quotidien</td><td><span class="badge badge-green">OK</span></td></tr>
             <tr><td>SCHAPI · Dordogne</td><td>Indicateurs · débit</td><td>il y a 14 min</td><td>quart-horaire</td><td><span class="badge badge-green">OK</span></td></tr>
             <tr><td>Partenaire Naia · La Cassagne</td><td>Comparateurs · centrale amie</td><td>il y a 20 min</td><td>quart-horaire</td><td><span class="badge badge-green">OK</span></td></tr>
-            <tr><td>EPEX SPOT FR · base load</td><td>Prix de l'électricité</td><td>il y a 1 h</td><td>horaire</td><td><span class="badge badge-green">OK</span></td></tr>
+            <tr><td>EPEX SPOT FR · base load</td><td>Prix d'électricité</td><td>il y a 1 h</td><td>horaire</td><td><span class="badge badge-green">OK</span></td></tr>
           </tbody>
         </table>
       </div>
@@ -307,7 +307,7 @@ const DATA_TYPES = {
   comparateurs: { ctrl: "comparateurs-controls", select: "comparateurs-select", unite: "comparateurs-unite",
                   ctx: (src, u, c) => `Comparateur — <b>${src}</b> sur <b>${c}</b> · unité ${u}` },
   prix:         { ctrl: "prix-controls",         select: "prix-select",         unite: "prix-unite",
-                  ctx: (src, u, c) => `Prix de l'électricité — <b>${src}</b> sur <b>${c}</b> · unité ${u}` },
+                  ctx: (src, u, c) => `Prix d'électricité — <b>${src}</b> sur <b>${c}</b> · unité ${u}` },
 };
 
 function switchType(type) {
