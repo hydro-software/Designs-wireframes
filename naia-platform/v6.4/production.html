@@ -152,7 +152,7 @@
         </div>
 
         <!-- Chart card (v5 polish round 4, matching dev.app.naiahydro.com screenshots from PO):
-             - LEFT slide-out: Indicateurs contextuels (checkbox grid Int./30j/12m/Ann.)
+             - LEFT slide-out: Données contextuelles (checkbox grid Int./30j/12m/Ann.)
              - RIGHT slide-out: Légende (loss/event categories with coloured dots)
              - Each side collapses into a thin vertical strip with rotated label + chevron at top
              - Bottom-left: MDA / Hydro… quick-comparator pills
@@ -162,10 +162,10 @@
 
         <div class="chart-with-panel" id="chart-with-panel" data-ind="open" data-leg="open">
 
-          <!-- ============== LEFT: Indicateurs contextuels (expanded) ============== -->
+          <!-- ============== LEFT: Données contextuelles (expanded) ============== -->
           <div class="indicateurs-panel" id="indicateurs-panel">
             <div class="indicateurs-panel-title">
-              <span>Indicateurs contextuels</span>
+              <span>Données contextuelles</span>
               <button class="collapse" onclick="toggleIndicateursPanel()" title="Réduire le panneau" aria-label="Réduire"><i data-lucide="chevron-left"></i></button>
             </div>
 
@@ -222,9 +222,9 @@
           </div>
 
           <!-- ============== LEFT collapsed strip (shown when indicateurs is collapsed) ============== -->
-          <button class="panel-strip panel-strip-left" id="indicateurs-strip" onclick="toggleIndicateursPanel()" aria-label="Afficher Indicateurs contextuels">
+          <button class="panel-strip panel-strip-left" id="indicateurs-strip" onclick="toggleIndicateursPanel()" aria-label="Afficher Données contextuelles">
             <i data-lucide="chevrons-right" class="strip-chev"></i>
-            <span class="strip-label">Indicateurs contextuels</span>
+            <span class="strip-label">Données contextuelles</span>
           </button>
 
           <!-- ============== CHART AREA ============== -->
@@ -290,7 +290,7 @@
 
 <!-- Chart configuration overlay (per-user) — Bernard's redesign (Designs-wireframes#1).
      Per-resolution axis Min/Max + units, Pluies / Indicateurs slot tables
-     (ex-sous-blocs des « Indicateurs contextuels », remontés au rang de volet),
+     (ex-sous-blocs du volet « Indicateurs contextuels » supprimé, remontés au rang de volet),
      Comparateur slot table with %-of-axis range + scale factor,
      and a WhatsApp section placeholder. Reached from the bottom-right wrench icon
      and from the icon-action sliders button. -->
@@ -604,7 +604,7 @@
     if (strip) strip.style.display = pill === "intraday" ? "" : "none";
   }
 
-  // ---- Side panels (Indicateurs contextuels + Légende) ----
+  // ---- Side panels (Données contextuelles + Légende) ----
   // Match dev.app.naiahydro.com: each panel collapses into a thin vertical strip with
   // a rotated label + chevron at top. The strip click re-expands the panel.
   // Container has two data attributes: data-ind="open|collapsed" and data-leg="open|collapsed".

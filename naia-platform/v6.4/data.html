@@ -6,8 +6,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link href="css/style.css" rel="stylesheet"><script src="https://cdn.tailwindcss.com"></script>
 <style>
-  /* Type de données segmented control (3 pills per v5) */
-  .type-seg { display: inline-flex; background: var(--bg-input); border: 1px solid var(--border-default); border-radius: 999px; padding: 3px; gap: 1px; }
+  /* Type de données segmented control (5 pastilles depuis v6.4 : Électricité / Pluies / Indicateurs / Comparateurs / Prix) */
+  .type-seg { display: inline-flex; flex-wrap: wrap; background: var(--bg-input); border: 1px solid var(--border-default); border-radius: 999px; padding: 3px; gap: 1px; }
   .type-seg button { padding: 6px 14px; font-size: 13px; border: 0; background: transparent; color: var(--text-muted); border-radius: 999px; cursor: pointer; font-family: inherit; font-weight: 500; }
   .type-seg button.on { background: var(--brand-blue-strong); color: white; }
   .dropzone {
@@ -80,15 +80,17 @@
           <div class="seg-label">Type de données</div>
           <div class="type-seg" style="margin-bottom:16px">
             <button class="on" data-type="electricite" onclick="switchType('electricite')">Électricité</button>
-            <button data-type="indcomp" onclick="switchType('indcomp')">Indicateur</button>
-            <button data-type="prix"    onclick="switchType('prix')">Prix d'Électricité</button>
+            <button data-type="pluies"       onclick="switchType('pluies')">Pluies</button>
+            <button data-type="indicateurs"  onclick="switchType('indicateurs')">Indicateurs</button>
+            <button data-type="comparateurs" onclick="switchType('comparateurs')">Comparateurs</button>
+            <button data-type="prix"         onclick="switchType('prix')">Prix de l'électricité</button>
           </div>
 
           <!-- Ligne 1 — Électricité : Source de données + unité (définie, non modifiable) -->
           <div id="elec-controls" class="ctrl-line">
             <div>
               <span class="mini-label" style="display:block">Source de données</span>
-              <select class="select" id="elec-compteur" onchange="updateUnite()" style="min-width:260px">
+              <select class="select" id="elec-compteur" onchange="updateUnite('electricite')" style="min-width:260px">
                 <option data-unite="kWh">MOU-PRINC · principal</option>
                 <option data-unite="kWh">MOU-AUX · auxiliaires</option>
                 <option data-unite="MWh">MOU-GROUPE · agrégat</option>
@@ -101,20 +103,54 @@
             </div>
           </div>
 
-          <!-- Ligne 1 — Indicateur -->
-          <div id="indcomp-controls" class="ctrl-line" style="display:none">
+          <!-- Ligne 1 — Pluies -->
+          <div id="pluies-controls" class="ctrl-line" style="display:none">
             <div>
               <span class="mini-label" style="display:block">Source de données</span>
-              <select class="select" id="indcomp-select" onchange="updateIndUnite()" style="min-width:300px">
-                <option data-unite="mm">Pluie · Bergerac (Météo)</option>
-                <option data-unite="m³/s">Débit · Dordogne (Hydro)</option>
-                <option data-unite="m">Niveau · Dordogne (Hydro)</option>
+              <select class="select" id="pluies-select" onchange="updateUnite('pluies')" style="min-width:300px">
+                <option data-unite="mm">Pluie · Bergerac (Météo France)</option>
+                <option data-unite="mm">Pluie · station amont (SCHAPI)</option>
+                <option data-unite="mm">Pluviomètre site (privé)</option>
               </select>
             </div>
             <div class="unit-inline">
               <span class="mini-label" style="display:block">Unité (définie)</span>
-              <span class="unit-val" id="indcomp-unite">mm</span>
+              <span class="unit-val" id="pluies-unite">mm</span>
+              <span class="unit-note muted">· définie dans Paramètres → Pluies · non modifiable</span>
+            </div>
+          </div>
+
+          <!-- Ligne 1 — Indicateurs -->
+          <div id="indicateurs-controls" class="ctrl-line" style="display:none">
+            <div>
+              <span class="mini-label" style="display:block">Source de données</span>
+              <select class="select" id="indicateurs-select" onchange="updateUnite('indicateurs')" style="min-width:300px">
+                <option data-unite="m³/s">Débit · Dordogne (Hydroportail)</option>
+                <option data-unite="m">Niveau · Dordogne (Vigicrues)</option>
+                <option data-unite="m">Sonde niveau amont (NaiaBox)</option>
+              </select>
+            </div>
+            <div class="unit-inline">
+              <span class="mini-label" style="display:block">Unité (définie)</span>
+              <span class="unit-val" id="indicateurs-unite">m³/s</span>
               <span class="unit-note muted">· définie dans Paramètres → Indicateurs · non modifiable</span>
+            </div>
+          </div>
+
+          <!-- Ligne 1 — Comparateurs -->
+          <div id="comparateurs-controls" class="ctrl-line" style="display:none">
+            <div>
+              <span class="mini-label" style="display:block">Source de données</span>
+              <select class="select" id="comparateurs-select" onchange="updateUnite('comparateurs')" style="min-width:300px">
+                <option data-unite="kWh">Centrale amie · La Cassagne (Partenaire Naia)</option>
+                <option data-unite="kWh">Benchmark régional (AGG DAILY)</option>
+                <option data-unite="kWh">Simulation 1 (import sur Naia)</option>
+              </select>
+            </div>
+            <div class="unit-inline">
+              <span class="mini-label" style="display:block">Unité (définie)</span>
+              <span class="unit-val" id="comparateurs-unite">kWh</span>
+              <span class="unit-note muted">· définie dans Paramètres → Comparateur · non modifiable</span>
             </div>
           </div>
 
@@ -122,16 +158,16 @@
           <div id="prix-controls" class="ctrl-line" style="display:none">
             <div>
               <span class="mini-label" style="display:block">Source de données</span>
-              <select class="select" style="min-width:260px">
-                <option selected>EPEX SPOT FR · base load</option>
-                <option>EPEX SPOT FR · peak load</option>
-                <option>Belpex BE · base load</option>
-                <option>Tarif d'obligation d'achat</option>
+              <select class="select" id="prix-select" onchange="updateUnite('prix')" style="min-width:260px">
+                <option data-unite="€/MWh" selected>EPEX SPOT FR · base load</option>
+                <option data-unite="€/MWh">EPEX SPOT FR · peak load</option>
+                <option data-unite="€/MWh">Belpex BE · base load</option>
+                <option data-unite="€/MWh">Tarif d'obligation d'achat</option>
               </select>
             </div>
             <div class="unit-inline">
               <span class="mini-label" style="display:block">Unité (définie)</span>
-              <span class="unit-val">€/MWh</span>
+              <span class="unit-val" id="prix-unite">€/MWh</span>
               <span class="unit-note muted">· définie dans Paramètres → Marchés · non modifiable</span>
             </div>
           </div>
@@ -161,7 +197,7 @@
                     <p><b>Événementielle</b> — Données à pas de temps variable : un nouveau point uniquement quand la valeur change.</p>
                     <p style="margin-bottom:2px">Entre deux points consécutifs, le calcul dépend du type de donnée :</p>
                     <ul>
-                      <li><b>Électricité, indicateurs</b> → interpolation linéaire entre les 2 points</li>
+                      <li><b>Électricité, pluies, indicateurs, comparateurs</b> → interpolation linéaire entre les 2 points</li>
                       <li><b>Prix</b> → valeur constante jusqu'au prochain point (escalier)</li>
                     </ul>
                   </span>
@@ -226,7 +262,7 @@
           <thead><tr><th>Date</th><th>Source de données</th><th>Type</th><th>Période</th><th>Lignes</th><th>Statut</th></tr></thead>
           <tbody>
             <tr><td class="tabular">23 avr. 14:23</td><td>MOU-PRINC</td><td><span class="badge badge-blue">Électricité · SCADA</span></td><td>auto · 1–22 avr.</td><td class="num">8 640</td><td><span class="badge badge-green">Validé</span></td></tr>
-            <tr><td class="tabular">22 avr. 09:12</td><td>Pluie · Bergerac</td><td><span class="badge badge-cyan">Indicateur · Météo</span></td><td>1–22 avr.</td><td class="num">22</td><td><span class="badge badge-green">Validé</span></td></tr>
+            <tr><td class="tabular">22 avr. 09:12</td><td>Pluie · Bergerac</td><td><span class="badge badge-cyan">Pluies · Météo</span></td><td>1–22 avr.</td><td class="num">22</td><td><span class="badge badge-green">Validé</span></td></tr>
             <tr><td class="tabular">10 avr. 16:48</td><td>MOU-PRINC</td><td><span class="badge badge-blue">Électricité · CSV</span></td><td>1–9 avr.</td><td class="num">864</td><td><span class="badge badge-amber">2 trous détectés</span></td></tr>
           </tbody>
         </table>
@@ -240,9 +276,10 @@
           <tbody>
             <tr><td>SCADA · MOU-PRINC</td><td>Électricité</td><td>il y a 2 h</td><td>quart-horaire</td><td><span class="badge badge-green">OK</span></td></tr>
             <tr><td>Enedis R63 · MOU-PRINC</td><td>Électricité · backup</td><td>hier</td><td>quotidien</td><td><span class="badge badge-green">OK</span></td></tr>
-            <tr><td>Météo France · Bergerac</td><td>Indicateur · pluie</td><td>il y a 35 min</td><td>quotidien</td><td><span class="badge badge-green">OK</span></td></tr>
-            <tr><td>SCHAPI · Dordogne</td><td>Indicateur · débit</td><td>il y a 14 min</td><td>quart-horaire</td><td><span class="badge badge-green">OK</span></td></tr>
-            <tr><td>EPEX SPOT FR · base load</td><td>Prix d'électricité</td><td>il y a 1 h</td><td>horaire</td><td><span class="badge badge-green">OK</span></td></tr>
+            <tr><td>Météo France · Bergerac</td><td>Pluies · Météo France</td><td>il y a 35 min</td><td>quotidien</td><td><span class="badge badge-green">OK</span></td></tr>
+            <tr><td>SCHAPI · Dordogne</td><td>Indicateurs · débit</td><td>il y a 14 min</td><td>quart-horaire</td><td><span class="badge badge-green">OK</span></td></tr>
+            <tr><td>Partenaire Naia · La Cassagne</td><td>Comparateurs · centrale amie</td><td>il y a 20 min</td><td>quart-horaire</td><td><span class="badge badge-green">OK</span></td></tr>
+            <tr><td>EPEX SPOT FR · base load</td><td>Prix de l'électricité</td><td>il y a 1 h</td><td>horaire</td><td><span class="badge badge-green">OK</span></td></tr>
           </tbody>
         </table>
       </div>
@@ -257,28 +294,34 @@
 // Initialise the upload-context strings.
 window.addEventListener('DOMContentLoaded', () => { refreshContext(); });
 
-function switchType(type) {
-  document.querySelectorAll(".type-seg button").forEach(b => b.classList.toggle("on", b.dataset.type === type));
-  const elec    = document.getElementById("elec-controls");
-  const indcomp = document.getElementById("indcomp-controls");
-  const prix    = document.getElementById("prix-controls");
-  elec.style.display    = type === "electricite" ? "flex" : "none";
-  indcomp.style.display = type === "indcomp"     ? "flex" : "none";
-  prix.style.display    = type === "prix"        ? "flex" : "none";
+// Un type de données = une ligne de contrôles + une phrase de contexte.
+// Les 5 pastilles partagent la même mécanique (v6.4 : Indicateur scindé en Pluies / Indicateurs / Comparateurs).
+const DATA_TYPES = {
+  electricite:  { ctrl: "elec-controls",         select: "elec-compteur",     unite: "elec-unite",
+                  ctx: (src, u, c) => `Électricité pour <b>${c}</b> · source ${src.split(' ·')[0]} · unité ${u}` },
+  pluies:       { ctrl: "pluies-controls",       select: "pluies-select",       unite: "pluies-unite",
+                  // le nom de la source porte déjà « Pluie · » — pas de préfixe de type, sinon ça bégaie
+                  ctx: (src, u, c) => `<b>${src}</b> sur <b>${c}</b> · unité ${u}` },
+  indicateurs:  { ctrl: "indicateurs-controls",  select: "indicateurs-select",  unite: "indicateurs-unite",
+                  ctx: (src, u, c) => `Indicateur — <b>${src}</b> sur <b>${c}</b> · unité ${u}` },
+  comparateurs: { ctrl: "comparateurs-controls", select: "comparateurs-select", unite: "comparateurs-unite",
+                  ctx: (src, u, c) => `Comparateur — <b>${src}</b> sur <b>${c}</b> · unité ${u}` },
+  prix:         { ctrl: "prix-controls",         select: "prix-select",         unite: "prix-unite",
+                  ctx: (src, u, c) => `Prix de l'électricité — <b>${src}</b> sur <b>${c}</b> · unité ${u}` },
+};
 
-  const ctx = document.getElementById("upload-context");
+function switchType(type) {
+  if (!DATA_TYPES[type]) type = "electricite";
+  document.querySelectorAll(".type-seg button").forEach(b => b.classList.toggle("on", b.dataset.type === type));
+  Object.keys(DATA_TYPES).forEach(k => {
+    document.getElementById(DATA_TYPES[k].ctrl).style.display = (k === type) ? "flex" : "none";
+  });
+
+  const t = DATA_TYPES[type];
+  const sel = document.getElementById(t.select);
+  const opt = sel.options[sel.selectedIndex];
   const centrale = document.querySelector('[data-centrale-name]')?.textContent || "Centrale des Moulins";
-  if (type === "electricite") {
-    const sel = document.getElementById("elec-compteur");
-    const opt = sel.options[sel.selectedIndex];
-    ctx.innerHTML = `Électricité pour <b>${centrale}</b> · source ${opt.text.split(' ·')[0]} · unité ${opt.dataset.unite}${ctxSuffix()}`;
-  } else if (type === "indcomp") {
-    const sel = document.getElementById("indcomp-select");
-    const opt = sel.options[sel.selectedIndex];
-    ctx.innerHTML = `Indicateur — <b>${sel.value}</b> sur <b>${centrale}</b> · unité ${opt.dataset.unite}${ctxSuffix()}`;
-  } else {
-    ctx.innerHTML = `Prix d'électricité sur <b>${centrale}</b> · unité €/MWh${ctxSuffix()}`;
-  }
+  document.getElementById("upload-context").innerHTML = t.ctx(opt.text, opt.dataset.unite, centrale) + ctxSuffix();
 }
 
 // Suffixe du contexte d'upload : format timestamp + mode d'enregistrement (remontés dans la carte du haut)
@@ -292,18 +335,12 @@ function ctxSuffix() {
 }
 function refreshContext() { switchType(currentType()); }
 
-function updateUnite() {
-  const sel = document.getElementById("elec-compteur");
-  const opt = sel.options[sel.selectedIndex];
-  document.getElementById("elec-unite").textContent = opt.dataset.unite;
-  switchType("electricite");
-}
-
-function updateIndUnite() {
-  const sel = document.getElementById("indcomp-select");
-  const opt = sel.options[sel.selectedIndex];
-  document.getElementById("indcomp-unite").textContent = opt.dataset.unite;
-  switchType("indcomp");
+// Chaque option porte son unité dans data-unite → une seule fonction pour les 5 lignes.
+function updateUnite(type) {
+  const t = DATA_TYPES[type] || DATA_TYPES.electricite;
+  const sel = document.getElementById(t.select);
+  document.getElementById(t.unite).textContent = sel.options[sel.selectedIndex].dataset.unite;
+  switchType(type);
 }
 
 document.querySelectorAll(".freq-toggle button").forEach(btn => {
