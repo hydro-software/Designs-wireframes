@@ -736,165 +736,154 @@
         </div>
       </div>
 
-      <!-- ============================ Section 5 — Indicateurs contextuels (brouillon BL) ============================ -->
+      <!-- ============================ Section 5 — Pluies (brouillon BL) ============================
+           Ex-sous-chapitre « Pluie » des Indicateurs contextuels, remonté au rang de volet. -->
       <div class="pd-section" data-open="false">
         <div class="pd-section-head" onclick="this.parentElement.dataset.open = this.parentElement.dataset.open === 'true' ? 'false' : 'true'">
-          <div class="pd-section-title"><i data-lucide="layers" style="width:16px; height:16px; color:var(--brand-cyan)"></i> Indicateurs</div>
+          <div class="pd-section-title"><i data-lucide="cloud-rain" style="width:16px; height:16px; color:var(--brand-cyan)"></i> Pluies</div>
           <i data-lucide="chevron-down" class="pd-chev"></i>
         </div>
         <div class="pd-section-body">
-          <p class="muted" style="font-size:13px; margin:0 0 14px">
-            Choisissez, par type, les données contextuelles qui seront mises à disposition de vos utilisateurs à côté de la production.
+          <p class="muted" style="font-size:12.5px; margin:0 0 14px; line-height:1.6">
+            Sélectionnez les données pluie (histogramme inversé) qui seront <b style="color:var(--text-primary)">sélectionnables par vos utilisateurs</b>.
+            Cochez une ou plusieurs sources à gauche, puis appuyez sur la flèche pour les ajouter. Le compteur sur la flèche indique le nombre déjà pris sur le maximum autorisé pour cette catégorie.
           </p>
 
-          <!-- Sous-chapitre : Pluie -->
-          <div class="pd-sub" data-open="true">
-            <div class="pd-sub-head" onclick="this.parentElement.dataset.open = this.parentElement.dataset.open === 'true' ? 'false' : 'true'">
-              <div class="pd-sub-title"><i data-lucide="cloud-rain" style="width:16px; height:16px; color:var(--brand-cyan)"></i> Pluie</div>
-              <i data-lucide="chevron-down" class="pd-sub-chev"></i>
+          <div class="picker" data-picker-max="10">
+            <!-- Colonne gauche : sources prédéfinies (listes déroulantes, sélection puis flèche) -->
+            <div>
+              <div class="picker-col-title">Sources disponibles</div>
+
+              <div class="src-group" data-cat-max="3" data-cat="publique">
+                <div class="src-main">
+                  <div class="src-group-title"><span class="swatch" style="background:#60a5fa"></span> Pluie publique</div>
+                  <div class="src-list">
+                    <div class="src-row" data-name="Pluie · Bergerac" data-meta="Météo France · station proche · horaire" onclick="toggleSrcRow(this)"><div class="src-row-main"><span class="src-name">Pluie · Bergerac</span><button class="src-detail-btn" onclick="srcDetail(event,this)">Détail</button></div><div class="src-detail" hidden>Météo France · station proche · horaire</div></div>
+                    <div class="src-row" data-name="Pluie · station amont" data-meta="SCHAPI · 12 km amont · horaire" onclick="toggleSrcRow(this)"><div class="src-row-main"><span class="src-name">Pluie · station amont</span><button class="src-detail-btn" onclick="srcDetail(event,this)">Détail</button></div><div class="src-detail" hidden>SCHAPI · 12 km amont · horaire</div></div>
+                    <div class="src-row" data-name="Pluie · grille ERA5" data-meta="Copernicus · maille 9 km · 3 h" onclick="toggleSrcRow(this)"><div class="src-row-main"><span class="src-name">Pluie · grille ERA5</span><button class="src-detail-btn" onclick="srcDetail(event,this)">Détail</button></div><div class="src-detail" hidden>Copernicus · maille 9 km · 3 h</div></div>
+                    <div class="src-row" data-name="Pluie · Bergerac aéro." data-meta="Météo France · station synoptique" onclick="toggleSrcRow(this)"><div class="src-row-main"><span class="src-name">Pluie · Bergerac aéro.</span><button class="src-detail-btn" onclick="srcDetail(event,this)">Détail</button></div><div class="src-detail" hidden>Météo France · station synoptique</div></div>
+                    <div class="src-row" data-name="Pluie · radar ANTILOPE" data-meta="Météo France · radar 1 km" onclick="toggleSrcRow(this)"><div class="src-row-main"><span class="src-name">Pluie · radar ANTILOPE</span><button class="src-detail-btn" onclick="srcDetail(event,this)">Détail</button></div><div class="src-detail" hidden>Météo France · radar 1 km</div></div>
+                    <div class="src-row" data-name="Pluie · grille AROME" data-meta="Météo France · prévision 1,3 km" onclick="toggleSrcRow(this)"><div class="src-row-main"><span class="src-name">Pluie · grille AROME</span><button class="src-detail-btn" onclick="srcDetail(event,this)">Détail</button></div><div class="src-detail" hidden>Météo France · prévision 1,3 km</div></div>
+                  </div>
+                  <button class="src-create" onclick="openOverlay('ajouter-source-publique')"><i data-lucide="plus"></i> Ajouter une source</button>
+                </div>
+                <div class="src-arrow"><button title="Ajouter à la sélection" onclick="movePluieSelected(this)" disabled><i data-lucide="arrow-right"></i></button><span class="arrow-count">0/3</span></div>
+              </div>
+
+              <div class="src-group" data-cat-max="3" data-create-max="5" data-cat="privee">
+                <div class="src-main">
+                  <div class="src-group-title"><span class="swatch" style="background:#a3e635"></span> Données privées <span class="src-group-max">(max 5)</span></div>
+                  <div class="src-list">
+                    <div class="src-row" data-name="Pluviomètre site" data-meta="Capteur sur site · privé" data-unite="mm" data-ingestion="NaiaBox" onclick="toggleSrcRow(this)"><div class="src-row-main"><span class="src-name">Pluviomètre site</span><button class="src-detail-btn" onclick="srcDetail(event,this)">Détail</button></div><div class="src-detail" hidden>Capteur sur site · privé</div></div>
+                    <div class="src-row" data-name="Pluviomètre voisin" data-meta="Partagé · centrale amont" data-unite="mm" data-ingestion="Partenaire Naia" onclick="toggleSrcRow(this)"><div class="src-row-main"><span class="src-name">Pluviomètre voisin</span><button class="src-detail-btn" onclick="srcDetail(event,this)">Détail</button></div><div class="src-detail" hidden>Partagé · centrale amont</div></div>
+                  </div>
+                  <button class="src-create" onclick="openFluxDonnee(this)"><i data-lucide="plus"></i> Créer une source</button>
+                </div>
+                <div class="src-arrow"><button title="Ajouter à la sélection" onclick="movePluieSelected(this)" disabled><i data-lucide="arrow-right"></i></button><span class="arrow-count">0/3</span></div>
+              </div>
+
+              <div class="src-group" data-cat-max="2" data-create-max="5" data-cat="composite">
+                <div class="src-main">
+                  <div class="src-group-title"><span class="swatch" style="background:#7dd3fc"></span> Données composites <span class="src-group-max">(max 5)</span></div>
+                  <div class="src-list">
+                    <div class="src-row" data-name="Moyenne pondérée bassin" data-meta="Composite · 3 sources" data-op="somme" onclick="toggleSrcRow(this)"><div class="src-row-main"><span class="src-name">Moyenne pondérée bassin</span><button class="src-detail-btn" onclick="srcDetail(event,this)">Détail</button></div><div class="src-detail" hidden>Composite · 3 sources</div></div>
+                    <div class="src-row" data-name="Pluie corrigée altitude" data-meta="Composite · modèle Naia" data-op="somme" onclick="toggleSrcRow(this)"><div class="src-row-main"><span class="src-name">Pluie corrigée altitude</span><button class="src-detail-btn" onclick="srcDetail(event,this)">Détail</button></div><div class="src-detail" hidden>Composite · modèle Naia</div></div>
+                  </div>
+                  <button class="src-create" onclick="openComposite(this)"><i data-lucide="plus"></i> Créer une source</button>
+                </div>
+                <div class="src-arrow"><button title="Ajouter à la sélection" onclick="movePluieSelected(this)" disabled><i data-lucide="arrow-right"></i></button><span class="arrow-count">0/2</span></div>
+              </div>
             </div>
-            <div class="pd-sub-body">
-              <p class="muted" style="font-size:12.5px; margin:0 0 14px; line-height:1.6">
-                Sélectionnez les données pluie (histogramme inversé) qui seront <b style="color:var(--text-primary)">sélectionnables par vos utilisateurs</b>.
-                Cochez une ou plusieurs sources à gauche, puis appuyez sur la flèche pour les ajouter. Le compteur sur la flèche indique le nombre déjà pris sur le maximum autorisé pour cette catégorie.
-              </p>
 
-              <div class="picker" data-picker-max="10">
-                <!-- Colonne gauche : sources prédéfinies (listes déroulantes, sélection puis flèche) -->
-                <div>
-                  <div class="picker-col-title">Sources disponibles</div>
-
-                  <div class="src-group" data-cat-max="3" data-cat="publique">
-                    <div class="src-main">
-                      <div class="src-group-title"><span class="swatch" style="background:#60a5fa"></span> Pluie publique</div>
-                      <div class="src-list">
-                        <div class="src-row" data-name="Pluie · Bergerac" data-meta="Météo France · station proche · horaire" onclick="toggleSrcRow(this)"><div class="src-row-main"><span class="src-name">Pluie · Bergerac</span><button class="src-detail-btn" onclick="srcDetail(event,this)">Détail</button></div><div class="src-detail" hidden>Météo France · station proche · horaire</div></div>
-                        <div class="src-row" data-name="Pluie · station amont" data-meta="SCHAPI · 12 km amont · horaire" onclick="toggleSrcRow(this)"><div class="src-row-main"><span class="src-name">Pluie · station amont</span><button class="src-detail-btn" onclick="srcDetail(event,this)">Détail</button></div><div class="src-detail" hidden>SCHAPI · 12 km amont · horaire</div></div>
-                        <div class="src-row" data-name="Pluie · grille ERA5" data-meta="Copernicus · maille 9 km · 3 h" onclick="toggleSrcRow(this)"><div class="src-row-main"><span class="src-name">Pluie · grille ERA5</span><button class="src-detail-btn" onclick="srcDetail(event,this)">Détail</button></div><div class="src-detail" hidden>Copernicus · maille 9 km · 3 h</div></div>
-                        <div class="src-row" data-name="Pluie · Bergerac aéro." data-meta="Météo France · station synoptique" onclick="toggleSrcRow(this)"><div class="src-row-main"><span class="src-name">Pluie · Bergerac aéro.</span><button class="src-detail-btn" onclick="srcDetail(event,this)">Détail</button></div><div class="src-detail" hidden>Météo France · station synoptique</div></div>
-                        <div class="src-row" data-name="Pluie · radar ANTILOPE" data-meta="Météo France · radar 1 km" onclick="toggleSrcRow(this)"><div class="src-row-main"><span class="src-name">Pluie · radar ANTILOPE</span><button class="src-detail-btn" onclick="srcDetail(event,this)">Détail</button></div><div class="src-detail" hidden>Météo France · radar 1 km</div></div>
-                        <div class="src-row" data-name="Pluie · grille AROME" data-meta="Météo France · prévision 1,3 km" onclick="toggleSrcRow(this)"><div class="src-row-main"><span class="src-name">Pluie · grille AROME</span><button class="src-detail-btn" onclick="srcDetail(event,this)">Détail</button></div><div class="src-detail" hidden>Météo France · prévision 1,3 km</div></div>
-                      </div>
-                      <button class="src-create" onclick="openOverlay('ajouter-source-publique')"><i data-lucide="plus"></i> Ajouter une source</button>
-                    </div>
-                    <div class="src-arrow"><button title="Ajouter à la sélection" onclick="movePluieSelected(this)" disabled><i data-lucide="arrow-right"></i></button><span class="arrow-count">0/3</span></div>
-                  </div>
-
-                  <div class="src-group" data-cat-max="3" data-create-max="5" data-cat="privee">
-                    <div class="src-main">
-                      <div class="src-group-title"><span class="swatch" style="background:#a3e635"></span> Données privées <span class="src-group-max">(max 5)</span></div>
-                      <div class="src-list">
-                        <div class="src-row" data-name="Pluviomètre site" data-meta="Capteur sur site · privé" data-unite="mm" data-ingestion="NaiaBox" onclick="toggleSrcRow(this)"><div class="src-row-main"><span class="src-name">Pluviomètre site</span><button class="src-detail-btn" onclick="srcDetail(event,this)">Détail</button></div><div class="src-detail" hidden>Capteur sur site · privé</div></div>
-                        <div class="src-row" data-name="Pluviomètre voisin" data-meta="Partagé · centrale amont" data-unite="mm" data-ingestion="Partenaire Naia" onclick="toggleSrcRow(this)"><div class="src-row-main"><span class="src-name">Pluviomètre voisin</span><button class="src-detail-btn" onclick="srcDetail(event,this)">Détail</button></div><div class="src-detail" hidden>Partagé · centrale amont</div></div>
-                      </div>
-                      <button class="src-create" onclick="openFluxDonnee(this)"><i data-lucide="plus"></i> Créer une source</button>
-                    </div>
-                    <div class="src-arrow"><button title="Ajouter à la sélection" onclick="movePluieSelected(this)" disabled><i data-lucide="arrow-right"></i></button><span class="arrow-count">0/3</span></div>
-                  </div>
-
-                  <div class="src-group" data-cat-max="2" data-create-max="5" data-cat="composite">
-                    <div class="src-main">
-                      <div class="src-group-title"><span class="swatch" style="background:#7dd3fc"></span> Données composites <span class="src-group-max">(max 5)</span></div>
-                      <div class="src-list">
-                        <div class="src-row" data-name="Moyenne pondérée bassin" data-meta="Composite · 3 sources" data-op="somme" onclick="toggleSrcRow(this)"><div class="src-row-main"><span class="src-name">Moyenne pondérée bassin</span><button class="src-detail-btn" onclick="srcDetail(event,this)">Détail</button></div><div class="src-detail" hidden>Composite · 3 sources</div></div>
-                        <div class="src-row" data-name="Pluie corrigée altitude" data-meta="Composite · modèle Naia" data-op="somme" onclick="toggleSrcRow(this)"><div class="src-row-main"><span class="src-name">Pluie corrigée altitude</span><button class="src-detail-btn" onclick="srcDetail(event,this)">Détail</button></div><div class="src-detail" hidden>Composite · modèle Naia</div></div>
-                      </div>
-                      <button class="src-create" onclick="openComposite(this)"><i data-lucide="plus"></i> Créer une source</button>
-                    </div>
-                    <div class="src-arrow"><button title="Ajouter à la sélection" onclick="movePluieSelected(this)" disabled><i data-lucide="arrow-right"></i></button><span class="arrow-count">0/2</span></div>
-                  </div>
-                </div>
-
-                <!-- Colonne droite : sélection de l'utilisateur -->
-                <div>
-                  <div class="picker-col-title">Données sélectionnables <span id="pluie-count" class="sel-count" style="color:var(--text-muted); font-weight:400; text-transform:none; letter-spacing:0">(0/10)</span></div>
-                  <div class="sel-box" id="pluie-selection">
-                    <div class="sel-empty">Aucune donnée sélectionnée.<br>Cochez des sources à gauche puis appuyez sur la flèche.</div>
-                  </div>
-                </div>
+            <!-- Colonne droite : sélection de l'utilisateur -->
+            <div>
+              <div class="picker-col-title">Données sélectionnables <span id="pluie-count" class="sel-count" style="color:var(--text-muted); font-weight:400; text-transform:none; letter-spacing:0">(0/10)</span></div>
+              <div class="sel-box" id="pluie-selection">
+                <div class="sel-empty">Aucune donnée sélectionnée.<br>Cochez des sources à gauche puis appuyez sur la flèche.</div>
               </div>
             </div>
           </div>
+        </div>
+      </div>
 
-          <!-- Sous-chapitre : Courbe (ex-Capteur) — clone du picker Pluie -->
-          <div class="pd-sub" data-open="false">
-            <div class="pd-sub-head" onclick="this.parentElement.dataset.open = this.parentElement.dataset.open === 'true' ? 'false' : 'true'">
-              <div class="pd-sub-title"><i data-lucide="activity" style="width:16px; height:16px; color:var(--brand-cyan)"></i> Courbe</div>
-              <i data-lucide="chevron-down" class="pd-sub-chev"></i>
+      <!-- ============================ Section 5a — Indicateurs (brouillon BL) ============================
+           Ex-sous-chapitre « Courbe » des Indicateurs contextuels, remonté au rang de volet. -->
+      <div class="pd-section" data-open="false">
+        <div class="pd-section-head" onclick="this.parentElement.dataset.open = this.parentElement.dataset.open === 'true' ? 'false' : 'true'">
+          <div class="pd-section-title"><i data-lucide="activity" style="width:16px; height:16px; color:var(--brand-cyan)"></i> Indicateurs</div>
+          <i data-lucide="chevron-down" class="pd-chev"></i>
+        </div>
+        <div class="pd-section-body">
+          <p class="muted" style="font-size:12.5px; margin:0 0 14px; line-height:1.6">
+            Sélectionnez les données affichées en courbe qui seront <b style="color:var(--text-primary)">sélectionnables par vos utilisateurs</b>.
+            Cochez une ou plusieurs sources à gauche, puis appuyez sur la flèche pour les ajouter. Le compteur sur la flèche indique le nombre déjà pris sur le maximum autorisé pour cette catégorie.
+          </p>
+
+          <div class="picker" data-picker-max="10">
+            <!-- Colonne gauche : sources prédéfinies -->
+            <div>
+              <div class="picker-col-title">Sources disponibles</div>
+
+              <div class="src-group" data-cat-max="3" data-cat="publique">
+                <div class="src-main">
+                  <div class="src-group-title"><span class="swatch" style="background:#60a5fa"></span> Hydrologie publique</div>
+                  <div class="src-list">
+                    <div class="src-row" data-name="Débit · Dordogne" data-meta="Hydroportail · station Bergerac · horaire" onclick="toggleSrcRow(this)"><div class="src-row-main"><span class="src-name">Débit · Dordogne</span><button class="src-detail-btn" onclick="srcDetail(event,this)">Détail</button></div><div class="src-detail" hidden>Hydroportail · station Bergerac · horaire</div></div>
+                    <div class="src-row" data-name="Hauteur d'eau · station amont" data-meta="Vigicrues · 8 km amont · 15 min" onclick="toggleSrcRow(this)"><div class="src-row-main"><span class="src-name">Hauteur d'eau · station amont</span><button class="src-detail-btn" onclick="srcDetail(event,this)">Détail</button></div><div class="src-detail" hidden>Vigicrues · 8 km amont · 15 min</div></div>
+                    <div class="src-row" data-name="Débit · grille ERA5-Land" data-meta="Copernicus · maille 9 km · horaire" onclick="toggleSrcRow(this)"><div class="src-row-main"><span class="src-name">Débit · grille ERA5-Land</span><button class="src-detail-btn" onclick="srcDetail(event,this)">Détail</button></div><div class="src-detail" hidden>Copernicus · maille 9 km · horaire</div></div>
+                    <div class="src-row" data-name="Débit naturel reconstitué" data-meta="Banque Hydro · station de référence" onclick="toggleSrcRow(this)"><div class="src-row-main"><span class="src-name">Débit naturel reconstitué</span><button class="src-detail-btn" onclick="srcDetail(event,this)">Détail</button></div><div class="src-detail" hidden>Banque Hydro · station de référence</div></div>
+                    <div class="src-row" data-name="Hauteur d'eau · Vigicrues local" data-meta="SCHAPI · station proche · 15 min" onclick="toggleSrcRow(this)"><div class="src-row-main"><span class="src-name">Hauteur d'eau · Vigicrues local</span><button class="src-detail-btn" onclick="srcDetail(event,this)">Détail</button></div><div class="src-detail" hidden>SCHAPI · station proche · 15 min</div></div>
+                  </div>
+                  <button class="src-create" onclick="openOverlay('ajouter-source-publique')"><i data-lucide="plus"></i> Ajouter une source</button>
+                </div>
+                <div class="src-arrow"><button title="Ajouter à la sélection" onclick="movePluieSelected(this)" disabled><i data-lucide="arrow-right"></i></button><span class="arrow-count">0/3</span></div>
+              </div>
+
+              <div class="src-group" data-cat-max="3" data-create-max="5" data-cat="privee">
+                <div class="src-main">
+                  <div class="src-group-title"><span class="swatch" style="background:#a3e635"></span> Données privées <span class="src-group-max">(max 5)</span></div>
+                  <div class="src-list">
+                    <div class="src-row" data-name="Sonde niveau amont" data-meta="NaiaBox · m" data-unite="m" data-ingestion="NaiaBox" onclick="toggleSrcRow(this)"><div class="src-row-main"><span class="src-name">Sonde niveau amont</span><button class="src-detail-btn" onclick="srcDetail(event,this)">Détail</button></div><div class="src-detail" hidden>NaiaBox · m</div></div>
+                    <div class="src-row" data-name="Débitmètre turbine" data-meta="Partenaire Naia · m³/s" data-unite="m³/s" data-ingestion="Partenaire Naia" onclick="toggleSrcRow(this)"><div class="src-row-main"><span class="src-name">Débitmètre turbine</span><button class="src-detail-btn" onclick="srcDetail(event,this)">Détail</button></div><div class="src-detail" hidden>Partenaire Naia · m³/s</div></div>
+                  </div>
+                  <button class="src-create" onclick="openFluxDonnee(this)"><i data-lucide="plus"></i> Créer une source</button>
+                </div>
+                <div class="src-arrow"><button title="Ajouter à la sélection" onclick="movePluieSelected(this)" disabled><i data-lucide="arrow-right"></i></button><span class="arrow-count">0/3</span></div>
+              </div>
+
+              <div class="src-group" data-cat-max="2" data-create-max="5" data-cat="composite">
+                <div class="src-main">
+                  <div class="src-group-title"><span class="swatch" style="background:#7dd3fc"></span> Données composites <span class="src-group-max">(max 5)</span></div>
+                  <div class="src-list">
+                    <div class="src-row" data-name="Débit reconstitué" data-meta="Composite · somme" data-op="somme" onclick="toggleSrcRow(this)"><div class="src-row-main"><span class="src-name">Débit reconstitué</span><button class="src-detail-btn" onclick="srcDetail(event,this)">Détail</button></div><div class="src-detail" hidden>Composite · somme</div></div>
+                    <div class="src-row" data-name="Niveau corrigé biais" data-meta="Composite · produit" data-op="produit" onclick="toggleSrcRow(this)"><div class="src-row-main"><span class="src-name">Niveau corrigé biais</span><button class="src-detail-btn" onclick="srcDetail(event,this)">Détail</button></div><div class="src-detail" hidden>Composite · produit</div></div>
+                  </div>
+                  <button class="src-create" onclick="openComposite(this)"><i data-lucide="plus"></i> Créer une source</button>
+                </div>
+                <div class="src-arrow"><button title="Ajouter à la sélection" onclick="movePluieSelected(this)" disabled><i data-lucide="arrow-right"></i></button><span class="arrow-count">0/2</span></div>
+              </div>
+
+              <!-- 4e catégorie : Meter / Tarifs — pas de création, alimentée par les menus « Compteur électrique » et « Tarification » -->
+              <div class="src-group" data-cat-max="3" data-cat="meter">
+                <div class="src-main">
+                  <div class="src-group-title"><span class="swatch" style="background:#fbbf24"></span> Meter / Tarifs</div>
+                  <div class="src-list">
+                    <div class="src-row" data-name="Compteur MOU-PRINC" data-meta="Compteur électrique · principal" onclick="toggleSrcRow(this)"><div class="src-row-main"><span class="src-name">Compteur MOU-PRINC</span><button class="src-detail-btn" onclick="srcDetail(event,this)">Détail</button></div><div class="src-detail" hidden>Compteur électrique · principal</div></div>
+                    <div class="src-row" data-name="Compteur MOU-AUX" data-meta="Compteur électrique · auxiliaires" onclick="toggleSrcRow(this)"><div class="src-row-main"><span class="src-name">Compteur MOU-AUX</span><button class="src-detail-btn" onclick="srcDetail(event,this)">Détail</button></div><div class="src-detail" hidden>Compteur électrique · auxiliaires</div></div>
+                    <div class="src-row" data-name="Tarif EDF OA (H07)" data-meta="Tarification · contrat OA" onclick="toggleSrcRow(this)"><div class="src-row-main"><span class="src-name">Tarif EDF OA (H07)</span><button class="src-detail-btn" onclick="srcDetail(event,this)">Détail</button></div><div class="src-detail" hidden>Tarification · contrat OA</div></div>
+                    <div class="src-row" data-name="Prix Spot EPEX" data-meta="Tarification · marché Spot" onclick="toggleSrcRow(this)"><div class="src-row-main"><span class="src-name">Prix Spot EPEX</span><button class="src-detail-btn" onclick="srcDetail(event,this)">Détail</button></div><div class="src-detail" hidden>Tarification · marché Spot</div></div>
+                  </div>
+                  <p class="muted" style="font-size:11px; margin:8px 2px 0; line-height:1.5">Pas de création ici : ces données proviennent des menus « Compteur électrique » et « Tarification ».</p>
+                </div>
+                <div class="src-arrow"><button title="Ajouter à la sélection" onclick="movePluieSelected(this)" disabled><i data-lucide="arrow-right"></i></button><span class="arrow-count">0/3</span></div>
+              </div>
             </div>
-            <div class="pd-sub-body">
-              <p class="muted" style="font-size:12.5px; margin:0 0 14px; line-height:1.6">
-                Sélectionnez les données de courbe (histogramme inversé) qui seront <b style="color:var(--text-primary)">sélectionnables par vos utilisateurs</b>.
-                Cochez une ou plusieurs sources à gauche, puis appuyez sur la flèche pour les ajouter. Le compteur sur la flèche indique le nombre déjà pris sur le maximum autorisé pour cette catégorie.
-              </p>
 
-              <div class="picker" data-picker-max="10">
-                <!-- Colonne gauche : sources prédéfinies -->
-                <div>
-                  <div class="picker-col-title">Sources disponibles</div>
-
-                  <div class="src-group" data-cat-max="3" data-cat="publique">
-                    <div class="src-main">
-                      <div class="src-group-title"><span class="swatch" style="background:#60a5fa"></span> Hydrologie publique</div>
-                      <div class="src-list">
-                        <div class="src-row" data-name="Débit · Dordogne" data-meta="Hydroportail · station Bergerac · horaire" onclick="toggleSrcRow(this)"><div class="src-row-main"><span class="src-name">Débit · Dordogne</span><button class="src-detail-btn" onclick="srcDetail(event,this)">Détail</button></div><div class="src-detail" hidden>Hydroportail · station Bergerac · horaire</div></div>
-                        <div class="src-row" data-name="Hauteur d'eau · station amont" data-meta="Vigicrues · 8 km amont · 15 min" onclick="toggleSrcRow(this)"><div class="src-row-main"><span class="src-name">Hauteur d'eau · station amont</span><button class="src-detail-btn" onclick="srcDetail(event,this)">Détail</button></div><div class="src-detail" hidden>Vigicrues · 8 km amont · 15 min</div></div>
-                        <div class="src-row" data-name="Débit · grille ERA5-Land" data-meta="Copernicus · maille 9 km · horaire" onclick="toggleSrcRow(this)"><div class="src-row-main"><span class="src-name">Débit · grille ERA5-Land</span><button class="src-detail-btn" onclick="srcDetail(event,this)">Détail</button></div><div class="src-detail" hidden>Copernicus · maille 9 km · horaire</div></div>
-                        <div class="src-row" data-name="Débit naturel reconstitué" data-meta="Banque Hydro · station de référence" onclick="toggleSrcRow(this)"><div class="src-row-main"><span class="src-name">Débit naturel reconstitué</span><button class="src-detail-btn" onclick="srcDetail(event,this)">Détail</button></div><div class="src-detail" hidden>Banque Hydro · station de référence</div></div>
-                        <div class="src-row" data-name="Hauteur d'eau · Vigicrues local" data-meta="SCHAPI · station proche · 15 min" onclick="toggleSrcRow(this)"><div class="src-row-main"><span class="src-name">Hauteur d'eau · Vigicrues local</span><button class="src-detail-btn" onclick="srcDetail(event,this)">Détail</button></div><div class="src-detail" hidden>SCHAPI · station proche · 15 min</div></div>
-                      </div>
-                      <button class="src-create" onclick="openOverlay('ajouter-source-publique')"><i data-lucide="plus"></i> Ajouter une source</button>
-                    </div>
-                    <div class="src-arrow"><button title="Ajouter à la sélection" onclick="movePluieSelected(this)" disabled><i data-lucide="arrow-right"></i></button><span class="arrow-count">0/3</span></div>
-                  </div>
-
-                  <div class="src-group" data-cat-max="3" data-create-max="5" data-cat="privee">
-                    <div class="src-main">
-                      <div class="src-group-title"><span class="swatch" style="background:#a3e635"></span> Données privées <span class="src-group-max">(max 5)</span></div>
-                      <div class="src-list">
-                        <div class="src-row" data-name="Sonde niveau amont" data-meta="NaiaBox · m" data-unite="m" data-ingestion="NaiaBox" onclick="toggleSrcRow(this)"><div class="src-row-main"><span class="src-name">Sonde niveau amont</span><button class="src-detail-btn" onclick="srcDetail(event,this)">Détail</button></div><div class="src-detail" hidden>NaiaBox · m</div></div>
-                        <div class="src-row" data-name="Débitmètre turbine" data-meta="Partenaire Naia · m³/s" data-unite="m³/s" data-ingestion="Partenaire Naia" onclick="toggleSrcRow(this)"><div class="src-row-main"><span class="src-name">Débitmètre turbine</span><button class="src-detail-btn" onclick="srcDetail(event,this)">Détail</button></div><div class="src-detail" hidden>Partenaire Naia · m³/s</div></div>
-                      </div>
-                      <button class="src-create" onclick="openFluxDonnee(this)"><i data-lucide="plus"></i> Créer une source</button>
-                    </div>
-                    <div class="src-arrow"><button title="Ajouter à la sélection" onclick="movePluieSelected(this)" disabled><i data-lucide="arrow-right"></i></button><span class="arrow-count">0/3</span></div>
-                  </div>
-
-                  <div class="src-group" data-cat-max="2" data-create-max="5" data-cat="composite">
-                    <div class="src-main">
-                      <div class="src-group-title"><span class="swatch" style="background:#7dd3fc"></span> Données composites <span class="src-group-max">(max 5)</span></div>
-                      <div class="src-list">
-                        <div class="src-row" data-name="Débit reconstitué" data-meta="Composite · somme" data-op="somme" onclick="toggleSrcRow(this)"><div class="src-row-main"><span class="src-name">Débit reconstitué</span><button class="src-detail-btn" onclick="srcDetail(event,this)">Détail</button></div><div class="src-detail" hidden>Composite · somme</div></div>
-                        <div class="src-row" data-name="Niveau corrigé biais" data-meta="Composite · produit" data-op="produit" onclick="toggleSrcRow(this)"><div class="src-row-main"><span class="src-name">Niveau corrigé biais</span><button class="src-detail-btn" onclick="srcDetail(event,this)">Détail</button></div><div class="src-detail" hidden>Composite · produit</div></div>
-                      </div>
-                      <button class="src-create" onclick="openComposite(this)"><i data-lucide="plus"></i> Créer une source</button>
-                    </div>
-                    <div class="src-arrow"><button title="Ajouter à la sélection" onclick="movePluieSelected(this)" disabled><i data-lucide="arrow-right"></i></button><span class="arrow-count">0/2</span></div>
-                  </div>
-
-                  <!-- 4e catégorie : Meter / Tarifs — pas de création, alimentée par les menus « Compteur électrique » et « Tarification » -->
-                  <div class="src-group" data-cat-max="3" data-cat="meter">
-                    <div class="src-main">
-                      <div class="src-group-title"><span class="swatch" style="background:#fbbf24"></span> Meter / Tarifs</div>
-                      <div class="src-list">
-                        <div class="src-row" data-name="Compteur MOU-PRINC" data-meta="Compteur électrique · principal" onclick="toggleSrcRow(this)"><div class="src-row-main"><span class="src-name">Compteur MOU-PRINC</span><button class="src-detail-btn" onclick="srcDetail(event,this)">Détail</button></div><div class="src-detail" hidden>Compteur électrique · principal</div></div>
-                        <div class="src-row" data-name="Compteur MOU-AUX" data-meta="Compteur électrique · auxiliaires" onclick="toggleSrcRow(this)"><div class="src-row-main"><span class="src-name">Compteur MOU-AUX</span><button class="src-detail-btn" onclick="srcDetail(event,this)">Détail</button></div><div class="src-detail" hidden>Compteur électrique · auxiliaires</div></div>
-                        <div class="src-row" data-name="Tarif EDF OA (H07)" data-meta="Tarification · contrat OA" onclick="toggleSrcRow(this)"><div class="src-row-main"><span class="src-name">Tarif EDF OA (H07)</span><button class="src-detail-btn" onclick="srcDetail(event,this)">Détail</button></div><div class="src-detail" hidden>Tarification · contrat OA</div></div>
-                        <div class="src-row" data-name="Prix Spot EPEX" data-meta="Tarification · marché Spot" onclick="toggleSrcRow(this)"><div class="src-row-main"><span class="src-name">Prix Spot EPEX</span><button class="src-detail-btn" onclick="srcDetail(event,this)">Détail</button></div><div class="src-detail" hidden>Tarification · marché Spot</div></div>
-                      </div>
-                      <p class="muted" style="font-size:11px; margin:8px 2px 0; line-height:1.5">Pas de création ici : ces données proviennent des menus « Compteur électrique » et « Tarification ».</p>
-                    </div>
-                    <div class="src-arrow"><button title="Ajouter à la sélection" onclick="movePluieSelected(this)" disabled><i data-lucide="arrow-right"></i></button><span class="arrow-count">0/3</span></div>
-                  </div>
-                </div>
-
-                <!-- Colonne droite : sélection de l'utilisateur -->
-                <div>
-                  <div class="picker-col-title">Données sélectionnables <span id="courbem-count" class="sel-count" style="color:var(--text-muted); font-weight:400; text-transform:none; letter-spacing:0">(0/10)</span></div>
-                  <div class="sel-box" id="courbem-selection">
-                    <div class="sel-empty">Aucune donnée sélectionnée.<br>Cochez des sources à gauche puis appuyez sur la flèche.</div>
-                  </div>
-                </div>
+            <!-- Colonne droite : sélection de l'utilisateur -->
+            <div>
+              <div class="picker-col-title">Données sélectionnables <span id="courbem-count" class="sel-count" style="color:var(--text-muted); font-weight:400; text-transform:none; letter-spacing:0">(0/10)</span></div>
+              <div class="sel-box" id="courbem-selection">
+                <div class="sel-empty">Aucune donnée sélectionnée.<br>Cochez des sources à gauche puis appuyez sur la flèche.</div>
               </div>
             </div>
           </div>
@@ -902,7 +891,7 @@
       </div>
 
       <!-- ============================ Section 5b — Comparateur (brouillon BL) ============================
-           Même principe que les Indicateurs contextuels, mais 2 sous-chapitres : Vue production / Vue revenus.
+           Même principe que les volets Pluies / Indicateurs, mais 2 sous-chapitres : Vue production / Vue revenus.
            Les pickers ont data-allow-shift="true" → la composite propose un décalage temporel ("il y a 1 an"). -->
       <div class="pd-section" data-open="false">
         <div class="pd-section-head" onclick="this.parentElement.dataset.open = this.parentElement.dataset.open === 'true' ? 'false' : 'true'">
@@ -2130,7 +2119,7 @@
     if (window.lucide) lucide.createIcons();
   }
 
-  // Indicateurs contextuels · Pluie (brouillon BL) — sélecteur "histogramme inversé"
+  // Volets Pluies / Indicateurs (brouillon BL) — sélecteur "histogramme inversé"
   // Chaque boîte a un MAX (data-cat-max). Le compteur sur la flèche = déjà pris / max de la boîte.
   // On coche des sources (dans la limite des places restantes), la flèche les déplace à droite.
   // À max, la flèche est bloquée tant qu'on n'a pas supprimé une donnée de cette boîte à droite.
@@ -2171,7 +2160,7 @@
     arrow.querySelector(".arrow-count").textContent = taken + "/" + catMax(group);
     arrow.querySelector("button").disabled = (staged === 0);
   }
-  // Compteur "Données sélectionnables" scopé au picker courant (plusieurs pickers cohabitent : Pluie, Courbe M…)
+  // Compteur "Données sélectionnables" scopé au picker courant (plusieurs pickers cohabitent : Pluies, Indicateurs…)
   function pickerRefreshCount(picker) {
     const box = picker.querySelector(".sel-box");
     const max = parseInt(picker.dataset.pickerMax || "10", 10);
@@ -2244,7 +2233,7 @@
     document.getElementById("flux-donnee-cat").textContent = catLabel;
     document.getElementById("flux-donnee-save").innerHTML = '<i data-lucide="check"></i> Créer';
     document.getElementById("flux-donnee-nom").value = "";
-    populateFluxDonneeUnits(fdIndicatorType(btn));   // unités selon l'indicateur (Pluie → mm/h, mm/d, Autre)
+    populateFluxDonneeUnits(fdIndicatorType(btn));   // unités selon l'indicateur (Pluies → mm/h, mm/d, Autre)
     document.getElementById("flux-donnee-unite").selectedIndex = 0;
     fluxDonneeUniteChange();                          // cache le bloc "Autre"
     document.getElementById("flux-donnee-ingestion").selectedIndex = 0; // "Import sur Naia" par défaut
@@ -2269,12 +2258,17 @@
     openOverlay("flux-donnee");
     if (window.lucide) lucide.createIcons();
   }
-  // Unités proposées selon le type d'indicateur (brouillon BL). Pluie restreint à mm/h, mm/d, Autre.
-  const FD_UNIT_SETS = { "Pluie": ["mm/h", "mm/d", "Autre"] };
+  // Unités proposées selon le type d'indicateur (brouillon BL). Pluies restreint à mm/h, mm/d, Autre.
+  const FD_UNIT_SETS = { "Pluies": ["mm/h", "mm/d", "Autre"] };
   const FD_UNIT_DEFAULT = ["mm", "mm/h", "m³/s", "m³", "°C", "m", "kWh", "kW", "%", "Autre"];
   function fdIndicatorType(el) {
-    const sub = el && el.closest(".pd-sub");
-    const t = sub && sub.querySelector(".pd-sub-title");
+    if (!el) return null;
+    // Sous-chapitre d'abord (Comparateur : Vue production / Vue revenus),
+    // sinon le volet lui-même (Pluies / Indicateurs, remontés au rang de volet).
+    const sub = el.closest(".pd-sub");
+    const sec = el.closest(".pd-section");
+    const t = sub ? sub.querySelector(".pd-sub-title")
+                  : (sec && sec.querySelector(".pd-section-title"));
     return t ? t.textContent.trim() : null;
   }
   function populateFluxDonneeUnits(indicatorType) {
@@ -2605,7 +2599,7 @@
     compositeTarget = group;
     compositeEditRow = null;
     var compIndic = fdIndicatorType(btn);
-    compositeNoProduct = (compIndic === "Pluie");
+    compositeNoProduct = (compIndic === "Pluies");
     compositeAllowFixed = (compIndic === "Vue production" || compIndic === "Vue revenus");
     document.getElementById("composite-title").textContent = "Créer une donnée composite";
     document.getElementById("composite-save").innerHTML = '<i data-lucide="check"></i> Créer';
@@ -2620,7 +2614,7 @@
     compositeTarget = row.closest(".src-group");
     compositeEditRow = row;
     var compIndicE = fdIndicatorType(row);
-    compositeNoProduct = (compIndicE === "Pluie");
+    compositeNoProduct = (compIndicE === "Pluies");
     compositeAllowFixed = (compIndicE === "Vue production" || compIndicE === "Vue revenus");
     document.getElementById("composite-title").textContent = "Modifier la donnée composite";
     document.getElementById("composite-save").innerHTML = '<i data-lucide="check"></i> Enregistrer';

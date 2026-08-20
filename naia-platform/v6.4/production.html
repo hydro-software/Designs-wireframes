@@ -45,7 +45,7 @@
   .axis-input::-webkit-outer-spin-button, .axis-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
   .axis-input:focus { border-color: var(--brand-cyan); }
 
-  /* Slot tables (Histogramme inversé / Indicateurs courbes / Comparateur) */
+  /* Slot tables (Pluies / Indicateurs / Comparateur) */
   .slot-table { width: 100%; border-collapse: collapse; }
   .slot-table th { text-align: left; font-size: 10.5px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; padding: 0 8px 6px; border-bottom: 1px solid var(--border-default); }
   .slot-table td { padding: 7px 8px; border-bottom: 1px solid var(--border-subtle); vertical-align: middle; }
@@ -174,7 +174,7 @@
             </div>
 
             <div class="ind-section">
-              <div class="ind-section-title">Indicateurs inversés</div>
+              <div class="ind-section-title">Pluies</div>
               <div class="ind-row">
                 <label><span class="swatch" style="background:#60a5fa"></span>Météo</label>
                 <span class="ind-cell"><input type="checkbox" checked></span>
@@ -185,7 +185,7 @@
             </div>
 
             <div class="ind-section">
-              <div class="ind-section-title">Indicateurs courbes</div>
+              <div class="ind-section-title">Indicateurs</div>
               <div class="ind-row">
                 <label><span class="swatch" style="background:#a3e635"></span>Débit</label>
                 <span class="ind-cell"><input type="checkbox" checked></span>
@@ -289,8 +289,9 @@
 <!-- ============================== OVERLAYS ============================== -->
 
 <!-- Chart configuration overlay (per-user) — Bernard's redesign (Designs-wireframes#1).
-     Per-resolution axis Min/Max + units, Histogramme inversé / Indicateurs courbes
-     slot tables, Comparateur slot table with %-of-axis range + scale factor,
+     Per-resolution axis Min/Max + units, Pluies / Indicateurs slot tables
+     (ex-sous-blocs des « Indicateurs contextuels », remontés au rang de volet),
+     Comparateur slot table with %-of-axis range + scale factor,
      and a WhatsApp section placeholder. Reached from the bottom-right wrench icon
      and from the icon-action sliders button. -->
 <div id="chart-config" class="overlay" onclick="if(event.target===this) closeOverlay('chart-config')">
@@ -405,85 +406,75 @@
       </div>
     </div>
 
-    <!-- ============ Indicateurs contextuels ============ -->
+    <!-- ============ Pluies ============ -->
     <div class="pd-section" data-open="true">
       <div class="pd-section-head" onclick="toggleCfgSec(this)">
-        <div class="pd-section-title"><i data-lucide="activity" style="width:16px; height:16px; color:var(--brand-cyan)"></i> Indicateurs contextuels</div>
+        <div class="pd-section-title"><i data-lucide="cloud-rain" style="width:16px; height:16px; color:var(--brand-cyan)"></i> Pluies</div>
         <i data-lucide="chevron-down" class="pd-chev"></i>
       </div>
       <div class="pd-section-body">
+        <table class="slot-table">
+          <thead><tr><th class="col-width-lab">Étiquette</th><th>Source de données</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><input class="lab-in" type="text" value="Pluie bassin"></td>
+              <td><select class="select sel"><option>—</option><option selected>Pluie bassin versant (mm)</option><option>Pluie radar (mm)</option></select></td>
+            </tr>
+            <tr>
+              <td><input class="lab-in" type="text" placeholder="Précipitations 2"></td>
+              <td><select class="select sel"><option selected>—</option><option>Pluie station Météo-France</option></select></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
 
-        <!-- Histogramme inversé (slots 1-2) -->
-        <div class="axis-block" data-open="true">
-          <div class="axis-head" onclick="toggleCfgAxis(this)">
-            <div class="axis-half-title"><i data-lucide="bar-chart-3" style="width:13px; height:13px; transform:scaleY(-1)"></i>Histogramme inversé</div>
-            <i data-lucide="chevron-down" class="axis-chev"></i>
-          </div>
-          <div class="axis-body">
-            <table class="slot-table">
-              <thead><tr><th class="col-width-lab">Étiquette</th><th>Source de données</th></tr></thead>
-              <tbody>
-                <tr>
-                  <td><input class="lab-in" type="text" value="Pluie bassin"></td>
-                  <td><select class="select sel"><option>—</option><option selected>Pluie bassin versant (mm)</option><option>Pluie radar (mm)</option></select></td>
-                </tr>
-                <tr>
-                  <td><input class="lab-in" type="text" placeholder="Précipitations 2"></td>
-                  <td><select class="select sel"><option selected>—</option><option>Pluie station Météo-France</option></select></td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- Indicateurs courbes (slots 3-5) -->
-        <div class="axis-block" data-open="true">
-          <div class="axis-head" onclick="toggleCfgAxis(this)">
-            <div class="axis-half-title"><i data-lucide="trending-up" style="width:13px; height:13px"></i>Indicateurs courbes</div>
-            <i data-lucide="chevron-down" class="axis-chev"></i>
-          </div>
-          <div class="axis-body">
-            <table class="slot-table">
-              <thead><tr><th class="col-width-lab">Étiquette</th><th>Source de données</th><th>Plage visible</th></tr></thead>
-              <tbody>
-                <tr>
-                  <td><input class="lab-in" type="text" value="Débit rivière"></td>
-                  <td><select class="select sel"><option>—</option><option selected>Débit rivière (m³/s)</option><option>Niveau rivière (m)</option><option>Production théorique (kW)</option></select></td>
-                  <td>
-                    <div class="range-cell">
-                      <input class="range-in" type="number" value="2"><span class="range-sep">—</span><input class="range-in" type="number" value="18">
-                      <span class="range-unit">m³/s</span>
-                      <label class="clamp-lab"><input type="checkbox"> Rogner</label>
-                      <span class="reset-link">Réinit.</span>
-                    </div>
-                  </td>
-                </tr>
-                <tr>
-                  <td><input class="lab-in" type="text" value="Spot Belpex"></td>
-                  <td><select class="select sel"><option>—</option><option selected>Spot Belpex (€/MWh)</option><option>Niveau rivière (m)</option></select></td>
-                  <td>
-                    <div class="range-cell">
-                      <input class="range-in" type="number" value="-20"><span class="range-sep">—</span><input class="range-in" type="number" value="180">
-                      <span class="range-unit">€/MWh</span>
-                      <label class="clamp-lab"><input type="checkbox" checked> Rogner</label>
-                      <span class="reset-link">Réinit.</span>
-                    </div>
-                  </td>
-                </tr>
-                <tr>
-                  <td><input class="lab-in" type="text" placeholder="Courbe 3"></td>
-                  <td><select class="select sel"><option selected>—</option><option>Température (°C)</option><option>Production théorique (kW)</option></select></td>
-                  <td>
-                    <div class="range-cell">
-                      <input class="range-in" type="number" placeholder="Min" disabled><span class="range-sep">—</span><input class="range-in" type="number" placeholder="Max" disabled>
-                      <label class="clamp-lab" style="opacity:.45"><input type="checkbox" disabled> Rogner</label>
-                    </div>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
+    <!-- ============ Indicateurs ============ -->
+    <div class="pd-section" data-open="true">
+      <div class="pd-section-head" onclick="toggleCfgSec(this)">
+        <div class="pd-section-title"><i data-lucide="activity" style="width:16px; height:16px; color:var(--brand-cyan)"></i> Indicateurs</div>
+        <i data-lucide="chevron-down" class="pd-chev"></i>
+      </div>
+      <div class="pd-section-body">
+        <table class="slot-table">
+          <thead><tr><th class="col-width-lab">Étiquette</th><th>Source de données</th><th>Plage visible</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><input class="lab-in" type="text" value="Débit rivière"></td>
+              <td><select class="select sel"><option>—</option><option selected>Débit rivière (m³/s)</option><option>Niveau rivière (m)</option><option>Production théorique (kW)</option></select></td>
+              <td>
+                <div class="range-cell">
+                  <input class="range-in" type="number" value="2"><span class="range-sep">—</span><input class="range-in" type="number" value="18">
+                  <span class="range-unit">m³/s</span>
+                  <label class="clamp-lab"><input type="checkbox"> Rogner</label>
+                  <span class="reset-link">Réinit.</span>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td><input class="lab-in" type="text" value="Spot Belpex"></td>
+              <td><select class="select sel"><option>—</option><option selected>Spot Belpex (€/MWh)</option><option>Niveau rivière (m)</option></select></td>
+              <td>
+                <div class="range-cell">
+                  <input class="range-in" type="number" value="-20"><span class="range-sep">—</span><input class="range-in" type="number" value="180">
+                  <span class="range-unit">€/MWh</span>
+                  <label class="clamp-lab"><input type="checkbox" checked> Rogner</label>
+                  <span class="reset-link">Réinit.</span>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td><input class="lab-in" type="text" placeholder="Courbe 3"></td>
+              <td><select class="select sel"><option selected>—</option><option>Température (°C)</option><option>Production théorique (kW)</option></select></td>
+              <td>
+                <div class="range-cell">
+                  <input class="range-in" type="number" placeholder="Min" disabled><span class="range-sep">—</span><input class="range-in" type="number" placeholder="Max" disabled>
+                  <label class="clamp-lab" style="opacity:.45"><input type="checkbox" disabled> Rogner</label>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
 
