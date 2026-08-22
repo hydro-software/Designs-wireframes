@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin · Client — Naia</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="css/style.css" rel="stylesheet"><script src="https://cdn.tailwindcss.com"></script>
+<style>
+  .cd-section { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 12px; margin-bottom: 12px; }
+  .cd-section-head { padding: 14px 20px; border-bottom: 1px solid var(--border-subtle); display: flex; justify-content: space-between; align-items: center; }
+  .cd-section-title { font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 10px; }
+  .cd-section-body { padding: 18px 20px; }
+  .cd-info-row { display: flex; justify-content: space-between; gap: 16px; padding: 7px 0; border-bottom: 1px solid var(--border-subtle); font-size: 13px; }
+  .cd-info-row:last-child { border-bottom: 0; }
+  .cd-info-row .lbl { color: var(--text-muted); flex-shrink: 0; }
+  .cd-info-row span:last-child { text-align: right; }
+  .timeline-item { display: flex; gap: 14px; padding: 10px 0; border-bottom: 1px solid var(--border-subtle); }
+  .timeline-item:last-child { border-bottom: 0; }
+  .timeline-dot { width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+  .timeline-dot i { width: 14px; height: 14px; }
+  .timeline-main { flex: 1; min-width: 0; }
+  .timeline-title { font-size: 13px; font-weight: 500; }
+  .timeline-meta { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+  .odoo-card { background: linear-gradient(135deg, rgba(167,139,250,0.10), rgba(56,189,248,0.06)); border: 1px solid rgba(167,139,250,0.30); border-radius: 12px; margin-bottom: 12px; }
+</style>
+</head>
+<body data-page="admin-customer" data-section="admin">
+<div class="app-shell">
+  <aside class="sidebar"></aside>
+  <main class="main-area">
+
+    <header class="topbar">
+      <div>
+        <div class="page-eyebrow"><a class="link" href="admin-abonnements.html">Administration · Organisations</a> ·  Convert FMG</div>
+        <div style="font-size:18px; font-weight:600; display:flex; align-items:center; gap:10px">
+          Convert FMG
+          <span class="badge badge-slate tabular" title="Référence d'organisation Naia" style="font-size:11px; letter-spacing:0.02em">NAIA-00042</span>
+          <span class="badge badge-green">Actif</span>
+        </div>
+        <div class="muted" style="font-size:11px; margin-top:4px; display:flex; align-items:center; gap:6px">
+          <i data-lucide="building-2" style="width:12px; height:12px"></i>
+          Organisation Naia · l'identité légale (raison sociale, TVA, adresse) est gérée dans <a class="link" href="https://hydro-software-services.odoo.com/odoo/contacts/4182" target="_blank" rel="noopener">Odoo</a>.
+        </div>
+      </div>
+      <div style="display:flex; gap:8px">
+        <button class="btn btn-secondary btn-sm" onclick="openOverlay('edit-subscription')"><i data-lucide="edit-3"></i> Modifier l'abonnement</button>
+        <button class="btn btn-secondary btn-sm" onclick="openOverlay('change-plan')"><i data-lucide="repeat"></i> Changer de plan</button>
+        <button class="btn btn-secondary btn-sm" style="color:var(--accent-red)" onclick="openOverlay('cancel-subscription')"><i data-lucide="x-circle"></i> Annuler</button>
+      </div>
+    </header>
+
+    <div class="page-content" style="max-width:1100px">
+
+      <!-- Top KPI strip -->
+      <div style="display:grid; gap:14px; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); margin-bottom:18px">
+        <div class="kpi-card"><div class="kpi-label">Statut</div><div class="kpi-value" style="font-size:18px">Actif</div><div class="kpi-delta muted">depuis le 14 sept. 2024</div></div>
+        <div class="kpi-card"><div class="kpi-label">Récurrent</div><div class="kpi-value tabular">740 €</div><div class="kpi-delta muted">/ mois HT</div></div>
+        <div class="kpi-card"><div class="kpi-label">Plan</div><div class="kpi-value" style="font-size:16px">Enterprise</div><div class="kpi-delta muted">11 MW · 9 centrales</div></div>
+        <div class="kpi-card"><div class="kpi-label">Renouvellement</div><div class="kpi-value" style="font-size:16px">22 mai 2026</div><div class="kpi-delta muted">cadence mensuelle</div></div>
+      </div>
+
+      <!-- PII isolation notice -->
+      <div style="display:flex; gap:12px; align-items:center; padding:10px 16px; background:var(--bg-input); border:1px solid var(--border-subtle); border-radius:10px; margin-bottom:14px; font-size:12px; color:var(--text-muted)">
+        <i data-lucide="shield-check" style="width:16px; color:var(--brand-cyan); flex-shrink:0"></i>
+        <span>Naia ne conserve que le <b>lien vers le contact Odoo</b> et des champs opérationnels. Le nom légal, le n<sup>o</sup> de TVA, l'adresse, l'e-mail de facturation et le bon de commande sont gérés dans <b>Odoo</b> (source de vérité).</span>
+      </div>
+
+      <!-- Two-column layout -->
+      <div style="display:grid; gap:14px; grid-template-columns: 1fr 1fr">
+
+        <!-- LEFT COLUMN -->
+        <div>
+
+          <!-- Section: Odoo source of truth -->
+          <div class="odoo-card">
+            <div class="cd-section-body" style="display:flex; gap:14px; align-items:center; padding:16px 20px">
+              <div style="width:44px; height:44px; background:rgba(167,139,250,0.18); border-radius:12px; display:flex; align-items:center; justify-content:center; color:#c4b5fd; flex-shrink:0"><i data-lucide="building-2"></i></div>
+              <div style="flex:1">
+                <div style="font-weight:600; display:flex; align-items:center; gap:8px">Fiche Odoo <span class="badge badge-purple" style="font-size:10px">res.partner</span></div>
+                <div class="muted" style="font-size:12px; margin-top:2px">Nom légal, n<sup>o</sup> de TVA, adresse, e-mail de facturation et bon de commande (PO) sont gérés dans Odoo. Contact lié : <span class="tabular">#res.partner/4182</span>.</div>
+              </div>
+              <div style="display:flex; flex-direction:column; gap:6px; flex-shrink:0">
+                <a class="btn btn-secondary btn-sm" href="https://hydro-software-services.odoo.com/odoo/contacts/4182" target="_blank" rel="noopener"><i data-lucide="external-link"></i> Voir le contact Odoo</a>
+                <button class="btn btn-secondary btn-sm" onclick="openOverlay('edit-odoo-link')"><i data-lucide="edit-3"></i> Modifier le lien</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section: Operational subscription record -->
+          <div class="cd-section">
+            <div class="cd-section-head">
+              <div class="cd-section-title"><i data-lucide="credit-card" style="width:15px; color:var(--brand-cyan)"></i> Abonnement · champs opérationnels</div>
+              <div style="display:flex; gap:6px">
+                <button class="btn btn-secondary btn-sm" onclick="openOverlay('edit-subscription')"><i data-lucide="edit-3"></i> Modifier</button>
+                <button class="btn btn-secondary btn-sm" onclick="openOverlay('change-plan')"><i data-lucide="repeat"></i> Changer de plan</button>
+              </div>
+            </div>
+            <div class="cd-section-body">
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px">
+                <div>
+                  <div class="cd-info-row"><span class="lbl">Statut</span><span><span class="badge badge-green">Actif</span></span></div>
+                  <div class="cd-info-row"><span class="lbl">Mode de facturation</span><span><span class="badge badge-purple">Enterprise</span></span></div>
+                  <div class="cd-info-row"><span class="lbl">Prix applicable</span><span class="tabular">740 € / mois HT</span></div>
+                  <div class="cd-info-row"><span class="lbl">Version de pricing</span><span><a class="link" href="admin-pricing.html">v01</a> · pinnée</span></div>
+                  <div class="cd-info-row"><span class="lbl">Mode / bracket</span><span>Enterprise · palier 10–25 MW</span></div>
+                </div>
+                <div>
+                  <div class="cd-info-row"><span class="lbl">Date de début</span><span>14 sept. 2024</span></div>
+                  <div class="cd-info-row"><span class="lbl">Durée / terme</span><span>Sans engagement</span></div>
+                  <div class="cd-info-row"><span class="lbl">Cadence de facturation</span><span>Mensuelle</span></div>
+                  <div class="cd-info-row"><span class="lbl">Bon de commande (PO)</span><span class="tabular">PO-2024-0917</span></div>
+                  <div class="cd-info-row"><span class="lbl">Date de renouvellement</span><span>22 mai 2026</span></div>
+                </div>
+              </div>
+              <div style="margin-top:14px; padding:10px 12px; background:var(--bg-input); border-radius:8px; font-size:12px; color:var(--text-muted)">
+                Décomposition : 650 € (palier 10–25 MW) + 9 × 10 € (add-on par centrale) = <b>740 € / mois HT</b>.
+                Le n<sup>o</sup> de bon de commande référencé ci-dessus correspond au PO émis dans Odoo.
+              </div>
+            </div>
+          </div>
+
+          <!-- Section: Usage & santé (FR-USAGE / FR-HEALTH) -->
+          <div class="cd-section">
+            <div class="cd-section-head">
+              <div class="cd-section-title"><i data-lucide="activity" style="width:15px; color:var(--brand-cyan)"></i> Usage &amp; santé</div>
+              <button class="btn btn-secondary btn-sm" onclick="openOverlay('adjust-health')"><i data-lucide="sliders-horizontal"></i> Ajuster le score (override)</button>
+            </div>
+            <div class="cd-section-body">
+
+              <!-- Health score + risk bucket -->
+              <div style="display:flex; gap:16px; align-items:center; padding:4px 0 16px; border-bottom:1px solid var(--border-subtle); margin-bottom:16px">
+                <div style="width:64px; height:64px; border-radius:14px; background:rgba(132,204,22,0.12); border:1px solid rgba(132,204,22,0.30); display:flex; flex-direction:column; align-items:center; justify-content:center; flex-shrink:0">
+                  <div class="tabular" style="font-size:24px; font-weight:700; color:var(--accent-green); line-height:1">78</div>
+                  <div class="muted" style="font-size:9px; letter-spacing:0.04em">/ 100</div>
+                </div>
+                <div style="flex:1">
+                  <div style="display:flex; align-items:center; gap:8px">
+                    <span class="badge badge-green">Sain</span>
+                    <span class="muted" style="font-size:11px">(healthy)</span>
+                  </div>
+                  <div class="muted" style="font-size:12px; margin-top:6px; line-height:1.5">Score de santé du compte calculé quotidiennement à partir du paiement, de la tendance d'usage, de la dernière connexion et de l'ancienneté du plan.</div>
+                </div>
+              </div>
+
+              <!-- Activity rollups (FR-USAGE) -->
+              <h4 style="font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em; font-weight:600; margin:0 0 10px">Activité &amp; usage</h4>
+
+              <!-- Connexions par période -->
+              <div class="muted" style="font-size:11px; margin-bottom:6px">Connexions à Naia · tous les utilisateurs de l'organisation</div>
+              <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:10px; margin-bottom:14px">
+                <div style="background:var(--bg-input); border:1px solid var(--border-subtle); border-radius:8px; padding:10px 12px">
+                  <div class="muted" style="font-size:10px; text-transform:uppercase; letter-spacing:0.04em">7 derniers jours</div>
+                  <div class="tabular" style="font-size:18px; font-weight:700; margin-top:2px">9</div>
+                  <div style="font-size:11px; color:var(--accent-amber)"><i data-lucide="trending-down" style="width:11px; height:11px; vertical-align:-1px"></i> −25 % vs sem. préc.</div>
+                </div>
+                <div style="background:var(--bg-input); border:1px solid var(--border-subtle); border-radius:8px; padding:10px 12px">
+                  <div class="muted" style="font-size:10px; text-transform:uppercase; letter-spacing:0.04em">30 jours</div>
+                  <div class="tabular" style="font-size:18px; font-weight:700; margin-top:2px">142</div>
+                  <div style="font-size:11px; color:var(--accent-amber)"><i data-lucide="trending-down" style="width:11px; height:11px; vertical-align:-1px"></i> −18 % vs préc.</div>
+                </div>
+                <div style="background:var(--bg-input); border:1px solid var(--border-subtle); border-radius:8px; padding:10px 12px">
+                  <div class="muted" style="font-size:10px; text-transform:uppercase; letter-spacing:0.04em">Trimestre</div>
+                  <div class="tabular" style="font-size:18px; font-weight:700; margin-top:2px">487</div>
+                  <div class="muted" style="font-size:11px">≈ stable</div>
+                </div>
+                <div style="background:var(--bg-input); border:1px solid var(--border-subtle); border-radius:8px; padding:10px 12px">
+                  <div class="muted" style="font-size:10px; text-transform:uppercase; letter-spacing:0.04em">12 mois</div>
+                  <div class="tabular" style="font-size:18px; font-weight:700; margin-top:2px">1 980</div>
+                  <div style="font-size:11px; color:var(--accent-green)"><i data-lucide="trending-up" style="width:11px; height:11px; vertical-align:-1px"></i> +12 % a/a</div>
+                </div>
+              </div>
+
+              <!-- Tendance d'activité (sparkline · 12 dernières semaines) -->
+              <div style="background:var(--bg-input); border:1px solid var(--border-subtle); border-radius:8px; padding:12px; margin-bottom:14px">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px">
+                  <span class="muted" style="font-size:11px; text-transform:uppercase; letter-spacing:0.04em">Tendance d'activité · 12 dernières semaines</span>
+                  <span style="font-size:11px; color:var(--accent-amber); font-weight:600"><i data-lucide="trending-down" style="width:12px; height:12px; vertical-align:-2px"></i> en baisse · −18 % sur 30 j</span>
+                </div>
+                <svg width="100%" height="44" viewBox="0 0 232 44" preserveAspectRatio="none" style="display:block" role="img" aria-label="Connexions hebdomadaires, tendance à la baisse sur les 3 dernières semaines">
+                  <rect x="2"   y="10" width="14" height="30" rx="2" fill="#38bdf8"></rect>
+                  <rect x="20"  y="6"  width="14" height="34" rx="2" fill="#38bdf8"></rect>
+                  <rect x="38"  y="8"  width="14" height="32" rx="2" fill="#38bdf8"></rect>
+                  <rect x="56"  y="4"  width="14" height="36" rx="2" fill="#38bdf8"></rect>
+                  <rect x="74"  y="7"  width="14" height="33" rx="2" fill="#38bdf8"></rect>
+                  <rect x="92"  y="5"  width="14" height="35" rx="2" fill="#38bdf8"></rect>
+                  <rect x="110" y="9"  width="14" height="31" rx="2" fill="#38bdf8"></rect>
+                  <rect x="128" y="6"  width="14" height="34" rx="2" fill="#38bdf8"></rect>
+                  <rect x="146" y="8"  width="14" height="32" rx="2" fill="#38bdf8"></rect>
+                  <rect x="164" y="13" width="14" height="27" rx="2" fill="#fbbf24"></rect>
+                  <rect x="182" y="16" width="14" height="24" rx="2" fill="#fbbf24"></rect>
+                  <rect x="200" y="19" width="14" height="21" rx="2" fill="#fbbf24"></rect>
+                </svg>
+                <div class="muted" style="font-size:10px; margin-top:4px">Connexions hebdomadaires — les 3 dernières semaines (orange) sont sous la moyenne du trimestre.</div>
+              </div>
+
+              <!-- Dernière connexion + jours actifs -->
+              <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(120px, 1fr)); gap:10px; margin-bottom:14px">
+                <div style="background:var(--bg-input); border:1px solid var(--border-subtle); border-radius:8px; padding:10px 12px">
+                  <div class="muted" style="font-size:10px; text-transform:uppercase; letter-spacing:0.04em">Dernière connexion</div>
+                  <div style="font-size:14px; font-weight:600; margin-top:3px">il y a 2 j</div>
+                  <div class="muted" style="font-size:11px">15 juin 2026</div>
+                </div>
+                <div style="background:var(--bg-input); border:1px solid var(--border-subtle); border-radius:8px; padding:10px 12px">
+                  <div class="muted" style="font-size:10px; text-transform:uppercase; letter-spacing:0.04em">Jours actifs · 30 j</div>
+                  <div class="tabular" style="font-size:14px; font-weight:600; margin-top:3px">18 <span class="muted" style="font-size:11px; font-weight:400">/ 30</span></div>
+                  <div style="font-size:11px; color:var(--accent-amber)"><i data-lucide="trending-down" style="width:11px; height:11px; vertical-align:-1px"></i> −18 % vs base 90 j</div>
+                </div>
+                <div style="background:var(--bg-input); border:1px solid var(--border-subtle); border-radius:8px; padding:10px 12px">
+                  <div class="muted" style="font-size:10px; text-transform:uppercase; letter-spacing:0.04em">Jours actifs · 90 j</div>
+                  <div class="tabular" style="font-size:14px; font-weight:600; margin-top:3px">66 <span class="muted" style="font-size:11px; font-weight:400">/ 90</span></div>
+                  <div class="muted" style="font-size:11px">base de référence</div>
+                </div>
+              </div>
+
+              <!-- Utilisation des fonctionnalités (FR-USAGE) -->
+              <div class="muted" style="font-size:11px; margin-bottom:6px">Utilisation des fonctionnalités · 30 j</div>
+              <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(96px, 1fr)); gap:10px; margin-bottom:18px">
+                <div style="background:var(--bg-input); border:1px solid var(--border-subtle); border-radius:8px; padding:10px 12px; text-align:center">
+                  <div class="tabular" style="font-size:18px; font-weight:700">142</div>
+                  <div class="muted" style="font-size:11px; margin-top:2px"><i data-lucide="log-in" style="width:11px; height:11px; vertical-align:-1px"></i> Connexions</div>
+                </div>
+                <div style="background:var(--bg-input); border:1px solid var(--border-subtle); border-radius:8px; padding:10px 12px; text-align:center">
+                  <div class="tabular" style="font-size:18px; font-weight:700">27</div>
+                  <div class="muted" style="font-size:11px; margin-top:2px"><i data-lucide="file-bar-chart" style="width:11px; height:11px; vertical-align:-1px"></i> Rapports</div>
+                </div>
+                <div style="background:var(--bg-input); border:1px solid var(--border-subtle); border-radius:8px; padding:10px 12px; text-align:center">
+                  <div class="tabular" style="font-size:18px; font-weight:700">9</div>
+                  <div class="muted" style="font-size:11px; margin-top:2px"><i data-lucide="flask-conical" style="width:11px; height:11px; vertical-align:-1px"></i> Simulations</div>
+                </div>
+                <div style="background:var(--bg-input); border:1px solid var(--border-subtle); border-radius:8px; padding:10px 12px; text-align:center">
+                  <div class="tabular" style="font-size:18px; font-weight:700">14</div>
+                  <div class="muted" style="font-size:11px; margin-top:2px"><i data-lucide="download" style="width:11px; height:11px; vertical-align:-1px"></i> Exports</div>
+                </div>
+                <div style="background:var(--bg-input); border:1px solid var(--border-subtle); border-radius:8px; padding:10px 12px; text-align:center">
+                  <div class="tabular" style="font-size:18px; font-weight:700">6</div>
+                  <div class="muted" style="font-size:11px; margin-top:2px"><i data-lucide="bar-chart-3" style="width:11px; height:11px; vertical-align:-1px"></i> Comparateurs</div>
+                </div>
+              </div>
+
+              <!-- Why this score? (FR-HLT-3) -->
+              <h4 style="font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em; font-weight:600; margin:0 0 10px">Pourquoi ce score&nbsp;?</h4>
+              <div style="display:flex; flex-direction:column; gap:7px; margin-bottom:16px">
+                <div style="display:flex; justify-content:space-between; align-items:center; font-size:13px">
+                  <span style="display:flex; align-items:center; gap:8px"><i data-lucide="check-circle" style="width:14px; height:14px; color:var(--accent-green)"></i> Paiement à jour</span>
+                  <span style="color:var(--accent-green); font-weight:600">+ 30</span>
+                </div>
+                <div style="display:flex; justify-content:space-between; align-items:center; font-size:13px">
+                  <span style="display:flex; align-items:center; gap:8px"><i data-lucide="log-in" style="width:14px; height:14px; color:var(--brand-cyan)"></i> Connexion récente · il y a 2 j</span>
+                  <span style="color:var(--accent-green); font-weight:600">+ 22</span>
+                </div>
+                <div style="display:flex; justify-content:space-between; align-items:center; font-size:13px">
+                  <span style="display:flex; align-items:center; gap:8px"><i data-lucide="trending-down" style="width:14px; height:14px; color:var(--accent-amber)"></i> Connexions −18 % sur 30 j</span>
+                  <span style="color:var(--accent-amber); font-weight:600">− 12</span>
+                </div>
+                <div style="display:flex; justify-content:space-between; align-items:center; font-size:13px">
+                  <span style="display:flex; align-items:center; gap:8px"><i data-lucide="calendar-clock" style="width:14px; height:14px; color:var(--brand-cyan)"></i> Ancienneté du plan · 14 mois</span>
+                  <span style="color:var(--accent-green); font-weight:600">+ 8</span>
+                </div>
+                <div style="display:flex; justify-content:space-between; align-items:center; font-size:13px">
+                  <span style="display:flex; align-items:center; gap:8px"><i data-lucide="life-buoy" style="width:14px; height:14px; color:var(--text-muted)"></i> Aucun signal support négatif</span>
+                  <span class="muted" style="font-weight:600">0</span>
+                </div>
+              </div>
+
+              <!-- Informational framing (FR-HLT-6 / FR-SUB-3) — PO decision 2026-07-06:
+                   the health score is computed and shown PER CUSTOMER (org aggregate);
+                   no per-centrale breakdown at V1 (aligned with issue #108). -->
+              <div style="padding:10px 12px; background:var(--bg-input); border-radius:8px; font-size:12px; color:var(--text-muted); line-height:1.6">
+                <i data-lucide="info" style="width:13px; height:13px; vertical-align:-2px"></i> Le score de santé est <b>informatif</b> et calculé <b>au niveau du client</b> (agrégat de l'organisation). Il alimente le tableau de bord admin et le <b>suivi manuel des impayés</b> (décision d'accès au cas par cas, FR-SUB-3). Il ne déclenche <b>aucun</b> blocage, suspension ou relance automatique.
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- RIGHT COLUMN -->
+        <div>
+
+          <!-- Section: Naia record (operational, non-PII) -->
+          <div class="cd-section">
+            <div class="cd-section-head"><div class="cd-section-title"><i data-lucide="database" style="width:15px; color:var(--brand-cyan)"></i> Fiche Naia (opérationnelle)</div><button class="btn btn-secondary btn-sm" onclick="openOverlay('edit-naia-record')"><i data-lucide="edit-3"></i> Modifier</button></div>
+            <div class="cd-section-body">
+              <div class="cd-info-row"><span class="lbl">Nom d'affichage</span><span>Convert FMG</span></div>
+              <div class="cd-info-row"><span class="lbl">Contact Odoo lié</span><span><a class="link" href="https://hydro-software-services.odoo.com/odoo/contacts/4182" target="_blank" rel="noopener">#res.partner/4182 →</a></span></div>
+              <div class="cd-info-row"><span class="lbl">Pays (opérationnel)</span><span>France</span></div>
+              <div class="cd-info-row"><span class="lbl">Capacité totale</span><span class="tabular">11 MW · 9 centrales</span></div>
+              <div class="cd-info-row"><span class="lbl">Utilisateurs Naia</span><span>4</span></div>
+              <div style="margin-top:12px; padding:9px 11px; background:var(--bg-input); border-radius:8px; font-size:11px; color:var(--text-muted); line-height:1.6">
+                <i data-lucide="info" style="width:12px; height:12px; vertical-align:-2px"></i> Aucune donnée personnelle n'est stockée ici. Pour modifier le nom légal, la TVA, l'adresse ou l'e-mail de facturation, ouvrez la <a class="link" href="https://hydro-software-services.odoo.com/odoo/contacts/4182" target="_blank" rel="noopener">fiche Odoo</a>.
+              </div>
+            </div>
+          </div>
+
+          <!-- Section: Centrales & compteurs — FR-DSL-3/4/5, FR-SUB-5, FR-PLT-0/1/2/3.
+               PO decision 2026-07-06, amended 2026-07-16 (PRD v2.17): the
+               subscription module is the SOLE authoring surface — the Naia admin
+               adds BOTH the centrale and the compteur here; nothing is created
+               in the Core. A client can only REQUEST one from its portal (that
+               request emails the naia superadmin; a ticket follows in phase 2).
+               A centrale the Core has not yet imported carries a "Nouvelle"
+               marker, derived from the import lineage — not a stored flag.
+               User management stays client-only. -->
+          <div class="cd-section">
+            <div class="cd-section-head">
+              <div class="cd-section-title"><i data-lucide="zap" style="width:15px; color:var(--brand-cyan)"></i> Centrales &amp; compteurs <span class="muted" style="font-weight:400">· 9 centrales</span></div>
+              <button class="btn btn-secondary btn-sm" onclick="openOverlay('manage-plants')"><i data-lucide="plus"></i> Ajouter une centrale</button>
+            </div>
+            <div class="cd-section-body">
+
+              <!-- Missing-mandate alert banner (FR-DSL-5) -->
+              <div style="display:flex; gap:10px; align-items:flex-start; padding:10px 12px; background:rgba(251,191,36,0.10); border:1px solid rgba(251,191,36,0.30); border-radius:8px; margin-bottom:14px; font-size:12px; line-height:1.5">
+                <i data-lucide="alert-triangle" style="width:16px; height:16px; color:var(--accent-amber); flex-shrink:0; margin-top:1px"></i>
+                <span><b>2 compteurs en attente de mandat signé</b> — les données ne sont pas affichées tant que le compteur n'est pas validé.</span>
+              </div>
+
+              <!-- Centrale 1 : Centrale du Moulin (active, 2 compteurs) -->
+              <div style="border:1px solid var(--border-subtle); border-radius:10px; margin-bottom:12px; overflow:hidden">
+                <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; padding:11px 14px; background:var(--bg-input); border-bottom:1px solid var(--border-subtle)">
+                  <div style="font-weight:600; font-size:13px; display:flex; align-items:center; gap:8px"><i data-lucide="zap" style="width:14px; height:14px; color:var(--brand-cyan)"></i> Centrale du Moulin <span class="muted" style="font-weight:400; font-size:12px">· Deux-Sèvres · 2,4 MW</span></div>
+                  <div id="bloc-c1-controls" style="display:flex; align-items:center; gap:8px">
+                    <span id="bloc-c1-badge" class="badge badge-red" style="display:none">Accès bloqué</span>
+                    <button class="btn btn-secondary btn-sm" onclick="openOverlay('ajouter-compteur')" title="Ajouter un compteur à cette centrale (FR-PLT-2)"><i data-lucide="plus"></i> Compteur</button>
+                    <button id="bloc-c1-btn" class="btn btn-secondary btn-sm" onclick="toggleBlocCentrale('c1','Centrale du Moulin')"><i data-lucide="lock"></i> Bloquer l'accès</button>
+                  </div>
+                </div>
+                <table class="data-table" style="font-size:13px; margin:0">
+                  <thead><tr><th>Compteur · PRM</th><th>État</th><th>Mandat DSO (kDrive)</th><th></th></tr></thead>
+                  <tbody>
+                    <tr>
+                      <td><b>Compteur principal</b><br><span class="muted tabular" style="font-size:11px">PRM 14582136987412</span></td>
+                      <td><span class="badge badge-green">Validé</span></td>
+                      <td><a class="link" href="https://kdrive.infomaniak.com/app/share/naia/mandats/moulin-principal.pdf" target="_blank" rel="noopener"><i data-lucide="link" style="width:12px; height:12px; vertical-align:-2px"></i> Voir le mandat</a></td>
+                      <td></td>
+                    </tr>
+                    <tr>
+                      <td><b>Compteur injection</b><br><span class="muted tabular" style="font-size:11px">PRM 14582136987413</span></td>
+                      <td><span class="badge badge-green">Validé</span></td>
+                      <td><a class="link" href="https://kdrive.infomaniak.com/app/share/naia/mandats/moulin-injection.pdf" target="_blank" rel="noopener"><i data-lucide="link" style="width:12px; height:12px; vertical-align:-2px"></i> Voir le mandat</a></td>
+                      <td></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <!-- Centrale 2 : Barrage de la Sèvre (1 compteur en validation, lien manquant) -->
+              <div style="border:1px solid var(--border-subtle); border-radius:10px; margin-bottom:12px; overflow:hidden">
+                <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; padding:11px 14px; background:var(--bg-input); border-bottom:1px solid var(--border-subtle)">
+                  <div style="font-weight:600; font-size:13px; display:flex; align-items:center; gap:8px"><i data-lucide="zap" style="width:14px; height:14px; color:var(--brand-cyan)"></i> Barrage de la Sèvre <span class="muted" style="font-weight:400; font-size:12px">· Deux-Sèvres · 3,1 MW</span>
+                    <!-- FR-PAD-3 / FR-SEAM-1: shown while the Core has not yet imported the
+                         centrale. Derived from the import lineage (no stored status), so a
+                         stuck import stays visible instead of being masked by a flag. -->
+                    <span class="badge badge-cyan" style="font-size:10px" title="La centrale n'est pas encore reprise dans le Core — le marqueur disparaît dès l'import">Nouvelle</span>
+                  </div>
+                  <div id="bloc-c2-controls" style="display:flex; align-items:center; gap:8px">
+                    <span id="bloc-c2-badge" class="badge badge-red" style="display:none">Accès bloqué</span>
+                    <button class="btn btn-secondary btn-sm" onclick="openOverlay('ajouter-compteur')" title="Ajouter un compteur à cette centrale (FR-PLT-2)"><i data-lucide="plus"></i> Compteur</button>
+                    <button id="bloc-c2-btn" class="btn btn-secondary btn-sm" onclick="toggleBlocCentrale('c2','Barrage de la Sèvre')"><i data-lucide="lock"></i> Bloquer l'accès</button>
+                  </div>
+                </div>
+                <table class="data-table" style="font-size:13px; margin:0">
+                  <thead><tr><th>Compteur · PRM</th><th>État</th><th>Mandat DSO (kDrive)</th><th></th></tr></thead>
+                  <tbody>
+                    <tr>
+                      <td><b>Compteur principal</b><br><span class="muted tabular" style="font-size:11px">PRM 30001610071234</span></td>
+                      <td><span class="badge badge-amber">En validation</span></td>
+                      <td><span class="badge badge-red" style="font-size:10px">Lien manquant</span></td>
+                      <td style="text-align:right; white-space:nowrap"><button class="btn btn-primary btn-sm" onclick="openOverlay('valider-compteur')"><i data-lucide="check-circle"></i> Valider</button></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <!-- Centrale 3 : Microcentrale de la Sèvre (1 compteur en validation, lien ajouté) -->
+              <div style="border:1px solid var(--border-subtle); border-radius:10px; margin-bottom:12px; overflow:hidden">
+                <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; padding:11px 14px; background:var(--bg-input); border-bottom:1px solid var(--border-subtle)">
+                  <div style="font-weight:600; font-size:13px; display:flex; align-items:center; gap:8px"><i data-lucide="zap" style="width:14px; height:14px; color:var(--brand-cyan)"></i> Microcentrale de la Sèvre <span class="muted" style="font-weight:400; font-size:12px">· Deux-Sèvres · 0,5 MW</span></div>
+                  <div id="bloc-c3-controls" style="display:flex; align-items:center; gap:8px">
+                    <span id="bloc-c3-badge" class="badge badge-red">Accès bloqué</span>
+                    <button class="btn btn-secondary btn-sm" onclick="openOverlay('ajouter-compteur')" title="Ajouter un compteur à cette centrale (FR-PLT-2)"><i data-lucide="plus"></i> Compteur</button>
+                    <button id="bloc-c3-btn" class="btn btn-secondary btn-sm" onclick="toggleBlocCentrale('c3','Microcentrale de la Sèvre')"><i data-lucide="unlock"></i> Débloquer</button>
+                  </div>
+                </div>
+                <table class="data-table" style="font-size:13px; margin:0">
+                  <thead><tr><th>Compteur · PRM</th><th>État</th><th>Mandat DSO (kDrive)</th><th></th></tr></thead>
+                  <tbody>
+                    <tr>
+                      <td><b>Compteur principal</b><br><span class="muted tabular" style="font-size:11px">PRM 30001610079988</span></td>
+                      <td><span class="badge badge-amber">En validation</span></td>
+                      <td><a class="link" href="https://kdrive.infomaniak.com/app/share/naia/mandats/microsevre-principal.pdf" target="_blank" rel="noopener"><i data-lucide="link" style="width:12px; height:12px; vertical-align:-2px"></i> Voir le mandat</a></td>
+                      <td style="text-align:right; white-space:nowrap"><button class="btn btn-primary btn-sm" onclick="openOverlay('valider-compteur')"><i data-lucide="check-circle"></i> Valider</button></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div style="padding:8px 4px; font-size:12px; color:var(--text-muted)">
+                + 6 autres centrales · <a class="link" href="plant-detail.html">voir le détail des centrales →</a>
+              </div>
+
+              <!-- Block-by-plant note (FR-SUB-5) -->
+              <div style="margin-top:8px; padding:10px 12px; background:var(--bg-input); border-radius:8px; font-size:12px; color:var(--text-muted); line-height:1.6">
+                <i data-lucide="lock" style="width:13px; height:13px; vertical-align:-2px"></i> Un blocage masque les données de la centrale côté client&#8239;; l'utilisateur voit «&#8239;Abonnement non actif&#8239;». À utiliser en cas de non-paiement (décision manuelle au cas par cas).
+              </div>
+
+              <!-- Admin rights caption (PO decision 2026-07-06, amended 2026-07-16 / PRD v2.17) -->
+              <div style="margin-top:8px; padding:10px 12px; background:var(--bg-input); border-radius:8px; font-size:12px; color:var(--text-muted); line-height:1.6">
+                <i data-lucide="info" style="width:13px; height:13px; vertical-align:-2px"></i> L'admin Naia peut <b>ajouter une centrale</b>, <b>ajouter un compteur</b> et <b>valider le mandat par compteur</b>&#8239;; les autres paramètres du client restent en lecture seule. C'est <b>ici</b> que centrales et compteurs sont créés&#8239;— jamais dans le Core&#8239;: le Core reprend la centrale depuis l'abonnement, puis le superadmin y complète la configuration de mesure (origine, type de données, unité…). Le client, lui, peut seulement <b>demander</b> l'ajout d'une centrale ou d'un compteur depuis son portail&#8239;: la demande part par e-mail au superadmin Naia (un ticket suivra en phase&#8239;2), elle ne crée rien. La signature des mandats DSO est réalisée à 100&#8239;% dans Odoo&#8239;; Naia n'affiche qu'un lien kDrive vers le PDF signé.
+              </div>
+            </div>
+          </div>
+
+          <!-- Section: Invoices (Odoo-hosted) -->
+          <div class="cd-section">
+            <div class="cd-section-head">
+              <div class="cd-section-title"><i data-lucide="receipt" style="width:15px; color:var(--brand-cyan)"></i> Factures <span class="muted" style="font-weight:400">· hébergées par Odoo</span></div>
+              <a class="link" style="font-size:12px" href="https://hydro-software-services.odoo.com/odoo/account-move?partner=4182" target="_blank" rel="noopener">Toutes les factures Odoo →</a>
+            </div>
+            <div class="cd-section-body" style="padding:0">
+              <table class="data-table" style="font-size:13px">
+                <thead><tr><th>Date</th><th>Numéro</th><th class="num" style="text-align:right">TTC</th><th>Statut</th><th></th></tr></thead>
+                <tbody>
+                  <tr><td class="tabular">1 mai 2026</td><td class="tabular">INV/2026/0518</td><td class="num" style="text-align:right">888,00 €</td><td><span class="badge badge-green">Payée</span></td><td><a class="link" href="https://hydro-software-services.odoo.com/odoo/account-move/0518" target="_blank" rel="noopener" style="font-size:11px"><i data-lucide="file-text" style="width:12px; height:12px; vertical-align:-2px"></i> Voir la facture (Odoo)</a></td></tr>
+                  <tr><td class="tabular">1 avr. 2026</td><td class="tabular">INV/2026/0414</td><td class="num" style="text-align:right">888,00 €</td><td><span class="badge badge-green">Payée</span></td><td><a class="link" href="https://hydro-software-services.odoo.com/odoo/account-move/0414" target="_blank" rel="noopener" style="font-size:11px"><i data-lucide="file-text" style="width:12px; height:12px; vertical-align:-2px"></i> Voir la facture (Odoo)</a></td></tr>
+                  <tr><td class="tabular">1 mars 2026</td><td class="tabular">INV/2026/0309</td><td class="num" style="text-align:right">888,00 €</td><td><span class="badge badge-green">Payée</span></td><td><a class="link" href="https://hydro-software-services.odoo.com/odoo/account-move/0309" target="_blank" rel="noopener" style="font-size:11px"><i data-lucide="file-text" style="width:12px; height:12px; vertical-align:-2px"></i> Voir la facture (Odoo)</a></td></tr>
+                </tbody>
+              </table>
+              <div style="padding:10px 16px; border-top:1px solid var(--border-subtle); font-size:12px; color:var(--text-muted)">
+                Odoo émet chaque facture ainsi que le PDF. Naia ne génère ni ne stocke de PDF — chaque ligne pointe vers la facture hébergée dans Odoo.
+              </div>
+            </div>
+          </div>
+
+          <!-- Section: Contrats (kDrive) — FR-CUS-6 / issue #106.
+               PO decision 2026-07-06: contracts are signed in Odoo, the signed
+               PDFs are archived on kDrive; Naia stores ONE per-customer kDrive
+               folder link (no per-contract rows drawn from Odoo). -->
+          <div class="cd-section">
+            <div class="cd-section-head">
+              <div class="cd-section-title"><i data-lucide="file-text" style="width:15px; color:var(--brand-cyan)"></i> Contrats <span class="muted" style="font-weight:400">· source : kDrive</span></div>
+              <button class="btn btn-secondary btn-sm" onclick="alert('Modifier le lien kDrive — à venir')"><i data-lucide="edit-3"></i> Modifier le lien</button>
+            </div>
+            <div class="cd-section-body">
+              <div class="cd-info-row"><span class="lbl">Dossier contrats du client</span><span><a class="link" href="https://kdrive.infomaniak.com/app/share/naia/contrats/convert-fmg" target="_blank" rel="noopener"><i data-lucide="folder-open" style="width:13px; height:13px; vertical-align:-2px"></i> kDrive · Contrats — Convert FMG →</a></span></div>
+              <div style="margin-top:12px; padding:10px 12px; background:var(--bg-input); border-radius:8px; font-size:12px; color:var(--text-muted); line-height:1.6">
+                <i data-lucide="info" style="width:13px; height:13px; vertical-align:-2px"></i> La signature des contrats (abonnement, SEPA, avenants) est réalisée à 100&#8239;% dans <b>Odoo</b>&#8239;; les PDF signés sont archivés sur <b>kDrive</b>. Naia ne stocke que ce lien — aucune donnée de contrat dans l'application.
+              </div>
+            </div>
+          </div>
+
+          <!-- Section: Multi-user (read-only) — FR-AUT-3 -->
+          <div class="cd-section">
+            <div class="cd-section-head">
+              <div class="cd-section-title"><i data-lucide="users" style="width:15px; color:var(--brand-cyan)"></i> Utilisateurs de l'organisation <span class="muted" style="font-weight:400">· 4</span></div>
+            </div>
+            <div class="cd-section-body" style="padding:0">
+              <table class="data-table" style="font-size:13px">
+                <thead><tr><th>Utilisateur</th><th>Rôle</th><th>Centrales accessibles</th></tr></thead>
+                <tbody>
+                  <tr>
+                    <td><b>Pierre Lefebvre</b><br><span class="muted" style="font-size:11px">p.lefebvre@convert-fmg.fr</span></td>
+                    <td><span class="badge badge-cyan">Admin org.</span></td>
+                    <td><span class="badge badge-slate" style="font-size:10px">Toutes (9)</span></td>
+                  </tr>
+                  <tr>
+                    <td><b>Marie Lambert</b><br><span class="muted" style="font-size:11px">m.lambert@convert-fmg.fr</span></td>
+                    <td><span class="badge badge-slate">Membre</span></td>
+                    <td><span class="badge badge-slate" style="font-size:10px">Centrale du Moulin</span> <span class="badge badge-slate" style="font-size:10px">Barrage de la Sèvre</span></td>
+                  </tr>
+                  <tr>
+                    <td><b>Julien Roy</b><br><span class="muted" style="font-size:11px">j.roy@convert-fmg.fr</span></td>
+                    <td><span class="badge badge-slate">Membre</span></td>
+                    <td><span class="badge badge-slate" style="font-size:10px">Centrale du Moulin</span></td>
+                  </tr>
+                  <tr>
+                    <td><b>Sophie Garnier</b><br><span class="muted" style="font-size:11px">s.garnier@convert-fmg.fr</span></td>
+                    <td><span class="badge badge-slate">Membre</span></td>
+                    <td><span class="badge badge-slate" style="font-size:10px">Microcentrale de la Sèvre</span></td>
+                  </tr>
+                </tbody>
+              </table>
+              <div style="padding:10px 16px; border-top:1px solid var(--border-subtle); font-size:12px; color:var(--text-muted); line-height:1.6">
+                <i data-lucide="info" style="width:13px; height:13px; vertical-align:-2px"></i> Lecture seule — la gestion des utilisateurs est faite par le client (admin de l'organisation). L'admin Naia ne peut pas ajouter ou modifier les utilisateurs ni le client.
+              </div>
+            </div>
+          </div>
+
+          <!-- Section: Audit timeline (FR-CUS-4) -->
+          <div class="cd-section">
+            <div class="cd-section-head"><div class="cd-section-title"><i data-lucide="history" style="width:15px; color:var(--brand-cyan)"></i> Journal d'activité</div><a class="link" style="font-size:11px" href="admin-audit.html?entity=convert-fmg">Audit complet →</a></div>
+            <div class="cd-section-body">
+
+              <div class="timeline-item">
+                <div class="timeline-dot" style="background:rgba(132,204,22,0.18); color:#bef264"><i data-lucide="activity"></i></div>
+                <div class="timeline-main">
+                  <div class="timeline-title">Santé du compte · bucket modifié</div>
+                  <div style="font-family:'JetBrains Mono', monospace; font-size:11px; margin-top:4px">
+                    <span class="muted">bucket :</span>
+                    <span style="background:rgba(251,191,36,0.18); color:#fcd34d; padding:1px 6px; border-radius:4px; text-decoration:line-through">à surveiller (72)</span>
+                    <span class="muted">→</span>
+                    <span style="background:rgba(132,204,22,0.18); color:#bef264; padding:1px 6px; border-radius:4px">sain (78)</span>
+                  </div>
+                  <div class="timeline-meta">10 mai 2026 · recalcul automatique · usage en hausse</div>
+                </div>
+              </div>
+
+              <div class="timeline-item">
+                <div class="timeline-dot" style="background:rgba(251,191,36,0.18); color:#fcd34d"><i data-lucide="repeat"></i></div>
+                <div class="timeline-main">
+                  <div class="timeline-title">Plan modifié</div>
+                  <div style="font-family:'JetBrains Mono', monospace; font-size:11px; margin-top:4px">
+                    <span class="muted">mode :</span>
+                    <span style="background:rgba(244,63,94,0.12); color:#fda4af; padding:1px 6px; border-radius:4px; text-decoration:line-through">per_plant</span>
+                    <span class="muted">→</span>
+                    <span style="background:rgba(132,204,22,0.18); color:#bef264; padding:1px 6px; border-radius:4px">enterprise</span>
+                  </div>
+                  <div class="timeline-meta">2 mai 2026 · par Ugo D. · raison : «&nbsp;demande Pierre&nbsp;»</div>
+                </div>
+              </div>
+
+              <div class="timeline-item">
+                <div class="timeline-dot" style="background:rgba(56,189,248,0.18); color:#7dd3fc"><i data-lucide="user-plus"></i></div>
+                <div class="timeline-main">
+                  <div class="timeline-title">Utilisateur ajouté · Marie Lambert</div>
+                  <div style="font-family:'JetBrains Mono', monospace; font-size:11px; margin-top:4px">
+                    <span class="muted">rôle :</span>
+                    <span style="background:rgba(132,204,22,0.18); color:#bef264; padding:1px 6px; border-radius:4px">membre</span>
+                  </div>
+                  <div class="timeline-meta">1 mai 2026 · par Pierre Lefebvre (client)</div>
+                </div>
+              </div>
+
+              <div class="timeline-item">
+                <div class="timeline-dot" style="background:rgba(56,189,248,0.18); color:#7dd3fc"><i data-lucide="building-2"></i></div>
+                <div class="timeline-main">
+                  <div class="timeline-title">Contact Odoo lié mis à jour</div>
+                  <div class="timeline-meta">28 avr. 2026 · synchro Odoo · res.partner #4182</div>
+                </div>
+              </div>
+
+              <div class="timeline-item">
+                <div class="timeline-dot" style="background:rgba(56,189,248,0.18); color:#7dd3fc"><i data-lucide="zap"></i></div>
+                <div class="timeline-main">
+                  <div class="timeline-title">Centrale ajoutée · Microcentrale du Saux</div>
+                  <div style="font-family:'JetBrains Mono', monospace; font-size:11px; margin-top:4px">
+                    <span class="muted">capacité totale :</span>
+                    <span style="background:rgba(244,63,94,0.12); color:#fda4af; padding:1px 6px; border-radius:4px; text-decoration:line-through">10,5 MW · 8 centrales</span>
+                    <span class="muted">→</span>
+                    <span style="background:rgba(132,204,22,0.18); color:#bef264; padding:1px 6px; border-radius:4px">11 MW · 9 centrales</span>
+                  </div>
+                  <div class="timeline-meta">15 mars 2026 · par Ugo D.</div>
+                </div>
+              </div>
+
+              <div class="timeline-item">
+                <div class="timeline-dot" style="background:rgba(132,204,22,0.18); color:#bef264"><i data-lucide="check-circle"></i></div>
+                <div class="timeline-main">
+                  <div class="timeline-title">Client créé (statut <span class="tabular">active</span>)</div>
+                  <div class="timeline-meta">14 sept. 2024 · par Bernard L. · contrat signé dans Odoo au préalable</div>
+                </div>
+              </div>
+
+              <div style="text-align:center; margin-top:10px">
+                <a class="link" style="font-size:11px" href="admin-audit.html?entity=convert-fmg">Voir tous les évènements dans l'audit log →</a>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<!-- ===== Modal: Modifier l'abonnement (operational fields only) ===== -->
+<div class="overlay" id="edit-subscription" onclick="if(event.target===this)closeOverlay('edit-subscription')">
+  <div class="modal">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px">
+      <div>
+        <div class="modal-title">Modifier l'abonnement</div>
+        <div class="modal-subtitle">Champs opérationnels uniquement. Les données légales et de facturation se modifient dans Odoo.</div>
+      </div>
+      <button class="btn btn-ghost" onclick="closeOverlay('edit-subscription')"><i data-lucide="x"></i></button>
+    </div>
+    <div style="display:flex; flex-direction:column; gap:14px">
+      <div>
+        <label class="muted" style="font-size:11px; text-transform:uppercase; letter-spacing:0.06em; font-weight:600">Cadence de facturation</label>
+        <select class="select" style="width:100%; margin-top:4px"><option>Mensuelle</option><option>Trimestrielle</option><option>Annuelle</option></select>
+      </div>
+      <div>
+        <label class="muted" style="font-size:11px; text-transform:uppercase; letter-spacing:0.06em; font-weight:600">Bon de commande (PO)</label>
+        <input class="input" style="width:100%; margin-top:4px" value="PO-2024-0917">
+      </div>
+      <div>
+        <label class="muted" style="font-size:11px; text-transform:uppercase; letter-spacing:0.06em; font-weight:600">Date de renouvellement</label>
+        <input class="input" type="date" style="width:100%; margin-top:4px" value="2026-05-22">
+      </div>
+      <div style="padding:10px 12px; background:rgba(167,139,250,0.10); border:1px solid rgba(167,139,250,0.30); border-radius:8px; font-size:12px; color:var(--text-muted)">
+        <i data-lucide="info" style="width:13px; height:13px; vertical-align:-2px"></i> Le nom légal, la TVA, l'adresse et l'e-mail de facturation se modifient dans la <a class="link" href="https://hydro-software-services.odoo.com/odoo/contacts/4182" target="_blank" rel="noopener">fiche Odoo</a>.
+      </div>
+    </div>
+    <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:18px; padding-top:14px; border-top:1px solid var(--border-subtle)">
+      <button class="btn btn-secondary" onclick="closeOverlay('edit-subscription')">Annuler</button>
+      <button class="btn btn-primary" onclick="closeOverlay('edit-subscription'); alert('Modifications enregistrées — à venir')"><i data-lucide="check"></i> Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Modal: Changer de plan ===== -->
+<div class="overlay" id="change-plan" onclick="if(event.target===this)closeOverlay('change-plan')">
+  <div class="modal">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px">
+      <div>
+        <div class="modal-title">Changer de plan</div>
+        <div class="modal-subtitle">Plan actuel : Enterprise · palier 10–25 MW · 740 € / mois HT · pricing v01.</div>
+      </div>
+      <button class="btn btn-ghost" onclick="closeOverlay('change-plan')"><i data-lucide="x"></i></button>
+    </div>
+    <div style="display:flex; flex-direction:column; gap:14px">
+      <div>
+        <label class="muted" style="font-size:11px; text-transform:uppercase; letter-spacing:0.06em; font-weight:600">Mode de facturation</label>
+        <select class="select" style="width:100%; margin-top:4px"><option>Enterprise</option><option>Per-plant</option></select>
+      </div>
+      <div>
+        <label class="muted" style="font-size:11px; text-transform:uppercase; letter-spacing:0.06em; font-weight:600">Version de pricing</label>
+        <select class="select" style="width:100%; margin-top:4px"><option>v01 · active (pinnée)</option></select>
+        <div class="muted" style="font-size:11px; margin-top:4px">Les barèmes sont gérés dans <a class="link" href="admin-pricing.html">Pricing schedules</a>.</div>
+      </div>
+      <div>
+        <label class="muted" style="font-size:11px; text-transform:uppercase; letter-spacing:0.06em; font-weight:600">Raison du changement</label>
+        <input class="input" style="width:100%; margin-top:4px" placeholder="ex. demande client, ajout de centrales…">
+      </div>
+    </div>
+    <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:18px; padding-top:14px; border-top:1px solid var(--border-subtle)">
+      <button class="btn btn-secondary" onclick="closeOverlay('change-plan')">Annuler</button>
+      <button class="btn btn-primary" onclick="closeOverlay('change-plan'); alert('Changement de plan appliqué — à venir')"><i data-lucide="repeat"></i> Appliquer le changement</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Modal: Annuler l'abonnement ===== -->
+<div class="overlay" id="cancel-subscription" onclick="if(event.target===this)closeOverlay('cancel-subscription')">
+  <div class="modal">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px">
+      <div>
+        <div class="modal-title">Annuler l'abonnement</div>
+        <div class="modal-subtitle">L'abonnement passera à l'état <span class="tabular">cancelled</span>. La facturation récurrente s'arrête.</div>
+      </div>
+      <button class="btn btn-ghost" onclick="closeOverlay('cancel-subscription')"><i data-lucide="x"></i></button>
+    </div>
+    <div style="display:flex; flex-direction:column; gap:14px">
+      <div style="padding:12px; background:rgba(244,63,94,0.08); border:1px solid rgba(244,63,94,0.25); border-radius:8px; font-size:13px; line-height:1.5">
+        <b>Convert FMG</b> perdra l'accès à la plateforme à la fin de la période en cours (22 mai 2026). Les factures déjà émises dans Odoo ne sont pas affectées.
+      </div>
+      <div>
+        <label class="muted" style="font-size:11px; text-transform:uppercase; letter-spacing:0.06em; font-weight:600">Motif d'annulation</label>
+        <select class="select" style="width:100%; margin-top:4px"><option>Demande du client</option><option>Non-renouvellement</option><option>Migration vers un autre outil</option><option>Autre</option></select>
+      </div>
+      <div>
+        <label class="muted" style="font-size:11px; text-transform:uppercase; letter-spacing:0.06em; font-weight:600">Date d'effet</label>
+        <input class="input" type="date" style="width:100%; margin-top:4px" value="2026-05-22">
+      </div>
+    </div>
+    <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:18px; padding-top:14px; border-top:1px solid var(--border-subtle)">
+      <button class="btn btn-secondary" onclick="closeOverlay('cancel-subscription')">Conserver l'abonnement</button>
+      <button class="btn btn-primary" style="background:var(--accent-red)" onclick="closeOverlay('cancel-subscription'); alert('Abonnement programmé pour annulation — à venir')"><i data-lucide="x-circle"></i> Confirmer l'annulation</button>
+    </div>
+  </div>
+</div>
+
+<!-- (Modal « Ajouter un utilisateur » removed — PO decision 2026-07-06:
+     user management is client-side only (FR-AUT-3); the Naia admin is
+     read-only over an organisation's users.) -->
+
+<!-- ===== Modal: Ajuster le score de santé (override) — FR-HLT-5 ===== -->
+<div class="overlay" id="adjust-health" onclick="if(event.target===this)closeOverlay('adjust-health')">
+  <div class="modal">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px">
+      <div>
+        <div class="modal-title">Ajuster le score (override)</div>
+        <div class="modal-subtitle">Score calculé actuel : <b>78 / 100</b> · bucket <span class="badge badge-green" style="font-size:10px">Sain</span>. L'override remplace temporairement le score calculé.</div>
+      </div>
+      <button class="btn btn-ghost" onclick="closeOverlay('adjust-health')"><i data-lucide="x"></i></button>
+    </div>
+    <div style="display:flex; flex-direction:column; gap:14px">
+      <div>
+        <label class="muted" style="font-size:11px; text-transform:uppercase; letter-spacing:0.06em; font-weight:600">Score imposé (0–100)</label>
+        <input class="input tabular" type="number" min="0" max="100" style="width:100%; margin-top:4px" value="60">
+      </div>
+      <div>
+        <label class="muted" style="font-size:11px; text-transform:uppercase; letter-spacing:0.06em; font-weight:600">Bucket imposé</label>
+        <select class="select" style="width:100%; margin-top:4px"><option>Sain</option><option selected>À surveiller</option><option>À risque</option><option>Critique</option></select>
+      </div>
+      <div>
+        <label class="muted" style="font-size:11px; text-transform:uppercase; letter-spacing:0.06em; font-weight:600">Raison de l'override <span style="color:var(--accent-red)">*</span></label>
+        <input class="input" id="override-reason" style="width:100%; margin-top:4px" placeholder="ex. churn signalé par le commercial, contexte hors plateforme…" required>
+        <div class="muted" style="font-size:11px; margin-top:4px">La raison est obligatoire et journalisée dans l'audit.</div>
+      </div>
+      <div style="padding:10px 12px; background:rgba(251,191,36,0.10); border:1px solid rgba(251,191,36,0.30); border-radius:8px; font-size:12px; color:var(--text-muted); line-height:1.6">
+        <i data-lucide="clock" style="width:13px; height:13px; vertical-align:-2px"></i> L'override <b>expire automatiquement après 30 jours</b>, puis le score calculé reprend la main (FR-HLT-5).
+      </div>
+    </div>
+    <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:18px; padding-top:14px; border-top:1px solid var(--border-subtle)">
+      <button class="btn btn-secondary" onclick="closeOverlay('adjust-health')">Annuler</button>
+      <button class="btn btn-primary" onclick="if(!document.getElementById('override-reason').value.trim()){alert('La raison de l\'override est obligatoire.');return;} closeOverlay('adjust-health'); alert('Override du score enregistré (expire dans 30 jours) — à venir')"><i data-lucide="check"></i> Appliquer l'override</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Modal: Modifier le lien Odoo ===== -->
+<div class="overlay" id="edit-odoo-link" onclick="if(event.target===this)closeOverlay('edit-odoo-link')">
+  <div class="modal">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px">
+      <div>
+        <div class="modal-title">Modifier le lien Odoo</div>
+        <div class="modal-subtitle">Re-pointe ce client vers un autre contact Odoo (res.partner). Ne modifie pas les données dans Odoo.</div>
+      </div>
+      <button class="btn btn-ghost" onclick="closeOverlay('edit-odoo-link')"><i data-lucide="x"></i></button>
+    </div>
+    <div style="display:flex; flex-direction:column; gap:14px">
+      <div>
+        <label class="muted" style="font-size:11px; text-transform:uppercase; letter-spacing:0.06em; font-weight:600">Lien du contact Odoo (URL)</label>
+        <input class="input" style="width:100%; margin-top:4px" value="https://hydro-software-services.odoo.com/odoo/contacts/4182">
+        <div class="muted" style="font-size:11px; margin-top:4px">Format : <span class="tabular">.../odoo/contacts/&lt;id&gt;</span>. Le nom légal, la TVA, l'adresse et l'e-mail de facturation restent gérés dans Odoo.</div>
+      </div>
+    </div>
+    <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:18px; padding-top:14px; border-top:1px solid var(--border-subtle)">
+      <button class="btn btn-secondary" onclick="closeOverlay('edit-odoo-link')">Annuler</button>
+      <button class="btn btn-primary" onclick="closeOverlay('edit-odoo-link'); alert('Lien Odoo mis à jour — à venir')"><i data-lucide="check"></i> Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Modal: Modifier la fiche Naia (operational, non-PII) ===== -->
+<div class="overlay" id="edit-naia-record" onclick="if(event.target===this)closeOverlay('edit-naia-record')">
+  <div class="modal">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px">
+      <div>
+        <div class="modal-title">Modifier la fiche Naia</div>
+        <div class="modal-subtitle">Champs opérationnels gérés par Naia. Les données légales et de facturation restent dans Odoo.</div>
+      </div>
+      <button class="btn btn-ghost" onclick="closeOverlay('edit-naia-record')"><i data-lucide="x"></i></button>
+    </div>
+    <div style="display:flex; flex-direction:column; gap:14px">
+      <div>
+        <label class="muted" style="font-size:11px; text-transform:uppercase; letter-spacing:0.06em; font-weight:600">Nom d'affichage</label>
+        <input class="input" style="width:100%; margin-top:4px" value="Convert FMG">
+      </div>
+      <div>
+        <label class="muted" style="font-size:11px; text-transform:uppercase; letter-spacing:0.06em; font-weight:600">Pays (opérationnel)</label>
+        <select class="select" style="width:100%; margin-top:4px"><option>France</option><option>Belgique</option><option>Autre</option></select>
+      </div>
+      <div>
+        <label class="muted" style="font-size:11px; text-transform:uppercase; letter-spacing:0.06em; font-weight:600">Langue (locale)</label>
+        <select class="select" style="width:100%; margin-top:4px"><option>Français (FR)</option><option>English (EN)</option><option>Deutsch (DE)</option></select>
+      </div>
+      <label style="display:flex; align-items:center; gap:8px; font-size:13px"><input type="checkbox"> Abonné de test (exclu du MRR)</label>
+      <div style="padding:10px 12px; background:rgba(167,139,250,0.10); border:1px solid rgba(167,139,250,0.30); border-radius:8px; font-size:12px; color:var(--text-muted)">
+        <i data-lucide="info" style="width:13px; height:13px; vertical-align:-2px"></i> Le nom légal, la TVA, l'adresse et l'e-mail de facturation se modifient dans la <a class="link" href="https://hydro-software-services.odoo.com/odoo/contacts/4182" target="_blank" rel="noopener">fiche Odoo</a>.
+      </div>
+    </div>
+    <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:18px; padding-top:14px; border-top:1px solid var(--border-subtle)">
+      <button class="btn btn-secondary" onclick="closeOverlay('edit-naia-record')">Annuler</button>
+      <button class="btn btn-primary" onclick="closeOverlay('edit-naia-record'); alert('Fiche Naia mise à jour — à venir')"><i data-lucide="check"></i> Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Modal: Gérer les centrales (add a plant) ===== -->
+<div class="overlay" id="manage-plants" onclick="if(event.target===this)closeOverlay('manage-plants')">
+  <div class="modal">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px">
+      <div>
+        <div class="modal-title">Ajouter une centrale</div>
+        <div class="modal-subtitle">Rattache une centrale à l'abonnement. Le lien de mandat et le retrait se gèrent par ligne dans le tableau.</div>
+      </div>
+      <button class="btn btn-ghost" onclick="closeOverlay('manage-plants')"><i data-lucide="x"></i></button>
+    </div>
+    <div style="display:flex; flex-direction:column; gap:14px">
+      <div>
+        <label class="muted" style="font-size:11px; text-transform:uppercase; letter-spacing:0.06em; font-weight:600">Nom de la centrale</label>
+        <input class="input" style="width:100%; margin-top:4px" placeholder="ex. Centrale du Saux">
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px">
+        <div>
+          <label class="muted" style="font-size:11px; text-transform:uppercase; letter-spacing:0.06em; font-weight:600">Région</label>
+          <input class="input" style="width:100%; margin-top:4px" placeholder="ex. Ariège">
+        </div>
+        <div>
+          <label class="muted" style="font-size:11px; text-transform:uppercase; letter-spacing:0.06em; font-weight:600">Capacité (kW)</label>
+          <input class="input tabular" type="number" style="width:100%; margin-top:4px" placeholder="2400">
+        </div>
+      </div>
+      <div>
+        <label class="muted" style="font-size:11px; text-transform:uppercase; letter-spacing:0.06em; font-weight:600">Lien mandat DSO (kDrive) — optionnel</label>
+        <input class="input" style="width:100%; margin-top:4px" placeholder="https://kdrive.infomaniak.com/app/share/…">
+        <div class="muted" style="font-size:11px; margin-top:4px">La signature du mandat se fait dans Odoo ; collez ici le lien kDrive vers le PDF signé (peut être ajouté plus tard).</div>
+      </div>
+    </div>
+    <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:18px; padding-top:14px; border-top:1px solid var(--border-subtle)">
+      <button class="btn btn-secondary" onclick="closeOverlay('manage-plants')">Annuler</button>
+      <button class="btn btn-primary" onclick="closeOverlay('manage-plants'); alert('Centrale ajoutée — à venir')"><i data-lucide="plus"></i> Ajouter la centrale</button>
+    </div>
+  </div>
+</div>
+
+<!-- Ajouter un compteur — FR-PLT-2 / FR-PLT-3 (PRD v2.17).
+     Volontairement limité à l'IDENTITÉ CONTRACTUELLE du compteur (nom + PRM) :
+     c'est ce que l'abonnement possède. La configuration de MESURE (origine,
+     type de données, unité, code compteur, période de validité, remarques)
+     appartient au Core et se complète dans ses paramètres, en édition seule —
+     elle ne traverse pas la frontière (même principe que le fuseau horaire). -->
+<div class="overlay" id="ajouter-compteur" onclick="if(event.target===this)closeOverlay('ajouter-compteur')">
+  <div class="modal">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px">
+      <div>
+        <div class="modal-title">Ajouter un compteur</div>
+        <div class="modal-subtitle">Déclare le compteur sur l'abonnement. Le Core le reprend ensuite&#8239;; le superadmin y complète la configuration de mesure.</div>
+      </div>
+      <button class="btn btn-ghost" onclick="closeOverlay('ajouter-compteur')"><i data-lucide="x"></i></button>
+    </div>
+    <div style="display:flex; flex-direction:column; gap:14px">
+      <div>
+        <label class="muted" style="font-size:11px; text-transform:uppercase; letter-spacing:0.06em; font-weight:600">Centrale</label>
+        <select class="select" style="width:100%; margin-top:4px"><option>Centrale du Moulin</option><option>Barrage de la Sèvre</option><option>Microcentrale de la Sèvre</option></select>
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px">
+        <div>
+          <label class="muted" style="font-size:11px; text-transform:uppercase; letter-spacing:0.06em; font-weight:600">Nom du compteur</label>
+          <input class="input" style="width:100%; margin-top:4px" placeholder="ex. Compteur principal">
+        </div>
+        <div>
+          <label class="muted" style="font-size:11px; text-transform:uppercase; letter-spacing:0.06em; font-weight:600">PRM</label>
+          <input class="input tabular" style="width:100%; margin-top:4px" placeholder="14 chiffres — ex. 14582136987412">
+        </div>
+      </div>
+      <div>
+        <label class="muted" style="font-size:11px; text-transform:uppercase; letter-spacing:0.06em; font-weight:600">Lien mandat DSO (kDrive) — optionnel</label>
+        <input class="input" style="width:100%; margin-top:4px" placeholder="https://kdrive.infomaniak.com/app/share/…">
+        <div class="muted" style="font-size:11px; margin-top:4px">Le compteur démarre «&#8239;En validation&#8239;» : les données ne remontent qu'une fois le mandat validé (FR-DSL-3).</div>
+      </div>
+      <div style="display:flex; gap:9px; align-items:flex-start; padding:10px 12px; background:var(--bg-input); border-radius:8px; font-size:11px; color:var(--text-muted); line-height:1.6">
+        <i data-lucide="info" style="width:13px; height:13px; flex-shrink:0; margin-top:2px"></i>
+        <span>L'origine, le type de données, l'unité et la période de validité se règlent dans le Core une fois le compteur repris — ils ne sont pas demandés ici.</span>
+      </div>
+    </div>
+    <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:18px; padding-top:14px; border-top:1px solid var(--border-subtle)">
+      <button class="btn btn-secondary" onclick="closeOverlay('ajouter-compteur')">Annuler</button>
+      <button class="btn btn-primary" onclick="closeOverlay('ajouter-compteur'); alert('Compteur ajouté — à venir')"><i data-lucide="plus"></i> Ajouter le compteur</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Modal: Lien du mandat DSO (kDrive) — FR-DSL-2 ===== -->
+<div class="overlay" id="edit-mandate" onclick="if(event.target===this)closeOverlay('edit-mandate')">
+  <div class="modal">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px">
+      <div>
+        <div class="modal-title">Lien du mandat DSO (kDrive)</div>
+        <div class="modal-subtitle">La signature du mandat est réalisée à 100 % dans Odoo. Collez ici le lien kDrive vers le PDF signé.</div>
+      </div>
+      <button class="btn btn-ghost" onclick="closeOverlay('edit-mandate')"><i data-lucide="x"></i></button>
+    </div>
+    <div style="display:flex; flex-direction:column; gap:14px">
+      <div>
+        <label class="muted" style="font-size:11px; text-transform:uppercase; letter-spacing:0.06em; font-weight:600">Lien kDrive du PDF signé</label>
+        <input class="input" style="width:100%; margin-top:4px" placeholder="https://kdrive.infomaniak.com/app/share/naia/mandats/…">
+        <div class="muted" style="font-size:11px; margin-top:4px">Lien collé manuellement par l'admin (FR-DSL-2). Naia ne stocke que le lien — aucun rendu ni suivi de mandat dans l'application.</div>
+      </div>
+    </div>
+    <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:18px; padding-top:14px; border-top:1px solid var(--border-subtle)">
+      <button class="btn btn-secondary" onclick="closeOverlay('edit-mandate')">Annuler</button>
+      <button class="btn btn-primary" onclick="closeOverlay('edit-mandate'); alert('Lien de mandat enregistré — à venir')"><i data-lucide="check"></i> Enregistrer le lien</button>
+    </div>
+  </div>
+</div>
+
+<!-- (Modal « Modifier l'utilisateur » removed — PO decision 2026-07-06:
+     user management is client-side only (FR-AUT-3); roles are managed by
+     the organisation's own admin in the customer portal.) -->
+
+<!-- ===== Modal: Valider le compteur (mandat kDrive) — FR-DSL-4 ===== -->
+<div class="overlay" id="valider-compteur" onclick="if(event.target===this)closeOverlay('valider-compteur')">
+  <div class="modal">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px">
+      <div>
+        <div class="modal-title">Valider le compteur</div>
+        <div class="modal-subtitle">Collez le lien kDrive vers le mandat DSO signé, puis validez le compteur.</div>
+      </div>
+      <button class="btn btn-ghost" onclick="closeOverlay('valider-compteur')"><i data-lucide="x"></i></button>
+    </div>
+    <div style="display:flex; flex-direction:column; gap:14px">
+      <div class="cd-info-row" style="border:0; padding:0"><span class="lbl">Compteur</span><span><b>Compteur principal</b> · <span class="tabular">PRM 30001610071234</span></span></div>
+      <div>
+        <label class="muted" style="font-size:11px; text-transform:uppercase; letter-spacing:0.06em; font-weight:600">Lien kDrive du mandat signé</label>
+        <input class="input" style="width:100%; margin-top:4px" placeholder="https://kdrive.infomaniak.com/app/share/naia/mandats/…">
+        <div class="muted" style="font-size:11px; margin-top:4px">La signature du mandat est réalisée à 100&#8239;% dans Odoo. Naia ne stocke que le lien.</div>
+      </div>
+      <div style="padding:10px 12px; background:rgba(132,204,22,0.10); border:1px solid rgba(132,204,22,0.30); border-radius:8px; font-size:12px; color:var(--text-muted); line-height:1.6">
+        <i data-lucide="check-circle" style="width:13px; height:13px; vertical-align:-2px"></i> Le compteur passe à «&#8239;Validé&#8239;» et les données de production deviennent visibles.
+      </div>
+    </div>
+    <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:18px; padding-top:14px; border-top:1px solid var(--border-subtle)">
+      <button class="btn btn-secondary" onclick="closeOverlay('valider-compteur')">Annuler</button>
+      <button class="btn btn-primary" onclick="closeOverlay('valider-compteur'); alert('Compteur validé — les données de production deviennent visibles — à venir')"><i data-lucide="check-circle"></i> Valider le compteur</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Block / unblock access per centrale (FR-SUB-5) — local mockup toggle only.
+  function toggleBlocCentrale(key, name) {
+    var badge = document.getElementById('bloc-' + key + '-badge');
+    var btn = document.getElementById('bloc-' + key + '-btn');
+    var blocked = badge.style.display !== 'none';
+    if (blocked) {
+      badge.style.display = 'none';
+      btn.innerHTML = '<i data-lucide="lock"></i> Bloquer l\'accès';
+    } else {
+      badge.style.display = '';
+      btn.innerHTML = '<i data-lucide="unlock"></i> Débloquer';
+    }
+    if (window.lucide && lucide.createIcons) lucide.createIcons();
+  }
+</script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="js/app.js"></script>
+</body></html>

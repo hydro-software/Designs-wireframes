@@ -6,7 +6,8 @@ Interactive HTML wireframes / clickable prototypes for **Naia** (hydro-software)
 
 | Area | Version | Status | Live URL |
 |---|---|---|---|
-| **Platform** (integrated app) | **v6.4** | **Active** | https://hydro-software.github.io/Designs-wireframes/naia-platform/v6.4/ |
+| **Platform** (integrated app) | **v6.5** | **Active** | https://hydro-software.github.io/Designs-wireframes/naia-platform/v6.5/ |
+| | v6.4 | Reference (Subscription PRD v2.6) | https://hydro-software.github.io/Designs-wireframes/naia-platform/v6.4/ |
 | | v6.3 | Reference (Paramètres versioning) | https://hydro-software.github.io/Designs-wireframes/naia-platform/v6.3/ |
 | | v6.2 | Reference (pre-Paramètres iter) | https://hydro-software.github.io/Designs-wireframes/naia-platform/v6.2/ |
 | | v6.1 | Reference (pre-descope) | https://hydro-software.github.io/Designs-wireframes/naia-platform/v6.1/ |
@@ -25,7 +26,7 @@ The integrated app is the **`naia-platform/`** lineage (Insight / Pilotage · Co
 ```
 Designs-wireframes/
 ├── README.md             this file — index + changelog
-├── naia-platform/        integrated app: v0 v3 v4 v5 v6.1 v6.2 v6.3 v6.4  (v6.4 = current)
+├── naia-platform/        integrated app: v0 v3 v4 v5 v6.1 v6.2 v6.3 v6.4 v6.5  (v6.5 = current)
 │   ├── v0/               first wireframe document (2025, static screenshots)
 │   └── v5/bl_draft/      Bernard's original Paramètres drafts
 ├── naia-community/        standalone community/loyalty wireframes (archived): v1 v2
@@ -40,13 +41,30 @@ Static multi-page site, no build step: Tailwind (Play CDN), Inter, Lucide icons,
 
 ## Iteration
 
-Edit the **current** version folder (`naia-platform/v6.4/`), commit, and push to `main` — GitHub Pages auto-rebuilds in ~60 s. Older version folders are frozen comparison references and are not edited.
+Edit the **current** version folder (`naia-platform/v6.5/`), commit, and push to `main` — GitHub Pages auto-rebuilds in ~60 s. Older version folders are frozen comparison references and are not edited.
 
 ---
 
 # Changelog
 
-## v6.4 — Subscription PRD v2.6 (team-review re-baseline) *(current)*
+## v6.5 — Production réalignée sur l'app en production *(current)*
+
+`v6.5` is `v6.4` with **`production.html` brought back in line with what actually ships on `app.naiahydro.com`** (screenshot review with Bernard, 2026-08-21), plus the new **Liste des événements** page it leads to. No other page changes.
+
+- **Time-granularity pills moved out of the topbar** into their own centred row **below the centrale tabs**, as in the live app. The topbar keeps only the breadcrumbs. (The v5 CSS hack that centred the pills inside the topbar is now scoped to `revenue.html` only.)
+- **New Production toolbar** between the pills and the chart, matching the live layout: **Exporter ▾** (left) · **Retour à &lt;période parente&gt;** drill-up link, hidden on the widest granularity (centre) · **Générer une liste** (right).
+- **Side panels collapsed by default** — the live app opens with both *Données contextuelles* and *Légende* reduced to their vertical strips.
+- **`evenements.html` — new page: Liste des événements.** *Générer une liste* is a plain link straight to it, no dropdown. Dynamic spreadsheet-style table — sortable columns, free-text search on the remarks, type / sous-type filters, running totals — plus an **Exporter en Excel** button (the point of the page — the operator comes here to leave with a file; the export carries what is displayed, filters and sort included). Columns: index · date · **tranche** · temps début · temps fin · durée · kWh · type · sous-type · remarques.
+  - **One row = one day**, not one event (Bernard, 2026-08-21): a loss spanning 3 days shows as 3 rows, as if 3 events — the way hydro operators read it. This maps 1:1 onto the backend's `energy_loss_daily` table (PK `loss_id` + `date`, `energy_kWh` per plant-local calendar day; `production_flux_id` and `loss_type_code` are already denormalised onto it, so no join is needed).
+  - The **« Tranche » column** (`2/3`) warns that a row is one day of a multi-day event — the rows stay independent, but without a marker three consecutive *Prise d'eau* rows read as three separate incidents. Blank for single-day events.
+  - The per-day **start / end times are clipped to the day** (a fully-covered day reads `00:00 → 24:00`). ⚠ Those two times are **not stored** in `energy_loss_daily` today — they have to be derived from the parent `energy_losses.start_time` / `end_time`. Same for the remark, which lives on the parent row.
+  - *Type* and *sous-type* are the two halves of the backend's self-describing 3-digit `loss_type_code` (hundreds = category, units = subtype; `101` = category 1 subtype 1). Missing data is **already** part of that taxonomy — `901` *Correction / Données manquantes*, `902` *Correction / Données erronées* — so « événement = écart de production **ou** donnée manquante » needs no new model, just no filter.
+- **WhatsApp removed from Production** — the intraday event strip, the status dots on the time pills, the *Événements WhatsApp* overlay and the *Message WhatsApp* section of the chart-config popup are gone.
+- **« Top 5 des pertes détectées » note removed** from the bottom of the page.
+
+**Vocabulary:** the UI says **« événement »**, never **« perte »** — an event is either a production shortfall or a missing-data gap. Applied to the new page; the older wording elsewhere in the wireframe is untouched for now.
+
+## v6.4 — Subscription PRD v2.6 (team-review re-baseline) *(reference)*
 
 `v6.4` is `v6.3` with the **Subscription / admin surfaces reworked to [Subscription PRD v2.6](https://github.com/hydro-software/subscription-system/blob/main/product-requirements.md)** (the 2026-06-17 team-review re-baseline; triage in the subscription repo's `review-feedback-triage.md`). Insight (Pilotage) and Communauté surfaces are unchanged from v6.3.
 

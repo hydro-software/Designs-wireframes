@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Liste des événements — Naia</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="css/style.css" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  /* v6.5 — tableau dynamique des événements (style tableur) */
+  .ev-bar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
+  .ev-search { position: relative; flex: 1; min-width: 200px; max-width: 320px; }
+  .ev-search i { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; color: var(--text-muted); }
+  .ev-search input {
+    width: 100%; padding: 8px 10px 8px 32px; font-size: 13px; font-family: inherit;
+    background: var(--bg-input); border: 1px solid var(--border-default);
+    border-radius: 8px; color: var(--text-primary); outline: none; box-sizing: border-box;
+  }
+  .ev-search input:focus { border-color: var(--brand-cyan); }
+  .ev-count { margin-left: auto; font-size: 12.5px; color: var(--text-muted); }
+
+  /* ---- En-têtes : le texte trie, l'entonnoir filtre ---- */
+  .data-table th.sortable { cursor: pointer; user-select: none; white-space: nowrap; }
+  .data-table th.sortable:hover { color: var(--text-primary); }
+  .data-table th .sort-arrow { opacity: 0; margin-left: 4px; font-size: 9px; }
+  .data-table th[data-dir] .sort-arrow { opacity: 1; }
+  .th-wrap { display: inline-flex; align-items: center; gap: 2px; }
+  .th-filter {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 20px; height: 20px; margin-left: 2px; padding: 0;
+    background: transparent; border: 0; border-radius: 5px;
+    color: var(--text-muted); cursor: pointer; flex: none;
+  }
+  .th-filter svg, .th-filter i { width: 13px; height: 13px; }
+  .th-filter:hover { background: var(--bg-card-hover); color: var(--text-primary); }
+  /* Colonne filtrée : l'entonnoir s'allume, comme dans un tableur */
+  .th-filter.on { color: var(--brand-cyan); background: rgba(56,189,248,0.14); }
+
+  /* ---- Panneau de filtre (cases à cocher) ---- */
+  .ev-filter {
+    display: none; position: fixed; z-index: 80; width: 262px;
+    background: var(--bg-card); border: 1px solid var(--border-default);
+    border-radius: 10px; box-shadow: 0 14px 34px rgba(0,0,0,0.42);
+    overflow: hidden;
+  }
+  .ev-filter[data-open="true"] { display: block; }
+  .ev-filter-search { padding: 10px 10px 8px; border-bottom: 1px solid var(--border-subtle); }
+  .ev-filter-search input {
+    width: 100%; padding: 6px 9px; font-size: 12.5px; font-family: inherit;
+    background: var(--bg-input); border: 1px solid var(--border-default);
+    border-radius: 7px; color: var(--text-primary); outline: none; box-sizing: border-box;
+  }
+  .ev-filter-search input:focus { border-color: var(--brand-cyan); }
+  .ev-filter-list { max-height: 240px; overflow-y: auto; padding: 6px; }
+  .ev-filter-list label {
+    display: flex; align-items: center; gap: 9px;
+    padding: 6px 8px; border-radius: 7px; cursor: pointer;
+    font-size: 12.5px; color: var(--text-primary);
+  }
+  .ev-filter-list label:hover { background: var(--bg-card-hover); }
+  .ev-filter-list input[type="checkbox"] { accent-color: var(--brand-cyan); width: 14px; height: 14px; flex: none; cursor: pointer; }
+  .ev-filter-list .all { font-weight: 600; border-bottom: 1px solid var(--border-subtle); border-radius: 0; margin-bottom: 4px; }
+  .ev-filter-list .none { padding: 14px 8px; color: var(--text-muted); font-size: 12px; }
+
+  /* Variante « filtre numérique » — sur Durée et kWh, un intervalle vaut mieux
+     qu'une liste de cases où chaque valeur serait unique. */
+  .ev-filter-range { display: none; padding: 12px; }
+  .ev-filter[data-kind="range"] .ev-filter-range { display: block; }
+  .ev-filter[data-kind="range"] .ev-filter-search,
+  .ev-filter[data-kind="range"] .ev-filter-list { display: none; }
+  .ev-range-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+  .ev-range-row label { width: 26px; font-size: 12.5px; color: var(--text-muted); flex: none; }
+  .ev-range-row input {
+    flex: 1; min-width: 0; padding: 6px 9px; font-size: 12.5px; font-family: inherit; text-align: right;
+    background: var(--bg-input); border: 1px solid var(--border-default);
+    border-radius: 7px; color: var(--text-primary); outline: none; -moz-appearance: textfield;
+  }
+  .ev-range-row input::-webkit-outer-spin-button,
+  .ev-range-row input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  .ev-range-row input:focus { border-color: var(--brand-cyan); }
+  .ev-range-row .unit { width: 30px; font-size: 12px; color: var(--text-muted); flex: none; }
+  .ev-range-hint { font-size: 11px; line-height: 1.5; color: var(--text-muted); margin-top: 10px; }
+  .ev-range-hint b { color: var(--text-primary); font-weight: 600; }
+  .ev-filter-foot {
+    display: flex; justify-content: flex-end; gap: 8px;
+    padding: 9px 10px; border-top: 1px solid var(--border-subtle); background: var(--bg-base);
+  }
+
+  .data-table td.num, .data-table th.num { text-align: right; }
+  .data-table td.rem { color: var(--text-muted); font-size: 12.5px; }
+  /* Colonne « Tranche » — repère discret, ne doit pas concurrencer la donnée */
+  .data-table td.span { color: var(--text-muted); font-size: 11.5px; white-space: nowrap; }
+  .data-table td.span span { border-bottom: 1px dotted var(--border-default); cursor: help; }
+
+  /* Pastille de couleur de catégorie, reprise de la légende du graphique */
+  .cat { display: inline-flex; align-items: center; gap: 7px; white-space: nowrap; }
+  .cat .dot { width: 8px; height: 8px; border-radius: 50%; flex: none; }
+
+  .ev-total td { border-top: 1px solid var(--border-default); font-weight: 600; background: var(--bg-base); }
+  .ev-empty { padding: 40px; text-align: center; color: var(--text-muted); font-size: 13px; }
+</style>
+</head>
+<!-- v6.5 — Page ouverte par « Générer une liste » depuis Production.
+
+     Granularité : UNE LIGNE PAR JOUR (décision BL, 2026-08-21). Un événement
+     qui court sur 3 jours donne 3 lignes, comme s'il s'agissait de 3
+     événements — c'est la lecture métier en hydro. Côté base ça correspond
+     exactement à la table `energy_loss_daily` (clé loss_id + date, kWh du
+     jour, en heure locale de la centrale).
+
+     Les heures de début / fin sont rognées aux bornes du jour : une journée
+     traversée de bout en bout s'affiche 00:00 → 24:00. Ces deux heures ne
+     sont PAS stockées dans energy_loss_daily aujourd'hui — elles se déduisent
+     du start_time / end_time de l'événement parent (energy_losses).
+
+     Filtres : comportement de filtre automatique de tableur (BL, 2026-08-21).
+     Chaque colonne filtrable porte un entonnoir dans son en-tête ; on coche
+     les valeurs à afficher. Le texte de l'en-tête trie, l'entonnoir filtre. -->
+<body data-page="evenements" data-section="production" data-centrale="all">
+
+<div class="app-shell">
+  <aside class="sidebar"></aside>
+  <main class="main-area">
+
+    <header class="topbar" style="align-items:center">
+      <div class="crumbs">
+        <a href="index.html"><i data-lucide="home" style="width:12px; height:12px"></i></a>
+        <span class="sep">/</span>
+        <a href="index.html">Pilotage</a>
+        <span class="sep">/</span>
+        <a href="production.html">Production</a>
+        <span class="sep">/</span>
+        <span class="current">Liste des événements</span>
+      </div>
+    </header>
+
+    <div id="centrale-tabs" class="centrale-tabs"></div>
+
+    <div class="page-content">
+
+      <h1 style="font-size:22px; font-weight:600; margin:0 0 4px">Liste des événements</h1>
+      <div class="muted" style="font-size:12.5px; margin-bottom:16px">
+        Février 2025 · une ligne par jour. Un événement qui dure plusieurs jours apparaît sur autant de lignes.
+      </div>
+
+      <div class="ev-bar">
+        <div class="ev-search">
+          <i data-lucide="search"></i>
+          <input type="text" id="ev-q" placeholder="Rechercher dans les remarques…" oninput="evRender()">
+        </div>
+        <button class="btn btn-secondary btn-sm" id="ev-clear" onclick="evClearFilters()" style="display:none">
+          <i data-lucide="filter-x"></i> Effacer les filtres
+        </button>
+        <div class="ev-count" id="ev-count"></div>
+        <!-- L'export est la raison d'être de la page : l'exploitant vient
+             chercher son fichier Excel. Il porte ce qui est AFFICHÉ —
+             filtres et tri compris. -->
+        <button class="btn btn-primary btn-sm" onclick="evExport()">
+          <i data-lucide="file-spreadsheet"></i> Exporter en Excel
+        </button>
+      </div>
+
+      <div class="card" style="padding:0; overflow:hidden">
+        <div style="overflow-x:auto">
+          <table class="data-table" id="ev-table">
+            <thead>
+              <tr>
+                <th class="num"><span class="th-wrap"><span class="sortable" onclick="evSort('idx')">Index<span class="sort-arrow" data-key="idx">▲</span></span></span></th>
+                <th><span class="th-wrap"><span class="sortable" onclick="evSort('date')">Date<span class="sort-arrow" data-key="date">▲</span></span><button class="th-filter" data-col="date" onclick="evOpenFilter(event, 'date')" title="Filtrer les dates"><i data-lucide="filter"></i></button></span></th>
+                <th class="num" title="Prévient qu'un même événement est étalé sur plusieurs jours : 2/3 = deuxième tranche sur trois.">Tranche</th>
+                <th class="num"><span class="th-wrap"><span class="sortable" onclick="evSort('start')">Temps début<span class="sort-arrow" data-key="start">▲</span></span></span></th>
+                <th class="num"><span class="th-wrap"><span class="sortable" onclick="evSort('end')">Temps fin<span class="sort-arrow" data-key="end">▲</span></span></span></th>
+                <th class="num"><span class="th-wrap"><span class="sortable" onclick="evSort('mins')">Durée<span class="sort-arrow" data-key="mins">▲</span></span><button class="th-filter" data-col="mins" onclick="evOpenFilter(event, 'mins')" title="Filtrer sur la durée"><i data-lucide="filter"></i></button></span></th>
+                <th class="num"><span class="th-wrap"><span class="sortable" onclick="evSort('kwh')">kWh<span class="sort-arrow" data-key="kwh">▲</span></span><button class="th-filter" data-col="kwh" onclick="evOpenFilter(event, 'kwh')" title="Filtrer sur les kWh"><i data-lucide="filter"></i></button></span></th>
+                <th><span class="th-wrap"><span class="sortable" onclick="evSort('type')">Type<span class="sort-arrow" data-key="type">▲</span></span><button class="th-filter" data-col="type" onclick="evOpenFilter(event, 'type')" title="Filtrer les types"><i data-lucide="filter"></i></button></span></th>
+                <th><span class="th-wrap"><span class="sortable" onclick="evSort('sub')">Sous-type<span class="sort-arrow" data-key="sub">▲</span></span><button class="th-filter" data-col="sub" onclick="evOpenFilter(event, 'sub')" title="Filtrer les sous-types"><i data-lucide="filter"></i></button></span></th>
+                <th>Remarques</th>
+              </tr>
+            </thead>
+            <tbody id="ev-body"></tbody>
+            <tfoot id="ev-foot"></tfoot>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<!-- Panneau de filtre, réutilisé par toutes les colonnes et positionné sous
+     l'entonnoir cliqué. En `position: fixed` pour ne pas être rogné par le
+     défilement horizontal du tableau. -->
+<div class="ev-filter" id="ev-filter" data-open="false">
+  <div class="ev-filter-search">
+    <input type="text" id="ev-filter-q" placeholder="Rechercher…" oninput="evFilterList()">
+  </div>
+  <div class="ev-filter-list" id="ev-filter-list"></div>
+  <div class="ev-filter-range">
+    <div class="ev-range-row"><label for="ev-range-min">De</label><input type="number" id="ev-range-min" placeholder="—"><span class="unit" id="ev-range-unit-1"></span></div>
+    <div class="ev-range-row"><label for="ev-range-max">À</label><input type="number" id="ev-range-max" placeholder="—"><span class="unit" id="ev-range-unit-2"></span></div>
+    <div class="ev-range-hint">Laisser vide = pas de limite.<br>Valeurs présentes : <b id="ev-range-bounds"></b></div>
+  </div>
+  <div class="ev-filter-foot">
+    <button class="btn btn-ghost btn-sm" onclick="evFilterClose()">Annuler</button>
+    <button class="btn btn-primary btn-sm" onclick="evFilterApply()">OK</button>
+  </div>
+</div>
+
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="js/app.js"></script>
+
+<script>
+  // Couleurs des 6 catégories + Correction, reprises de la légende du graphique
+  // de Production. En base, la catégorie est la centaine du code à 3 chiffres
+  // (101 = catégorie 1 sous-type 1) et les 9xx sont les corrections.
+  const EV_CAT_COLOR = {
+    "Pannes":        "#ef4444",
+    "Maintenance":   "#10b981",
+    "Environnement": "#a855f7",
+    "Exploitation":  "#ec4899",
+    "Structurel":    "#eab308",
+    "Contraintes":   "#94a3b8",
+    "Correction":    "#dc2626",
+  };
+
+  // Jeu de démonstration. Chaque entrée = UN JOUR d'un événement.
+  // `ev` est l'identifiant de l'événement parent (energy_losses.id côté base) :
+  // plusieurs lignes qui le partagent sont le MÊME événement étalé sur
+  // plusieurs jours. Il n'est pas affiché tel quel — il sert à calculer la
+  // colonne « Tranche » (2/3, etc.).
+  const EV_ROWS = [
+    { ev: 1,  date: "2025-02-03", start: "08:15", end: "11:45", kwh: 142.6, type: "Maintenance",   sub: "Dégrillage",         rem: "Nettoyage grille amont après crue" },
+    { ev: 2,  date: "2025-02-06", start: "14:02", end: "14:38", kwh: 21.4,  type: "Exploitation",  sub: "Groupe",             rem: "Arrêt volontaire, essai régulation" },
+    { ev: 3,  date: "2025-02-09", start: "23:10", end: "24:00", kwh: 34.8,  type: "Pannes",        sub: "Automate",           rem: "Défaut automate, redémarrage à distance" },
+    { ev: 3,  date: "2025-02-10", start: "00:00", end: "03:40", kwh: 158.2, type: "Pannes",        sub: "Automate",           rem: "Défaut automate, redémarrage à distance" },
+    { ev: 4,  date: "2025-02-13", start: "06:30", end: "24:00", kwh: 612.0, type: "Structurel",    sub: "Prise d'eau",        rem: "Colmatage prise d'eau, intervention prestataire" },
+    { ev: 4,  date: "2025-02-14", start: "00:00", end: "24:00", kwh: 848.5, type: "Structurel",    sub: "Prise d'eau",        rem: "Colmatage prise d'eau, intervention prestataire" },
+    { ev: 4,  date: "2025-02-15", start: "00:00", end: "17:20", kwh: 596.3, type: "Structurel",    sub: "Prise d'eau",        rem: "Colmatage prise d'eau, intervention prestataire" },
+    { ev: 5,  date: "2025-02-17", start: "00:00", end: "24:00", kwh: 0,     type: "Correction",    sub: "Données manquantes", rem: "Pas de relève compteur — coupure télécom" },
+    { ev: 5,  date: "2025-02-18", start: "00:00", end: "09:15", kwh: 0,     type: "Correction",    sub: "Données manquantes", rem: "Pas de relève compteur — coupure télécom" },
+    { ev: 6,  date: "2025-02-20", start: "09:00", end: "16:30", kwh: 287.9, type: "Environnement", sub: "Amont",              rem: "Étiage sévère, débit insuffisant" },
+    { ev: 7,  date: "2025-02-22", start: "11:20", end: "12:05", kwh: 26.7,  type: "Contraintes",   sub: "Débit Réservé",      rem: "Consigne débit réservé relevée par la DDT" },
+    { ev: 8,  date: "2025-02-25", start: "04:45", end: "07:10", kwh: 96.1,  type: "Pannes",        sub: "Électrique",         rem: "Déclenchement protection, réarmement sur place" },
+    { ev: 9,  date: "2025-02-26", start: "13:30", end: "15:55", kwh: 104.3, type: "Maintenance",   sub: "Groupe",             rem: "Graissage paliers, maintenance planifiée" },
+    { ev: 10, date: "2025-02-28", start: "18:40", end: "21:00", kwh: 88.4,  type: "Correction",    sub: "Données erronées",   rem: "Valeurs compteur aberrantes, corrigées à la main" },
+  ];
+
+  // Colonne « Tranche » : rang du jour dans son événement, et nombre total de
+  // jours. Vide quand l'événement tient sur une seule journée — on ne met un
+  // repère que là où il y a quelque chose à signaler.
+  const EV_SPAN = {};
+  EV_ROWS.forEach(r => { EV_SPAN[r.ev] = (EV_SPAN[r.ev] || 0) + 1; });
+  const EV_RANK = {};
+  (function () {
+    const seen = {};
+    EV_ROWS.forEach((r, i) => { seen[r.ev] = (seen[r.ev] || 0) + 1; EV_RANK[i] = seen[r.ev]; });
+  })();
+
+  // ---------- Helpers d'affichage ----------
+  function evMins(r) {
+    const to = t => { const p = t.split(":"); return Number(p[0]) * 60 + Number(p[1]); };
+    return to(r.end) - to(r.start);
+  }
+  function evDuree(mins) {
+    const h = Math.floor(mins / 60), m = mins % 60;
+    if (!h) return m + " min";
+    return m ? h + " h " + String(m).padStart(2, "0") : h + " h";
+  }
+  function evDate(iso) {
+    const p = iso.split("-");
+    const mois = ["janv.", "févr.", "mars", "avr.", "mai", "juin", "juil.", "août", "sept.", "oct.", "nov.", "déc."];
+    return Number(p[2]) + " " + mois[Number(p[1]) - 1] + " " + p[0];
+  }
+  function evNum(v) {
+    return v.toLocaleString("fr-FR", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+  }
+
+  // ---------- Filtres façon tableur ----------
+  // Pour chaque colonne filtrable : null = aucun filtre (tout passe),
+  // sinon un tableau des valeurs cochées.
+  // Deux familles de filtres, comme dans un tableur :
+  //   « list »  → cases à cocher, pour les colonnes à valeurs répétées
+  //   « range » → intervalle de / à, pour les colonnes de nombres, où une
+  //               liste de cases serait inutile (chaque valeur est unique)
+  const EV_FILTER_COLS = {
+    date: { kind: "list",  label: v => evDate(v) },
+    type: { kind: "list",  label: v => v },
+    sub:  { kind: "list",  label: v => v },
+    // La durée est stockée en minutes mais se saisit en heures : personne ne
+    // filtre « plus de 150 minutes ».
+    mins: { kind: "range", unit: "h",   toInput: m => m / 60, fromInput: h => h * 60, fmt: m => evDuree(Math.round(m)) },
+    kwh:  { kind: "range", unit: "kWh", toInput: v => v,      fromInput: v => v,      fmt: v => evNum(v) },
+  };
+  const evFilters = { date: null, type: null, sub: null, mins: null, kwh: null };
+
+  let evFilterCol = null;     // colonne en cours d'édition
+  let evFilterDraft = null;   // Set des valeurs cochées, avant validation
+
+  // Valeurs distinctes d'une colonne, dans l'ordre d'apparition trié
+  function evValues(col) {
+    const seen = [];
+    EV_ROWS.forEach(r => { if (seen.indexOf(r[col]) === -1) seen.push(r[col]); });
+    return col === "date" ? seen.sort() : seen.sort((a, b) => a.localeCompare(b, "fr"));
+  }
+
+  // Bornes réelles d'une colonne numérique, affichées en repère sous les champs
+  function evBounds(col) {
+    const vals = evAllRows().map(r => r[col]);
+    return { min: Math.min.apply(null, vals), max: Math.max.apply(null, vals) };
+  }
+
+  function evOpenFilter(e, col) {
+    e.stopPropagation();
+    const already = evFilterCol === col && document.getElementById("ev-filter").dataset.open === "true";
+    if (already) return evFilterClose();
+
+    evFilterCol = col;
+    const conf = EV_FILTER_COLS[col];
+    const panel = document.getElementById("ev-filter");
+    panel.dataset.kind = conf.kind;
+
+    if (conf.kind === "range") {
+      const cur = evFilters[col];
+      const b = evBounds(col);
+      document.getElementById("ev-range-min").value = cur && cur.min !== null ? conf.toInput(cur.min) : "";
+      document.getElementById("ev-range-max").value = cur && cur.max !== null ? conf.toInput(cur.max) : "";
+      document.getElementById("ev-range-unit-1").textContent = conf.unit;
+      document.getElementById("ev-range-unit-2").textContent = conf.unit;
+      document.getElementById("ev-range-bounds").textContent = conf.fmt(b.min) + " → " + conf.fmt(b.max);
+    } else {
+      const current = evFilters[col];
+      evFilterDraft = new Set(current === null ? evValues(col) : current);
+      document.getElementById("ev-filter-q").value = "";
+      evFilterList();
+    }
+
+    // Positionne le panneau sous l'entonnoir, sans déborder de la fenêtre
+    const box = e.currentTarget.getBoundingClientRect();
+    panel.dataset.open = "true";
+    const w = panel.offsetWidth;
+    let left = box.left;
+    if (left + w > window.innerWidth - 12) left = window.innerWidth - w - 12;
+    panel.style.left = Math.max(12, left) + "px";
+    panel.style.top = (box.bottom + 6) + "px";
+    document.getElementById(conf.kind === "range" ? "ev-range-min" : "ev-filter-q").focus();
+  }
+
+  function evFilterClose() {
+    document.getElementById("ev-filter").dataset.open = "false";
+    evFilterCol = null;
+  }
+
+  // Construit la liste de cases à cocher, filtrée par la recherche du panneau
+  function evFilterList() {
+    const q = (document.getElementById("ev-filter-q").value || "").toLowerCase();
+    const conf = EV_FILTER_COLS[evFilterCol];
+    const vals = evValues(evFilterCol).filter(v => conf.label(v).toLowerCase().indexOf(q) !== -1);
+    const host = document.getElementById("ev-filter-list");
+
+    if (!vals.length) {
+      host.innerHTML = '<div class="none">Aucune valeur ne correspond.</div>';
+      return;
+    }
+
+    const allChecked = vals.every(v => evFilterDraft.has(v));
+    let html = '<label class="all"><input type="checkbox" ' + (allChecked ? "checked" : "") +
+               ' onchange="evFilterToggleAll(this.checked)"> (Tout sélectionner)</label>';
+    html += vals.map(v =>
+      '<label><input type="checkbox" value="' + String(v).replace(/"/g, "&quot;") + '" ' +
+      (evFilterDraft.has(v) ? "checked" : "") +
+      ' onchange="evFilterToggle(this)"> ' + conf.label(v) + '</label>'
+    ).join("");
+    host.innerHTML = html;
+    evFilterSyncAll();
+  }
+
+  // On ne reconstruit PAS la liste à chaque case cochée : ça ferait sauter le
+  // défilement sous le doigt et perdrait le focus. On touche seulement l'état
+  // de « (Tout sélectionner) ».
+  function evFilterToggle(input) {
+    if (input.checked) evFilterDraft.add(input.value);
+    else evFilterDraft.delete(input.value);
+    evFilterSyncAll();
+  }
+
+  function evFilterSyncAll() {
+    const all = document.querySelector("#ev-filter-list label.all input");
+    if (!all) return;
+    const boxes = document.querySelectorAll("#ev-filter-list label:not(.all) input");
+    const checked = [].filter.call(boxes, b => b.checked).length;
+    all.checked = checked === boxes.length && boxes.length > 0;
+    // État intermédiaire quand une partie seulement est cochée, comme dans un tableur
+    all.indeterminate = checked > 0 && checked < boxes.length;
+  }
+
+  // « Tout sélectionner » n'agit que sur les valeurs visibles dans le panneau,
+  // comme dans un tableur quand une recherche est active.
+  function evFilterToggleAll(checked) {
+    document.querySelectorAll("#ev-filter-list label:not(.all) input").forEach(b => {
+      b.checked = checked;
+      if (checked) evFilterDraft.add(b.value);
+      else evFilterDraft.delete(b.value);
+    });
+    evFilterSyncAll();
+  }
+
+  function evFilterApply() {
+    const conf = EV_FILTER_COLS[evFilterCol];
+
+    if (conf.kind === "range") {
+      const rawMin = document.getElementById("ev-range-min").value;
+      const rawMax = document.getElementById("ev-range-max").value;
+      let min = rawMin === "" ? null : conf.fromInput(Number(rawMin));
+      let max = rawMax === "" ? null : conf.fromInput(Number(rawMax));
+      // De > À : on remet dans l'ordre plutôt que de ne rien afficher
+      if (min !== null && max !== null && min > max) { const t = min; min = max; max = t; }
+      evFilters[evFilterCol] = (min === null && max === null) ? null : { min: min, max: max };
+      evFilterClose();
+      evRender();
+      return;
+    }
+
+    const all = evValues(evFilterCol);
+    const q = (document.getElementById("ev-filter-q").value || "").trim().toLowerCase();
+    let kept;
+
+    if (q) {
+      // Recherche active : on ne retient que les valeurs cochées PARMI celles
+      // trouvées, comme un tableur — chercher « auto » puis valider affiche
+      // les Automate, et rien d'autre.
+      const conf = EV_FILTER_COLS[evFilterCol];
+      kept = all.filter(v => conf.label(v).toLowerCase().indexOf(q) !== -1 && evFilterDraft.has(v));
+    } else {
+      kept = all.filter(v => evFilterDraft.has(v));
+    }
+
+    // Tout coché = pas de filtre du tout (l'entonnoir reste éteint)
+    evFilters[evFilterCol] = kept.length === all.length ? null : kept;
+    evFilterClose();
+    evRender();
+  }
+
+  function evClearFilters() {
+    Object.keys(evFilters).forEach(k => evFilters[k] = null);
+    document.getElementById("ev-q").value = "";
+    evRender();
+  }
+
+  // Fermer en cliquant ailleurs
+  document.addEventListener("click", e => {
+    if (!e.target.closest("#ev-filter") && !e.target.closest(".th-filter")) evFilterClose();
+  });
+  document.addEventListener("keydown", e => { if (e.key === "Escape") evFilterClose(); });
+
+  // ---------- Tri ----------
+  let evSortKey = "date", evSortDir = "asc";
+  function evSort(key) {
+    if (evSortKey === key) evSortDir = evSortDir === "asc" ? "desc" : "asc";
+    else { evSortKey = key; evSortDir = "asc"; }
+    evRender();
+  }
+
+  // ---------- Rendu ----------
+  // Les lignes complètes, avant tout filtre — sert aussi à calculer les bornes
+  // des filtres numériques.
+  function evAllRows() {
+    return EV_ROWS.map((r, i) => Object.assign({}, r, {
+      idx: i + 1,
+      mins: evMins(r),
+      rank: EV_RANK[i],
+      span: EV_SPAN[r.ev],
+    }));
+  }
+
+  function evInRange(value, f) {
+    if (f === null) return true;
+    if (f.min !== null && value < f.min) return false;
+    if (f.max !== null && value > f.max) return false;
+    return true;
+  }
+
+  function evRender() {
+    const q = (document.getElementById("ev-q").value || "").toLowerCase();
+
+    let rows = evAllRows().filter(r =>
+      (evFilters.date === null || evFilters.date.indexOf(r.date) !== -1) &&
+      (evFilters.type === null || evFilters.type.indexOf(r.type) !== -1) &&
+      (evFilters.sub  === null || evFilters.sub.indexOf(r.sub)  !== -1) &&
+      evInRange(r.mins, evFilters.mins) &&
+      evInRange(r.kwh,  evFilters.kwh) &&
+      (!q || r.rem.toLowerCase().indexOf(q) !== -1)
+    );
+
+    const dir = evSortDir === "asc" ? 1 : -1;
+    rows.sort((a, b) => {
+      const va = a[evSortKey], vb = b[evSortKey];
+      if (typeof va === "number") return (va - vb) * dir;
+      return String(va).localeCompare(String(vb), "fr") * dir;
+    });
+
+    // Flèche de tri sur la bonne colonne
+    document.querySelectorAll("#ev-table .sort-arrow").forEach(a => {
+      const th = a.closest("th");
+      if (a.dataset.key === evSortKey) {
+        th.dataset.dir = evSortDir;
+        a.textContent = evSortDir === "asc" ? "▲" : "▼";
+      } else {
+        th.removeAttribute("data-dir");
+      }
+    });
+
+    // Entonnoirs allumés sur les colonnes filtrées
+    document.querySelectorAll(".th-filter").forEach(b => {
+      b.classList.toggle("on", evFilters[b.dataset.col] !== null);
+    });
+    const anyFilter = Object.keys(evFilters).some(k => evFilters[k] !== null) || !!q;
+    document.getElementById("ev-clear").style.display = anyFilter ? "" : "none";
+
+    const body = document.getElementById("ev-body");
+    body.innerHTML = rows.length ? rows.map(r =>
+      '<tr>' +
+        '<td class="num muted">' + r.idx + '</td>' +
+        '<td>' + evDate(r.date) + '</td>' +
+        '<td class="num span">' + (r.span > 1
+          ? '<span title="Jour ' + r.rank + ' sur ' + r.span + ' — même événement, étalé sur ' + r.span + ' jours">' + r.rank + '/' + r.span + '</span>'
+          : '') + '</td>' +
+        '<td class="num">' + r.start + '</td>' +
+        '<td class="num">' + r.end + '</td>' +
+        '<td class="num">' + evDuree(r.mins) + '</td>' +
+        '<td class="num">' + evNum(r.kwh) + '</td>' +
+        '<td><span class="cat"><span class="dot" style="background:' + (EV_CAT_COLOR[r.type] || "#94a3b8") + '"></span>' + r.type + '</span></td>' +
+        '<td>' + r.sub + '</td>' +
+        '<td class="rem">' + r.rem + '</td>' +
+      '</tr>').join("")
+      : '<tr><td colspan="10" class="ev-empty">Aucun événement ne correspond à ces filtres.</td></tr>';
+
+    const totKwh  = rows.reduce((s, r) => s + r.kwh, 0);
+    const totMins = rows.reduce((s, r) => s + r.mins, 0);
+    document.getElementById("ev-foot").innerHTML = rows.length ?
+      '<tr class="ev-total">' +
+        '<td colspan="5">Total</td>' +
+        '<td class="num">' + evDuree(totMins) + '</td>' +
+        '<td class="num">' + evNum(totKwh) + '</td>' +
+        '<td colspan="3"></td>' +
+      '</tr>' : "";
+
+    document.getElementById("ev-count").textContent =
+      rows.length + " ligne" + (rows.length > 1 ? "s" : "") + " sur " + EV_ROWS.length;
+
+    if (window.lucide) lucide.createIcons();
+  }
+
+  // L'export reprend exactement les lignes affichées, dans l'ordre affiché.
+  function evExport() {
+    const n = document.querySelectorAll("#ev-body tr").length;
+    alert("Export Excel (démo) — " + n + " ligne(s), filtres et tri en cours appliqués.");
+  }
+
+  evRender();
+</script>
+</body>
+</html>
