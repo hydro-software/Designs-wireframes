@@ -47,9 +47,13 @@ Edit the **current** version folder (`naia-platform/v6.5/`), commit, and push to
 
 # Changelog
 
-## v6.5 — Production réalignée sur l'app en production *(current)*
+## v6.5 — Production réalignée sur l'app en production · console Naia (Core) *(current)*
 
-`v6.5` is `v6.4` with **`production.html` brought back in line with what actually ships on `app.naiahydro.com`** (screenshot review with Bernard, 2026-08-21), plus the new **Liste des événements** page it leads to. No other page changes.
+`v6.5` is `v6.4` with **two independent changes**, drawn in parallel and merged into the same folder: `production.html` realigned on the live app (plus the new *Liste des événements* page it leads to), and a **new admin console for the Naia (Core) module**. Everything else (Pilotage, Communauté, Subscription) is unchanged from v6.4.
+
+### Production réalignée sur l'app en production
+
+**`production.html` brought back in line with what actually ships on `app.naiahydro.com`** (screenshot review with Bernard, 2026-08-21), plus the new **Liste des événements** page it leads to.
 
 - **Time-granularity pills moved out of the topbar** into their own centred row **below the centrale tabs**, as in the live app. The topbar keeps only the breadcrumbs. (The v5 CSS hack that centred the pills inside the topbar is now scoped to `revenue.html` only.)
 - **New Production toolbar** between the pills and the chart, matching the live layout: **Exporter ▾** (left) · **Retour à &lt;période parente&gt;** drill-up link, hidden on the widest granularity (centre) · **Générer une liste** (right).
@@ -63,6 +67,20 @@ Edit the **current** version folder (`naia-platform/v6.5/`), commit, and push to
 - **« Top 5 des pertes détectées » note removed** from the bottom of the page.
 
 **Vocabulary:** the UI says **« événement »**, never **« perte »** — an event is either a production shortfall or a missing-data gap. Applied to the new page; the older wording elsewhere in the wireframe is untouched for now.
+
+### Administration : console Naia (Core)
+
+The **Administration surface is split in two**, with a **new admin console for the Naia (Core) module**.
+
+**Why.** The Naia-module admin operations (installing a public source, creating a user, granting plant access) are done today **through the public Swagger**. `/docs` and `/openapi.json` are exposed in production, which the pre-launch security audit has to close — and closing them requires the operations to exist in the UI first. This console is that prerequisite, alongside admin 2FA.
+
+- **Sidebar** — « Administration » is a **fold** again (same idiom as Communauté), with two entries: **Naia (Core)** (`admin-core.html`) and **Subscription** (`admin.html`, the existing dashboard). This reverses the 2026-05-25 flat-link decision, which held while admin covered a single surface.
+- **`admin-core.html` (new)** — four sections as top tabs, hash-routed (`#sources-publiques`, `#acces`, `#support`, `#logs`), gated to the **superadmin** (a future `is_naia_superadmin` column will allow several).
+  - **Sources publiques · Sources actives** — table of installed sources + a detail sheet: identity (provider, station code, river, coordinates, in-service), Naia state (**vérifiée / non vérifiée** and **active / dormante**), collection health (last run, last point, 7/30-day volume, gaps) and **who selected it** (the lazy-activation gate: a source nobody selected does not collect **by design**, and the sheet says so).
+  - **Sources publiques · Ajouter une source** — a **single two-step flow**: *Vérifier la station* (provider + station code) then, only once the station checks out, *Installer la source* (domain pre-filled from the provider). Both API responses are transcribed into plain French, with the four verification outcomes (found / out of service / unknown code / provider unreachable) previewable from a wireframe scenario picker.
+  - **Sources publiques · Ingestion de données** — reached **from a source**, not from the sub-nav: the detail sheet's « Ingérer des données » button (next to « Forcer une collecte ») opens the import screen already scoped to that source, with a « Retour à la source » link. It is the « Données » import flow minus the centrale tabs and the data-type pills (a public source is GLOBAL and its type follows the source): sensor unit vs file unit (file units offered per domain), timestamp format, file timezone, declared granularity, separators, frequential/eventual, drag-and-drop zone, preview before confirmation, and that source's own manual-import history.
+  - **Accès utilisateurs** — *Créer un utilisateur* and *Donner un accès à une centrale* drawn in full, plus the existing-access table; **« Se connecter à la place d'un utilisateur » is marked En construction**.
+  - **Support** and **Logs** — **En construction**. The Naia audit data already exists in the `naia` schema; the note flags the open choice between this section and a third tab on `admin-audit.html`.
 
 ## v6.4 — Subscription PRD v2.6 (team-review re-baseline) *(reference)*
 

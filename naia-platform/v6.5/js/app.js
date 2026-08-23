@@ -27,12 +27,18 @@ const COMMUNITY_TOPICS = [
   { slug: "forum",        label: "Forum & annuaire",     icon: "users",       href: "#",                        tier: "v2" },
 ];
 
-// 2026-05-25 PO decision: the sidebar's "Administration" entry is now
-// a flat link straight to admin.html (no submenu, no chevron). All
-// admin pages are reachable from the Raccourcis cards on admin.html,
-// so a sidebar submenu would just duplicate them. If a power-user
-// pattern emerges (e.g. reps living in admin-leads all day), revisit
-// and add a pinned-shortcut affordance then.
+// 2026-08-21 (v6.5) — "Administration" is a fold again, same idiom as
+// Communauté (chevron + .subnav). The 2026-05-25 flat-link decision held
+// while admin covered a single surface (Community + Subscription on one
+// dashboard); v6.5 adds a second, unrelated surface — Naia (Core), the
+// admin dashboard for the dashboard module itself — so the two need to be
+// separable from the sidebar. Two entries only:
+//   - Naia (Core)   -> admin-core.html   (sources publiques, accès, support, logs)
+//   - Subscription  -> admin.html        (the existing cross-module dashboard)
+const ADMIN_ITEMS = [
+  { slug: "admin-core", label: "Naia (Core)",  href: "admin-core.html" },
+  { slug: "admin-sub",  label: "Subscription", href: "admin.html" },
+];
 
 // ---- THEME ----
 function getTheme() { return localStorage.getItem("naia-theme") || "dark"; }
@@ -120,6 +126,17 @@ function buildSidebar() {
     }).join("")}
   `;
 
+  // Admin sub-entries. "Naia (Core)" is its own page; "Subscription" is the
+  // historical admin.html dashboard, so anything under section=admin that is
+  // not the core page lights up the Subscription entry.
+  const adminItems = ADMIN_ITEMS.map(a => {
+    const isCore = a.slug === "admin-core";
+    const active = section === "admin" && (isCore ? page === "admin-core" : page !== "admin-core");
+    return `<a href="${a.href}" class="subnav-item ${active ? "active" : ""}">
+      <span>${a.label}</span>
+    </a>`;
+  }).join("");
+
   aside.innerHTML = `
     <a href="index.html" class="sidebar-brand" style="text-decoration:none">
       <img src="img/logo.png" alt="Naia hydro" style="width:100%; max-width:184px; height:auto; display:block">
@@ -171,10 +188,14 @@ function buildSidebar() {
         ${communityItems}
       </div>
 
-      <a href="admin.html" class="sidebar-item ${section === 'admin' ? 'active' : ''}">
+      <a href="admin.html" class="sidebar-item ${section === 'admin' ? 'active' : ''}" aria-expanded="${open.admin}">
         <i data-lucide="shield"></i>
         <span>Administration</span>
+        <i data-lucide="chevron-right" class="chev" onclick="event.preventDefault(); event.stopPropagation(); toggleFoldByLink(this)"></i>
       </a>
+      <div class="subnav" data-open="${open.admin}">
+        ${adminItems}
+      </div>
     </nav>
 
     <div class="sidebar-foot">
