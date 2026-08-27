@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Merci · Naia Hydro</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="css/style.css" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  /* FR-SIGNUP-FORM confirmation surface — shown after the public sign-up
+     notification form is submitted on naiahydro.com/signup. The form only
+     notifies the team + sends the prospect a confirmation e-mail via
+     Infomaniak; nothing is persisted and no CRM lead is created. This page
+     is the synchronous reassurance the prospect gets immediately. */
+  body.public-shell {
+    background:
+      radial-gradient(900px 700px at 50% -20%, rgba(132,204,22,0.10), transparent 60%),
+      radial-gradient(700px 500px at 50% 100%, rgba(56,189,248,0.08), transparent 60%),
+      var(--bg-base);
+    min-height: 100vh;
+    display: flex; flex-direction: column;
+  }
+  .public-nav {
+    padding: 20px 40px;
+    display: flex; justify-content: space-between; align-items: center;
+    border-bottom: 1px solid var(--border-subtle);
+    background: rgba(10,19,38,0.45);
+    backdrop-filter: blur(8px);
+  }
+  .public-logo { display: flex; align-items: center; gap: 10px; font-size: 18px; font-weight: 700; color: var(--text-primary); text-decoration: none; }
+  .public-logo-mark { width: 32px; height: 32px; border-radius: 8px; background: linear-gradient(135deg, var(--brand-cyan) 0%, var(--accent-green) 100%); display: flex; align-items: center; justify-content: center; color: #0a1326; font-weight: 700; font-size: 16px; }
+
+  .thanks-container {
+    flex: 1;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 56px 40px;
+    text-align: center;
+  }
+  .check-mark {
+    width: 72px; height: 72px; border-radius: 50%;
+    background: rgba(132,204,22,0.18);
+    border: 2px solid var(--accent-green);
+    color: var(--accent-green);
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 24px;
+  }
+  .thanks-title {
+    font-size: 30px; font-weight: 700; color: var(--text-primary);
+    margin: 0 0 10px;
+  }
+  .thanks-subtitle {
+    font-size: 16px; color: var(--text-secondary);
+    margin: 0 0 36px; max-width: 560px;
+  }
+
+  .what-next-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: 14px;
+    padding: 24px;
+    max-width: 520px;
+    margin: 0 auto;
+    text-align: left;
+  }
+  .what-next-card .head {
+    font-size: 12px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.08em; color: var(--text-subtle);
+    margin: 0 0 14px;
+  }
+  .next-step {
+    display: flex; gap: 14px; padding: 12px 0;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+  .next-step:last-child { border-bottom: 0; }
+  .next-step .num {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: var(--brand-cyan-soft); color: var(--brand-cyan);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 600; font-size: 13px; flex-shrink: 0;
+  }
+  .next-step .body { font-size: 13px; color: var(--text-secondary); line-height: 1.5; }
+  .next-step .body strong { display: block; color: var(--text-primary); margin-bottom: 2px; font-weight: 600; }
+
+  .public-footer {
+    padding: 24px 40px; border-top: 1px solid var(--border-subtle);
+    display: flex; justify-content: space-between;
+    font-size: 12px; color: var(--text-subtle);
+  }
+  .public-footer a { color: var(--text-muted); }
+</style>
+</head>
+<body class="public-shell" data-page="public-thanks">
+
+<nav class="public-nav">
+  <a href="index.html" class="public-logo">
+    <span class="public-logo-mark">N</span>
+    <span>Naia Hydro</span>
+  </a>
+</nav>
+
+<div class="thanks-container">
+  <div class="check-mark">
+    <i data-lucide="check" style="width:36px; height:36px"></i>
+  </div>
+
+  <h1 class="thanks-title">Merci — nous avons bien reçu votre demande.</h1>
+  <p class="thanks-subtitle">
+    Un e-mail de confirmation vient de vous être envoyé. L'équipe Naia vous recontacte
+    rapidement.
+  </p>
+
+  <div class="what-next-card">
+    <p class="head">Et maintenant ?</p>
+
+    <div class="next-step">
+      <div class="num"><i data-lucide="mail" style="width:14px; height:14px"></i></div>
+      <div class="body">
+        <strong>E-mail de confirmation envoyé</strong>
+        Vérifiez votre boîte de réception (et vos indésirables). Si vous ne recevez rien,
+        écrivez-nous à <a href="mailto:contact@naiahydro.com" class="link">contact@naiahydro.com</a>.
+      </div>
+    </div>
+
+    <div class="next-step">
+      <div class="num"><i data-lucide="phone" style="width:14px; height:14px"></i></div>
+      <div class="body">
+        <strong>L'équipe Naia vous recontacte</strong>
+        Un membre de l'équipe reprend contact avec vous rapidement pour faire le point sur
+        vos centrales et vos besoins.
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-top:32px">
+    <a href="index.html" class="btn btn-secondary btn-sm">
+      <i data-lucide="arrow-left"></i> Retour à l'accueil
+    </a>
+  </div>
+
+  <div style="margin-top:20px; font-size:12px; color:var(--text-subtle)">
+    Une question ? <a href="mailto:contact@naiahydro.com" class="link">contact@naiahydro.com</a>
+  </div>
+</div>
+
+<footer class="public-footer">
+  <div>© 2026 Naia Hydro — Tous droits réservés.</div>
+  <div style="display:flex; gap:18px">
+    <a href="index.html">Accueil</a>
+    <a href="mailto:contact@naiahydro.com">Contact</a>
+  </div>
+</footer>
+
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script>
+  lucide.createIcons();
+</script>
+</body>
+</html>

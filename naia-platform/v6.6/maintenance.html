@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Registre de maintenance — Naia</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="css/style.css" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  /* v6.6 — Registre de maintenance. Reprend la mécanique de tri/filtre de
+     evenements.html (même comportement tableur) : le texte de l'en-tête trie,
+     l'entonnoir filtre. Ce qui change, ce sont les colonnes — ici on ne parle
+     plus d'énergie perdue mais d'un acte d'exploitation déclaré par un humain. */
+  .ev-bar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
+  .ev-search { position: relative; flex: 1; min-width: 200px; max-width: 320px; }
+  .ev-search i { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; color: var(--text-muted); }
+  .ev-search input {
+    width: 100%; padding: 8px 10px 8px 32px; font-size: 13px; font-family: inherit;
+    background: var(--bg-input); border: 1px solid var(--border-default);
+    border-radius: 8px; color: var(--text-primary); outline: none; box-sizing: border-box;
+  }
+  .ev-search input:focus { border-color: var(--brand-cyan); }
+  .ev-count { margin-left: auto; font-size: 12.5px; color: var(--text-muted); }
+
+  .data-table th.sortable { cursor: pointer; user-select: none; white-space: nowrap; }
+  .data-table th.sortable:hover { color: var(--text-primary); }
+  .data-table th .sort-arrow { opacity: 0; margin-left: 4px; font-size: 9px; }
+  .data-table th[data-dir] .sort-arrow { opacity: 1; }
+  .th-wrap { display: inline-flex; align-items: center; gap: 2px; }
+  .th-filter {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 20px; height: 20px; margin-left: 2px; padding: 0;
+    background: transparent; border: 0; border-radius: 5px;
+    color: var(--text-muted); cursor: pointer; flex: none;
+  }
+  .th-filter svg, .th-filter i { width: 13px; height: 13px; }
+  .th-filter:hover { background: var(--bg-card-hover); color: var(--text-primary); }
+  .th-filter.on { color: var(--brand-cyan); background: rgba(56,189,248,0.14); }
+
+  .ev-filter {
+    display: none; position: fixed; z-index: 80; width: 262px;
+    background: var(--bg-card); border: 1px solid var(--border-default);
+    border-radius: 10px; box-shadow: 0 14px 34px rgba(0,0,0,0.42);
+    overflow: hidden;
+  }
+  .ev-filter[data-open="true"] { display: block; }
+  .ev-filter-search { padding: 10px 10px 8px; border-bottom: 1px solid var(--border-subtle); }
+  .ev-filter-search input {
+    width: 100%; padding: 6px 9px; font-size: 12.5px; font-family: inherit;
+    background: var(--bg-input); border: 1px solid var(--border-default);
+    border-radius: 7px; color: var(--text-primary); outline: none; box-sizing: border-box;
+  }
+  .ev-filter-search input:focus { border-color: var(--brand-cyan); }
+  .ev-filter-list { max-height: 240px; overflow-y: auto; padding: 6px; }
+  .ev-filter-list label {
+    display: flex; align-items: center; gap: 9px;
+    padding: 6px 8px; border-radius: 7px; cursor: pointer;
+    font-size: 12.5px; color: var(--text-primary);
+  }
+  .ev-filter-list label:hover { background: var(--bg-card-hover); }
+  .ev-filter-list input[type="checkbox"] { accent-color: var(--brand-cyan); width: 14px; height: 14px; flex: none; cursor: pointer; }
+  .ev-filter-list .all { font-weight: 600; border-bottom: 1px solid var(--border-subtle); border-radius: 0; margin-bottom: 4px; }
+  .ev-filter-list .none { padding: 14px 8px; color: var(--text-muted); font-size: 12px; }
+  .ev-filter-foot {
+    display: flex; justify-content: flex-end; gap: 8px;
+    padding: 9px 10px; border-top: 1px solid var(--border-subtle); background: var(--bg-base);
+  }
+
+  .data-table td.num, .data-table th.num { text-align: right; }
+  .data-table td.msg { color: var(--text-primary); font-size: 12.5px; max-width: 340px; }
+  .data-table tbody tr { cursor: pointer; }
+  .data-table tbody tr:hover { background: var(--bg-card-hover); }
+
+  /* Pastille de nature (préventive / corrective / autre) */
+  .cat { display: inline-flex; align-items: center; gap: 7px; white-space: nowrap; }
+  .cat .dot { width: 8px; height: 8px; border-radius: 50%; flex: none; }
+
+  /* Auteur — un humain, pas un système. Initiales en pastille pour que la
+     colonne reste lisible quand le registre s'allonge. */
+  .who { display: inline-flex; align-items: center; gap: 7px; white-space: nowrap; }
+  .who .ini {
+    width: 20px; height: 20px; border-radius: 50%; flex: none;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 9.5px; font-weight: 700; letter-spacing: 0.2px;
+    background: rgba(56,189,248,0.16); color: var(--brand-cyan);
+  }
+  .who.corr .ini { background: rgba(163,230,53,0.16); color: #a3e635; }
+
+  /* Trombone photo — la pièce jointe est une décision produit encore ouverte
+     (coût par message chez le fournisseur WhatsApp), donc elle se voit. */
+  .clip { color: var(--text-muted); }
+  .clip.on { color: var(--brand-cyan); }
+
+  .ev-empty { padding: 40px; text-align: center; color: var(--text-muted); font-size: 13px; }
+
+  /* ---- Tiroir de détail : message brut vs message corrigé ---- */
+  .mt-drawer {
+    position: fixed; top: 0; right: 0; bottom: 0; width: 420px; max-width: 92vw;
+    background: var(--bg-card); border-left: 1px solid var(--border-default);
+    box-shadow: -18px 0 44px rgba(0,0,0,0.42);
+    transform: translateX(100%); transition: transform 0.18s ease-out;
+    z-index: 90; display: flex; flex-direction: column;
+  }
+  .mt-drawer[data-open="true"] { transform: translateX(0); }
+  .mt-drawer-head {
+    display: flex; align-items: center; gap: 10px;
+    padding: 16px 18px; border-bottom: 1px solid var(--border-subtle);
+  }
+  .mt-drawer-head h2 { font-size: 15px; font-weight: 600; margin: 0; flex: 1; }
+  .mt-drawer-body { padding: 18px; overflow-y: auto; flex: 1; }
+  .mt-field { margin-bottom: 18px; }
+  .mt-field-label {
+    font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.6px;
+    color: var(--text-muted); margin-bottom: 6px;
+  }
+  .mt-field-value { font-size: 13px; line-height: 1.5; color: var(--text-primary); }
+  /* Le message brut est cité tel qu'il est arrivé — fautes comprises. C'est
+     une pièce justificative, on ne la réécrit pas silencieusement. */
+  .mt-raw {
+    font-size: 12.5px; line-height: 1.5; color: var(--text-muted);
+    background: var(--bg-base); border: 1px solid var(--border-subtle);
+    border-left: 3px solid var(--border-default);
+    border-radius: 8px; padding: 10px 12px; font-style: italic;
+  }
+  .mt-photo {
+    width: 100%; height: 150px; border-radius: 8px;
+    background: var(--bg-base); border: 1px dashed var(--border-default);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 6px; color: var(--text-muted); font-size: 11.5px;
+  }
+  .mt-trace {
+    font-size: 11.5px; line-height: 1.7; color: var(--text-muted);
+    border-top: 1px solid var(--border-subtle); padding-top: 12px;
+  }
+  .mt-trace b { color: var(--text-primary); font-weight: 600; }
+  .mt-scrim {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.45);
+    opacity: 0; pointer-events: none; transition: opacity 0.18s; z-index: 89;
+  }
+  .mt-scrim[data-open="true"] { opacity: 1; pointer-events: auto; }
+</style>
+</head>
+<!-- v6.6 — Registre de maintenance.
+
+     POURQUOI UNE PAGE SÉPARÉE DE « Liste des événements » (question Q4, Jan
+     2026-08-27) : la liste des événements est adossée aux PERTES d'énergie —
+     une ligne y porte un loss_id, des kWh, une durée, et se découpe par jour
+     quand l'événement traverse minuit (voir backend/api/dashboard_schemas/
+     loss_events.py, livré par platform#1375). Une intervention de maintenance
+     déclarée par WhatsApp n'a rien de tout ça : c'est un acte ponctuel, sans
+     kWh, souvent sans durée. La forcer dans ce tableau reviendrait à remplir
+     de vide les trois colonnes qui font l'intérêt du tableau.
+
+     Ce qui EST réutilisé de la liste des événements : la surface (on arrive
+     ici par le même menu « Générer une liste »), la bascule en haut de page,
+     et toute la mécanique tri / filtre entonnoir / export. Autrement dit on
+     réutilise la PAGE, pas la TABLE. C'est aussi ce que la séparation des
+     rôles impose : la maintenance vit dans son propre schéma, le module ne
+     peut pas écrire dans naia.energy_losses (ADR-012).
+
+     Structure des colonnes d'après le commentaire de Bernard sur l'issue #229
+     (2026-04-01) : nature + objet issus d'un catalogue (et non une chaîne
+     libre), auteur du message brut ET auteur de la dernière correction. -->
+<body data-page="maintenance" data-section="production" data-centrale="all">
+
+<div class="app-shell">
+  <aside class="sidebar"></aside>
+  <main class="main-area">
+
+    <header class="topbar" style="align-items:center">
+      <div class="crumbs">
+        <a href="index.html"><i data-lucide="home" style="width:12px; height:12px"></i></a>
+        <span class="sep">/</span>
+        <a href="index.html">Pilotage</a>
+        <span class="sep">/</span>
+        <a href="production.html">Production</a>
+        <span class="sep">/</span>
+        <span class="current">Registre de maintenance</span>
+      </div>
+    </header>
+
+    <div id="centrale-tabs" class="centrale-tabs"></div>
+
+    <div class="page-content">
+
+      <!-- Bascule entre les deux registres. Même page, deux tables : c'est la
+           réponse à « peut-on utiliser la liste des événements ? » — oui comme
+           surface, non comme table. -->
+      <div class="list-switch" role="tablist" aria-label="Registre affiché">
+        <a href="evenements.html" role="tab" aria-selected="false">Pertes d'énergie</a>
+        <a href="maintenance.html" role="tab" aria-selected="true" class="on">Maintenance</a>
+      </div>
+
+      <h1 style="font-size:22px; font-weight:600; margin:0 0 4px">Registre de maintenance</h1>
+      <div class="muted" style="font-size:12.5px; margin-bottom:16px">
+        Février 2025 · interventions déclarées par les exploitants depuis WhatsApp.
+        Une ligne = une intervention. Cliquez une ligne pour voir le message d'origine.
+      </div>
+
+      <div class="ev-bar">
+        <div class="ev-search">
+          <i data-lucide="search"></i>
+          <input type="text" id="ev-q" placeholder="Rechercher dans les messages…" oninput="mtRender()">
+        </div>
+        <button class="btn btn-secondary btn-sm" id="ev-clear" onclick="mtClearFilters()" style="display:none">
+          <i data-lucide="filter-x"></i> Effacer les filtres
+        </button>
+        <div class="ev-count" id="ev-count"></div>
+        <button class="btn btn-primary btn-sm" onclick="mtExport()">
+          <i data-lucide="file-spreadsheet"></i> Exporter en Excel
+        </button>
+      </div>
+
+      <div class="card" style="padding:0; overflow:hidden">
+        <div style="overflow-x:auto">
+          <table class="data-table" id="mt-table">
+            <thead>
+              <tr>
+                <th class="num"><span class="th-wrap"><span class="sortable" onclick="mtSort('idx')">Index<span class="sort-arrow" data-key="idx">▲</span></span></span></th>
+                <th><span class="th-wrap"><span class="sortable" onclick="mtSort('date')">Date<span class="sort-arrow" data-key="date">▲</span></span><button class="th-filter" data-col="date" onclick="mtOpenFilter(event, 'date')" title="Filtrer les dates"><i data-lucide="filter"></i></button></span></th>
+                <th class="num"><span class="th-wrap"><span class="sortable" onclick="mtSort('time')">Heure<span class="sort-arrow" data-key="time">▲</span></span></span></th>
+                <th class="col-centrale"><span class="th-wrap"><span class="sortable" onclick="mtSort('centrale')">Centrale<span class="sort-arrow" data-key="centrale">▲</span></span><button class="th-filter" data-col="centrale" onclick="mtOpenFilter(event, 'centrale')" title="Filtrer les centrales"><i data-lucide="filter"></i></button></span></th>
+                <th><span class="th-wrap"><span class="sortable" onclick="mtSort('nature')">Nature<span class="sort-arrow" data-key="nature">▲</span></span><button class="th-filter" data-col="nature" onclick="mtOpenFilter(event, 'nature')" title="Filtrer la nature"><i data-lucide="filter"></i></button></span></th>
+                <th><span class="th-wrap"><span class="sortable" onclick="mtSort('objet')">Objet<span class="sort-arrow" data-key="objet">▲</span></span><button class="th-filter" data-col="objet" onclick="mtOpenFilter(event, 'objet')" title="Filtrer l'objet"><i data-lucide="filter"></i></button></span></th>
+                <th><span class="th-wrap"><span class="sortable" onclick="mtSort('auteur')">Auteur<span class="sort-arrow" data-key="auteur">▲</span></span><button class="th-filter" data-col="auteur" onclick="mtOpenFilter(event, 'auteur')" title="Filtrer les auteurs"><i data-lucide="filter"></i></button></span></th>
+                <th>Message</th>
+                <th class="num" title="Photo jointe au message WhatsApp">Photo</th>
+                <th><span class="th-wrap"><span class="sortable" onclick="mtSort('corrPar')">Corrigé par<span class="sort-arrow" data-key="corrPar">▲</span></span></span></th>
+              </tr>
+            </thead>
+            <tbody id="mt-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<div class="ev-filter" id="ev-filter" data-open="false">
+  <div class="ev-filter-search">
+    <input type="text" id="ev-filter-q" placeholder="Rechercher…" oninput="mtFilterList()">
+  </div>
+  <div class="ev-filter-list" id="ev-filter-list"></div>
+  <div class="ev-filter-foot">
+    <button class="btn btn-ghost btn-sm" onclick="mtFilterClose()">Annuler</button>
+    <button class="btn btn-primary btn-sm" onclick="mtFilterApply()">OK</button>
+  </div>
+</div>
+
+<!-- Tiroir de détail d'une intervention -->
+<div class="mt-scrim" id="mt-scrim" data-open="false" onclick="mtCloseDrawer()"></div>
+<aside class="mt-drawer" id="mt-drawer" data-open="false" role="dialog" aria-label="Détail de l'intervention">
+  <div class="mt-drawer-head">
+    <h2 id="mt-d-title">Intervention</h2>
+    <button class="btn btn-ghost btn-sm" onclick="mtCloseDrawer()" aria-label="Fermer"><i data-lucide="x"></i></button>
+  </div>
+  <div class="mt-drawer-body" id="mt-d-body"></div>
+</aside>
+
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="js/app.js"></script>
+
+<script>
+  // ---------- Catalogue ----------
+  // Bernard (#229, 2026-04-01) : « What about putting an integer instead of a
+  // VARCHAR, and adding a catalog table? » — d'où des codes, pas des chaînes
+  // libres. La centaine porte la nature, l'unité porte l'objet, exactement
+  // comme la taxonomie des pertes (101 = catégorie 1, sous-type 1).
+  const MT_NATURE = {
+    1: { label: "Préventive", color: "#10b981" },
+    2: { label: "Corrective", color: "#f59e0b" },
+    3: { label: "Autre",      color: "#94a3b8" },
+  };
+  const MT_OBJET = {
+    1: "Groupe", 2: "Prise d'eau", 3: "Grille", 4: "Vanne",
+    5: "Électrique", 6: "Automate", 7: "Génie civil", 8: "Abords",
+  };
+
+  // Jeu de démonstration. `code` = nature × 100 + objet.
+  // `corrPar` vide = le message est passé tel quel, personne ne l'a retouché.
+  const MT_ROWS = [
+    { id: 1,  date: "2025-02-03", time: "08:35", centrale: "moulins", code: 103, auteur: "Marc Dupont",
+      raw: "grille amont nettoyé ce matin apres la crue, beaucoup de branches",
+      msg: "Dégrillage de la grille amont après la crue — importante quantité de branches.",
+      photo: true,  corrPar: "Sophie Bernard", recu: "2025-02-03 08:36", corrLe: "2025-02-03 14:12" },
+    { id: 2,  date: "2025-02-05", time: "10:12", centrale: "moulins", code: 101, auteur: "Marc Dupont",
+      raw: "j ai mis de l huile sur les paliers du groupe 1",
+      msg: "Graissage des paliers du groupe 1.",
+      photo: false, corrPar: "Sophie Bernard", recu: "2025-02-05 10:14", corrLe: "2025-02-05 16:40" },
+    { id: 3,  date: "2025-02-07", time: "15:48", centrale: "ariege",  code: 205, auteur: "Luc Fontaine",
+      raw: "disjoncteur a saute, j ai rearmé sur place. a surveiller",
+      msg: "Réarmement du disjoncteur sur place après déclenchement. À surveiller.",
+      photo: true,  corrPar: "", recu: "2025-02-07 15:49", corrLe: "" },
+    { id: 4,  date: "2025-02-11", time: "07:20", centrale: "bocq",    code: 104, auteur: "Els Vermeulen",
+      raw: "vanne de garde graissée + testée, ok",
+      msg: "Graissage et essai de la vanne de garde — conforme.",
+      photo: false, corrPar: "", recu: "2025-02-11 07:22", corrLe: "" },
+    { id: 5,  date: "2025-02-13", time: "09:05", centrale: "moulins", code: 202, auteur: "Marc Dupont",
+      raw: "prise d eau bouchée, on a appelé l entreprise, ils viennent demain",
+      msg: "Colmatage de la prise d'eau — intervention prestataire commandée.",
+      photo: true,  corrPar: "Sophie Bernard", recu: "2025-02-13 09:07", corrLe: "2025-02-13 11:30" },
+    { id: 6,  date: "2025-02-14", time: "13:40", centrale: "moulins", code: 202, auteur: "Sophie Bernard",
+      raw: "prestataire sur site, curage en cours",
+      msg: "Prestataire sur site — curage de la prise d'eau en cours.",
+      photo: true,  corrPar: "", recu: "2025-02-14 13:41", corrLe: "" },
+    { id: 7,  date: "2025-02-18", time: "11:15", centrale: "lesse",   code: 106, auteur: "Els Vermeulen",
+      raw: "mise a jour automate faite par le sav",
+      msg: "Mise à jour de l'automate réalisée par le SAV.",
+      photo: false, corrPar: "Luc Fontaine", recu: "2025-02-18 11:16", corrLe: "2025-02-19 08:05" },
+    { id: 8,  date: "2025-02-20", time: "16:30", centrale: "ariege",  code: 301, auteur: "Luc Fontaine",
+      raw: "bruit anormal sur le groupe 2, a faire verifier",
+      msg: "Bruit anormal signalé sur le groupe 2 — vérification à programmer.",
+      photo: false, corrPar: "", recu: "2025-02-20 16:31", corrLe: "" },
+    { id: 9,  date: "2025-02-24", time: "08:50", centrale: "moulins", code: 108, auteur: "Marc Dupont",
+      raw: "debroussaillage des abords du canal",
+      msg: "Débroussaillage des abords du canal d'amenée.",
+      photo: true,  corrPar: "", recu: "2025-02-24 08:52", corrLe: "" },
+    { id: 10, date: "2025-02-26", time: "14:05", centrale: "bocq",    code: 201, auteur: "Els Vermeulen",
+      raw: "remplacement du roulement cote turbine groupe 1",
+      msg: "Remplacement du roulement côté turbine, groupe 1.",
+      photo: true,  corrPar: "Sophie Bernard", recu: "2025-02-26 14:07", corrLe: "2025-02-26 17:20" },
+    { id: 11, date: "2025-02-27", time: "09:30", centrale: "lesse",   code: 103, auteur: "Els Vermeulen",
+      raw: "degrillage manuel, feuilles",
+      msg: "Dégrillage manuel — accumulation de feuilles.",
+      photo: false, corrPar: "", recu: "2025-02-27 09:31", corrLe: "" },
+    { id: 12, date: "2025-02-28", time: "17:45", centrale: "ariege",  code: 107, auteur: "Luc Fontaine",
+      raw: "fissure repérée sur le mur du canal, photo jointe",
+      msg: "Fissure repérée sur le mur du canal — photo jointe.",
+      photo: true,  corrPar: "Luc Fontaine", recu: "2025-02-28 17:46", corrLe: "2025-02-28 18:02" },
+  ];
+
+  // ---------- Helpers ----------
+  function mtNature(r) { return MT_NATURE[Math.floor(r.code / 100)] || MT_NATURE[3]; }
+  function mtObjet(r)  { return MT_OBJET[r.code % 100] || "—"; }
+  function mtCentraleLabel(slug) {
+    const c = CENTRALES.filter(function (x) { return x.slug === slug; })[0];
+    return c ? c.label : slug;
+  }
+  function mtDate(iso) {
+    const p = iso.split("-");
+    const mois = ["janv.", "févr.", "mars", "avr.", "mai", "juin", "juil.", "août", "sept.", "oct.", "nov.", "déc."];
+    return Number(p[2]) + " " + mois[Number(p[1]) - 1] + " " + p[0];
+  }
+  function mtInitials(name) {
+    return name.split(/\s+/).map(function (w) { return w[0]; }).join("").slice(0, 2).toUpperCase();
+  }
+  function mtEsc(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  }
+
+  // ---------- Filtres façon tableur ----------
+  // Toutes les colonnes filtrables ici sont des listes de valeurs répétées :
+  // pas de filtre par intervalle, il n'y a aucune colonne numérique à borner
+  // (c'est précisément ce qui distingue ce registre de la liste des pertes).
+  const MT_FILTER_COLS = {
+    date:     function (v) { return mtDate(v); },
+    centrale: function (v) { return mtCentraleLabel(v); },
+    nature:   function (v) { return v; },
+    objet:    function (v) { return v; },
+    auteur:   function (v) { return v; },
+  };
+  const mtFilters = { date: null, centrale: null, nature: null, objet: null, auteur: null };
+
+  let mtFilterCol = null;
+  let mtFilterDraft = null;
+
+  function mtValues(col) {
+    const seen = [];
+    mtAllRows().forEach(function (r) { if (seen.indexOf(r[col]) === -1) seen.push(r[col]); });
+    return col === "date" ? seen.sort() : seen.sort(function (a, b) {
+      return MT_FILTER_COLS[col](a).localeCompare(MT_FILTER_COLS[col](b), "fr");
+    });
+  }
+
+  function mtOpenFilter(e, col) {
+    e.stopPropagation();
+    const panel = document.getElementById("ev-filter");
+    const already = mtFilterCol === col && panel.dataset.open === "true";
+    if (already) return mtFilterClose();
+
+    mtFilterCol = col;
+    const current = mtFilters[col];
+    mtFilterDraft = new Set(current === null ? mtValues(col) : current);
+    document.getElementById("ev-filter-q").value = "";
+    mtFilterList();
+
+    const box = e.currentTarget.getBoundingClientRect();
+    panel.dataset.open = "true";
+    const w = panel.offsetWidth;
+    let left = box.left;
+    if (left + w > window.innerWidth - 12) left = window.innerWidth - w - 12;
+    panel.style.left = Math.max(12, left) + "px";
+    panel.style.top = (box.bottom + 6) + "px";
+    document.getElementById("ev-filter-q").focus();
+  }
+
+  function mtFilterClose() {
+    document.getElementById("ev-filter").dataset.open = "false";
+    mtFilterCol = null;
+  }
+
+  function mtFilterList() {
+    const q = (document.getElementById("ev-filter-q").value || "").toLowerCase();
+    const label = MT_FILTER_COLS[mtFilterCol];
+    const vals = mtValues(mtFilterCol).filter(function (v) { return label(v).toLowerCase().indexOf(q) !== -1; });
+    const host = document.getElementById("ev-filter-list");
+
+    if (!vals.length) { host.innerHTML = '<div class="none">Aucune valeur ne correspond.</div>'; return; }
+
+    const allChecked = vals.every(function (v) { return mtFilterDraft.has(v); });
+    let html = '<label class="all"><input type="checkbox" ' + (allChecked ? "checked" : "") +
+               ' onchange="mtFilterToggleAll(this.checked)"> (Tout sélectionner)</label>';
+    html += vals.map(function (v) {
+      return '<label><input type="checkbox" value="' + mtEsc(v) + '" ' +
+        (mtFilterDraft.has(v) ? "checked" : "") +
+        ' onchange="mtFilterToggle(this)"> ' + label(v) + '</label>';
+    }).join("");
+    host.innerHTML = html;
+    mtFilterSyncAll();
+  }
+
+  function mtFilterToggle(input) {
+    if (input.checked) mtFilterDraft.add(input.value);
+    else mtFilterDraft.delete(input.value);
+    mtFilterSyncAll();
+  }
+
+  function mtFilterSyncAll() {
+    const all = document.querySelector("#ev-filter-list label.all input");
+    if (!all) return;
+    const boxes = document.querySelectorAll("#ev-filter-list label:not(.all) input");
+    const checked = [].filter.call(boxes, function (b) { return b.checked; }).length;
+    all.checked = checked === boxes.length && boxes.length > 0;
+    all.indeterminate = checked > 0 && checked < boxes.length;
+  }
+
+  function mtFilterToggleAll(checked) {
+    document.querySelectorAll("#ev-filter-list label:not(.all) input").forEach(function (b) {
+      b.checked = checked;
+      if (checked) mtFilterDraft.add(b.value);
+      else mtFilterDraft.delete(b.value);
+    });
+    mtFilterSyncAll();
+  }
+
+  function mtFilterApply() {
+    const all = mtValues(mtFilterCol);
+    const q = (document.getElementById("ev-filter-q").value || "").trim().toLowerCase();
+    const label = MT_FILTER_COLS[mtFilterCol];
+    let kept;
+    if (q) {
+      kept = all.filter(function (v) { return label(v).toLowerCase().indexOf(q) !== -1 && mtFilterDraft.has(v); });
+    } else {
+      kept = all.filter(function (v) { return mtFilterDraft.has(v); });
+    }
+    mtFilters[mtFilterCol] = kept.length === all.length ? null : kept;
+    mtFilterClose();
+    mtRender();
+  }
+
+  function mtClearFilters() {
+    Object.keys(mtFilters).forEach(function (k) { mtFilters[k] = null; });
+    document.getElementById("ev-q").value = "";
+    mtRender();
+  }
+
+  document.addEventListener("click", function (e) {
+    if (!e.target.closest("#ev-filter") && !e.target.closest(".th-filter")) mtFilterClose();
+  });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape") { mtFilterClose(); mtCloseDrawer(); }
+  });
+
+  // ---------- Tri ----------
+  let mtSortKey = "date", mtSortDir = "asc";
+  function mtSort(key) {
+    if (mtSortKey === key) mtSortDir = mtSortDir === "asc" ? "desc" : "asc";
+    else { mtSortKey = key; mtSortDir = "asc"; }
+    mtRender();
+  }
+
+  // ---------- Rendu ----------
+  function mtAllRows() {
+    return MT_ROWS.map(function (r, i) {
+      return Object.assign({}, r, {
+        idx: i + 1,
+        nature: mtNature(r).label,
+        objet: mtObjet(r),
+      });
+    });
+  }
+
+  function mtRender() {
+    const q = (document.getElementById("ev-q").value || "").toLowerCase();
+
+    // Onglet centrale : « Toutes » montre la colonne Centrale et tout le parc ;
+    // une centrale précise la masque et ne garde que ses lignes. C'est la
+    // demande du briefing (« of all centrales when on the all centrales-tab »).
+    const slug = (typeof currentCentrale === "function") ? currentCentrale() : "all";
+    const isAll = slug === "all";
+    document.querySelectorAll(".col-centrale").forEach(function (el) {
+      el.style.display = isAll ? "" : "none";
+    });
+
+    let rows = mtAllRows().filter(function (r) {
+      return (isAll || r.centrale === slug) &&
+        (mtFilters.date     === null || mtFilters.date.indexOf(r.date) !== -1) &&
+        (mtFilters.centrale === null || mtFilters.centrale.indexOf(r.centrale) !== -1) &&
+        (mtFilters.nature   === null || mtFilters.nature.indexOf(r.nature) !== -1) &&
+        (mtFilters.objet    === null || mtFilters.objet.indexOf(r.objet) !== -1) &&
+        (mtFilters.auteur   === null || mtFilters.auteur.indexOf(r.auteur) !== -1) &&
+        (!q || (r.msg + " " + r.raw).toLowerCase().indexOf(q) !== -1);
+    });
+
+    const dir = mtSortDir === "asc" ? 1 : -1;
+    rows.sort(function (a, b) {
+      const va = a[mtSortKey], vb = b[mtSortKey];
+      if (typeof va === "number") return (va - vb) * dir;
+      return String(va).localeCompare(String(vb), "fr") * dir;
+    });
+
+    document.querySelectorAll("#mt-table .sort-arrow").forEach(function (a) {
+      const th = a.closest("th");
+      if (a.dataset.key === mtSortKey) {
+        th.dataset.dir = mtSortDir;
+        a.textContent = mtSortDir === "asc" ? "▲" : "▼";
+      } else {
+        th.removeAttribute("data-dir");
+      }
+    });
+
+    document.querySelectorAll(".th-filter").forEach(function (b) {
+      b.classList.toggle("on", mtFilters[b.dataset.col] !== null);
+    });
+    const anyFilter = Object.keys(mtFilters).some(function (k) { return mtFilters[k] !== null; }) || !!q;
+    document.getElementById("ev-clear").style.display = anyFilter ? "" : "none";
+
+    const body = document.getElementById("mt-body");
+    const colspan = isAll ? 10 : 9;
+    body.innerHTML = rows.length ? rows.map(function (r) {
+      const nat = mtNature(r);
+      return '<tr onclick="mtOpenDrawer(' + r.id + ')">' +
+        '<td class="num muted">' + r.idx + '</td>' +
+        '<td>' + mtDate(r.date) + '</td>' +
+        '<td class="num">' + r.time + '</td>' +
+        '<td class="col-centrale"' + (isAll ? "" : ' style="display:none"') + '>' + mtCentraleLabel(r.centrale) + '</td>' +
+        '<td><span class="cat"><span class="dot" style="background:' + nat.color + '"></span>' + nat.label + '</span></td>' +
+        '<td>' + r.objet + '</td>' +
+        '<td><span class="who"><span class="ini">' + mtInitials(r.auteur) + '</span>' + r.auteur + '</span></td>' +
+        '<td class="msg">' + mtEsc(r.msg) + '</td>' +
+        '<td class="num">' + (r.photo
+          ? '<i data-lucide="paperclip" class="clip on" style="width:14px;height:14px"></i>'
+          : '<span class="muted">—</span>') + '</td>' +
+        '<td>' + (r.corrPar
+          ? '<span class="who corr"><span class="ini">' + mtInitials(r.corrPar) + '</span>' + r.corrPar + '</span>'
+          : '<span class="muted">—</span>') + '</td>' +
+      '</tr>';
+    }).join("")
+      : '<tr><td colspan="' + colspan + '" class="ev-empty">Aucune intervention ne correspond à ces filtres.</td></tr>';
+
+    document.getElementById("ev-count").textContent =
+      rows.length + " intervention" + (rows.length > 1 ? "s" : "");
+
+    if (window.lucide) lucide.createIcons();
+  }
+
+  // ---------- Tiroir de détail ----------
+  // Le message brut ET le message corrigé sont montrés côte à côte : c'est la
+  // demande de Bernard (#229) de tracer qui a écrit et qui a corrigé. Sans le
+  // brut, une correction est une réécriture de l'histoire.
+  function mtOpenDrawer(id) {
+    const r = MT_ROWS.filter(function (x) { return x.id === id; })[0];
+    if (!r) return;
+    const nat = mtNature(r);
+
+    document.getElementById("mt-d-title").textContent = mtDate(r.date) + " · " + r.time;
+    document.getElementById("mt-d-body").innerHTML =
+      '<div class="mt-field">' +
+        '<div class="mt-field-label">Centrale</div>' +
+        '<div class="mt-field-value">' + mtCentraleLabel(r.centrale) + '</div>' +
+      '</div>' +
+      '<div class="mt-field">' +
+        '<div class="mt-field-label">Classement</div>' +
+        '<div class="mt-field-value"><span class="cat"><span class="dot" style="background:' + nat.color + '"></span>' +
+          nat.label + ' · ' + mtObjet(r) + '</span> <span class="muted" style="font-size:11px">(code ' + r.code + ')</span></div>' +
+      '</div>' +
+      '<div class="mt-field">' +
+        '<div class="mt-field-label">Message retenu</div>' +
+        '<div class="mt-field-value">' + mtEsc(r.msg) + '</div>' +
+      '</div>' +
+      '<div class="mt-field">' +
+        '<div class="mt-field-label">Message d\'origine (WhatsApp)</div>' +
+        '<div class="mt-raw">« ' + mtEsc(r.raw) + ' »</div>' +
+      '</div>' +
+      '<div class="mt-field">' +
+        '<div class="mt-field-label">Photo jointe</div>' +
+        (r.photo
+          ? '<div class="mt-photo"><i data-lucide="image"></i>photo-' + r.id + '.jpg — 1,2 Mo</div>'
+          : '<div class="mt-field-value muted">Aucune</div>') +
+      '</div>' +
+      '<div class="mt-trace">' +
+        'Déclaré par <b>' + r.auteur + '</b>, reçu le ' + r.recu + '.<br>' +
+        (r.corrPar
+          ? 'Corrigé par <b>' + r.corrPar + '</b> le ' + r.corrLe + '.'
+          : 'Message non corrigé — conservé tel qu\'il est arrivé.') +
+      '</div>';
+
+    document.getElementById("mt-drawer").dataset.open = "true";
+    document.getElementById("mt-scrim").dataset.open = "true";
+    if (window.lucide) lucide.createIcons();
+  }
+
+  function mtCloseDrawer() {
+    document.getElementById("mt-drawer").dataset.open = "false";
+    document.getElementById("mt-scrim").dataset.open = "false";
+  }
+
+  function mtExport() {
+    const n = document.querySelectorAll("#mt-body tr").length;
+    alert("Export Excel (démo) — " + n + " intervention(s), filtres et tri en cours appliqués.");
+  }
+
+  // Le shell rappelle applyCentrale() au clic sur un onglet centrale ; on
+  // s'y raccroche pour re-rendre le tableau avec le bon périmètre.
+  const _mtApplyCentrale = window.applyCentrale;
+  window.applyCentrale = function (slug) {
+    if (_mtApplyCentrale) _mtApplyCentrale(slug);
+    mtRender();
+  };
+
+  window.addEventListener("DOMContentLoaded", mtRender);
+</script>
+</body>
+</html>

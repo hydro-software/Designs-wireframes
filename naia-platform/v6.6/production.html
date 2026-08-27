@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Production — Naia</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="css/style.css" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  /* v5c — styles for the Configuration du panneau popup (Bernard's redesign).
+     The pd-section / pd-chev / fld pieces mirror the styles inlined in
+     parametres.html so the popup feels native to the rest of the platform. */
+  .modal-cfg { max-width: 920px; }
+  #chart-config .pd-section { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 12px; margin-bottom: 12px; overflow: hidden; }
+  #chart-config .pd-section-head { padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none; }
+  #chart-config .pd-section-head:hover { background: var(--bg-card-hover); }
+  #chart-config .pd-section-title { font-size: 15px; font-weight: 600; display: flex; align-items: center; gap: 10px; }
+  #chart-config .pd-section-body { padding: 0 20px 20px; border-top: 1px solid var(--border-subtle); padding-top: 18px; }
+  #chart-config .pd-section[data-open="false"] .pd-section-body { display: none; }
+  #chart-config .pd-section[data-open="false"] .pd-chev { transform: rotate(-90deg); }
+  #chart-config .pd-chev { transition: transform 0.18s; color: var(--text-muted); }
+
+  /* Axis blocks — Min/Max per resolution (Intraday / 30 j / 12 mois / Années) */
+  .axis-half-title { font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-primary); margin: 0; display: flex; align-items: center; gap: 8px; }
+  .axis-half-title .swatch { width: 10px; height: 10px; border-radius: 50%; flex: none; }
+  .axis-block { background: var(--bg-base); border: 1px solid var(--border-subtle); border-radius: 10px; padding: 14px 16px; margin-bottom: 14px; }
+  .axis-head { display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none; gap: 10px; }
+  .axis-head-actions { display: flex; align-items: center; gap: 10px; flex: none; }
+  .axis-reset { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-family: inherit; color: var(--text-muted); background: transparent; border: 1px solid var(--border-default); border-radius: 7px; padding: 4px 9px; cursor: pointer; white-space: nowrap; }
+  .axis-reset:hover { color: var(--text-primary); border-color: var(--brand-cyan); }
+  .axis-reset i { width: 12px; height: 12px; }
+  .axis-chev { width: 16px; height: 16px; transition: transform 0.18s; color: var(--text-muted); flex: none; }
+  .axis-body { padding-top: 14px; }
+  .axis-block[data-open="false"] .axis-body { display: none; }
+  .axis-block[data-open="false"] .axis-chev { transform: rotate(-90deg); }
+  .axis-pick { margin-left: 4px; padding: 4px 24px 4px 9px; font-size: 12px; font-family: inherit; font-weight: 500; text-transform: none; letter-spacing: normal; background: var(--bg-input); color: var(--text-primary); border: 1px solid var(--border-default); border-radius: 7px; appearance: none; cursor: pointer; outline: none; background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 7px center; }
+  .axis-pick:focus { border-color: var(--brand-cyan); }
+  .axis-grid { display: grid; grid-template-columns: 3.5rem repeat(4, 1fr); gap: 10px 12px; align-items: end; }
+  .axis-col-header { font-size: 11.5px; font-weight: 500; color: var(--text-muted); line-height: 1.5; }
+  .axis-row-label { font-size: 11.5px; color: var(--text-muted); font-weight: 500; padding-bottom: 9px; }
+  .axis-unit-select { width: 100%; margin-top: 4px; padding: 6px 26px 6px 10px; font-size: 12.5px; font-family: inherit; background: var(--bg-input); color: var(--text-primary); border: 1px solid var(--border-default); border-radius: 8px; cursor: pointer; appearance: none; outline: none; background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 8px center; }
+  .axis-unit-select:focus { border-color: var(--brand-cyan); }
+  .axis-input { width: 100%; padding: 8px 10px; font-size: 13px; text-align: right; background: var(--bg-input); border: 1px solid var(--border-default); border-radius: 8px; color: var(--text-primary); outline: none; box-sizing: border-box; font-family: inherit; -moz-appearance: textfield; }
+  .axis-input::-webkit-outer-spin-button, .axis-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  .axis-input:focus { border-color: var(--brand-cyan); }
+
+  /* Slot tables (Pluies / Indicateurs / Comparateur) */
+  .slot-table { width: 100%; border-collapse: collapse; }
+  .slot-table th { text-align: left; font-size: 10.5px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; padding: 0 8px 6px; border-bottom: 1px solid var(--border-default); }
+  .slot-table td { padding: 7px 8px; border-bottom: 1px solid var(--border-subtle); vertical-align: middle; }
+  .slot-table .lab-in { width: 100%; padding: 5px 8px; font-size: 12.5px; background: var(--bg-input); border: 1px solid var(--border-default); border-radius: 8px; color: var(--text-primary); outline: none; box-sizing: border-box; }
+  .slot-table .lab-in:focus, .slot-table .sel:focus { border-color: var(--brand-cyan); }
+  .slot-table .sel { width: 100%; font-size: 12.5px; }
+  .range-cell { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .range-in { width: 4.4rem; padding: 4px 6px; font-size: 12px; text-align: right; background: var(--bg-input); border: 1px solid var(--border-default); border-radius: 8px; color: var(--text-primary); outline: none; -moz-appearance: textfield; }
+  .range-in::-webkit-outer-spin-button, .range-in::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  .range-sep, .range-unit { font-size: 11.5px; color: var(--text-muted); }
+  .clamp-lab { display: inline-flex; align-items: center; gap: 5px; font-size: 11.5px; color: var(--text-muted); cursor: pointer; user-select: none; }
+  .reset-link { font-size: 11.5px; color: var(--brand-cyan); cursor: pointer; }
+  .reset-link:hover { text-decoration: underline; }
+  .col-width-lab { width: 12rem; }
+</style>
+</head>
+<body data-page="production" data-section="production" data-centrale="all">
+
+<div class="app-shell">
+  <aside class="sidebar"></aside>
+  <main class="main-area">
+
+    <!-- v5: top header now hosts breadcrumbs + time pills only.
+         The old left "Production · titre" and right "Total / dates" are gone —
+         centrales tabs directly below carry the contextual info. -->
+    <header class="topbar" style="align-items:center">
+      <div class="crumbs">
+        <a href="index.html"><i data-lucide="home" style="width:12px; height:12px"></i></a>
+        <span class="sep">/</span>
+        <a href="index.html">Pilotage</a>
+        <span class="sep">/</span>
+        <span class="current">Production</span>
+      </div>
+
+    </header>
+
+    <div id="centrale-tabs" class="centrale-tabs"></div>
+
+    <div class="page-content">
+
+      <!-- ============================================================
+           v6.5 — BARRE D'OUTILS PRODUCTION
+           Alignée sur l'app en production (capture BL, 2026-08) :
+             ligne 1  pastilles de granularité, centrées, SOUS les onglets
+                      centrales (elles étaient dans le topbar en v6.4)
+             ligne 2  Exporter (gauche) · Retour à <période parente> (centre)
+                      · Générer une liste (droite)
+           « Générer une liste » ouvre directement evenements.html.
+           ============================================================ -->
+      <div class="prod-toolbar">
+
+        <div class="prod-toolbar-pills">
+          <div class="time-pills" role="tablist" aria-label="Granularité temporelle">
+          <button class="on" data-pill="intraday" onclick="setTimePill(this, 'intraday')">
+          Intraday
+          </button>
+          <button data-pill="30j" onclick="setTimePill(this, '30j')">
+          30 jours
+          </button>
+          <button data-pill="12m" onclick="setTimePill(this, '12m')">
+          12 mois
+          </button>
+          <button data-pill="annees" onclick="setTimePill(this, 'annees')">
+          Années
+          </button>
+          </div>
+        </div>
+
+        <div class="prod-actions">
+
+          <div class="tb-menu" id="tb-export" data-open="false">
+            <button class="tb-btn" onclick="toggleTbMenu('tb-export')" aria-haspopup="true">
+              <i data-lucide="download"></i> Exporter <i data-lucide="chevron-down" class="tb-chev"></i>
+            </button>
+            <div class="tb-dropdown">
+              <button onclick="tbPick('tb-export', 'Export CSV')"><i data-lucide="file-spreadsheet"></i> Données du graphique (CSV)</button>
+              <button onclick="tbPick('tb-export', 'Export Excel')"><i data-lucide="table"></i> Données du graphique (Excel)</button>
+              <button onclick="tbPick('tb-export', 'Export image')"><i data-lucide="image"></i> Image du graphique (PNG)</button>
+            </div>
+          </div>
+
+          <a class="tb-drill" id="tb-drill" href="#" onclick="event.preventDefault(); tbDrillUp()">Retour à <b id="tb-drill-target">2025</b></a>
+
+          <!-- v6.6 — « Générer une liste » devient un menu à deux entrées.
+               Le briefing demandait un bouton de plus pour la maintenance ;
+               un deuxième bouton à côté d'un bouton qui fait déjà « ouvrir un
+               tableau » aurait dédoublé l'affordance. Une entrée de plus dans
+               le menu existant dit la même chose sans encombrer la barre. -->
+          <div class="tb-menu tb-menu-right" id="tb-liste" data-open="false">
+            <button class="tb-btn" onclick="toggleTbMenu('tb-liste')" aria-haspopup="true">
+              <i data-lucide="file-text"></i> Générer une liste <i data-lucide="chevron-down" class="tb-chev"></i>
+            </button>
+            <div class="tb-dropdown">
+              <a href="evenements.html"><i data-lucide="zap-off"></i> Liste des événements</a>
+              <a href="maintenance.html"><i data-lucide="wrench"></i> Registre de maintenance</a>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+
+      <!-- v5: KPI tiles removed. Only the graph remains.
+           The configuration of THIS chart (axis config, indicators shown) is reached
+           through a discrete sliders icon on the right of the chart toolbar — it is
+           per-user (defines the production view for this user). -->
+
+
+      <!-- Funnel state 2026-05-31 (platform#647): when a logged-in conference LEAD
+           (community points, no connected plant, no subscription) lands here via their
+           magic link, the chart is greyed/blurred behind a locked overlay with a
+           "Connectez votre centrale" CTA → plaquette. Toggle persona via the "Accès"
+           chip (top-right). Paying customers ("Client") see the chart normally.
+           The .locked-wrap / .locked-content / .lock-overlay structure is driven by
+           body[data-access] — see css/style.css "LOCKED INSIGHT STATE". -->
+      <div class="locked-wrap" style="margin-bottom:14px">
+
+        <!-- Locked overlay — only visible in data-access="lead" -->
+        <div class="lock-overlay">
+          <div class="lock-card">
+            <div class="lock-ico"><i data-lucide="lock"></i></div>
+            <span class="lock-points"><i data-lucide="sparkles" style="width:13px;height:13px"></i> 187 points gagnés au jeu Naia</span>
+            <div class="lock-title">Connectez votre centrale pour voir votre production</div>
+            <div class="lock-desc">
+              Vous êtes connecté, mais aucune centrale n'est encore reliée à votre compte.
+              Activez votre abonnement Naia pour brancher vos données et débloquer l'analyse
+              de production, des pertes et des revenus.
+            </div>
+            <a class="btn btn-primary" href="inscription.html">
+              <i data-lucide="plug-zap"></i> Connectez votre centrale
+            </a>
+            <div class="muted" style="font-size:11px; margin-top:12px">
+              Vos points restent acquis et seront transférés à votre organisation à l'activation.
+            </div>
+          </div>
+        </div>
+
+        <!-- Chart card (v5 polish round 4, matching dev.app.naiahydro.com screenshots from PO):
+             - LEFT slide-out: Données contextuelles (checkbox grid Int./30j/12m/Ann.)
+             - RIGHT slide-out: Légende (loss/event categories with coloured dots)
+             - Each side collapses into a thin vertical strip with rotated label + chevron at top
+             - Bottom-left: MDA / Hydro… quick-comparator pills
+             - Bottom-right: small floating wrench icon for chart configuration
+             - Right-axis toggle stays as a floating pill above the right axis. -->
+      <div class="card locked-content" style="padding:0; overflow:hidden">
+
+        <div class="chart-with-panel" id="chart-with-panel" data-ind="collapsed" data-leg="collapsed">
+
+          <!-- ============== LEFT: Données contextuelles (expanded) ============== -->
+          <div class="indicateurs-panel" id="indicateurs-panel">
+            <div class="indicateurs-panel-title">
+              <span>Données contextuelles</span>
+              <button class="collapse" onclick="toggleIndicateursPanel()" title="Réduire le panneau" aria-label="Réduire"><i data-lucide="chevron-left"></i></button>
+            </div>
+
+            <div class="ind-headers">
+              <span></span><span>Int.</span><span>30j</span><span>12m</span><span>Ann.</span>
+            </div>
+
+            <div class="ind-section">
+              <div class="ind-section-title">Pluies</div>
+              <div class="ind-row">
+                <label><span class="swatch" style="background:#60a5fa"></span>Météo</label>
+                <span class="ind-cell"><input type="checkbox" checked></span>
+                <span class="ind-cell"><input type="checkbox" checked></span>
+                <span class="ind-cell"><input type="checkbox" checked></span>
+                <span class="ind-cell"><input type="checkbox" checked></span>
+              </div>
+            </div>
+
+            <div class="ind-section">
+              <div class="ind-section-title">Indicateurs</div>
+              <div class="ind-row">
+                <label><span class="swatch" style="background:#a3e635"></span>Débit</label>
+                <span class="ind-cell"><input type="checkbox" checked></span>
+                <span class="ind-cell"><input type="checkbox" checked></span>
+                <span class="ind-cell"><input type="checkbox" checked></span>
+                <span class="ind-cell"><input type="checkbox" checked></span>
+              </div>
+              <div class="ind-row">
+                <label><span class="swatch" style="background:#c4b5fd"></span>Prix spot de l'électricité</label>
+                <span class="ind-cell"><input type="checkbox"></span>
+                <span class="ind-cell"><input type="checkbox"></span>
+                <span class="ind-cell"><input type="checkbox"></span>
+                <span class="ind-cell"><input type="checkbox"></span>
+              </div>
+            </div>
+
+            <div class="ind-section">
+              <div class="ind-section-title">Comparateurs</div>
+              <div class="ind-row">
+                <label><span class="swatch" style="background:#7dd3fc"></span>AGG DAILY MDA</label>
+                <span class="ind-cell"><input type="checkbox" checked></span>
+                <span class="ind-cell"><input type="checkbox" checked></span>
+                <span class="ind-cell"><input type="checkbox" checked></span>
+                <span class="ind-cell"><input type="checkbox" checked></span>
+              </div>
+              <div class="ind-row">
+                <label><span class="swatch" style="background:#a5b4fc"></span>Centrale ref.</label>
+                <span class="ind-cell"><input type="checkbox"></span>
+                <span class="ind-cell"><input type="checkbox"></span>
+                <span class="ind-cell"><input type="checkbox"></span>
+                <span class="ind-cell"><input type="checkbox"></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- ============== LEFT collapsed strip (shown when indicateurs is collapsed) ============== -->
+          <button class="panel-strip panel-strip-left" id="indicateurs-strip" onclick="toggleIndicateursPanel()" aria-label="Afficher Données contextuelles">
+            <i data-lucide="chevrons-right" class="strip-chev"></i>
+            <span class="strip-label">Données contextuelles</span>
+          </button>
+
+          <!-- ============== CHART AREA ============== -->
+          <div class="chart-area" style="position:relative; height:480px; padding:14px">
+            <button class="right-axis-toggle" id="right-axis-toggle" onclick="toggleRightAxis()" title="Basculer l'axe droit entre Pluie et Débit">
+              <span id="right-axis-label">Pluie (mm)</span>
+              <i data-lucide="arrow-left-right"></i>
+            </button>
+            <div class="chart-container" style="height:100%"><canvas id="production-chart"></canvas></div>
+
+            <!-- Bottom-left: quick comparator pills (MDA = active, Hydro… secondary) -->
+            <div class="quick-comparators">
+              <button class="qc-pill active" title="Comparateur MDA (AGG DAILY)">MDA</button>
+              <button class="qc-pill" title="Comparateur Hydro régional" onclick="alert('Comparateur Hydro régional (démo)')">Hydro…</button>
+            </div>
+
+            <!-- Bottom-right: discrete wrench icon for chart settings -->
+            <button class="chart-config-wrench" onclick="openOverlay('chart-config')" title="Configurer ce graphique"><i data-lucide="wrench"></i></button>
+
+            <!-- v6.6 — bulle de lecture d'un message WhatsApp. Un seul nœud
+                 réutilisé : au survol il suit la bulle survolée, au clic il
+                 s'épingle (data-pinned) et gagne sa croix de fermeture. -->
+            <div class="wa-popup" id="wa-popup" data-open="false" data-pinned="false" role="dialog" aria-label="Message WhatsApp">
+              <button class="wa-popup-close" onclick="waUnpin()" aria-label="Fermer"><i data-lucide="x"></i></button>
+              <div class="wa-popup-body" id="wa-popup-body"></div>
+            </div>
+          </div>
+
+          <!-- ============== RIGHT collapsed strip (shown when légende is collapsed) ============== -->
+          <button class="panel-strip panel-strip-right" id="legende-strip" onclick="toggleLegende()" aria-label="Afficher la Légende">
+            <i data-lucide="chevrons-left" class="strip-chev"></i>
+            <span class="strip-label">Légende</span>
+          </button>
+
+          <!-- ============== RIGHT: Légende (expanded) ============== -->
+          <div class="legende-panel" id="legende-panel">
+            <div class="legende-panel-title">
+              <button class="collapse" onclick="toggleLegende()" title="Réduire le panneau" aria-label="Réduire"><i data-lucide="chevron-right"></i></button>
+              <span>Légende</span>
+            </div>
+            <div class="legende-items">
+              <div class="legende-item"><span class="dot" style="background:#3b82f6"></span>Production</div>
+              <div class="legende-item"><span class="dot" style="background:#ef4444"></span>Pannes</div>
+              <div class="legende-item"><span class="dot" style="background:#10b981"></span>Maintenance</div>
+              <div class="legende-item"><span class="dot" style="background:#a855f7"></span>Environnement</div>
+              <div class="legende-item"><span class="dot" style="background:#ec4899"></span>Exploitation</div>
+              <div class="legende-item"><span class="dot" style="background:#eab308"></span>Structurel</div>
+              <div class="legende-item"><span class="dot" style="background:#94a3b8"></span>Contraintes</div>
+              <div class="legende-item"><span class="dot" style="background:#dc2626"></span>Données manquantes</div>
+            </div>
+
+            <!-- ══════ v6.6 — Messages WhatsApp ══════
+                 Volontairement séparé des pastilles ci-dessus. Les pastilles
+                 répondent à « de quelle catégorie de perte s'agit-il ? » ; la
+                 bulle répond à « un humain a-t-il déclaré quelque chose ce
+                 jour-là ? ». Deux questions différentes, donc deux familles de
+                 symboles : une pastille pleine pour la donnée calculée, une
+                 bulle de parole pour la donnée déclarée.
+
+                 La bulle est neutre — pas le logo WhatsApp. Le logo est une
+                 marque déposée, illisible à 12 px, et il périmerait le jour où
+                 un deuxième canal (SMS, Telegram) arrive. Le rouge du briefing
+                 a été écarté : dans cette légende il est déjà pris par
+                 « Pannes » (#ef4444) et « Données manquantes » (#dc2626).
+
+                 Les deux cases répondent à la demande de Bernard (#229) :
+                 « people should be able to display operations without
+                 maintenance, or at least see maintenance in another color ». -->
+            <div class="legende-panel-title" style="margin-top:18px">
+              <span>Messages WhatsApp</span>
+            </div>
+            <div class="legende-items">
+              <label class="legende-item wa-toggle">
+                <input type="checkbox" id="wa-show-ops" checked onchange="waRefresh()">
+                <span class="wa-chip wa-chip-ops"></span>Opérations
+              </label>
+              <label class="legende-item wa-toggle">
+                <input type="checkbox" id="wa-show-maint" checked onchange="waRefresh()">
+                <span class="wa-chip wa-chip-maint"></span>Maintenance
+              </label>
+              <div class="muted" style="font-size:10.5px; line-height:1.5; padding:2px 2px 0">
+                Survolez une bulle pour lire le message, cliquez pour l'épingler.
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+      </div><!-- /.locked-wrap -->
+
+
+    </div>
+  </main>
+</div>
+
+<!-- ============================== OVERLAYS ============================== -->
+
+<!-- Chart configuration overlay (per-user) — Bernard's redesign (Designs-wireframes#1).
+     Per-resolution axis Min/Max + units, Pluies / Indicateurs slot tables
+     (ex-sous-blocs du volet « Indicateurs contextuels » supprimé, remontés au rang de volet),
+     Comparateur slot table with %-of-axis range + scale factor.
+     Reached from the bottom-right wrench icon
+     and from the icon-action sliders button. -->
+<div id="chart-config" class="overlay" onclick="if(event.target===this) closeOverlay('chart-config')">
+  <div class="modal modal-lg modal-cfg">
+
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:18px">
+      <div>
+        <div class="modal-title"><i data-lucide="sliders-horizontal" style="width:17px; height:17px; vertical-align:-3px; color:var(--brand-cyan)"></i> Configuration du panneau</div>
+        <div class="modal-subtitle">
+          Définit la vue <b>Production</b> pour <b>Marc Dupont</b> uniquement.
+          Les autres utilisateurs gardent leur propre configuration.
+        </div>
+      </div>
+      <button class="btn btn-ghost" onclick="closeOverlay('chart-config')"><i data-lucide="x"></i></button>
+    </div>
+
+    <!-- ============ Axe ============ -->
+    <div class="pd-section" data-open="true">
+      <div class="pd-section-head" onclick="toggleCfgSec(this)">
+        <div class="pd-section-title"><i data-lucide="ruler" style="width:16px; height:16px; color:var(--brand-cyan)"></i> Axe</div>
+        <i data-lucide="chevron-down" class="pd-chev"></i>
+      </div>
+      <div class="pd-section-body">
+
+        <!-- Axe gauche -->
+        <div class="axis-block" data-open="true">
+          <div class="axis-head" onclick="toggleCfgAxis(this)">
+            <div class="axis-half-title"><span class="swatch" style="background:#1d4ed8"></span>Axe gauche — Puissance / Énergie</div>
+            <div class="axis-head-actions">
+              <button class="axis-reset" onclick="resetCfgAxis(event, this)"><i data-lucide="rotate-ccw"></i> Réinitialiser</button>
+              <i data-lucide="chevron-down" class="axis-chev"></i>
+            </div>
+          </div>
+          <div class="axis-body">
+            <div class="axis-grid">
+              <div></div>
+              <div class="axis-col-header">Intraday<br><select class="axis-unit-select"><option>kW</option><option>MW</option></select></div>
+              <div class="axis-col-header">30 jours<br><select class="axis-unit-select"><option>kWh</option><option selected>MWh</option><option>GWh</option></select></div>
+              <div class="axis-col-header">12 mois<br><select class="axis-unit-select"><option selected>MWh</option><option>GWh</option></select></div>
+              <div class="axis-col-header">Années<br><select class="axis-unit-select"><option selected>MWh</option><option>GWh</option></select></div>
+
+              <div class="axis-row-label">Min</div>
+              <input class="axis-input" type="number" value="0"><input class="axis-input" type="number" value="0"><input class="axis-input" type="number" value="0"><input class="axis-input" type="number" value="0">
+
+              <div class="axis-row-label">Max</div>
+              <input class="axis-input" type="number" value="450"><input class="axis-input" type="number" value="120"><input class="axis-input" type="number" value="1200"><input class="axis-input" type="number" value="9000">
+            </div>
+          </div>
+        </div>
+
+        <!-- Axe droit 1 — Pluie -->
+        <div class="axis-block" data-open="true">
+          <div class="axis-head" onclick="toggleCfgAxis(this)">
+            <div class="axis-half-title"><span class="swatch" style="background:var(--accent-amber)"></span>Axe droit 1 — Pluie</div>
+            <div class="axis-head-actions">
+              <button class="axis-reset" onclick="resetCfgAxis(event, this)"><i data-lucide="rotate-ccw"></i> Réinitialiser</button>
+              <i data-lucide="chevron-down" class="axis-chev"></i>
+            </div>
+          </div>
+          <div class="axis-body">
+            <div class="axis-grid">
+              <div></div>
+              <div class="axis-col-header">Intraday<br><select class="axis-unit-select"><option selected>mm</option><option>cm</option><option>m</option></select></div>
+              <div class="axis-col-header">30 jours<br><select class="axis-unit-select"><option selected>mm</option><option>cm</option><option>m</option></select></div>
+              <div class="axis-col-header">12 mois<br><select class="axis-unit-select"><option selected>mm</option><option>cm</option><option>m</option></select></div>
+              <div class="axis-col-header">Années<br><select class="axis-unit-select"><option selected>mm</option><option>cm</option><option>m</option></select></div>
+
+              <div class="axis-row-label">Min</div>
+              <input class="axis-input" type="number" value="0"><input class="axis-input" type="number" value="0"><input class="axis-input" type="number" value="0"><input class="axis-input" type="number" value="0">
+
+              <div class="axis-row-label">Max</div>
+              <input class="axis-input" type="number" value="40"><input class="axis-input" type="number" value="120"><input class="axis-input" type="number" value="300"><input class="axis-input" type="number" value="1500">
+            </div>
+          </div>
+        </div>
+
+        <!-- Axe droit 2 — indicateur au choix -->
+        <div class="axis-block" data-open="true">
+          <div class="axis-head" onclick="toggleCfgAxis(this)">
+            <div class="axis-half-title"><span class="swatch" style="background:#a78bfa"></span>Axe droit 2 —<select class="axis-pick" onclick="event.stopPropagation()">
+              <option selected>Débit rivière (m³/s)</option>
+              <option>Spot Belpex (€/MWh)</option>
+              <option>Niveau rivière (m)</option>
+              <option>Température (°C)</option>
+            </select></div>
+            <div class="axis-head-actions">
+              <button class="axis-reset" onclick="resetCfgAxis(event, this)"><i data-lucide="rotate-ccw"></i> Réinitialiser</button>
+              <i data-lucide="chevron-down" class="axis-chev"></i>
+            </div>
+          </div>
+          <div class="axis-body">
+            <div class="axis-grid">
+              <div></div>
+              <div class="axis-col-header">Intraday<br><select class="axis-unit-select"><option selected>m³/s</option></select></div>
+              <div class="axis-col-header">30 jours<br><select class="axis-unit-select"><option selected>m³/s</option></select></div>
+              <div class="axis-col-header">12 mois<br><select class="axis-unit-select"><option selected>m³/s</option></select></div>
+              <div class="axis-col-header">Années<br><select class="axis-unit-select"><option selected>m³/s</option></select></div>
+
+              <div class="axis-row-label">Min</div>
+              <input class="axis-input" type="number" value="0"><input class="axis-input" type="number" value="0"><input class="axis-input" type="number" value="0"><input class="axis-input" type="number" value="0">
+
+              <div class="axis-row-label">Max</div>
+              <input class="axis-input" type="number" value="20"><input class="axis-input" type="number" value="20"><input class="axis-input" type="number" value="20"><input class="axis-input" type="number" value="20">
+            </div>
+          </div>
+        </div>
+
+        <p class="muted" style="font-size:12px; margin:4px 0 0">
+          <i data-lucide="info" style="width:12px; height:12px; vertical-align:-1px"></i>
+          Bornes définies <b>par résolution</b> (Intraday / 30 j / 12 mois / Années). Laisser à 0 = échelle automatique côté backend.
+        </p>
+      </div>
+    </div>
+
+    <!-- ============ Pluies ============ -->
+    <div class="pd-section" data-open="true">
+      <div class="pd-section-head" onclick="toggleCfgSec(this)">
+        <div class="pd-section-title"><i data-lucide="cloud-rain" style="width:16px; height:16px; color:var(--brand-cyan)"></i> Pluies</div>
+        <i data-lucide="chevron-down" class="pd-chev"></i>
+      </div>
+      <div class="pd-section-body">
+        <table class="slot-table">
+          <thead><tr><th class="col-width-lab">Étiquette</th><th>Source de données</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><input class="lab-in" type="text" value="Pluie bassin"></td>
+              <td><select class="select sel"><option>—</option><option selected>Pluie bassin versant (mm)</option><option>Pluie radar (mm)</option></select></td>
+            </tr>
+            <tr>
+              <td><input class="lab-in" type="text" placeholder="Précipitations 2"></td>
+              <td><select class="select sel"><option selected>—</option><option>Pluie station Météo-France</option></select></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ============ Indicateurs ============ -->
+    <div class="pd-section" data-open="true">
+      <div class="pd-section-head" onclick="toggleCfgSec(this)">
+        <div class="pd-section-title"><i data-lucide="activity" style="width:16px; height:16px; color:var(--brand-cyan)"></i> Indicateurs</div>
+        <i data-lucide="chevron-down" class="pd-chev"></i>
+      </div>
+      <div class="pd-section-body">
+        <table class="slot-table">
+          <thead><tr><th class="col-width-lab">Étiquette</th><th>Source de données</th><th>Plage visible</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><input class="lab-in" type="text" value="Débit rivière"></td>
+              <td><select class="select sel"><option>—</option><option selected>Débit rivière (m³/s)</option><option>Niveau rivière (m)</option><option>Production théorique (kW)</option></select></td>
+              <td>
+                <div class="range-cell">
+                  <input class="range-in" type="number" value="2"><span class="range-sep">—</span><input class="range-in" type="number" value="18">
+                  <span class="range-unit">m³/s</span>
+                  <label class="clamp-lab"><input type="checkbox"> Rogner</label>
+                  <span class="reset-link">Réinit.</span>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td><input class="lab-in" type="text" value="Spot Belpex"></td>
+              <td><select class="select sel"><option>—</option><option selected>Spot Belpex (€/MWh)</option><option>Niveau rivière (m)</option></select></td>
+              <td>
+                <div class="range-cell">
+                  <input class="range-in" type="number" value="-20"><span class="range-sep">—</span><input class="range-in" type="number" value="180">
+                  <span class="range-unit">€/MWh</span>
+                  <label class="clamp-lab"><input type="checkbox" checked> Rogner</label>
+                  <span class="reset-link">Réinit.</span>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td><input class="lab-in" type="text" placeholder="Courbe 3"></td>
+              <td><select class="select sel"><option selected>—</option><option>Température (°C)</option><option>Production théorique (kW)</option></select></td>
+              <td>
+                <div class="range-cell">
+                  <input class="range-in" type="number" placeholder="Min" disabled><span class="range-sep">—</span><input class="range-in" type="number" placeholder="Max" disabled>
+                  <label class="clamp-lab" style="opacity:.45"><input type="checkbox" disabled> Rogner</label>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ============ Comparateur ============ -->
+    <div class="pd-section" data-open="true">
+      <div class="pd-section-head" onclick="toggleCfgSec(this)">
+        <div class="pd-section-title"><i data-lucide="git-compare" style="width:16px; height:16px; color:var(--brand-cyan)"></i> Comparateur</div>
+        <i data-lucide="chevron-down" class="pd-chev"></i>
+      </div>
+      <div class="pd-section-body">
+        <table class="slot-table">
+          <thead><tr><th class="col-width-lab">Étiquette</th><th>Source de données</th><th>Plage visible (% de l'axe)</th><th>Facteur d'échelle</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><input class="lab-in" type="text" value="AGG DAILY MDA"></td>
+              <td><select class="select sel"><option>—</option><option selected>Benchmark régional (AGG DAILY)</option><option>Production N-1</option><option>Centrale amie · La Cassagne</option></select></td>
+              <td>
+                <div class="range-cell">
+                  <input class="range-in" type="number" value="100"><span class="range-unit">%</span>
+                  <label class="clamp-lab"><input type="checkbox" checked> Rogner</label>
+                  <span class="reset-link">Réinit.</span>
+                </div>
+              </td>
+              <td><div class="range-cell"><input class="range-in" type="number" step="0.01" value="1.00"><span class="reset-link">Réinit.</span></div></td>
+            </tr>
+            <tr>
+              <td><input class="lab-in" type="text" placeholder="Comparateur 2"></td>
+              <td><select class="select sel"><option selected>—</option><option>Production N-1</option><option>Centrale amie · La Cassagne</option></select></td>
+              <td>
+                <div class="range-cell">
+                  <input class="range-in" type="number" placeholder="100" disabled><span class="range-unit">%</span>
+                  <label class="clamp-lab" style="opacity:.45"><input type="checkbox" disabled> Rogner</label>
+                </div>
+              </td>
+              <td><div class="range-cell"><input class="range-in" type="number" step="0.01" placeholder="—" disabled></div></td>
+            </tr>
+          </tbody>
+        </table>
+        <p class="muted" style="font-size:12px; margin:12px 0 0">
+          <i data-lucide="info" style="width:12px; height:12px; vertical-align:-1px"></i>
+          La plage est exprimée en <b>% de l'axe de production</b> ; le facteur d'échelle ajuste la mise à l'échelle de la série comparée.
+        </p>
+      </div>
+    </div>
+
+    <div style="display:flex; gap:8px; justify-content:flex-end; align-items:center; margin-top:18px; padding-top:14px; border-top:1px solid var(--border-subtle)">
+      <button class="btn btn-ghost" onclick="closeOverlay('chart-config')">Annuler</button>
+      <button class="btn btn-primary" onclick="alert('Vue enregistrée pour Marc Dupont (démo)'); closeOverlay('chart-config')"><i data-lucide="check"></i> Enregistrer ma vue</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // v5c — Bernard's chart-config popup interactions (Designs-wireframes#1).
+  function toggleCfgSec(head)  { const s = head.parentElement; s.dataset.open = s.dataset.open === 'true' ? 'false' : 'true'; }
+  function toggleCfgAxis(head) { const b = head.parentElement; b.dataset.open = b.dataset.open === 'true' ? 'false' : 'true'; }
+  function resetCfgAxis(e, btn){ e.stopPropagation(); btn.closest('.axis-block').querySelectorAll('.axis-input').forEach(i => i.value = 0); }
+</script>
+
+
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="js/app.js"></script>
+
+<script>
+  // ---- Time-pill granularity ----
+  let currentPill = "intraday";
+  function setTimePill(btn, pill) {
+    document.querySelectorAll(".time-pills button").forEach(b => b.classList.remove("on"));
+    btn.classList.add("on");
+    currentPill = pill;
+    tbSyncDrill(pill);
+  }
+
+  // ---- Side panels (Données contextuelles + Légende) ----
+  // Match dev.app.naiahydro.com: each panel collapses into a thin vertical strip with
+  // a rotated label + chevron at top. The strip click re-expands the panel.
+  // Container has two data attributes: data-ind="open|collapsed" and data-leg="open|collapsed".
+  function toggleIndicateursPanel() { _flipPanel("ind"); }
+  function toggleLegende()          { _flipPanel("leg"); }
+  function _flipPanel(side) {
+    const wrap = document.getElementById("chart-with-panel");
+    const cur = wrap.dataset[side === "ind" ? "ind" : "leg"];
+    const next = cur === "open" ? "collapsed" : "open";
+    if (side === "ind") wrap.dataset.ind = next;
+    else                wrap.dataset.leg = next;
+  }
+
+  window.addEventListener("DOMContentLoaded", () => tbSyncDrill(currentPill));
+
+  // ---- v6.5 : menus de la barre d'outils (Exporter / Generer une liste) ----
+  function toggleTbMenu(id) {
+    const el = document.getElementById(id);
+    const open = el.dataset.open === "true";
+    document.querySelectorAll(".tb-menu").forEach(m => m.dataset.open = "false");
+    el.dataset.open = open ? "false" : "true";
+  }
+  function tbPick(id, label) {
+    document.getElementById(id).dataset.open = "false";
+    alert(label + " (demo) — comportement a specifier");
+  }
+  document.addEventListener("click", e => {
+    if (!e.target.closest(".tb-menu")) document.querySelectorAll(".tb-menu").forEach(m => m.dataset.open = "false");
+  });
+
+  // ---- v6.5 : lien de remontee ("Retour a 2025") ----
+  // En prod ce lien remonte d'un cran de granularite : le 30 jours affiche un
+  // mois et propose de revenir a l'annee. Il disparait sur la vue la plus large.
+  const TB_DRILL = { intraday: "fevrier 2025", "30j": "2025", "12m": null, annees: null };
+  function tbSyncDrill(pill) {
+    const link = document.getElementById("tb-drill");
+    const target = TB_DRILL[pill];
+    if (!link) return;
+    link.style.visibility = target ? "visible" : "hidden";
+    if (target) document.getElementById("tb-drill-target").textContent = target;
+  }
+  function tbDrillUp() {
+    const next = currentPill === "intraday" ? "30j" : "12m";
+    const btn = document.querySelector('.time-pills button[data-pill="' + next + '"]');
+    if (btn) setTimePill(btn, next);
+  }
+
+  // ---- Right-axis toggle (moved to a floating chip above the right axis) ----
+  let rightAxis = "pluie";
+  function toggleRightAxis() {
+    rightAxis = rightAxis === "pluie" ? "debit" : "pluie";
+    document.getElementById("right-axis-label").textContent = rightAxis === "pluie" ? "Pluie (mm)" : "Débit (m³/s)";
+  }
+
+  // ══════════════════════════════════════════════════════════════════════
+  // v6.6 — MESSAGES WhatsApp SUR LE GRAPHIQUE
+  //
+  // Deux registres, un seul symbole : une bulle de parole. Elle ne dit pas
+  // « voici une perte de telle catégorie » (ça, c'est le rôle des pastilles
+  // de couleur de la légende) mais « ce jour-là, un exploitant a déclaré
+  // quelque chose ». D'où une forme distincte et non une couleur de plus.
+  //
+  // Le briefing demandait un point ROUGE : écarté. Dans cette légende le
+  // rouge est déjà « Pannes » (#ef4444) et « Données manquantes » (#dc2626) —
+  // un point rouge de plus se lirait comme une panne.
+  //
+  // Survol = lecture, clic = épinglage. Le jeu Naia (MaintenanceDot.vue)
+  // n'ouvre qu'au clic ; on garde le clic pour la photo, mais le survol seul
+  // suffit à lire un message court, ce qui est le cas courant.
+  // ══════════════════════════════════════════════════════════════════════
+
+  // Démo : février 2025, aligné sur maintenance.html (mêmes jours, mêmes
+  // auteurs). `kind` vaut "ops" (acte d'exploitation, non structuré) ou
+  // "maint" (intervention de maintenance, qui alimente le registre).
+  const WA_MSGS = [
+    { day: 3,  time: "08:35", kind: "maint", who: "Marc Dupont",   msg: "Dégrillage de la grille amont après la crue — importante quantité de branches.", photo: true },
+    { day: 5,  time: "10:12", kind: "maint", who: "Marc Dupont",   msg: "Graissage des paliers du groupe 1.", photo: false },
+    { day: 6,  time: "14:02", kind: "ops",   who: "Marc Dupont",   msg: "Arrêt volontaire du groupe 1 pour essai de régulation.", photo: false },
+    { day: 7,  time: "15:48", kind: "maint", who: "Luc Fontaine",  msg: "Réarmement du disjoncteur sur place après déclenchement. À surveiller.", photo: true },
+    { day: 11, time: "07:20", kind: "maint", who: "Els Vermeulen", msg: "Graissage et essai de la vanne de garde — conforme.", photo: false },
+    { day: 13, time: "06:30", kind: "ops",   who: "Marc Dupont",   msg: "Vanne de prise d'eau fermée manuellement, colmatage constaté.", photo: false },
+    { day: 13, time: "09:05", kind: "maint", who: "Marc Dupont",   msg: "Colmatage de la prise d'eau — intervention prestataire commandée.", photo: true },
+    { day: 14, time: "13:40", kind: "maint", who: "Sophie Bernard", msg: "Prestataire sur site — curage de la prise d'eau en cours.", photo: true },
+    { day: 17, time: "08:10", kind: "ops",   who: "Luc Fontaine",  msg: "Consigne de débit relevée à 1,2 m³/s dans l'automate.", photo: false },
+    { day: 18, time: "11:15", kind: "maint", who: "Els Vermeulen", msg: "Mise à jour de l'automate réalisée par le SAV.", photo: false },
+    { day: 20, time: "16:30", kind: "maint", who: "Luc Fontaine",  msg: "Bruit anormal signalé sur le groupe 2 — vérification à programmer.", photo: false },
+    { day: 24, time: "08:50", kind: "maint", who: "Marc Dupont",   msg: "Débroussaillage des abords du canal d'amenée.", photo: true },
+    { day: 26, time: "14:05", kind: "maint", who: "Els Vermeulen", msg: "Remplacement du roulement côté turbine, groupe 1.", photo: true },
+    { day: 27, time: "09:30", kind: "maint", who: "Els Vermeulen", msg: "Dégrillage manuel — accumulation de feuilles.", photo: false },
+    { day: 28, time: "17:45", kind: "maint", who: "Luc Fontaine",  msg: "Fissure repérée sur le mur du canal — photo jointe.", photo: true },
+  ];
+
+  const WA_STYLE = {
+    ops:   { stroke: "#38bdf8", fill: "transparent",           label: "Opération"   },
+    maint: { stroke: "#10b981", fill: "rgba(16,185,129,0.32)", label: "Maintenance" },
+  };
+
+  // Positions calculées au dernier rendu — sert au survol / clic. Reconstruit
+  // à chaque draw, donc toujours d'accord avec ce qui est réellement dessiné.
+  let waHits = [];
+  let waPinnedKey = null;
+
+  function waVisible() {
+    const ops   = document.getElementById("wa-show-ops");
+    const maint = document.getElementById("wa-show-maint");
+    return {
+      ops:   !ops   || ops.checked,
+      maint: !maint || maint.checked,
+    };
+  }
+
+  // Regroupe par jour : plusieurs messages le même jour = UNE bulle, avec un
+  // compteur. Sur 30 jours, empiler des bulles rendrait l'axe illisible.
+  function waByDay() {
+    const vis = waVisible();
+    const out = {};
+    WA_MSGS.forEach(function (m) {
+      if (!vis[m.kind]) return;
+      (out[m.day] = out[m.day] || []).push(m);
+    });
+    return out;
+  }
+
+  // Dessine une bulle de parole : rectangle arrondi + queue en bas à gauche.
+  function waDrawBubble(ctx, x, y, kind) {
+    const s = WA_STYLE[kind];
+    const w = 15, h = 11, r = 3;
+    const left = x - w / 2, top = y - h;
+
+    ctx.beginPath();
+    ctx.moveTo(left + r, top);
+    ctx.lineTo(left + w - r, top);
+    ctx.quadraticCurveTo(left + w, top, left + w, top + r);
+    ctx.lineTo(left + w, top + h - r);
+    ctx.quadraticCurveTo(left + w, top + h, left + w - r, top + h);
+    // queue
+    ctx.lineTo(left + 6, top + h);
+    ctx.lineTo(left + 3.5, top + h + 4);
+    ctx.lineTo(left + 3.5, top + h);
+    ctx.lineTo(left + r, top + h);
+    ctx.quadraticCurveTo(left, top + h, left, top + h - r);
+    ctx.lineTo(left, top + r);
+    ctx.quadraticCurveTo(left, top, left + r, top);
+    ctx.closePath();
+
+    ctx.fillStyle = s.fill;
+    if (s.fill !== "transparent") ctx.fill();
+    ctx.strokeStyle = s.stroke;
+    ctx.lineWidth = 1.4;
+    ctx.stroke();
+  }
+
+  // Compteur discret quand plusieurs messages tombent le même jour
+  function waDrawCount(ctx, x, y, n, kind) {
+    ctx.fillStyle = WA_STYLE[kind].stroke;
+    ctx.font = "700 8px Inter, sans-serif";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(String(n), x, y - 5.5);
+  }
+
+  const waMarkersPlugin = {
+    id: "waMarkers",
+    afterDatasetsDraw: function (chart) {
+      if (chart.canvas.id !== "production-chart") return;
+      const ctx = chart.ctx;
+      const byDay = waByDay();
+      waHits = [];
+
+      ctx.save();
+      Object.keys(byDay).forEach(function (dayStr) {
+        const day = Number(dayStr);
+        const i = day - 1;                      // labels "1".."31" → index 0-based
+        const msgs = byDay[dayStr];
+
+        // Sommet le plus haut des deux séries de barres, pour poser la bulle
+        // au-dessus de la production sans jamais la chevaucher.
+        let top = chart.chartArea.bottom;
+        [0, 1].forEach(function (ds) {
+          const meta = chart.getDatasetMeta(ds);
+          const el = meta && meta.data && meta.data[i];
+          if (el && typeof el.y === "number") top = Math.min(top, el.y);
+        });
+        const el0 = chart.getDatasetMeta(1).data[i];
+        if (!el0) return;
+        const x = el0.x;
+        const y = Math.max(chart.chartArea.top + 16, top - 8);
+
+        // Une seule bulle par jour ; la maintenance l'emporte sur l'opération
+        // pour la couleur — c'est la ligne qui finit dans le registre.
+        const kind = msgs.some(function (m) { return m.kind === "maint"; }) ? "maint" : "ops";
+        waDrawBubble(ctx, x, y, kind);
+        if (msgs.length > 1) waDrawCount(ctx, x, y, msgs.length, kind);
+
+        waHits.push({ day: day, x: x, y: y - 5, msgs: msgs });
+      });
+      ctx.restore();
+    },
+  };
+
+  if (window.Chart) Chart.register(waMarkersPlugin);
+
+  // ---- Survol / clic ----
+  function waHitAt(px, py) {
+    for (let i = 0; i < waHits.length; i++) {
+      const h = waHits[i];
+      const dx = px - h.x, dy = py - h.y;
+      if (dx * dx + dy * dy <= 121) return h;   // rayon 11 px
+    }
+    return null;
+  }
+
+  function waRenderPopup(hit, pinned) {
+    const pop = document.getElementById("wa-popup");
+    const kind = hit.msgs.some(function (m) { return m.kind === "maint"; }) ? "maint" : "ops";
+
+    // Au-delà de deux messages le même jour, la bulle renvoie au registre
+    // plutôt que de devenir une liste — le graphique n'est pas un tableau.
+    const shown = hit.msgs.slice(0, 2);
+    let html = shown.map(function (m) {
+      const st = WA_STYLE[m.kind];
+      return '<div class="wa-popup-when">' + hit.day + ' févr. 2025 · ' + m.time + '</div>' +
+        '<div class="wa-popup-msg">' + m.msg + '</div>' +
+        (m.photo ? '<div class="wa-popup-photo"><i data-lucide="image"></i> photo jointe</div>' : '') +
+        '<div class="wa-popup-who"><i data-lucide="user" style="width:12px;height:12px"></i>' + m.who +
+        '<span class="tag ' + m.kind + '">' + st.label + '</span></div>';
+    }).join('<div style="height:10px"></div>');
+
+    if (hit.msgs.length > shown.length) {
+      html += '<div class="wa-popup-more">+ ' + (hit.msgs.length - shown.length) +
+              ' autre(s) — voir le registre</div>';
+    }
+
+    document.getElementById("wa-popup-body").innerHTML = html;
+    pop.dataset.open = "true";
+    pop.dataset.pinned = pinned ? "true" : "false";
+
+    // Ancrage : à droite de la bulle par défaut, à gauche si ça déborde.
+    const area = pop.parentElement.getBoundingClientRect();
+    const w = pop.offsetWidth || 240;
+    let left = hit.x + 16;
+    if (left + w > area.width - 8) left = hit.x - w - 16;
+    pop.style.left = Math.max(8, left) + "px";
+    pop.style.top = Math.max(8, hit.y - 10) + "px";
+
+    if (window.lucide) lucide.createIcons();
+    return kind;
+  }
+
+  function waHidePopup() {
+    const pop = document.getElementById("wa-popup");
+    pop.dataset.open = "false";
+    pop.dataset.pinned = "false";
+  }
+
+  function waUnpin() {
+    waPinnedKey = null;
+    waHidePopup();
+  }
+
+  // Redessine le graphique quand on coche/décoche un registre dans la légende
+  function waRefresh() {
+    waUnpin();
+    if (typeof rebuildProductionChart === "function") rebuildProductionChart();
+  }
+
+  function waBindCanvas() {
+    const c = document.getElementById("production-chart");
+    if (!c || c.dataset.waBound === "true") return;
+    c.dataset.waBound = "true";
+
+    c.addEventListener("mousemove", function (e) {
+      const box = c.getBoundingClientRect();
+      const hit = waHitAt(e.clientX - box.left, e.clientY - box.top);
+      c.style.cursor = hit ? "pointer" : "";
+      if (waPinnedKey !== null) return;          // une bulle épinglée gagne
+      if (hit) waRenderPopup(hit, false);
+      else waHidePopup();
+    });
+
+    c.addEventListener("mouseleave", function () {
+      if (waPinnedKey === null) waHidePopup();
+    });
+
+    c.addEventListener("click", function (e) {
+      const box = c.getBoundingClientRect();
+      const hit = waHitAt(e.clientX - box.left, e.clientY - box.top);
+      if (!hit) { waUnpin(); return; }
+      if (waPinnedKey === hit.day) { waUnpin(); return; }
+      waPinnedKey = hit.day;
+      waRenderPopup(hit, true);
+    });
+  }
+
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape") waUnpin(); });
+  window.addEventListener("DOMContentLoaded", function () { setTimeout(waBindCanvas, 0); });
+</script>
+</body>
+</html>

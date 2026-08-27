@@ -6,7 +6,8 @@ Interactive HTML wireframes / clickable prototypes for **Naia** (hydro-software)
 
 | Area | Version | Status | Live URL |
 |---|---|---|---|
-| **Platform** (integrated app) | **v6.5** | **Active** | https://hydro-software.github.io/Designs-wireframes/naia-platform/v6.5/ |
+| **Platform** (integrated app) | **v6.6** | **Active** | https://hydro-software.github.io/Designs-wireframes/naia-platform/v6.6/ |
+| | v6.5 | Reference (Liste des événements · console Core) | https://hydro-software.github.io/Designs-wireframes/naia-platform/v6.5/ |
 | | v6.4 | Reference (Subscription PRD v2.6) | https://hydro-software.github.io/Designs-wireframes/naia-platform/v6.4/ |
 | | v6.3 | Reference (Paramètres versioning) | https://hydro-software.github.io/Designs-wireframes/naia-platform/v6.3/ |
 | | v6.2 | Reference (pre-Paramètres iter) | https://hydro-software.github.io/Designs-wireframes/naia-platform/v6.2/ |
@@ -26,7 +27,7 @@ The integrated app is the **`naia-platform/`** lineage (Insight / Pilotage · Co
 ```
 Designs-wireframes/
 ├── README.md             this file — index + changelog
-├── naia-platform/        integrated app: v0 v3 v4 v5 v6.1 v6.2 v6.3 v6.4 v6.5  (v6.5 = current)
+├── naia-platform/        integrated app: v0 v3 v4 v5 v6.1 v6.2 v6.3 v6.4 v6.5 v6.6  (v6.6 = current)
 │   ├── v0/               first wireframe document (2025, static screenshots)
 │   └── v5/bl_draft/      Bernard's original Paramètres drafts
 ├── naia-community/        standalone community/loyalty wireframes (archived): v1 v2
@@ -41,13 +42,76 @@ Static multi-page site, no build step: Tailwind (Play CDN), Inter, Lucide icons,
 
 ## Iteration
 
-Edit the **current** version folder (`naia-platform/v6.5/`), commit, and push to `main` — GitHub Pages auto-rebuilds in ~60 s. Older version folders are frozen comparison references and are not edited.
+Edit the **current** version folder (`naia-platform/v6.6/`), commit, and push to `main` — GitHub Pages auto-rebuilds in ~60 s. Older version folders are frozen comparison references and are not edited.
 
 ---
 
 # Changelog
 
-## v6.5 — Production réalignée sur l'app en production · console Naia (Core) *(current)*
+## v6.6 — Interventions déclarées par WhatsApp *(current)*
+
+`v6.6` is `v6.5` plus **one feature**: les exploitants déclarent leurs
+interventions par WhatsApp, et Naia les rend visibles. Tout le reste est
+inchangé. Cette version sert de support à la décision produit demandée par
+Bernard sur [platform#229](https://github.com/hydro-software/platform/issues/229)
+(commentaire du 2026-04-01) avant qu'une issue ne soit ouverte.
+
+### Deux registres, pas un
+
+Bernard distingue deux natures de message, et le wireframe les sépare :
+
+- **Opérations** — « j'ai ouvert la vanne ». Aide à la lecture, non structurée,
+  visible **uniquement sur le graphique**. Pas de tableau : c'est une note de
+  contexte pour celui qui qualifie les pertes, pas un objet de gestion.
+- **Maintenance** — structurée, classée, exportable. Elle alimente le nouveau
+  **`maintenance.html`** (registre filtrable + export Excel).
+
+### Marqueurs sur le graphique de production (`production.html`)
+
+- Une **bulle de parole neutre** au-dessus des barres du jour concerné.
+  Volontairement **pas** le logo WhatsApp (marque déposée, illisible à 12 px,
+  et faux le jour où un deuxième canal arrive) et volontairement **pas** un
+  point rouge comme le demandait le briefing initial : dans cette légende le
+  rouge est déjà pris par « Pannes » et « Données manquantes ».
+- La **forme** dit « un humain a déclaré ceci » ; la **couleur** dit lequel des
+  deux registres — cyan pour les opérations, vert pour la maintenance.
+- Plusieurs messages le même jour = **une bulle + un compteur**.
+- **Survol** pour lire, **clic** pour épingler (la photo mérite un arrêt).
+- La légende gagne une section « Messages WhatsApp » avec **deux cases à
+  cocher indépendantes**, pour afficher les opérations sans la maintenance.
+
+### Registre de maintenance (`maintenance.html`, nouveau)
+
+- Colonnes d'après le commentaire de Bernard : nature + objet issus d'un
+  **catalogue à codes** (et non une chaîne libre), **auteur du message brut**
+  et **auteur de la dernière correction**, pièce jointe.
+- Le clic sur une ligne ouvre un tiroir montrant le **message d'origine tel
+  qu'il est arrivé**, à côté du message retenu. Une correction sans son
+  original serait une réécriture de l'histoire.
+- La recherche porte sur les deux textes : chercher « huile » retrouve
+  l'intervention même si le message retenu dit « graissage ».
+- Onglet « Toutes » → colonne Centrale + tout le parc ; une centrale précise →
+  colonne masquée et périmètre réduit.
+
+### Pourquoi une page séparée de « Liste des événements »
+
+La liste des événements est adossée aux **pertes d'énergie** : chaque ligne
+porte un `loss_id`, des kWh et une durée, et se découpe par jour (livré par
+[platform#1375](https://github.com/hydro-software/platform/pull/1375)). Une
+intervention déclarée n'a rien de tout ça. Les deux registres partagent donc la
+**surface** — même entrée « Générer une liste », même mécanique de tri / filtre
+/ export, une bascule en haut de page — mais **pas la table**.
+
+### Divers
+
+- « Générer une liste » devient un **menu à deux entrées** plutôt qu'un
+  deuxième bouton dans la barre d'outils.
+- Correction héritée de v6.5 : `buildProductionChart()` était appelé deux fois
+  au chargement (une fois par `applyCentrale()`, une fois par le `setTimeout`
+  du `DOMContentLoaded`), et Chart.js jetait un « Canvas is already in use »
+  qui polluait la console. Un garde-fou d'une ligne dans `js/app.js`.
+
+## v6.5 — Production réalignée sur l'app en production · console Naia (Core)
 
 `v6.5` is `v6.4` with **two independent changes**, drawn in parallel and merged into the same folder: `production.html` realigned on the live app (plus the new *Liste des événements* page it leads to), and a **new admin console for the Naia (Core) module**. Everything else (Pilotage, Communauté, Subscription) is unchanged from v6.4.
 

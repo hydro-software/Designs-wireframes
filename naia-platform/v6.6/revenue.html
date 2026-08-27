@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Revenus — Naia</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="css/style.css" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body data-page="revenue" data-section="revenue" data-centrale="all">
+
+<div class="app-shell">
+  <aside class="sidebar"></aside>
+  <main class="main-area">
+
+    <!-- v5: same layout as Production — breadcrumbs + time pills, no top title block. -->
+    <header class="topbar" style="align-items:center">
+      <div class="crumbs">
+        <a href="index.html"><i data-lucide="home" style="width:12px; height:12px"></i></a>
+        <span class="sep">/</span>
+        <a href="index.html">Pilotage</a>
+        <span class="sep">/</span>
+        <span class="current">Revenus</span>
+      </div>
+
+      <div class="time-pills" role="tablist" aria-label="Granularité temporelle">
+        <button class="on" onclick="setTimePill(this, 'intraday')">Intraday <span class="pill-dot" title="Événements WhatsApp"></span></button>
+        <button onclick="setTimePill(this, '30j')">30 jours <span class="pill-dot"></span></button>
+        <button onclick="setTimePill(this, '12m')">12 mois <span class="pill-dot"></span></button>
+        <button onclick="setTimePill(this, 'annees')">Années <span class="pill-dot"></span></button>
+      </div>
+    </header>
+
+    <div id="centrale-tabs" class="centrale-tabs"></div>
+
+    <div class="page-content">
+
+      <!-- v5: KPI tiles removed. Only the chart remains. -->
+
+      <div class="card v2-banner" style="margin-bottom:14px">
+        <i data-lucide="rocket"></i>
+        <div><b>V2 :</b> module de simulation Valorise (BTM, batterie, digital twin) — visible dans le mockup pour validation, non livré en V1.</div>
+      </div>
+
+      <!-- Funnel state 2026-05-31 (platform#647): a logged-in conference LEAD (points,
+           no connected plant, no subscription) sees this chart greyed/blurred behind a
+           "Connectez votre centrale" CTA → plaquette. Toggle via the "Accès" chip
+           (top-right). Mirrors production.html. See css/style.css "LOCKED INSIGHT STATE". -->
+      <div class="locked-wrap" style="margin-bottom:14px">
+
+        <!-- Locked overlay — only visible in data-access="lead" -->
+        <div class="lock-overlay">
+          <div class="lock-card">
+            <div class="lock-ico"><i data-lucide="lock"></i></div>
+            <span class="lock-points"><i data-lucide="sparkles" style="width:13px;height:13px"></i> 187 points gagnés au jeu Naia</span>
+            <div class="lock-title">Connectez votre centrale pour voir vos revenus</div>
+            <div class="lock-desc">
+              Vous êtes connecté, mais aucune centrale n'est encore reliée à votre compte.
+              Activez votre abonnement Naia pour brancher vos données et suivre vos revenus,
+              votre manque à gagner et vos comparatifs.
+            </div>
+            <a class="btn btn-primary" href="inscription.html">
+              <i data-lucide="plug-zap"></i> Connectez votre centrale
+            </a>
+            <div class="muted" style="font-size:11px; margin-top:12px">
+              Vos points restent acquis et seront transférés à votre organisation à l'activation.
+            </div>
+          </div>
+        </div>
+
+        <!-- Chart card (v5 polish round 4): mirrors the Production card — Indicateurs
+             panel on the left, Légende on the right, both collapsible into thin
+             vertical strips. Bottom-left MDA/Hydro pills, bottom-right wrench. -->
+      <div class="card locked-content" style="padding:0; overflow:hidden">
+        <div class="chart-with-panel" id="chart-with-panel" data-ind="open" data-leg="open">
+
+          <!-- LEFT: Données contextuelles (expanded) -->
+          <div class="indicateurs-panel" id="indicateurs-panel">
+            <div class="indicateurs-panel-title">
+              <span>Données contextuelles</span>
+              <button class="collapse" onclick="toggleIndicateursPanel()" title="Réduire le panneau" aria-label="Réduire"><i data-lucide="chevron-left"></i></button>
+            </div>
+
+            <div class="ind-headers">
+              <span></span><span>Int.</span><span>30j</span><span>12m</span><span>Ann.</span>
+            </div>
+
+            <div class="ind-section">
+              <div class="ind-section-title">Pluies</div>
+              <div class="ind-row">
+                <label><span class="swatch" style="background:#60a5fa"></span>Météo</label>
+                <span class="ind-cell"><input type="checkbox" checked></span>
+                <span class="ind-cell"><input type="checkbox" checked></span>
+                <span class="ind-cell"><input type="checkbox" checked></span>
+                <span class="ind-cell"><input type="checkbox" checked></span>
+              </div>
+            </div>
+
+            <div class="ind-section">
+              <div class="ind-section-title">Indicateurs</div>
+              <div class="ind-row">
+                <label><span class="swatch" style="background:#fbbf24"></span>Prix spot Belpex</label>
+                <span class="ind-cell"><input type="checkbox" checked></span>
+                <span class="ind-cell"><input type="checkbox" checked></span>
+                <span class="ind-cell"><input type="checkbox" checked></span>
+                <span class="ind-cell"><input type="checkbox" checked></span>
+              </div>
+              <div class="ind-row">
+                <label><span class="swatch" style="background:#a3e635"></span>Débit</label>
+                <span class="ind-cell"><input type="checkbox"></span>
+                <span class="ind-cell"><input type="checkbox"></span>
+                <span class="ind-cell"><input type="checkbox"></span>
+                <span class="ind-cell"><input type="checkbox"></span>
+              </div>
+            </div>
+
+            <div class="ind-section">
+              <div class="ind-section-title">Comparateurs</div>
+              <div class="ind-row">
+                <label><span class="swatch" style="background:#7dd3fc"></span>Revenus N-1</label>
+                <span class="ind-cell"><input type="checkbox" checked></span>
+                <span class="ind-cell"><input type="checkbox" checked></span>
+                <span class="ind-cell"><input type="checkbox" checked></span>
+                <span class="ind-cell"><input type="checkbox" checked></span>
+              </div>
+              <div class="ind-row">
+                <label><span class="swatch" style="background:#c4b5fd"></span>Objectif budgété</label>
+                <span class="ind-cell"><input type="checkbox"></span>
+                <span class="ind-cell"><input type="checkbox"></span>
+                <span class="ind-cell"><input type="checkbox"></span>
+                <span class="ind-cell"><input type="checkbox"></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- LEFT collapsed strip -->
+          <button class="panel-strip panel-strip-left" id="indicateurs-strip" onclick="toggleIndicateursPanel()" aria-label="Afficher Données contextuelles">
+            <i data-lucide="chevrons-right" class="strip-chev"></i>
+            <span class="strip-label">Données contextuelles</span>
+          </button>
+
+          <!-- CHART AREA -->
+          <div class="chart-area" style="position:relative; height:480px; padding:14px">
+            <button class="right-axis-toggle" id="right-axis-toggle" onclick="toggleRightAxis()" title="Basculer l'axe droit entre Prix spot et Débit">
+              <span id="right-axis-label">Prix spot (€/MWh)</span>
+              <i data-lucide="arrow-left-right"></i>
+            </button>
+            <div class="chart-container" style="height:100%"><canvas id="production-chart"></canvas></div>
+
+            <div class="quick-comparators">
+              <button class="qc-pill active" title="Revenus N-1">N-1</button>
+              <button class="qc-pill" title="Objectif budgété" onclick="alert('Objectif budgété (démo)')">Budget</button>
+            </div>
+
+            <button class="chart-config-wrench" onclick="alert('Configurer ce graphique (démo)')" title="Configurer ce graphique"><i data-lucide="wrench"></i></button>
+          </div>
+
+          <!-- RIGHT collapsed strip -->
+          <button class="panel-strip panel-strip-right" id="legende-strip" onclick="toggleLegende()" aria-label="Afficher la Légende">
+            <i data-lucide="chevrons-left" class="strip-chev"></i>
+            <span class="strip-label">Légende</span>
+          </button>
+
+          <!-- RIGHT: Légende (revenue-flavoured categories) -->
+          <div class="legende-panel" id="legende-panel">
+            <div class="legende-panel-title">
+              <button class="collapse" onclick="toggleLegende()" title="Réduire le panneau" aria-label="Réduire"><i data-lucide="chevron-right"></i></button>
+              <span>Légende</span>
+            </div>
+            <div class="legende-items">
+              <div class="legende-item"><span class="dot" style="background:#3b82f6"></span>Revenus</div>
+              <div class="legende-item"><span class="dot" style="background:#10b981"></span>Bonus / capacité</div>
+              <div class="legende-item"><span class="dot" style="background:#ef4444"></span>Manque à gagner · pannes</div>
+              <div class="legende-item"><span class="dot" style="background:#a855f7"></span>Manque à gagner · environnement</div>
+              <div class="legende-item"><span class="dot" style="background:#ec4899"></span>Manque à gagner · exploitation</div>
+              <div class="legende-item"><span class="dot" style="background:#94a3b8"></span>Contraintes réseau</div>
+              <div class="legende-item"><span class="dot" style="background:#dc2626"></span>Données manquantes</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+      </div><!-- /.locked-wrap -->
+
+      <!-- v5: per-centrale breakdown table removed — same rule as Production (centrale info is in the tabs). -->
+
+    </div>
+  </main>
+</div>
+
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="js/app.js"></script>
+
+<script>
+  function setTimePill(btn, pill) {
+    document.querySelectorAll(".time-pills button").forEach(b => b.classList.remove("on"));
+    btn.classList.add("on");
+  }
+  // Side panels — same toggle as production.html (data-attribute driven).
+  function toggleIndicateursPanel() { _flipPanel("ind"); }
+  function toggleLegende()          { _flipPanel("leg"); }
+  function _flipPanel(side) {
+    const wrap = document.getElementById("chart-with-panel");
+    const cur = wrap.dataset[side === "ind" ? "ind" : "leg"];
+    const next = cur === "open" ? "collapsed" : "open";
+    if (side === "ind") wrap.dataset.ind = next;
+    else                wrap.dataset.leg = next;
+  }
+
+  let rightAxis = "prix";
+  function toggleRightAxis() {
+    rightAxis = rightAxis === "prix" ? "debit" : "prix";
+    document.getElementById("right-axis-label").textContent = rightAxis === "prix" ? "Prix spot (€/MWh)" : "Débit (m³/s)";
+  }
+</script>
+</body>
+</html>
