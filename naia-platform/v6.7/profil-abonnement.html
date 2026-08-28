@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mon abonnement — Naia</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="css/style.css" rel="stylesheet"><script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body data-page="profil-abonnement" data-section="profil">
+<div class="app-shell">
+  <aside class="sidebar"></aside>
+  <main class="main-area">
+    <header class="topbar"><div><div class="page-eyebrow">Profil</div><div style="font-size:18px; font-weight:600">Mon abonnement</div></div><div class="topbar-meta"><div class="plant">Pricing schedule v01</div><div>Renouvellement&nbsp;: 1<sup>er</sup> mai 2026</div></div></header>
+    <div class="centrale-tabs">
+      <a class="centrale-tab" href="profil.html"><span>Identité</span></a>
+      <a class="centrale-tab active" href="profil-abonnement.html"><span>Mon abonnement</span></a>
+      <a class="centrale-tab" href="profil-factures.html"><span>Mes factures</span></a>
+    </div>
+
+    <div class="page-content">
+
+      <div style="display:grid; gap:14px; grid-template-columns: 2fr 1fr; margin-bottom:18px">
+
+        <div class="card">
+          <div class="card-head"><div><div class="card-head-title">Plan actuel</div><div class="card-head-sub">Mode de tarification&nbsp;: per-plant · pricing schedule v01</div></div><span class="badge badge-green"><i data-lucide="check-circle-2"></i> Actif</span></div>
+          <div class="card-body">
+            <div style="display:flex; align-items:baseline; gap:6px; padding-bottom:14px; border-bottom:1px solid var(--border-subtle); margin-bottom:14px">
+              <span style="font-size:34px; font-weight:600" class="tabular">50,00 €</span>
+              <span class="muted">/ mois (HT)</span>
+              <span style="margin-left:auto; font-size:12px" class="muted">Cadence mensuelle · prochain renouvellement le 1<sup>er</sup> mai 2026</span>
+            </div>
+
+            <h4 style="font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em; font-weight:600; margin:0 0 8px">Détail des lignes</h4>
+            <div style="border:1px solid var(--border-subtle); border-radius:8px; overflow:hidden">
+              <div style="display:grid; grid-template-columns: 2fr 1fr 1fr; gap:0; padding:12px 14px; font-size:13px">
+                <div><b>Licence Naia tool</b><br><span class="muted" style="font-size:12px">Moulin du Bocq · 210 kW · bracket 250 kW–1 MW</span></div>
+                <div class="muted">Per-plant</div>
+                <div class="tabular" style="text-align:right">50,00 € / mois</div>
+              </div>
+              <!-- (Ligne « Box hardware » retirée — FR-HARDWARE stays DEFERRED
+                   per PO decision 2026-07-06; see PRD section 6.) -->
+            </div>
+
+            <div style="display:flex; gap:10px; align-items:center; margin-top:16px; padding-top:14px; border-top:1px solid var(--border-subtle)">
+              <i data-lucide="file-text" style="width:16px; height:16px; color:var(--text-muted)"></i>
+              <span class="muted" style="font-size:13px; flex:1">Facturation gérée par Naia, factures émises par Odoo.</span>
+              <a class="btn btn-secondary btn-sm" href="profil-factures.html"><i data-lucide="receipt"></i> Voir mes factures</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><div class="card-head-title">Détails de l'abonnement</div></div>
+          <div class="card-body" style="display:flex; flex-direction:column; gap:0">
+            <div style="display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid var(--border-subtle)"><span class="muted">Mode</span><span style="font-weight:500">Per-plant</span></div>
+            <div style="display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid var(--border-subtle)"><span class="muted">Centrales couvertes</span><span style="font-weight:500" class="tabular">1 centrale</span></div>
+            <div style="display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid var(--border-subtle)"><span class="muted">Cadence</span><span style="font-weight:500">Mensuelle</span></div>
+            <div style="display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid var(--border-subtle)"><span class="muted">Renouvellement</span><span style="font-weight:500" class="tabular">1<sup>er</sup> mai 2026</span></div>
+            <div style="display:flex; justify-content:space-between; padding:10px 0"><span class="muted">Terme</span><span style="font-weight:500">Reconduction tacite · sans engagement</span></div>
+            <button class="btn btn-ghost btn-sm" style="margin-top:14px; width:100%; color:var(--accent-red)" onclick="openOverlay('cancel-sub')"><i data-lucide="x-circle"></i> Demander l'annulation</button>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="card">
+        <div class="card-head"><div><div class="card-head-title">Pricing schedule v01</div><div class="card-head-sub">Vous êtes pinné sur cette version. Tout changement de tarif futur (v02, v03…) ne s'appliquera pas automatiquement à votre organisation.</div></div><span class="badge badge-cyan">v01 · 1 jan. 2026</span></div>
+        <div class="card-body">
+          <h4 style="font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em; font-weight:600; margin:0 0 8px">Brackets per-plant</h4>
+          <table class="data-table" style="font-size:12px">
+            <thead><tr><th>Capacité</th><th class="num" style="text-align:right">€/plant/mois</th></tr></thead>
+            <tbody>
+              <tr><td>&lt; 250 kW</td><td class="num" style="text-align:right">25 €</td></tr>
+              <tr style="background:var(--bg-card-hover)"><td><b>250 kW – 1 MW</b> ← votre bracket</td><td class="num" style="text-align:right; font-weight:600">50 €</td></tr>
+              <tr><td>1 – 5 MW</td><td class="num" style="text-align:right">100 €</td></tr>
+              <tr><td>5 – 10 MW</td><td class="num" style="text-align:right">250 €</td></tr>
+              <tr><td>&gt; 10 MW</td><td class="num" style="text-align:right">400 €</td></tr>
+            </tbody>
+          </table>
+          <p class="muted" style="font-size:12px; line-height:1.5; margin:12px 0 0">Ces tarifs font partie de la pricing schedule et ne changent qu'avec une nouvelle version (v02, v03…) approuvée par l'admin. Votre organisation reste pinnée sur la version ci-dessus.</p>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<!-- Cancellation request modal (FR-PCU-2) -->
+<div class="overlay" id="cancel-sub">
+  <div class="modal" style="max-width:520px">
+    <div class="modal-head">
+      <div>
+        <div class="page-eyebrow">Mon abonnement</div>
+        <div style="font-size:16px; font-weight:600">Demander l'annulation</div>
+      </div>
+      <button class="icon-btn" onclick="closeOverlay('cancel-sub')"><i data-lucide="x"></i></button>
+    </div>
+    <div class="modal-body">
+      <p class="muted" style="font-size:13px; margin-bottom:14px; line-height:1.6">Votre demande est transmise à l'équipe Naia. L'abonnement reste <b>actif jusqu'à la fin de la période en cours</b> (1<sup>er</sup> mai 2026)&nbsp;; aucun renouvellement ne sera prélevé ensuite. Un membre de l'équipe revient vers vous pour confirmer.</p>
+
+      <div style="display:flex; flex-direction:column; gap:14px">
+        <div>
+          <label class="form-label">Motif de l'annulation</label>
+          <select class="select" style="width:100%; margin-top:4px">
+            <option>Sélectionner un motif…</option>
+            <option>Coût trop élevé</option>
+            <option>Fonctionnalités manquantes</option>
+            <option>Cession ou arrêt de la centrale</option>
+            <option>Passage à une autre solution</option>
+            <option>Autre</option>
+          </select>
+        </div>
+        <div>
+          <label class="form-label">Précisions (optionnel)</label>
+          <textarea class="input" rows="3" placeholder="Aidez-nous à comprendre votre décision…" style="width:100%; margin-top:4px"></textarea>
+        </div>
+        <div style="display:flex; gap:10px; align-items:flex-start; padding:12px; background:rgba(251,191,36,0.08); border:1px solid rgba(251,191,36,0.25); border-radius:8px">
+          <i data-lucide="info" style="width:16px; height:16px; color:#fcd34d; flex-shrink:0; margin-top:2px"></i>
+          <span style="font-size:13px; line-height:1.5">La résiliation est traitée manuellement par l'équipe Naia. Aucun remboursement automatique n'est effectué pour la période déjà facturée.</span>
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-secondary" onclick="closeOverlay('cancel-sub')">Garder mon abonnement</button>
+      <button class="btn btn-primary" onclick="closeOverlay('cancel-sub'); alert('Demande d\'annulation envoyée à l\'équipe Naia — vous recevrez une confirmation par email.')"><i data-lucide="send"></i> Envoyer la demande</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="js/app.js"></script>
+</body></html>

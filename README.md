@@ -6,7 +6,8 @@ Interactive HTML wireframes / clickable prototypes for **Naia** (hydro-software)
 
 | Area | Version | Status | Live URL |
 |---|---|---|---|
-| **Platform** (integrated app) | **v6.6** | **Active** | https://hydro-software.github.io/Designs-wireframes/naia-platform/v6.6/ |
+| **Platform** (integrated app) | **v6.7** | **Active** | https://hydro-software.github.io/Designs-wireframes/naia-platform/v6.7/ |
+| | v6.6 | Reference (interventions WhatsApp) | https://hydro-software.github.io/Designs-wireframes/naia-platform/v6.6/ |
 | | v6.5 | Reference (Liste des événements · console Core) | https://hydro-software.github.io/Designs-wireframes/naia-platform/v6.5/ |
 | | v6.4 | Reference (Subscription PRD v2.6) | https://hydro-software.github.io/Designs-wireframes/naia-platform/v6.4/ |
 | | v6.3 | Reference (Paramètres versioning) | https://hydro-software.github.io/Designs-wireframes/naia-platform/v6.3/ |
@@ -27,7 +28,7 @@ The integrated app is the **`naia-platform/`** lineage (Insight / Pilotage · Co
 ```
 Designs-wireframes/
 ├── README.md             this file — index + changelog
-├── naia-platform/        integrated app: v0 v3 v4 v5 v6.1 v6.2 v6.3 v6.4 v6.5 v6.6  (v6.6 = current)
+├── naia-platform/        integrated app: v0 v3 v4 v5 v6.1 v6.2 v6.3 v6.4 v6.5 v6.6 v6.7  (v6.7 = current)
 │   ├── v0/               first wireframe document (2025, static screenshots)
 │   └── v5/bl_draft/      Bernard's original Paramètres drafts
 ├── naia-community/        standalone community/loyalty wireframes (archived): v1 v2
@@ -42,13 +43,68 @@ Static multi-page site, no build step: Tailwind (Play CDN), Inter, Lucide icons,
 
 ## Iteration
 
-Edit the **current** version folder (`naia-platform/v6.6/`), commit, and push to `main` — GitHub Pages auto-rebuilds in ~60 s. Older version folders are frozen comparison references and are not edited.
+Edit the **current** version folder (`naia-platform/v6.7/`), commit, and push to `main` — GitHub Pages auto-rebuilds in ~60 s. Older version folders are frozen comparison references and are not edited.
 
 ---
 
 # Changelog
 
-## v6.6 — Interventions déclarées par WhatsApp *(current)*
+## v6.7 — Prompt d'import assisté · aperçu détaillé des catégories *(current)*
+
+`v6.7` est `v6.6` plus **deux ajouts** et **un alignement de vocabulaire**. Aucun
+renommage « perte » → « événement » : ce balayage est réservé à une v6.8 dédiée.
+
+### « Générer un prompt » sur la page Données (`data.html`)
+
+L'utilisateur dont le fichier est refusé n'a pas besoin qu'on lui explique le format
+attendu : il a besoin qu'on le fasse pour lui. Un bouton dans la zone de dépôt, juste
+à côté de « Parcourir » — c'est-à-dire à l'endroit exact où il est bloqué — ouvre une
+modale contenant un prompt prêt à coller dans l'assistant IA de son choix, avec son
+CSV ou son XLSX en pièce jointe.
+
+- Le prompt est **générique**, il ne reprend pas les sélections de la page. C'est
+  volontaire : c'est le LLM qui, en lisant le fichier, dira à l'utilisateur quoi
+  choisir ici. Un prompt pré-rempli à partir de sélections que l'utilisateur a
+  justement du mal à poser tournerait en rond.
+- Il fait **deux choses** : convertir le fichier au format Naia (CSV UTF-8, deux
+  colonnes, `;`, ISO 8601, point décimal, trous laissés vides), et **rendre un
+  récapitulatif de ce qu'il faut sélectionner** — type de données, format
+  d'horodatage, fréquentiel / évènementiel, unité.
+- Il interdit au modèle de convertir des unités, de recalculer une valeur ou de
+  combler un trou par interpolation. Un import silencieusement « corrigé » est pire
+  qu'un import refusé.
+- La modale **affiche le prompt en entier** avant de le copier : l'utilisateur doit
+  pouvoir le lire, et l'adapter à son cas.
+- Wireframe uniquement à ce stade — la version applicative viendra ensuite.
+
+### Aperçu détaillé du wizard « Remplir automatiquement » (`parametres.html`)
+
+Le wizard proposait déjà les bons choix, mais son aperçu était un encart passif qui
+ne listait que les catégories de tête. Or « Remplir automatiquement » **écrase** le
+tableau existant : avant de cliquer Appliquer, on doit pouvoir lire ce qu'on va perdre
+et ce qu'on va gagner.
+
+- Un bouton **« Aperçu détaillé »** franc dans l'encart ouvre une modale (croix,
+  clic hors zone, `Fermer`) montrant l'**arbre entier** : catégorie → sous-types,
+  avec `Défaut type`, `Défaut sous-type` et `Affichage`.
+- Le tableau reprend exactement les colonnes du tableau « Catégories de pertes » de
+  la page, mais en **lecture seule** : ici on regarde ce qu'on s'apprête à appliquer,
+  on l'ajuste après, dans le vrai tableau.
+- `AUTOFILL_SETS` porte désormais les sous-types et les défauts pour les 2 templates
+  et les 3 centrales — il n'y avait que des catégories à plat.
+- Le compteur de l'encart annonce catégories **et** sous-types.
+
+### Bascule des deux registres alignée sur le menu
+
+Le menu « Générer une liste » de `production.html` propose « Liste des événements » et
+« Registre de maintenance », et ce sont exactement les titres des deux pages. Seule la
+bascule en haut de ces pages disait autre chose (« Pertes d'énergie » / « Maintenance »).
+Elle dit maintenant la même chose que le menu et que les titres.
+
+Effet de bord utile pour la v6.8 : « événement » n'est donc pas le terme parapluie des
+deux registres, c'est le nom du registre des pertes. Le renommage à venir a déjà sa place.
+
+## v6.6 — Interventions déclarées par WhatsApp
 
 `v6.6` is `v6.5` plus **one feature**: les exploitants déclarent leurs
 interventions par WhatsApp, et Naia les rend visibles. Tout le reste est

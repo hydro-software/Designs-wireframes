@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Données — Naia</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="css/style.css" rel="stylesheet"><script src="https://cdn.tailwindcss.com"></script>
+<style>
+  /* Type de données segmented control (5 pastilles depuis v6.4 : Électricité / Pluies / Indicateurs / Comparateurs / Prix) */
+  .type-seg { display: inline-flex; flex-wrap: wrap; background: var(--bg-input); border: 1px solid var(--border-default); border-radius: 999px; padding: 3px; gap: 1px; }
+  .type-seg button { padding: 6px 14px; font-size: 13px; border: 0; background: transparent; color: var(--text-muted); border-radius: 999px; cursor: pointer; font-family: inherit; font-weight: 500; }
+  .type-seg button.on { background: var(--brand-blue-strong); color: white; }
+  .dropzone {
+    border: 2px dashed var(--border-default);
+    border-radius: 12px;
+    padding: 36px 24px;
+    text-align: center;
+    background: var(--bg-base);
+    transition: all 0.15s;
+  }
+  .dropzone:hover { border-color: var(--brand-cyan); background: var(--bg-card-hover); }
+  .dropzone i { color: var(--text-muted); }
+
+  /* --- additions BL : libellés, ligne source+unité, 2e ligne commune (format + mode) --- */
+  .seg-label, .mini-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; margin-bottom: 6px; }
+  .ctrl-line { display: flex; gap: 18px; align-items: end; flex-wrap: wrap; }
+  .unit-inline { padding-bottom: 8px; font-size: 13px; color: var(--text-muted); }
+  .unit-inline .unit-val { color: var(--text-primary); font-weight: 600; }
+  .unit-inline .unit-note { font-size: 11.5px; }
+  .common-row { display: flex; gap: 20px; align-items: end; flex-wrap: wrap; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border-subtle); }
+  .fmt-select { min-width: 260px; }
+
+  /* "?" d'aide + bulle au survol (texte fréquentiel / événementiel) */
+  .help-tip { position: relative; display: inline-flex; align-items: center; cursor: help; color: var(--text-muted); outline: none; }
+  .help-tip:hover, .help-tip:focus { color: var(--brand-cyan); }
+  .help-tip .q { width: 17px; height: 17px; border-radius: 50%; border: 1px solid currentColor; display: inline-flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; line-height: 1; }
+  .help-bubble {
+    position: absolute; top: calc(100% + 8px); right: 0; left: auto;
+    width: 320px; max-width: 78vw;
+    background: var(--bg-card); border: 1px solid var(--border-default);
+    border-radius: 10px; padding: 12px 14px; box-shadow: var(--shadow-card);
+    font-size: 12px; color: var(--text-muted); line-height: 1.55;
+    text-transform: none; letter-spacing: normal; font-weight: 400; text-align: left;
+    opacity: 0; visibility: hidden; transition: opacity 0.15s; z-index: 60;
+  }
+  .help-tip:hover .help-bubble, .help-tip:focus .help-bubble { opacity: 1; visibility: visible; }
+  .help-bubble p { margin: 0 0 6px; }
+  .help-bubble b { color: var(--text-primary); font-weight: 600; }
+  .help-bubble ul { margin: 4px 0 0; padding-left: 16px; }
+  .help-bubble li { margin-bottom: 2px; }
+
+  /* --- v6.7 : bouton + modal « Générer un prompt » ---------------------------
+     Le bouton vit dans la zone de dépôt, à côté de « Parcourir » : c'est là que
+     se trouve l'utilisateur au moment précis où son fichier est refusé. Ghost,
+     pour que « Parcourir » reste le geste principal des deux. */
+  .prompt-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 14px; }
+
+  /* Le prompt lui-même : bloc monospace défilant. On le montre en entier plutôt
+     que de copier en silence — l'utilisateur doit pouvoir le lire et l'adapter. */
+  .prompt-box {
+    background: var(--bg-base); border: 1px solid var(--border-default); border-radius: 10px;
+    padding: 14px 16px; max-height: 42vh; overflow-y: auto;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 12px; line-height: 1.6; color: var(--text-primary);
+    white-space: pre-wrap; word-break: break-word; margin: 0;
+  }
+  .prompt-intro { font-size: 13px; color: var(--text-muted); line-height: 1.6; margin: 0 0 14px; }
+  .prompt-intro b { color: var(--text-primary); font-weight: 600; }
+  /* Tailwind (Play CDN) supprime les puces au preflight — ici la numérotation porte
+     du sens (« deux choses »), on la rétablit explicitement. */
+  .prompt-steps { margin: 10px 0 0; padding-left: 20px; font-size: 12.5px; color: var(--text-muted); line-height: 1.65; list-style: decimal; }
+  .prompt-steps li { margin-bottom: 3px; }
+</style>
+</head>
+<body data-page="data" data-section="data" data-centrale="moulins">
+<div class="app-shell">
+  <aside class="sidebar"></aside>
+  <main class="main-area">
+    <header class="topbar">
+      <div>
+        <div class="page-eyebrow">Données</div>
+        <div style="font-size:18px; font-weight:600">Importer &amp; gérer vos flux</div>
+      </div>
+      <div class="topbar-meta"><div class="plant" data-centrale-name>Centrale des Moulins</div><div>Dernier upload : il y a 2 h</div></div>
+    </header>
+
+    <!-- Centrales as tabs -->
+    <div class="centrale-tabs">
+      <a class="centrale-tab" href="data.html" data-centrale="all"><span>Toutes · santé des flux</span></a>
+      <a class="centrale-tab active" data-centrale="moulins" onclick="switchCentrale(event, 'moulins')"><span>Centrale des Moulins</span><span class="cap">450 kW</span></a>
+      <a class="centrale-tab" data-centrale="bocq" onclick="switchCentrale(event, 'bocq')"><span>Moulin du Bocq</span><span class="cap">210 kW</span></a>
+      <a class="centrale-tab" data-centrale="ariege" onclick="switchCentrale(event, 'ariege')"><span>Centrale d'Ariège</span><span class="cap">780 kW</span></a>
+      <a class="centrale-tab" data-centrale="lesse" onclick="switchCentrale(event, 'lesse')"><span>Moulin de la Lesse</span><span class="cap">320 kW</span></a>
+    </div>
+
+    <div class="page-content">
+
+      <!-- ============ Carte : Type de données (retravaillée BL) ============ -->
+      <div class="card" style="margin-bottom:14px">
+        <div class="card-body" style="padding:18px 20px">
+
+          <div class="seg-label">Type de données</div>
+          <div class="type-seg" style="margin-bottom:16px">
+            <button class="on" data-type="electricite" onclick="switchType('electricite')">Électricité</button>
+            <button data-type="pluies"       onclick="switchType('pluies')">Pluies</button>
+            <button data-type="indicateurs"  onclick="switchType('indicateurs')">Indicateurs</button>
+            <button data-type="comparateurs" onclick="switchType('comparateurs')">Comparateurs</button>
+            <button data-type="prix"         onclick="switchType('prix')">Prix d'Électricité</button>
+          </div>
+
+          <!-- Ligne 1 — Électricité : Source de données + unité (définie, non modifiable) -->
+          <div id="elec-controls" class="ctrl-line">
+            <div>
+              <span class="mini-label" style="display:block">Source de données</span>
+              <select class="select" id="elec-compteur" onchange="updateUnite('electricite')" style="min-width:260px">
+                <option data-unite="kWh">MOU-PRINC · principal</option>
+                <option data-unite="kWh">MOU-AUX · auxiliaires</option>
+                <option data-unite="MWh">MOU-GROUPE · agrégat</option>
+              </select>
+            </div>
+            <div class="unit-inline">
+              <span class="mini-label" style="display:block">Unité (définie)</span>
+              <span class="unit-val" id="elec-unite">kWh</span>
+              <span class="unit-note muted">· définie dans Paramètres → Compteurs · non modifiable</span>
+            </div>
+          </div>
+
+          <!-- Ligne 1 — Pluies -->
+          <div id="pluies-controls" class="ctrl-line" style="display:none">
+            <div>
+              <span class="mini-label" style="display:block">Source de données</span>
+              <select class="select" id="pluies-select" onchange="updateUnite('pluies')" style="min-width:300px">
+                <option data-unite="mm">Pluie · Bergerac (Météo France)</option>
+                <option data-unite="mm">Pluie · station amont (SCHAPI)</option>
+                <option data-unite="mm">Pluviomètre site (privé)</option>
+              </select>
+            </div>
+            <div class="unit-inline">
+              <span class="mini-label" style="display:block">Unité (définie)</span>
+              <span class="unit-val" id="pluies-unite">mm</span>
+              <span class="unit-note muted">· définie dans Paramètres → Pluies · non modifiable</span>
+            </div>
+          </div>
+
+          <!-- Ligne 1 — Indicateurs -->
+          <div id="indicateurs-controls" class="ctrl-line" style="display:none">
+            <div>
+              <span class="mini-label" style="display:block">Source de données</span>
+              <select class="select" id="indicateurs-select" onchange="updateUnite('indicateurs')" style="min-width:300px">
+                <option data-unite="m³/s">Débit · Dordogne (Hydroportail)</option>
+                <option data-unite="m">Niveau · Dordogne (Vigicrues)</option>
+                <option data-unite="m">Sonde niveau amont (NaiaBox)</option>
+              </select>
+            </div>
+            <div class="unit-inline">
+              <span class="mini-label" style="display:block">Unité (définie)</span>
+              <span class="unit-val" id="indicateurs-unite">m³/s</span>
+              <span class="unit-note muted">· définie dans Paramètres → Indicateurs · non modifiable</span>
+            </div>
+          </div>
+
+          <!-- Ligne 1 — Comparateurs -->
+          <div id="comparateurs-controls" class="ctrl-line" style="display:none">
+            <div>
+              <span class="mini-label" style="display:block">Source de données</span>
+              <select class="select" id="comparateurs-select" onchange="updateUnite('comparateurs')" style="min-width:300px">
+                <option data-unite="kWh">Centrale amie · La Cassagne (Partenaire Naia)</option>
+                <option data-unite="kWh">Benchmark régional (AGG DAILY)</option>
+                <option data-unite="kWh">Simulation 1 (import sur Naia)</option>
+              </select>
+            </div>
+            <div class="unit-inline">
+              <span class="mini-label" style="display:block">Unité (définie)</span>
+              <span class="unit-val" id="comparateurs-unite">kWh</span>
+              <span class="unit-note muted">· définie dans Paramètres → Comparateur · non modifiable</span>
+            </div>
+          </div>
+
+          <!-- Ligne 1 — Prix d'Électricité -->
+          <div id="prix-controls" class="ctrl-line" style="display:none">
+            <div>
+              <span class="mini-label" style="display:block">Source de données</span>
+              <select class="select" id="prix-select" onchange="updateUnite('prix')" style="min-width:260px">
+                <option data-unite="€/MWh" selected>EPEX SPOT FR · base load</option>
+                <option data-unite="€/MWh">EPEX SPOT FR · peak load</option>
+                <option data-unite="€/MWh">Belpex BE · base load</option>
+                <option data-unite="€/MWh">Tarif d'obligation d'achat</option>
+              </select>
+            </div>
+            <div class="unit-inline">
+              <span class="mini-label" style="display:block">Unité (définie)</span>
+              <span class="unit-val" id="prix-unite">€/MWh</span>
+              <span class="unit-note muted">· définie dans Paramètres → Marchés · non modifiable</span>
+            </div>
+          </div>
+
+          <!-- Ligne 2 commune — Format timestamp + Mode d'enregistrement (remonté ici) -->
+          <div class="common-row">
+            <div>
+              <span class="mini-label" style="display:block">Format timestamp</span>
+              <select class="select fmt-select" id="fmt-select" onchange="refreshContext()">
+                <option selected>ISO 8601 — 2026-04-01 14:30</option>
+                <option>JJ/MM/AA HH:MM — 01/04/26 14:30</option>
+                <option>MM/JJ/AA HH:MM — 04/01/26 14:30</option>
+                <option>XLS — n° de série Excel (45383,60)</option>
+              </select>
+            </div>
+            <div>
+              <span class="mini-label" style="display:block">Mode d'enregistrement</span>
+              <div style="display:flex; align-items:center; gap:8px">
+                <div class="freq-toggle" role="tablist" aria-label="Mode d'enregistrement">
+                  <button data-freq="frequentiel">Fréquentiel</button>
+                  <button class="on" data-freq="evenementiel">Évènementiel</button>
+                </div>
+                <span class="help-tip" tabindex="0" aria-label="Aide : fréquentiel / événementiel">
+                  <span class="q">?</span>
+                  <span class="help-bubble" role="tooltip">
+                    <p><b>Fréquentielle</b> — Données à pas de temps régulier (toutes les 5 min, 15 min, etc.).</p>
+                    <p><b>Événementielle</b> — Données à pas de temps variable : un nouveau point uniquement quand la valeur change.</p>
+                    <p style="margin-bottom:2px">Entre deux points consécutifs, le calcul dépend du type de donnée :</p>
+                    <ul>
+                      <li><b>Indicateurs</b> → interpolation linéaire entre les 2 points</li>
+                      <li><b>Électricité, pluies, comparateurs, prix</b> → valeur constante jusqu'au prochain point (escalier)</li>
+                    </ul>
+                  </span>
+                </span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Upload card (le toggle Évènementiel/Fréquentiel a été remonté dans la carte ci-dessus) -->
+      <div class="card" style="margin-bottom:14px">
+        <div class="card-head">
+          <div>
+            <div class="card-head-title">Charger un fichier</div>
+            <div class="card-head-sub" id="upload-context">Électricité pour <b data-centrale-name>Centrale des Moulins</b> · source MOU-PRINC · unité kWh</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="dropzone" onclick="simulateUpload()">
+            <i data-lucide="upload-cloud" style="width:36px; height:36px"></i>
+            <div style="font-size:14px; color:var(--text-primary); margin-top:10px; font-weight:500">Glissez-déposez un fichier ici</div>
+            <div style="font-size:12px; color:var(--text-muted); margin-top:4px">max 50 Mo · 1 an</div>
+            <div class="prompt-actions">
+              <button class="btn btn-secondary" onclick="event.stopPropagation(); simulateUpload()"><i data-lucide="folder-open"></i> Parcourir</button>
+              <button class="btn btn-ghost" onclick="event.stopPropagation(); openOverlay('import-prompt')"><i data-lucide="sparkles"></i> Générer un prompt</button>
+            </div>
+          </div>
+          <div style="display:flex; gap:8px; align-items:center; margin-top:12px; font-size:12px; color:var(--text-muted)">
+            <i data-lucide="info" style="width:13px; height:13px"></i>
+            Les doublons (mêmes horodatages) seront remplacés.
+          </div>
+
+          <div class="preview-card" id="preview-card" style="display:none">
+            <div class="pv-head">
+              <div class="pv-title"><i data-lucide="eye"></i> Prévisualisation · <span id="pv-filename">production_mou-princ_avril.csv</span></div>
+              <div class="pv-actions">
+                <button class="btn btn-ghost btn-sm" onclick="hidePreview()">Annuler</button>
+                <button class="btn btn-primary btn-sm" onclick="confirmImport()"><i data-lucide="check"></i> Confirmer l'import</button>
+              </div>
+            </div>
+            <div class="pv-meta" style="margin-bottom:8px">2 880 lignes détectées · pas 15 min · 1–30 avr. 2026 · 2 trous (1 h cumulée)</div>
+            <table class="data-table" style="font-size:12.5px">
+              <thead>
+                <tr><th>Horodatage</th><th class="num" style="text-align:right">Valeur</th><th>Statut</th></tr>
+              </thead>
+              <tbody>
+                <tr><td class="tabular">2026-04-01 00:00</td><td class="num" style="text-align:right">42,8</td><td><span class="badge badge-green">OK</span></td></tr>
+                <tr><td class="tabular">2026-04-01 00:15</td><td class="num" style="text-align:right">41,2</td><td><span class="badge badge-green">OK</span></td></tr>
+                <tr><td class="tabular">2026-04-01 00:30</td><td class="num" style="text-align:right">39,7</td><td><span class="badge badge-green">OK</span></td></tr>
+                <tr><td class="tabular">2026-04-01 00:45</td><td class="num" style="text-align:right">—</td><td><span class="badge badge-amber">trou</span></td></tr>
+                <tr><td class="tabular">2026-04-01 01:00</td><td class="num" style="text-align:right">40,1</td><td><span class="badge badge-green">OK</span></td></tr>
+                <tr><td class="tabular">…</td><td class="num" style="text-align:right">…</td><td class="muted">2 875 lignes supplémentaires</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent uploads (this centrale) -->
+      <div class="card" style="margin-bottom:14px">
+        <div class="card-head"><div class="card-head-title">Imports récents · <span data-centrale-name>Centrale des Moulins</span></div><a href="#" class="link" style="font-size:12px">Voir tout l'historique →</a></div>
+        <table class="data-table">
+          <thead><tr><th>Date</th><th>Source de données</th><th>Type</th><th>Période</th><th>Lignes</th><th>Statut</th></tr></thead>
+          <tbody>
+            <tr><td class="tabular">23 avr. 14:23</td><td>MOU-PRINC</td><td><span class="badge badge-blue">Électricité · SCADA</span></td><td>auto · 1–22 avr.</td><td class="num">8 640</td><td><span class="badge badge-green">Validé</span></td></tr>
+            <tr><td class="tabular">22 avr. 09:12</td><td>Pluie · Bergerac</td><td><span class="badge badge-cyan">Pluies · Météo</span></td><td>1–22 avr.</td><td class="num">22</td><td><span class="badge badge-green">Validé</span></td></tr>
+            <tr><td class="tabular">10 avr. 16:48</td><td>MOU-PRINC</td><td><span class="badge badge-blue">Électricité · CSV</span></td><td>1–9 avr.</td><td class="num">864</td><td><span class="badge badge-amber">2 trous détectés</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Sources health (compact) -->
+      <div class="card">
+        <div class="card-head"><div class="card-head-title">Sources automatisées</div></div>
+        <table class="data-table">
+          <thead><tr><th>Source</th><th>Type</th><th>Dernière maj.</th><th>Fréquence</th><th>Statut</th></tr></thead>
+          <tbody>
+            <tr><td>SCADA · MOU-PRINC</td><td>Électricité</td><td>il y a 2 h</td><td>quart-horaire</td><td><span class="badge badge-green">OK</span></td></tr>
+            <tr><td>Enedis R63 · MOU-PRINC</td><td>Électricité · backup</td><td>hier</td><td>quotidien</td><td><span class="badge badge-green">OK</span></td></tr>
+            <tr><td>Météo France · Bergerac</td><td>Pluies · Météo France</td><td>il y a 35 min</td><td>quotidien</td><td><span class="badge badge-green">OK</span></td></tr>
+            <tr><td>SCHAPI · Dordogne</td><td>Indicateurs · débit</td><td>il y a 14 min</td><td>quart-horaire</td><td><span class="badge badge-green">OK</span></td></tr>
+            <tr><td>Partenaire Naia · La Cassagne</td><td>Comparateurs · centrale amie</td><td>il y a 20 min</td><td>quart-horaire</td><td><span class="badge badge-green">OK</span></td></tr>
+            <tr><td>EPEX SPOT FR · base load</td><td>Prix d'électricité</td><td>il y a 1 h</td><td>horaire</td><td><span class="badge badge-green">OK</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+
+<!-- ============================ v6.7 — « Générer un prompt » ============================
+     Un utilisateur bloqué sur un format de fichier n'a pas besoin qu'on lui explique le
+     format : il a besoin qu'on le fasse pour lui. Le prompt est générique — il ne reprend
+     pas les sélections de la page — parce que c'est le LLM qui, en lisant le fichier, dira
+     à l'utilisateur quoi choisir ici. On l'affiche en entier plutôt que de le copier en
+     silence : il doit pouvoir le lire, et l'adapter à son cas avant de l'envoyer. -->
+<div id="import-prompt" class="overlay" onclick="if(event.target===this) closeOverlay('import-prompt')">
+  <div class="modal modal-lg">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px">
+      <div>
+        <div class="modal-title"><i data-lucide="sparkles" style="width:16px; height:16px; vertical-align:-2px; color:var(--brand-cyan)"></i> Générer un prompt</div>
+        <div class="modal-subtitle">Faites préparer votre fichier par une IA avant de l'importer.</div>
+      </div>
+      <button class="btn btn-ghost" onclick="closeOverlay('import-prompt')"><i data-lucide="x"></i></button>
+    </div>
+
+    <p class="prompt-intro">
+      Votre fichier est refusé, mal découpé, ou vous ne savez pas quelles options choisir ?
+      Copiez le prompt ci-dessous, collez-le dans l'assistant IA de votre choix
+      (<b>ChatGPT</b>, <b>Claude</b>, <b>Le Chat</b>…) et joignez-y votre fichier CSV ou Excel.
+      L'assistant s'occupe de deux choses :
+    </p>
+    <ol class="prompt-steps" style="margin-bottom:16px">
+      <li>il convertit votre fichier au format attendu par Naia ;</li>
+      <li>il vous dit quoi sélectionner sur cette page — format d'horodatage, séparateur, mode d'enregistrement, unité.</li>
+    </ol>
+
+    <pre class="prompt-box" id="import-prompt-text">Tu es un assistant d&#x27;import de données pour Naia, une plateforme de suivi de centrales hydroélectriques.
+
+Je te fournis un fichier de mesures (CSV ou Excel). Ton rôle est double : le convertir au format attendu par Naia, puis me dire exactement quoi sélectionner dans l&#x27;écran d&#x27;import.
+
+## 1. Analyse mon fichier
+
+Commence par me décrire ce que tu as trouvé, sans rien modifier :
+
+- le séparateur de colonnes (virgule, point-virgule, tabulation)
+- le séparateur décimal (point ou virgule)
+- le nombre de lignes d&#x27;en-tête avant les données
+- quelle colonne porte l&#x27;horodatage, quelle colonne porte la valeur
+- le format d&#x27;horodatage réel : 31/12/2025 14:30, 2025-12-31T14:30:00Z, ou un numéro de série Excel (45383,60)
+- le fuseau horaire, s&#x27;il est indiqué
+- le pas de temps entre deux points, et s&#x27;il est régulier ou non
+- la période couverte (première et dernière date)
+- les trous, les doublons d&#x27;horodatage, les valeurs vides ou non numériques
+
+Si quelque chose est ambigu — jour et mois inversés, deux colonnes candidates pour la valeur — pose-moi la question au lieu de deviner.
+
+## 2. Produis le fichier au format Naia
+
+Un CSV encodé en UTF-8, avec exactement deux colonnes dans cet ordre :
+
+    timestamp;valeur
+    2026-04-01 00:00;42.8
+    2026-04-01 00:15;41.2
+
+Règles :
+
+- séparateur de colonnes : point-virgule
+- horodatage au format ISO 8601 : AAAA-MM-JJ HH:MM
+- séparateur décimal : le point, jamais la virgule
+- une seule valeur par horodatage, triée par ordre chronologique croissant
+- pas de séparateur de milliers, pas d&#x27;unité dans la cellule, pas de guillemets
+- conserve la ligne d&#x27;en-tête timestamp;valeur
+- une donnée manquante est une ligne absente : n&#x27;écris ni 0, ni NA, ni tiret
+- ne comble aucun trou par interpolation
+- ne convertis aucune unité et ne recalcule aucune valeur. Si tu penses qu&#x27;une conversion est nécessaire, signale-le-moi, ne la fais pas
+- si le fichier dépasse 50 Mo ou plus d&#x27;un an de données, découpe-le en plusieurs fichiers d&#x27;un an maximum, nommés clairement
+
+## 3. Dis-moi quoi sélectionner dans Naia
+
+Termine par un récapitulatif de ce que je dois choisir dans l&#x27;écran « Données → Charger un fichier » :
+
+- Type de données : Électricité, Pluies, Indicateurs, Comparateurs ou Prix d&#x27;électricité, d&#x27;après ce que contient le fichier
+- Format timestamp : après ta conversion ce sera ISO 8601, mais rappelle-moi le format d&#x27;origine pour que je vérifie
+- Mode d&#x27;enregistrement : « Fréquentiel » si le pas de temps est régulier, « Évènementiel » s&#x27;il n&#x27;y a un point que lorsque la valeur change
+- Unité : dis-moi l&#x27;unité que tu as trouvée dans le fichier. Elle n&#x27;est pas modifiable à l&#x27;import, elle est définie dans Paramètres. Si elle ne correspond pas, préviens-moi
+
+Ajoute un avertissement pour chaque point qui mérite mon attention avant l&#x27;import : trous, doublons, valeurs aberrantes, changement d&#x27;heure, ou pas de temps qui change en cours de fichier.</pre>
+
+    <div style="display:flex; gap:8px; justify-content:space-between; align-items:center; margin-top:18px; padding-top:14px; border-top:1px solid var(--border-subtle)">
+      <span class="muted" style="font-size:11.5px">Aucune donnée n'est envoyée par Naia. Vous restez maître de ce que vous transmettez à l'assistant.</span>
+      <div style="display:flex; gap:8px">
+        <button class="btn btn-ghost" onclick="closeOverlay('import-prompt')">Fermer</button>
+        <button class="btn btn-primary" id="import-prompt-copy" onclick="copyImportPrompt()"><i data-lucide="copy"></i> Copier le prompt</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="js/app.js"></script>
+<script>
+// Initialise the upload-context strings.
+window.addEventListener('DOMContentLoaded', () => { refreshContext(); });
+
+// Un type de données = une ligne de contrôles + une phrase de contexte.
+// Les 5 pastilles partagent la même mécanique (v6.4 : Indicateur scindé en Pluies / Indicateurs / Comparateurs).
+const DATA_TYPES = {
+  electricite:  { ctrl: "elec-controls",         select: "elec-compteur",     unite: "elec-unite",
+                  ctx: (src, u, c) => `Électricité pour <b>${c}</b> · source ${src.split(' ·')[0]} · unité ${u}` },
+  pluies:       { ctrl: "pluies-controls",       select: "pluies-select",       unite: "pluies-unite",
+                  // le nom de la source porte déjà « Pluie · » — pas de préfixe de type, sinon ça bégaie
+                  ctx: (src, u, c) => `<b>${src}</b> sur <b>${c}</b> · unité ${u}` },
+  indicateurs:  { ctrl: "indicateurs-controls",  select: "indicateurs-select",  unite: "indicateurs-unite",
+                  ctx: (src, u, c) => `Indicateur — <b>${src}</b> sur <b>${c}</b> · unité ${u}` },
+  comparateurs: { ctrl: "comparateurs-controls", select: "comparateurs-select", unite: "comparateurs-unite",
+                  ctx: (src, u, c) => `Comparateur — <b>${src}</b> sur <b>${c}</b> · unité ${u}` },
+  prix:         { ctrl: "prix-controls",         select: "prix-select",         unite: "prix-unite",
+                  ctx: (src, u, c) => `Prix d'électricité — <b>${src}</b> sur <b>${c}</b> · unité ${u}` },
+};
+
+function switchType(type) {
+  if (!DATA_TYPES[type]) type = "electricite";
+  document.querySelectorAll(".type-seg button").forEach(b => b.classList.toggle("on", b.dataset.type === type));
+  Object.keys(DATA_TYPES).forEach(k => {
+    document.getElementById(DATA_TYPES[k].ctrl).style.display = (k === type) ? "flex" : "none";
+  });
+
+  const t = DATA_TYPES[type];
+  const sel = document.getElementById(t.select);
+  const opt = sel.options[sel.selectedIndex];
+  const centrale = document.querySelector('[data-centrale-name]')?.textContent || "Centrale des Moulins";
+  document.getElementById("upload-context").innerHTML = t.ctx(opt.text, opt.dataset.unite, centrale) + ctxSuffix();
+}
+
+// Suffixe du contexte d'upload : format timestamp + mode d'enregistrement (remontés dans la carte du haut)
+function currentType() { return document.querySelector('.type-seg button.on')?.dataset.type || 'electricite'; }
+function ctxSuffix() {
+  const fmt = document.getElementById('fmt-select');
+  const fmtLabel = fmt ? fmt.options[fmt.selectedIndex].text.split(' —')[0] : '';
+  const freqBtn = document.querySelector('.freq-toggle button.on');
+  const freqLabel = freqBtn ? freqBtn.textContent.trim() : '';
+  return ` · format ${fmtLabel} · ${freqLabel}`;
+}
+function refreshContext() { switchType(currentType()); }
+
+// Chaque option porte son unité dans data-unite → une seule fonction pour les 5 lignes.
+function updateUnite(type) {
+  const t = DATA_TYPES[type] || DATA_TYPES.electricite;
+  const sel = document.getElementById(t.select);
+  document.getElementById(t.unite).textContent = sel.options[sel.selectedIndex].dataset.unite;
+  switchType(type);
+}
+
+document.querySelectorAll(".freq-toggle button").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".freq-toggle button").forEach(b => b.classList.remove("on"));
+    btn.classList.add("on");
+    refreshContext();
+  });
+});
+
+function simulateUpload() {
+  document.getElementById("preview-card").style.display = "block";
+  setTimeout(() => { if (window.lucide) lucide.createIcons({ attrs: { "stroke-width": 1.75 } }); }, 0);
+}
+function hidePreview() { document.getElementById("preview-card").style.display = "none"; }
+function confirmImport() { alert("Import confirmé (démo)"); hidePreview(); }
+
+function switchCentrale(e, slug) {
+  if (e) e.preventDefault();
+  document.querySelectorAll(".centrale-tab").forEach(t => t.classList.toggle("active", t.dataset.centrale === slug));
+  const map = {
+    moulins: "Centrale des Moulins",
+    bocq:    "Moulin du Bocq",
+    ariege:  "Centrale d'Ariège",
+    lesse:   "Moulin de la Lesse",
+  };
+  const name = map[slug] || "Centrale";
+  document.querySelectorAll('[data-centrale-name]').forEach(el => el.textContent = name);
+  document.body.dataset.centrale = slug;
+}
+
+// v6.7 — copie du prompt d'import. On repasse le libellé du bouton à son état
+// initial après 2 s : sans ça, l'utilisateur qui rouvre la modal trouve un bouton
+// « Copié » alors qu'il n'a rien copié cette fois-ci.
+function copyImportPrompt() {
+  const txt = document.getElementById("import-prompt-text").textContent;
+  const btn = document.getElementById("import-prompt-copy");
+  const restore = () => {
+    btn.innerHTML = '<i data-lucide="copy"></i> Copier le prompt';
+    if (window.lucide) lucide.createIcons({ attrs: { "stroke-width": 1.75 } });
+  };
+  const done = () => {
+    btn.innerHTML = '<i data-lucide="check"></i> Copié';
+    if (window.lucide) lucide.createIcons({ attrs: { "stroke-width": 1.75 } });
+    setTimeout(restore, 2000);
+  };
+  if (navigator.clipboard) navigator.clipboard.writeText(txt).then(done).catch(done);
+  else done();
+}
+</script>
+</body></html>

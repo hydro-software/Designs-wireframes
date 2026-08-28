@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Administration · Naia (Core) — Naia</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="css/style.css" rel="stylesheet"><script src="https://cdn.tailwindcss.com"></script>
+<style>
+  /* Sous-navigation d'une section (même pastilles que « Type de données » sur data.html) */
+  .type-seg { display: inline-flex; flex-wrap: wrap; background: var(--bg-input); border: 1px solid var(--border-default); border-radius: 999px; padding: 3px; gap: 1px; }
+  .type-seg button { padding: 6px 14px; font-size: 13px; border: 0; background: transparent; color: var(--text-muted); border-radius: 999px; cursor: pointer; font-family: inherit; font-weight: 500; }
+  .type-seg button.on { background: var(--brand-blue-strong); color: white; }
+
+  /* Libellés de champ (repris de data.html) */
+  .mini-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; margin-bottom: 6px; display: block; }
+  .ctrl-line { display: flex; gap: 18px; align-items: end; flex-wrap: wrap; }
+  .ctrl-line.top { align-items: flex-start; }
+  .ctrl-line.top .act { padding-top: 23px; }
+  .common-row { display: flex; gap: 20px; align-items: end; flex-wrap: wrap; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border-subtle); }
+  .unit-inline { padding-bottom: 8px; font-size: 13px; color: var(--text-muted); }
+  .unit-inline .unit-val { color: var(--text-primary); font-weight: 600; }
+
+  /* Grille clé / valeur de la fiche source */
+  .kv { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 14px 20px; }
+  .kv .k { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; margin-bottom: 3px; }
+  .kv .v { font-size: 13.5px; color: var(--text-primary); }
+
+  /* Encart de résultat (traduction en langage humain d'une réponse d'API) */
+  .result { display: flex; gap: 12px; align-items: flex-start; border: 1px solid var(--border-default); border-radius: 10px; padding: 14px 16px; background: var(--bg-base); }
+  .result i { flex: none; width: 18px; height: 18px; margin-top: 1px; }
+  .result .r-title { font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px; }
+  .result .r-body { font-size: 12.5px; color: var(--text-muted); line-height: 1.6; }
+  .result.ok   { border-color: rgba(163,230,53,0.45); }
+  .result.warn { border-color: rgba(251,191,36,0.45); }
+  .result.err  { border-color: rgba(248,113,113,0.45); }
+
+  /* Zone de dépôt (identique à data.html) */
+  .dropzone { border: 2px dashed var(--border-default); border-radius: 12px; padding: 36px 24px; text-align: center; background: var(--bg-base); transition: all 0.15s; }
+  .dropzone:hover { border-color: var(--brand-cyan); background: var(--bg-card-hover); }
+  .dropzone i { color: var(--text-muted); }
+
+  /* Section pas encore construite */
+  .wip { border: 1px dashed var(--border-default); border-radius: 12px; padding: 34px 24px; text-align: center; background: var(--bg-base); }
+  .wip i { color: var(--text-muted); }
+  .wip .wip-title { font-size: 14px; font-weight: 600; color: var(--text-primary); margin-top: 10px; }
+  .wip .wip-body { font-size: 12.5px; color: var(--text-muted); margin-top: 6px; line-height: 1.6; max-width: 620px; margin-left: auto; margin-right: auto; }
+
+  /* Table de sources : lignes cliquables */
+  .src-table tbody tr { cursor: pointer; }
+  .src-table tbody tr.sel { background: var(--bg-card-hover); }
+
+  /* Bloc « contrat d'API » repliable, pour la revue technique */
+  details.api-note { margin-top: 12px; font-size: 12px; color: var(--text-muted); }
+  details.api-note summary { cursor: pointer; color: var(--brand-cyan); }
+  details.api-note pre { margin: 8px 0 0; padding: 10px 12px; background: var(--bg-base); border: 1px solid var(--border-subtle); border-radius: 8px; overflow-x: auto; font-size: 11.5px; line-height: 1.5; }
+
+  /* Sélecteur de scénario (wireframe uniquement) */
+  .scenario { display: flex; align-items: center; gap: 8px; font-size: 11.5px; color: var(--text-muted); }
+  .scenario select { width: auto; min-width: 190px; font-size: 12px; padding: 4px 8px; }
+</style>
+</head>
+<body data-page="admin-core" data-section="admin">
+<div class="app-shell">
+  <aside class="sidebar"></aside>
+  <main class="main-area">
+    <header class="topbar">
+      <div>
+        <div class="page-eyebrow">Administration · Naia (Core)</div>
+        <div style="font-size:18px; font-weight:600">Console d'administration du module Naia</div>
+      </div>
+      <div class="topbar-meta">
+        <div>Réservé au superadmin</div>
+        <div class="plant">5 sources publiques · 3 actives</div>
+      </div>
+    </header>
+
+    <!-- Sections de la console. Même composant d'onglets que Paramètres et Audit log. -->
+    <div class="centrale-tabs">
+      <a href="#sources-publiques" class="centrale-tab active" data-core-tab="sources-publiques" onclick="event.preventDefault(); switchCoreTab('sources-publiques')"><i data-lucide="cloud-rain" style="width:14px;height:14px"></i> Sources publiques</a>
+      <a href="#acces"   class="centrale-tab" data-core-tab="acces"   onclick="event.preventDefault(); switchCoreTab('acces')"><i data-lucide="user-cog" style="width:14px;height:14px"></i> Accès utilisateurs</a>
+      <a href="#support" class="centrale-tab" data-core-tab="support" onclick="event.preventDefault(); switchCoreTab('support')"><i data-lucide="life-buoy" style="width:14px;height:14px"></i> Support</a>
+      <a href="#logs"    class="centrale-tab" data-core-tab="logs"    onclick="event.preventDefault(); switchCoreTab('logs')"><i data-lucide="scroll-text" style="width:14px;height:14px"></i> Logs</a>
+    </div>
+
+    <div class="page-content">
+
+      <div class="v2-banner" style="margin-bottom:18px">
+        <i data-lucide="shield"></i>
+        <div>
+          Console réservée au <b>superadmin</b> (variable d'environnement <code>SUPERADMIN_USER_ID</code>, une seule personne aujourd'hui).
+          Une colonne <code>is_naia_superadmin</code> permettra d'en habiliter plusieurs.
+          Cet écran reprend les opérations faites aujourd'hui dans le <b>Swagger public</b> : il est le prérequis à la fermeture de <code>/docs</code> et à la mise en place du 2FA administrateur.
+        </div>
+      </div>
+
+      <!-- ================================================================= -->
+      <!-- SECTION 1 · SOURCES PUBLIQUES                                     -->
+      <!-- ================================================================= -->
+      <section data-core-section="sources-publiques">
+
+        <div class="type-seg" id="src-seg" style="margin-bottom:16px">
+          <button class="on" data-sub="actives" onclick="switchSourceSub('actives')">Sources actives</button>
+          <button          data-sub="ajouter" onclick="switchSourceSub('ajouter')">Ajouter une source</button>
+        </div>
+
+        <!-- ---------- 1A · Gestion des sources actives ---------- -->
+        <div data-sub-panel="actives">
+
+          <div class="card" style="margin-bottom:14px">
+            <div class="card-head">
+              <div>
+                <div class="card-head-title">Sources publiques installées</div>
+                <div class="card-head-sub">Cliquez sur une ligne pour ouvrir sa fiche</div>
+              </div>
+              <div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end">
+                <input class="input" placeholder="Rechercher une station…" style="width:200px">
+                <select class="select" style="width:180px"><option>Tous les fournisseurs</option><option>Hub'Eau</option><option>Météo-France</option><option>ENTSO-E</option></select>
+                <select class="select" style="width:165px"><option>Tous les domaines</option><option>Débit</option><option>Pluie</option><option>Prix d'électricité</option></select>
+                <select class="select" style="width:150px"><option>Tous les états</option><option>Active</option><option>Dormante</option><option>En anomalie</option></select>
+              </div>
+            </div>
+            <table class="data-table src-table">
+              <thead>
+                <tr><th>Source</th><th>Fournisseur</th><th>Domaine</th><th>Code station</th><th class="num" style="text-align:right">Utilisateurs</th><th>Collecte</th><th>Dernier point</th></tr>
+              </thead>
+              <tbody>
+                <tr class="sel" data-src="dordogne" onclick="selectSource('dordogne', this)">
+                  <td>La Dordogne à Bergerac</td><td>Hub'Eau</td><td><span class="badge badge-blue">Débit</span></td><td class="tabular">P123456789</td><td class="num" style="text-align:right">4</td><td><span class="badge badge-green">Active</span></td><td>il y a 1 h</td>
+                </tr>
+                <tr data-src="bourget" onclick="selectSource('bourget', this)">
+                  <td>Pluie · Bourget-en-Huile</td><td>Météo-France</td><td><span class="badge badge-cyan">Pluie</span></td><td class="tabular">73052002</td><td class="num" style="text-align:right">2</td><td><span class="badge badge-green">Active</span></td><td>il y a 2 h</td>
+                </tr>
+                <tr data-src="ariege" onclick="selectSource('ariege', this)">
+                  <td>L'Ariège à Foix</td><td>Hub'Eau</td><td><span class="badge badge-blue">Débit</span></td><td class="tabular">O123451001</td><td class="num" style="text-align:right">0</td><td><span class="badge badge-slate">Dormante</span></td><td>—</td>
+                </tr>
+                <tr data-src="roumaniere" onclick="selectSource('roumaniere', this)">
+                  <td>Pluie · Bergerac-Roumanière</td><td>Météo-France</td><td><span class="badge badge-cyan">Pluie</span></td><td class="tabular">24037003</td><td class="num" style="text-align:right">1</td><td><span class="badge badge-red">Échec</span></td><td>il y a 3 j</td>
+                </tr>
+                <tr data-src="isere" onclick="selectSource('isere', this)">
+                  <td>L'Isère à Grenoble</td><td>Hub'Eau</td><td><span class="badge badge-blue">Débit</span></td><td class="tabular">W123451001</td><td class="num" style="text-align:right">1</td><td><span class="badge badge-amber">Non vérifiée</span></td><td>il y a 1 h</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Fiche de la source sélectionnée -->
+          <div class="card" style="margin-bottom:14px">
+            <div class="card-head">
+              <div>
+                <div class="card-head-title" id="d-name">La Dordogne à Bergerac</div>
+                <div class="card-head-sub" id="d-sub">Hub'Eau · code P123456789</div>
+              </div>
+              <div style="display:flex; gap:8px; align-items:center" id="d-badges"></div>
+            </div>
+            <div class="card-body">
+
+              <div class="kv" style="margin-bottom:18px">
+                <div><div class="k">Fournisseur</div><div class="v" id="d-provider">Hub'Eau</div></div>
+                <div><div class="k">Code station</div><div class="v tabular" id="d-code">P123456789</div></div>
+                <div><div class="k">Domaine · unité</div><div class="v" id="d-domain">Débit · m³/s</div></div>
+                <div><div class="k">Cours d'eau · commune</div><div class="v" id="d-river">La Dordogne · Bergerac (24)</div></div>
+                <div><div class="k">Coordonnées</div><div class="v tabular" id="d-coords">44,8512 · 0,4903</div></div>
+                <div><div class="k">En service chez le fournisseur</div><div class="v" id="d-inservice">Oui</div></div>
+                <div><div class="k">Indicateur · capteur</div><div class="v tabular" id="d-ids">#412 · #987</div></div>
+                <div><div class="k">Installée le</div><div class="v" id="d-installed">12 août 2026 par Ugo Duraffourd</div></div>
+              </div>
+
+              <div style="display:grid; gap:14px; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr))">
+
+                <!-- Santé de la collecte -->
+                <div class="card" style="margin:0">
+                  <div class="card-head"><div class="card-head-title" style="font-size:13px">Collecte</div></div>
+                  <div class="card-body">
+                    <div class="kv" style="grid-template-columns:1fr 1fr; margin-bottom:12px">
+                      <div><div class="k">État</div><div class="v" id="d-state">Active</div></div>
+                      <div><div class="k">Cadence</div><div class="v" id="d-cadence">PT1H récent · P1D historique</div></div>
+                      <div><div class="k">Dernière exécution</div><div class="v" id="d-lastrun">Succès · aujourd'hui 04:12</div></div>
+                      <div><div class="k">Dernier point reçu</div><div class="v" id="d-lastpoint">aujourd'hui 03:00 UTC</div></div>
+                      <div><div class="k">Points · 7 jours</div><div class="v tabular" id="d-pts7">168</div></div>
+                      <div><div class="k">Points · 30 jours</div><div class="v tabular" id="d-pts30">718</div></div>
+                    </div>
+                    <div id="d-collect-note" class="muted" style="font-size:12px; line-height:1.6"></div>
+                    <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:14px">
+                      <button class="btn btn-secondary btn-sm" onclick="alert('Vérification auprès du fournisseur (démo)')"><i data-lucide="refresh-cw"></i> Re-vérifier la station</button>
+                      <button class="btn btn-secondary btn-sm" onclick="alert('Collecte forcée (démo)')"><i data-lucide="download-cloud"></i> Forcer une collecte</button>
+                      <button class="btn btn-secondary btn-sm" onclick="openIngest()"><i data-lucide="upload"></i> Ingérer des données</button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Qui l'utilise -->
+                <div class="card" style="margin:0">
+                  <div class="card-head"><div class="card-head-title" style="font-size:13px">Utilisation</div><span class="muted" style="font-size:11.5px" id="d-usage-count">4 utilisateurs · 3 centrales</span></div>
+                  <table class="data-table" style="font-size:12.5px">
+                    <thead><tr><th>Utilisateur</th><th>Centrale</th><th>Sélectionnée depuis</th></tr></thead>
+                    <tbody id="d-users"></tbody>
+                  </table>
+                </div>
+
+              </div>
+            </div>
+          </div>
+
+          <p class="muted" style="font-size:12px; margin:0">
+            Une source publique est <b>globale</b> : une station installée une seule fois est proposée à tous les clients. Les doublons sont refusés sur le couple fournisseur + code station.
+          </p>
+        </div>
+
+        <!-- ---------- 1B · Ajouter une source publique ---------- -->
+        <div data-sub-panel="ajouter" style="display:none">
+
+          <!-- Étape 1 : vérification -->
+          <div class="card" style="margin-bottom:14px">
+            <div class="card-head">
+              <div>
+                <div class="card-head-title">Étape 1 · Vérifier la station</div>
+                <div class="card-head-sub">Interrogation du référentiel du fournisseur. Aucune écriture en base.</div>
+              </div>
+              <div class="scenario">
+                Aperçu wireframe
+                <select class="select" id="verify-scenario">
+                  <option value="ok">station trouvée</option>
+                  <option value="closed">station hors service</option>
+                  <option value="notfound">code inconnu</option>
+                  <option value="unreachable">fournisseur injoignable</option>
+                </select>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="ctrl-line top">
+                <div>
+                  <span class="mini-label">Fournisseur</span>
+                  <select class="select" id="v-provider" style="min-width:240px" onchange="onProviderChange()">
+                    <option value="hubeau">Hub'Eau · débit des rivières (FR)</option>
+                    <option value="meteofrance">Météo-France · pluie (FR)</option>
+                    <option value="entsoe">ENTSO-E · prix d'électricité</option>
+                    <option value="spw" disabled>SPW · débit (BE) — bientôt</option>
+                    <option value="irm" disabled>IRM / KMI · pluie (BE) — bientôt</option>
+                  </select>
+                </div>
+                <div>
+                  <span class="mini-label">Code de la station</span>
+                  <input class="input" id="v-code" style="min-width:240px" placeholder="P123456789">
+                  <div class="muted" style="font-size:11.5px; margin-top:6px" id="v-hint">Hub'Eau : code de la station hydrométrique (10 caractères).</div>
+                </div>
+                <div class="act">
+                  <button class="btn btn-primary" onclick="verifyStation()"><i data-lucide="search"></i> Vérifier</button>
+                </div>
+              </div>
+
+              <div id="v-result" style="margin-top:16px; display:none"></div>
+
+              <details class="api-note">
+                <summary>Réponse d'API traduite dans cet encart</summary>
+                <pre>POST /api/v1/public_sources/validate
+{ "data": { "found": true, "provider_unreachable": false,
+            "label": "…", "river": "…", "latitude": 0, "longitude": 0,
+            "in_service": true }, "meta": {} }</pre>
+              </details>
+            </div>
+          </div>
+
+          <!-- Étape 2 : installation (apparaît une fois la station vérifiée) -->
+          <div class="card" id="install-card" style="margin-bottom:14px; display:none">
+            <div class="card-head">
+              <div>
+                <div class="card-head-title">Étape 2 · Installer la source</div>
+                <div class="card-head-sub">Crée le capteur et l'indicateur global. Aucune donnée n'est encore collectée.</div>
+              </div>
+              <div class="scenario">
+                Aperçu wireframe
+                <select class="select" id="install-scenario">
+                  <option value="created">installation réussie</option>
+                  <option value="exists">station déjà installée</option>
+                </select>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="ctrl-line top">
+                <div>
+                  <span class="mini-label">Station vérifiée</span>
+                  <div style="font-size:13.5px; color:var(--text-primary); padding-top:8px" id="i-recap">Hub'Eau · P123456789 · La Dordogne à Bergerac</div>
+                </div>
+                <div>
+                  <span class="mini-label">Domaine</span>
+                  <select class="select" id="i-domain" style="min-width:220px">
+                    <option value="FLOW">Débit</option>
+                    <option value="RAIN">Pluie</option>
+                    <option value="PRICE">Prix d'électricité</option>
+                  </select>
+                  <div class="muted" style="font-size:11.5px; margin-top:6px">Pré-rempli d'après le fournisseur, modifiable.</div>
+                </div>
+                <div class="act">
+                  <button class="btn btn-primary" id="i-btn" onclick="installStation()"><i data-lucide="plus"></i> Installer la source</button>
+                </div>
+              </div>
+
+              <div id="i-warn" style="margin-top:14px; display:none"></div>
+              <div id="i-result" style="margin-top:16px; display:none"></div>
+
+              <details class="api-note">
+                <summary>Réponse d'API traduite dans cet encart</summary>
+                <pre>POST /api/v1/public_sources/install
+{ "data": { "created": true, "indicator_id": 0, "sensor_id": 0,
+            "verification_status": "verified" }, "meta": {} }</pre>
+              </details>
+            </div>
+          </div>
+
+          <p class="muted" style="font-size:12px; margin:0">
+            Les utilisateurs ne créent pas de source publique : ils la <b>demandent</b> depuis Paramètres (« Ajouter une source », qui ouvre un ticket) puis la <b>sélectionnent</b> une fois installée ici.
+          </p>
+        </div>
+
+        <!-- ---------- 1C · Ingestion de données publiques ---------- -->
+        <div data-sub-panel="ingestion" style="display:none">
+
+          <div style="display:flex; align-items:center; gap:12px; margin-bottom:14px; flex-wrap:wrap">
+            <button class="btn btn-ghost btn-sm" onclick="switchSourceSub('actives')"><i data-lucide="arrow-left"></i> Retour à la source</button>
+            <div>
+              <div class="page-eyebrow" style="margin:0">Ingestion de données</div>
+              <div style="font-size:15px; font-weight:600" id="ing-title">La Dordogne à Bergerac</div>
+            </div>
+          </div>
+
+          <div class="card" style="margin-bottom:14px">
+            <div class="card-body" style="padding:18px 20px">
+
+              <div class="ctrl-line">
+                <div>
+                  <span class="mini-label">Source publique</span>
+                  <select class="select" id="ing-source" style="min-width:300px" onchange="refreshIngestContext()"></select>
+                  <div class="muted" style="font-size:11.5px; margin-top:6px" id="ing-meta">Hub'Eau · Débit · cadence native horaire</div>
+                </div>
+                <div class="unit-inline">
+                  <span class="mini-label">Unité du capteur (définie)</span>
+                  <span class="unit-val" id="ing-unite">m³/s</span>
+                  <span class="muted" style="font-size:11.5px"> · fixée à l'installation · non modifiable</span>
+                </div>
+                <div>
+                  <span class="mini-label">Unité du fichier</span>
+                  <select class="select" id="ing-file-unit" style="min-width:130px"></select>
+                </div>
+              </div>
+
+              <div class="common-row">
+                <div>
+                  <span class="mini-label">Format timestamp</span>
+                  <select class="select" style="min-width:260px">
+                    <option selected>ISO 8601 — 2026-04-01 14:30</option>
+                    <option>JJ/MM/AA HH:MM — 01/04/26 14:30</option>
+                    <option>MM/JJ/AA HH:MM — 04/01/26 14:30</option>
+                  </select>
+                </div>
+                <div>
+                  <span class="mini-label">Fuseau du fichier</span>
+                  <select class="select" style="min-width:180px"><option>Europe/Paris</option><option>UTC</option><option>Europe/Brussels</option></select>
+                </div>
+                <div>
+                  <span class="mini-label">Granularité déclarée</span>
+                  <select class="select" style="min-width:150px"><option>PT1H (horaire)</option><option>P1D (journalier)</option><option>PT15M</option><option>PT5M</option></select>
+                </div>
+                <div>
+                  <span class="mini-label">Séparateurs</span>
+                  <div style="display:flex; gap:8px">
+                    <select class="select" style="min-width:110px"><option>Colonne : ;</option><option>Colonne : ,</option></select>
+                    <select class="select" style="min-width:110px"><option>Décimal : ,</option><option>Décimal : .</option></select>
+                  </div>
+                </div>
+                <div>
+                  <span class="mini-label">Mode d'enregistrement</span>
+                  <div class="freq-toggle" role="tablist" aria-label="Mode d'enregistrement">
+                    <button class="on" data-freq="frequentiel">Fréquentiel</button>
+                    <button data-freq="evenementiel">Évènementiel</button>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <div class="card" style="margin-bottom:14px">
+            <div class="card-head">
+              <div>
+                <div class="card-head-title">Charger un fichier</div>
+                <div class="card-head-sub" id="ing-context">La Dordogne à Bergerac · unité du capteur m³/s · fichier en m³/s</div>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="dropzone" onclick="simulateUpload()">
+                <i data-lucide="upload-cloud" style="width:36px; height:36px"></i>
+                <div style="font-size:14px; color:var(--text-primary); margin-top:10px; font-weight:500">Glissez-déposez un fichier ici</div>
+                <div style="font-size:12px; color:var(--text-muted); margin-top:4px">CSV ou XLSX · max 50 Mo</div>
+                <button class="btn btn-secondary" style="margin-top:14px" onclick="event.stopPropagation(); simulateUpload()"><i data-lucide="folder-open"></i> Parcourir</button>
+              </div>
+              <div style="display:flex; gap:8px; align-items:flex-start; margin-top:12px; font-size:12px; color:var(--text-muted)">
+                <i data-lucide="alert-triangle" style="width:13px; height:13px; margin-top:2px; flex:none"></i>
+                Le fichier <b style="color:var(--text-primary)">remplace</b> la série brute de la source sur toute la période qu'il couvre, puis les indicateurs sont recalculés sur cette période. Les autres périodes ne sont pas touchées.
+              </div>
+
+              <div class="preview-card" id="preview-card" style="display:none">
+                <div class="pv-head">
+                  <div class="pv-title"><i data-lucide="eye"></i> Prévisualisation · <span>dordogne_bergerac_2024-2026.csv</span></div>
+                  <div class="pv-actions">
+                    <button class="btn btn-ghost btn-sm" onclick="hidePreview()">Annuler</button>
+                    <button class="btn btn-primary btn-sm" onclick="confirmImport()"><i data-lucide="check"></i> Confirmer l'import</button>
+                  </div>
+                </div>
+                <div class="pv-meta" style="margin-bottom:8px">17 544 lignes détectées · pas 1 h · 1 janv. 2024 au 31 déc. 2025 · 3 trous (5 h cumulées)</div>
+                <table class="data-table" style="font-size:12.5px">
+                  <thead><tr><th>Horodatage</th><th class="num" style="text-align:right">Valeur</th><th>Statut</th></tr></thead>
+                  <tbody>
+                    <tr><td class="tabular">2024-01-01 00:00</td><td class="num" style="text-align:right">38,4</td><td><span class="badge badge-green">OK</span></td></tr>
+                    <tr><td class="tabular">2024-01-01 01:00</td><td class="num" style="text-align:right">38,1</td><td><span class="badge badge-green">OK</span></td></tr>
+                    <tr><td class="tabular">2024-01-01 02:00</td><td class="num" style="text-align:right">—</td><td><span class="badge badge-amber">trou</span></td></tr>
+                    <tr><td class="tabular">2024-01-01 03:00</td><td class="num" style="text-align:right">37,6</td><td><span class="badge badge-green">OK</span></td></tr>
+                    <tr><td class="tabular">…</td><td class="num" style="text-align:right">…</td><td class="muted">17 540 lignes supplémentaires</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-head"><div class="card-head-title">Imports manuels · <span id="ing-hist-source">La Dordogne à Bergerac</span></div><a href="#" class="link" style="font-size:12px">Voir tout l'historique →</a></div>
+            <table class="data-table">
+              <thead><tr><th>Date</th><th>Période couverte</th><th>Lignes</th><th>Par</th><th>Statut</th></tr></thead>
+              <tbody id="ing-hist"></tbody>
+            </table>
+          </div>
+
+          <p class="muted" style="font-size:12px; margin:14px 0 0">
+            Même parcours d'import que « Données » côté client, sans onglet centrale : une source publique n'appartient à aucune centrale. L'import est toujours rattaché à la source ouverte.
+          </p>
+        </div>
+
+      </section>
+
+      <!-- ================================================================= -->
+      <!-- SECTION 2 · ACCÈS UTILISATEURS                                    -->
+      <!-- ================================================================= -->
+      <section data-core-section="acces" style="display:none">
+
+        <div style="display:grid; gap:14px; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); margin-bottom:14px">
+
+          <div class="card" style="margin:0">
+            <div class="card-head"><div><div class="card-head-title">Créer un utilisateur</div><div class="card-head-sub">Crée le compte. L'accès aux centrales se donne juste à côté.</div></div></div>
+            <div class="card-body">
+              <div style="display:grid; gap:14px; grid-template-columns:1fr 1fr">
+                <div><span class="mini-label">Prénom</span><input class="input" placeholder="Jean" style="width:100%"></div>
+                <div><span class="mini-label">Nom</span><input class="input" placeholder="Dupont" style="width:100%"></div>
+                <div style="grid-column:1/-1"><span class="mini-label">Adresse e-mail</span><input class="input" placeholder="jean.dupont@exemple.fr" style="width:100%"></div>
+                <div><span class="mini-label">Langue</span><select class="select" style="width:100%"><option>Français</option><option>English</option><option>Nederlands</option></select></div>
+                <div><span class="mini-label">Type de compte</span><select class="select" style="width:100%"><option>Client</option><option>Interne Naia</option><option>Démonstration</option></select></div>
+                <div style="grid-column:1/-1"><span class="mini-label">Mot de passe provisoire</span><input class="input" type="password" placeholder="••••••••••" style="width:100%">
+                  <div class="muted" style="font-size:11.5px; margin-top:6px">L'utilisateur le change à sa première connexion, ou se connecte par lien magique.</div>
+                </div>
+              </div>
+              <button class="btn btn-primary" style="margin-top:16px" onclick="createUser()"><i data-lucide="user-plus"></i> Créer l'utilisateur</button>
+              <div id="u-result" style="margin-top:14px; display:none"></div>
+            </div>
+          </div>
+
+          <div class="card" style="margin:0">
+            <div class="card-head"><div><div class="card-head-title">Donner un accès à une centrale</div><div class="card-head-sub">Le compte doit déjà exister.</div></div></div>
+            <div class="card-body">
+              <div style="display:grid; gap:14px">
+                <div><span class="mini-label">Utilisateur</span><input class="input" placeholder="jean.dupont@exemple.fr" style="width:100%"></div>
+                <div><span class="mini-label">Centrale</span><select class="select" style="width:100%"><option>Centrale des Moulins</option><option>Moulin du Bocq</option><option>Centrale d'Ariège</option><option>Moulin de la Lesse</option></select></div>
+                <div><span class="mini-label">Rôle sur la centrale</span><select class="select" style="width:100%"><option>Propriétaire</option><option>Exploitant</option><option>Lecture seule</option></select></div>
+              </div>
+              <button class="btn btn-primary" style="margin-top:16px" onclick="grantAccess()"><i data-lucide="key-round"></i> Donner l'accès</button>
+              <div id="g-result" style="margin-top:14px; display:none"></div>
+              <div class="muted" style="font-size:12px; margin-top:14px; line-height:1.6">
+                À la création de l'accès, les réglages d'affichage de la centrale (légendes, axes, widgets) sont recopiés depuis votre propre configuration, sinon depuis les valeurs par défaut.
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="card" style="margin-bottom:14px">
+          <div class="card-head">
+            <div><div class="card-head-title">Accès existants</div><div class="card-head-sub">Qui voit quelle centrale</div></div>
+            <div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end">
+              <input class="input" placeholder="Rechercher un utilisateur…" style="width:210px">
+              <select class="select" style="width:200px"><option>Toutes les centrales</option><option>Centrale des Moulins</option><option>Moulin du Bocq</option><option>Centrale d'Ariège</option><option>Moulin de la Lesse</option></select>
+            </div>
+          </div>
+          <table class="data-table">
+            <thead><tr><th>Utilisateur</th><th>E-mail</th><th>Centrale</th><th>Rôle</th><th>Depuis</th><th>Dernière connexion</th><th></th></tr></thead>
+            <tbody>
+              <tr><td>Marc Dupont</td><td class="muted">marc.dupont@exemple.fr</td><td>Moulin du Bocq</td><td><span class="badge badge-blue">Propriétaire</span></td><td>14 mars 2026</td><td>il y a 2 j</td><td style="text-align:right"><button class="btn btn-ghost btn-sm" onclick="alert('Révocation de l\'accès (démo)')"><i data-lucide="user-minus"></i> Révoquer</button></td></tr>
+              <tr><td>Claire Rousseau</td><td class="muted">claire.rousseau@exemple.fr</td><td>Centrale des Moulins</td><td><span class="badge badge-slate">Lecture seule</span></td><td>2 juin 2026</td><td>il y a 5 h</td><td style="text-align:right"><button class="btn btn-ghost btn-sm" onclick="alert('Révocation de l\'accès (démo)')"><i data-lucide="user-minus"></i> Révoquer</button></td></tr>
+              <tr><td>Bernard Lemoine</td><td class="muted">bernard.lemoine@exemple.fr</td><td>Centrale d'Ariège</td><td><span class="badge badge-blue">Exploitant</span></td><td>18 avr. 2026</td><td>hier</td><td style="text-align:right"><button class="btn btn-ghost btn-sm" onclick="alert('Révocation de l\'accès (démo)')"><i data-lucide="user-minus"></i> Révoquer</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="card">
+          <div class="card-head">
+            <div><div class="card-head-title">Se connecter à la place d'un utilisateur</div><div class="card-head-sub">Ouvrir l'application telle qu'il la voit, pour diagnostiquer</div></div>
+            <span class="badge badge-amber">En construction</span>
+          </div>
+          <div class="card-body">
+            <div class="wip">
+              <i data-lucide="construction" style="width:30px; height:30px"></i>
+              <div class="wip-title">En construction</div>
+              <div class="wip-body">
+                Principe retenu : le superadmin obtient un jeton de session limité au compte visé et l'application s'ouvre dans une fenêtre séparée, avec un bandeau permanent rappelant l'emprunt d'identité. Réservé au superadmin, durée limitée, tracé au journal d'audit.
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ================================================================= -->
+      <!-- SECTION 3 · SUPPORT                                               -->
+      <!-- ================================================================= -->
+      <section data-core-section="support" style="display:none">
+        <div class="card">
+          <div class="card-head"><div><div class="card-head-title">Support</div><div class="card-head-sub">Suivi des demandes clients côté administration</div></div><span class="badge badge-amber">En construction</span></div>
+          <div class="card-body">
+            <div class="wip">
+              <i data-lucide="life-buoy" style="width:30px; height:30px"></i>
+              <div class="wip-title">En construction</div>
+              <div class="wip-body">
+                Côté client, « Aide &amp; support » ouvre déjà un ticket. Cette section accueillera la vue administrateur de ces demandes (demandes de source publique, ajout de centrale, validation de compteur).
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================================= -->
+      <!-- SECTION 4 · LOGS                                                  -->
+      <!-- ================================================================= -->
+      <section data-core-section="logs" style="display:none">
+        <div class="card">
+          <div class="card-head"><div><div class="card-head-title">Logs</div><div class="card-head-sub">Journal des modifications du module Naia</div></div><span class="badge badge-amber">En construction</span></div>
+          <div class="card-body">
+            <div class="wip">
+              <i data-lucide="scroll-text" style="width:30px; height:30px"></i>
+              <div class="wip-title">En construction</div>
+              <div class="wip-body">
+                La donnée existe déjà en base (table d'audit du schéma <code>naia</code>, alimentée par déclencheur à chaque écriture). Reste à choisir la présentation : soit ici, soit comme troisième onglet du <a class="link" href="admin-audit.html">journal d'audit</a> existant, qui a déjà un onglet par module (Communauté, Abonnements).
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+</div>
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="js/app.js"></script>
+<script>
+// ---------- Onglets de la console ----------
+const CORE_TABS = ["sources-publiques", "acces", "support", "logs"];
+
+function switchCoreTab(tab) {
+  if (!CORE_TABS.includes(tab)) tab = CORE_TABS[0];
+  if (location.hash !== "#" + tab) history.replaceState(null, "", "#" + tab);
+  document.querySelectorAll("[data-core-tab]").forEach(t => t.classList.toggle("active", t.dataset.coreTab === tab));
+  document.querySelectorAll("[data-core-section]").forEach(s => s.style.display = (s.dataset.coreSection === tab) ? "" : "none");
+  icons();
+}
+
+// ---------- Sous-onglets « Sources publiques » ----------
+function switchSourceSub(sub) {
+  // L'ingestion n'est pas une pastille : on y entre depuis une source, on en ressort par « Retour ».
+  document.getElementById("src-seg").style.display = (sub === "ingestion") ? "none" : "";
+  document.querySelectorAll(".type-seg button").forEach(b => b.classList.toggle("on", b.dataset.sub === sub));
+  document.querySelectorAll("[data-sub-panel]").forEach(p => p.style.display = (p.dataset.subPanel === sub) ? "" : "none");
+  icons();
+}
+
+// « Ingérer des données » depuis la fiche : ouvre l'écran d'import sur la source sélectionnée.
+function openIngest(key) {
+  const k = key || currentSource;
+  document.getElementById("ing-source").value = k;
+  refreshIngestContext();
+  switchSourceSub("ingestion");
+  window.scrollTo({ top: 0 });
+}
+
+function icons() { if (window.lucide) lucide.createIcons({ attrs: { "stroke-width": 1.75 } }); }
+
+// ---------- 1A · fiche d'une source ----------
+const SOURCES = {
+  dordogne: {
+    name: "La Dordogne à Bergerac", provider: "Hub'Eau", code: "P123456789",
+    domain: "Débit · m³/s", river: "La Dordogne · Bergerac (24)", coords: "44,8512 · 0,4903",
+    inService: "Oui", ids: "#412 · #987", installed: "12 août 2026 par Ugo Duraffourd",
+    badges: [["badge-green", "Active"], ["badge-slate", "Vérifiée"]],
+    state: "Active", cadence: "PT1H récent · P1D historique",
+    lastRun: "Succès · aujourd'hui 04:12", lastPoint: "aujourd'hui 03:00 UTC", pts7: "168", pts30: "718",
+    note: "Aucun trou sur les 30 derniers jours. Historique disponible depuis le 12 août 2024 (rattrapage de 2 ans au moment de la première sélection).",
+    usage: "4 utilisateurs · 3 centrales",
+    users: [["Marc Dupont", "Moulin du Bocq", "14 août 2026"], ["Claire Rousseau", "Centrale des Moulins", "14 août 2026"], ["Bernard Lemoine", "Centrale d'Ariège", "16 août 2026"], ["Sophie Marchand", "Centrale des Moulins", "18 août 2026"]],
+  },
+  bourget: {
+    name: "Pluie · Bourget-en-Huile", provider: "Météo-France", code: "73052002",
+    domain: "Pluie · mm", river: "Bourget-en-Huile (73)", coords: "45,5183 · 6,1742",
+    inService: "Oui", ids: "#418 · #994", installed: "18 août 2026 par Ugo Duraffourd",
+    badges: [["badge-green", "Active"], ["badge-slate", "Vérifiée"]],
+    state: "Active", cadence: "PT1H récent · PT1H historique",
+    lastRun: "Succès · aujourd'hui 04:35", lastPoint: "aujourd'hui 02:00 UTC", pts7: "166", pts30: "716",
+    note: "Deux points manquants sur 30 jours, côté fournisseur. Le rattrapage repasse automatiquement à la prochaine collecte.",
+    usage: "2 utilisateurs · 2 centrales",
+    users: [["Marc Dupont", "Moulin du Bocq", "18 août 2026"], ["Sophie Marchand", "Centrale des Moulins", "19 août 2026"]],
+  },
+  ariege: {
+    name: "L'Ariège à Foix", provider: "Hub'Eau", code: "O123451001",
+    domain: "Débit · m³/s", river: "L'Ariège · Foix (09)", coords: "42,9654 · 1,6055",
+    inService: "Oui", ids: "#421 · #999", installed: "20 août 2026 par Ugo Duraffourd",
+    badges: [["badge-slate", "Dormante"], ["badge-slate", "Vérifiée"]],
+    state: "Dormante", cadence: "—",
+    lastRun: "Jamais exécutée", lastPoint: "—", pts7: "0", pts30: "0",
+    note: "Aucune collecte en cours, et c'est normal : personne n'a encore sélectionné cette source. La collecte démarre automatiquement à la première sélection, avec un rattrapage de 2 ans d'historique.",
+    usage: "Aucun utilisateur",
+    users: [],
+  },
+  roumaniere: {
+    name: "Pluie · Bergerac-Roumanière", provider: "Météo-France", code: "24037003",
+    domain: "Pluie · mm", river: "Bergerac (24)", coords: "44,8253 · 0,5186",
+    inService: "Oui", ids: "#415 · #991", installed: "13 août 2026 par Ugo Duraffourd",
+    badges: [["badge-red", "Échec de collecte"], ["badge-slate", "Vérifiée"]],
+    state: "Active, en anomalie", cadence: "PT1H récent · PT1H historique",
+    lastRun: "Échec · 18 août 04:35 (fournisseur injoignable, 3 tentatives)", lastPoint: "17 août 23:00 UTC", pts7: "24", pts30: "574",
+    note: "Trois jours sans nouveau point. Le fournisseur ne répond plus sur cette station : vérifiez la station puis relancez une collecte. Les données déjà collectées restent intactes.",
+    usage: "1 utilisateur · 1 centrale",
+    users: [["Claire Rousseau", "Centrale des Moulins", "13 août 2026"]],
+  },
+  isere: {
+    name: "L'Isère à Grenoble", provider: "Hub'Eau", code: "W123451001",
+    domain: "Débit · m³/s", river: "L'Isère · Grenoble (38)", coords: "45,1885 · 5,7245",
+    inService: "Inconnu (non vérifié)", ids: "#419 · #996", installed: "19 août 2026 par Ugo Duraffourd",
+    badges: [["badge-green", "Active"], ["badge-amber", "Non vérifiée"]],
+    state: "Active", cadence: "PT1H récent · P1D historique",
+    lastRun: "Succès · aujourd'hui 04:12", lastPoint: "aujourd'hui 03:00 UTC", pts7: "168", pts30: "168",
+    note: "Le fournisseur était injoignable au moment de l'installation : l'identité de la station n'a jamais été confirmée. La collecte fonctionne. Lancez « Re-vérifier la station » pour lever ce statut.",
+    usage: "1 utilisateur · 1 centrale",
+    users: [["Bernard Lemoine", "Centrale d'Ariège", "19 août 2026"]],
+  },
+};
+
+let currentSource = "dordogne";
+
+function selectSource(key, row) {
+  const s = SOURCES[key];
+  if (!s) return;
+  currentSource = key;
+  document.querySelectorAll(".src-table tbody tr").forEach(t => t.classList.remove("sel"));
+  if (row) row.classList.add("sel");
+
+  const set = (id, val) => { document.getElementById(id).textContent = val; };
+  set("d-name", s.name);
+  set("d-sub", s.provider + " · code " + s.code);
+  set("d-provider", s.provider);
+  set("d-code", s.code);
+  set("d-domain", s.domain);
+  set("d-river", s.river);
+  set("d-coords", s.coords);
+  set("d-inservice", s.inService);
+  set("d-ids", s.ids);
+  set("d-installed", s.installed);
+  set("d-state", s.state);
+  set("d-cadence", s.cadence);
+  set("d-lastrun", s.lastRun);
+  set("d-lastpoint", s.lastPoint);
+  set("d-pts7", s.pts7);
+  set("d-pts30", s.pts30);
+  set("d-usage-count", s.usage);
+  document.getElementById("d-badges").innerHTML = s.badges.map(b => `<span class="badge ${b[0]}">${b[1]}</span>`).join(" ");
+  document.getElementById("d-collect-note").textContent = s.note;
+  document.getElementById("d-users").innerHTML = s.users.length
+    ? s.users.map(u => `<tr><td>${u[0]}</td><td>${u[1]}</td><td>${u[2]}</td></tr>`).join("")
+    : `<tr><td colspan="3" class="muted">Personne n'a sélectionné cette source. Elle reste dormante tant que c'est le cas.</td></tr>`;
+  icons();
+}
+
+// ---------- 1B · vérification puis installation ----------
+const PROVIDERS = {
+  hubeau:      { label: "Hub'Eau",      hint: "Hub'Eau : code de la station hydrométrique (10 caractères).", placeholder: "P123456789", domain: "FLOW", station: "La Dordogne à Bergerac", river: "La Dordogne", coords: "44,8512 · 0,4903" },
+  meteofrance: { label: "Météo-France", hint: "Météo-France : identifiant de station à 8 chiffres, zéros initiaux compris.", placeholder: "73052002", domain: "RAIN", station: "Bourget-en-Huile", river: "Bourget-en-Huile (73)", coords: "45,5183 · 6,1742" },
+  entsoe:      { label: "ENTSO-E",      hint: "ENTSO-E : code de la zone de marché (FR, BE…).", placeholder: "FR", domain: "PRICE", station: "Zone de marché France", river: "Prix journalier EPEX", coords: "—" },
+};
+
+function onProviderChange() {
+  const p = PROVIDERS[document.getElementById("v-provider").value];
+  if (!p) return;
+  document.getElementById("v-hint").textContent = p.hint;
+  document.getElementById("v-code").placeholder = p.placeholder;
+  document.getElementById("v-result").style.display = "none";
+  document.getElementById("install-card").style.display = "none";
+}
+
+function resultBox(kind, icon, title, body) {
+  const colors = { ok: "var(--accent-green)", warn: "var(--accent-amber)", err: "var(--accent-red-strong)" };
+  return `<div class="result ${kind}">
+    <i data-lucide="${icon}" style="color:${colors[kind]}"></i>
+    <div><div class="r-title">${title}</div><div class="r-body">${body}</div></div>
+  </div>`;
+}
+
+function verifyStation() {
+  const p = PROVIDERS[document.getElementById("v-provider").value] || PROVIDERS.hubeau;
+  const code = document.getElementById("v-code").value.trim() || p.placeholder;
+  const scenario = document.getElementById("verify-scenario").value;
+  const box = document.getElementById("v-result");
+  const installCard = document.getElementById("install-card");
+  const warn = document.getElementById("i-warn");
+  box.style.display = "block";
+  document.getElementById("i-result").style.display = "none";
+
+  if (scenario === "notfound") {
+    box.innerHTML = resultBox("err", "x-circle", "Aucune station ne porte ce code",
+      `${p.label} ne connaît pas le code <b>${code}</b>. Vérifiez la saisie : ${p.hint.toLowerCase()}`);
+    installCard.style.display = "none";
+  } else if (scenario === "unreachable") {
+    box.innerHTML = resultBox("warn", "clock", "Fournisseur injoignable",
+      `${p.label} n'a pas répondu. Réessayez dans quelques minutes. L'installation reste possible : la source serait alors créée <b>non vérifiée</b>, et son identité confirmée à la première collecte réussie.`);
+    installCard.style.display = "none";
+  } else if (scenario === "closed") {
+    box.innerHTML = resultBox("warn", "alert-triangle", "Station trouvée, mais hors service",
+      `<b>${p.station}</b> · ${p.river} · ${p.coords}<br>Cette station <b>ne publie plus de mesures</b>. Elle ne fournira que son historique. Cherchez une station voisine encore en service, ou installez-la quand même si l'historique suffit.`);
+    installCard.style.display = "";
+    warn.style.display = "block";
+    warn.innerHTML = resultBox("warn", "alert-triangle", "Station hors service",
+      "Aucune mesure nouvelle ne sera collectée. Seul l'historique déjà publié sera récupéré.");
+    document.getElementById("i-btn").innerHTML = '<i data-lucide="plus"></i> Installer quand même';
+  } else {
+    box.innerHTML = resultBox("ok", "check-circle", "Station trouvée",
+      `<b>${p.station}</b> · ${p.river} · coordonnées ${p.coords} · <b>en service</b>. Vous pouvez l'installer.`);
+    installCard.style.display = "";
+    warn.style.display = "none";
+    document.getElementById("i-btn").innerHTML = '<i data-lucide="plus"></i> Installer la source';
+  }
+
+  document.getElementById("i-recap").textContent = `${p.label} · ${code} · ${p.station}`;
+  document.getElementById("i-domain").value = p.domain;
+  icons();
+}
+
+function installStation() {
+  const p = PROVIDERS[document.getElementById("v-provider").value] || PROVIDERS.hubeau;
+  const scenario = document.getElementById("install-scenario").value;
+  const box = document.getElementById("i-result");
+  box.style.display = "block";
+  if (scenario === "exists") {
+    box.innerHTML = resultBox("warn", "info", "Cette station est déjà installée",
+      `<b>${p.station}</b> existe déjà chez Naia (indicateur <b>#412</b>). Rien n'a été créé : une station n'est installée qu'une fois, pour tous les clients. <a class="link" href="#" onclick="event.preventDefault(); switchSourceSub('actives')">Ouvrir sa fiche</a>`);
+  } else {
+    box.innerHTML = resultBox("ok", "check-circle", "Source installée",
+      `<b>${p.station}</b> est maintenant disponible dans Naia · indicateur <b>#427</b> · capteur <b>#1004</b> · statut <b>vérifiée</b>.<br>
+       Elle est pour l'instant <b>dormante</b> : la collecte démarrera dès qu'un utilisateur la sélectionnera dans ses paramètres, avec un rattrapage automatique de 2 ans d'historique.`);
+  }
+  icons();
+}
+
+// ---------- 1C · import ----------
+// Le domaine d'une source porte déjà « Débit · m³/s » : on en dérive libellé et unité,
+// pour ne pas maintenir deux listes de sources.
+function domainLabel(s) { return s.domain.split(" · ")[0]; }
+function sourceUnit(s)  { return s.domain.split(" · ")[1]; }
+
+function buildIngestOptions() {
+  document.getElementById("ing-source").innerHTML = Object.entries(SOURCES)
+    .map(([k, s]) => `<option value="${k}">${s.name} (${s.provider})</option>`)
+    .join("");
+}
+
+// Unités plausibles dans un fichier, par domaine. La 1re est celle du capteur.
+const FILE_UNITS = { "Débit": ["m³/s", "L/s"], "Pluie": ["mm"], "Prix d'électricité": ["€/MWh"] };
+
+// Imports manuels déjà passés, par source (vide = jamais importé à la main).
+const ING_HISTORY = {
+  dordogne:   [["19 août 11:04", "1 janv. 2024 au 31 déc. 2025", "17 544", "Ugo Duraffourd", "badge-green", "Importé"]],
+  bourget:    [["14 août 16:20", "1 janv. au 31 juil. 2026", "5 088", "Ugo Duraffourd", "badge-amber", "3 trous détectés"]],
+  ariege:     [["12 août 09:41", "1 au 30 juin 2026", "720", "Ugo Duraffourd", "badge-red", "Rejeté · cadence incohérente"]],
+};
+
+function refreshIngestContext() {
+  const key = document.getElementById("ing-source").value;
+  const s = SOURCES[key] || SOURCES.dordogne;
+  const unit = sourceUnit(s);
+  document.getElementById("ing-unite").textContent = unit;
+  document.getElementById("ing-meta").textContent = `${s.provider} · ${domainLabel(s)} · code ${s.code}`;
+  document.getElementById("ing-title").textContent = s.name;
+  document.getElementById("ing-hist-source").textContent = s.name;
+  document.getElementById("ing-context").innerHTML = `${s.name} · ${s.provider} · unité du capteur ${unit}`;
+
+  const units = FILE_UNITS[domainLabel(s)] || [unit];
+  document.getElementById("ing-file-unit").innerHTML = units.map(u => `<option>${u}</option>`).join("");
+
+  const rows = ING_HISTORY[key] || [];
+  document.getElementById("ing-hist").innerHTML = rows.length
+    ? rows.map(r => `<tr><td class="tabular">${r[0]}</td><td>${r[1]}</td><td class="num">${r[2]}</td><td>${r[3]}</td><td><span class="badge ${r[4]}">${r[5]}</span></td></tr>`).join("")
+    : `<tr><td colspan="5" class="muted">Aucun import manuel sur cette source. Ses données viennent de la collecte automatique.</td></tr>`;
+}
+function simulateUpload() { document.getElementById("preview-card").style.display = "block"; icons(); }
+function hidePreview() { document.getElementById("preview-card").style.display = "none"; }
+function confirmImport() { alert("Import confirmé (démo)"); hidePreview(); }
+
+document.querySelectorAll(".freq-toggle button").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".freq-toggle button").forEach(b => b.classList.remove("on"));
+    btn.classList.add("on");
+  });
+});
+
+// ---------- 2 · accès ----------
+function createUser() {
+  const box = document.getElementById("u-result");
+  box.style.display = "block";
+  box.innerHTML = resultBox("ok", "check-circle", "Utilisateur créé",
+    "Compte <b>#128</b> · jean.dupont@exemple.fr. Il n'a encore accès à aucune centrale : donnez-lui un accès avec le formulaire voisin.");
+  icons();
+}
+function grantAccess() {
+  const box = document.getElementById("g-result");
+  box.style.display = "block";
+  box.innerHTML = resultBox("ok", "check-circle", "Accès accordé",
+    "Jean Dupont accède désormais à <b>Centrale des Moulins</b> en tant que propriétaire. Ses réglages d'affichage ont été initialisés.");
+  icons();
+}
+
+// ---------- init ----------
+window.addEventListener("DOMContentLoaded", () => {
+  const tab = (location.hash || "#sources-publiques").replace("#", "");
+  switchCoreTab(CORE_TABS.includes(tab) ? tab : "sources-publiques");
+  selectSource("dordogne", document.querySelector('.src-table tbody tr[data-src="dordogne"]'));
+  buildIngestOptions();
+  refreshIngestContext();
+});
+</script>
+</body></html>
