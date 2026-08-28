@@ -57,22 +57,36 @@ renommage « perte » → « événement » : ce balayage est réservé à une v
 ### « Générer un prompt » sur la page Données (`data.html`)
 
 L'utilisateur dont le fichier est refusé n'a pas besoin qu'on lui explique le format
-attendu : il a besoin qu'on le fasse pour lui. Un bouton dans la zone de dépôt, juste
-à côté de « Parcourir » — c'est-à-dire à l'endroit exact où il est bloqué — ouvre une
-modale contenant un prompt prêt à coller dans l'assistant IA de son choix, avec son
-CSV ou son XLSX en pièce jointe.
+attendu : il a besoin qu'on le fasse pour lui. Un bouton dans l'**en-tête de la carte
+« Charger un fichier »** ouvre une modale contenant un prompt prêt à coller dans
+l'assistant IA de son choix, avec son CSV ou son XLSX en pièce jointe. Il est dans
+l'en-tête et non dans la zone de dépôt : c'est une aide à la préparation du fichier,
+pas une deuxième façon de le déposer.
 
 - Le prompt est **générique**, il ne reprend pas les sélections de la page. C'est
   volontaire : c'est le LLM qui, en lisant le fichier, dira à l'utilisateur quoi
   choisir ici. Un prompt pré-rempli à partir de sélections que l'utilisateur a
   justement du mal à poser tournerait en rond.
+- Il **pose son propre contexte**. Le modèle qui le reçoit n'a jamais entendu parler
+  de Naia : le prompt commence donc par expliquer ce qu'est la plateforme, ce qu'elle
+  stocke, ce que l'écran d'import attend, et lui interdit d'aller chercher une
+  documentation qui n'existe pas.
 - Il fait **deux choses** : convertir le fichier au format Naia (CSV UTF-8, deux
   colonnes, `;`, ISO 8601, point décimal, trous laissés vides), et **rendre un
-  récapitulatif de ce qu'il faut sélectionner** — type de données, format
-  d'horodatage, fréquentiel / évènementiel, unité.
+  récapitulatif de ce qu'il faut sélectionner** — format d'horodatage, fréquentiel /
+  évènementiel, unité, avec les libellés exacts des options de l'écran.
+- **Le fuseau horaire y a sa propre section.** Naia stocke en UTC mais son import
+  attend l'**heure locale de la centrale**, écrite sans décalage ni `Z` (cf.
+  `product-system/features/timezone-storage-strategy/`). Le prompt fait détecter la
+  convention du fichier, interdit toute conversion vers UTC, impose de demander le
+  fuseau plutôt que de le supposer, et traite les deux cas de changement d'heure :
+  l'heure doublée d'octobre — à conserver en double, ce ne sont pas des doublons —
+  et l'heure manquante de mars, qu'il ne faut pas combler.
 - Il interdit au modèle de convertir des unités, de recalculer une valeur ou de
   combler un trou par interpolation. Un import silencieusement « corrigé » est pire
   qu'un import refusé.
+- Il ne demande pas au modèle de deviner le **type de données** : l'utilisateur sait
+  ce qu'il importe.
 - La modale **affiche le prompt en entier** avant de le copier : l'utilisateur doit
   pouvoir le lire, et l'adapter à son cas.
 - Wireframe uniquement à ce stade — la version applicative viendra ensuite.

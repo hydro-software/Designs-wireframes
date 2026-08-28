@@ -49,12 +49,10 @@
   .help-bubble ul { margin: 4px 0 0; padding-left: 16px; }
   .help-bubble li { margin-bottom: 2px; }
 
-  /* --- v6.7 : bouton + modal « Générer un prompt » ---------------------------
-     Le bouton vit dans la zone de dépôt, à côté de « Parcourir » : c'est là que
-     se trouve l'utilisateur au moment précis où son fichier est refusé. Ghost,
-     pour que « Parcourir » reste le geste principal des deux. */
-  .prompt-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 14px; }
-
+  /* --- v6.7 : modal « Générer un prompt » ------------------------------------
+     Le bouton vit dans l'en-tête de la carte « Charger un fichier », pas dans la
+     zone de dépôt : c'est une aide à la préparation du fichier, pas une deuxième
+     façon de le déposer. */
   /* Le prompt lui-même : bloc monospace défilant. On le montre en entier plutôt
      que de copier en silence — l'utilisateur doit pouvoir le lire et l'adapter. */
   .prompt-box {
@@ -238,16 +236,14 @@
             <div class="card-head-title">Charger un fichier</div>
             <div class="card-head-sub" id="upload-context">Électricité pour <b data-centrale-name>Centrale des Moulins</b> · source MOU-PRINC · unité kWh</div>
           </div>
+          <button class="btn btn-secondary btn-sm" onclick="openOverlay('import-prompt')"><i data-lucide="sparkles"></i> Générer un prompt</button>
         </div>
         <div class="card-body">
           <div class="dropzone" onclick="simulateUpload()">
             <i data-lucide="upload-cloud" style="width:36px; height:36px"></i>
             <div style="font-size:14px; color:var(--text-primary); margin-top:10px; font-weight:500">Glissez-déposez un fichier ici</div>
             <div style="font-size:12px; color:var(--text-muted); margin-top:4px">max 50 Mo · 1 an</div>
-            <div class="prompt-actions">
-              <button class="btn btn-secondary" onclick="event.stopPropagation(); simulateUpload()"><i data-lucide="folder-open"></i> Parcourir</button>
-              <button class="btn btn-ghost" onclick="event.stopPropagation(); openOverlay('import-prompt')"><i data-lucide="sparkles"></i> Générer un prompt</button>
-            </div>
+            <button class="btn btn-secondary" style="margin-top:14px" onclick="event.stopPropagation(); simulateUpload()"><i data-lucide="folder-open"></i> Parcourir</button>
           </div>
           <div style="display:flex; gap:8px; align-items:center; margin-top:12px; font-size:12px; color:var(--text-muted)">
             <i data-lucide="info" style="width:13px; height:13px"></i>
@@ -338,60 +334,85 @@
     </p>
     <ol class="prompt-steps" style="margin-bottom:16px">
       <li>il convertit votre fichier au format attendu par Naia ;</li>
-      <li>il vous dit quoi sélectionner sur cette page — format d'horodatage, séparateur, mode d'enregistrement, unité.</li>
+      <li>il vous dit quoi sélectionner sur cette page — format d'horodatage, mode d'enregistrement, unité.</li>
     </ol>
 
-    <pre class="prompt-box" id="import-prompt-text">Tu es un assistant d&#x27;import de données pour Naia, une plateforme de suivi de centrales hydroélectriques.
+    <pre class="prompt-box" id="import-prompt-text"># Contexte
 
-Je te fournis un fichier de mesures (CSV ou Excel). Ton rôle est double : le convertir au format attendu par Naia, puis me dire exactement quoi sélectionner dans l&#x27;écran d&#x27;import.
+Naia est une plateforme web de suivi de centrales hydroélectriques. Elle stocke des séries temporelles : une valeur horodatée, rattachée à une centrale et à une source de mesure précise — un compteur électrique, un pluviomètre, une sonde de débit, une courbe de prix. Ces séries alimentent des graphiques de production, des bilans d&#x27;énergie et des calculs de revenus. Une donnée mal horodatée fausse tout ce qui est calculé en aval.
+
+L&#x27;utilisateur charge ses données lui-même, fichier par fichier, dans un écran d&#x27;import. Cet écran ne devine rien et ne répare rien : il attend un fichier déjà propre. C&#x27;est pour cela que je te sollicite.
+
+Tu ne connais pas Naia et tu n&#x27;y as pas accès. Tout ce dont tu as besoin est écrit dans ce message. Ne cherche pas de documentation en ligne et ne suppose aucun comportement de la plateforme au-delà de ce qui suit.
+
+# Ta mission
+
+Je te fournis un fichier de mesures, en CSV ou en Excel. Tu dois faire trois choses, dans cet ordre : me dire ce que le fichier contient, me le rendre au format attendu par Naia, puis me dire quoi sélectionner dans l&#x27;écran d&#x27;import.
 
 ## 1. Analyse mon fichier
 
-Commence par me décrire ce que tu as trouvé, sans rien modifier :
+Décris d&#x27;abord ce que tu as trouvé, sans rien modifier :
 
 - le séparateur de colonnes (virgule, point-virgule, tabulation)
 - le séparateur décimal (point ou virgule)
 - le nombre de lignes d&#x27;en-tête avant les données
 - quelle colonne porte l&#x27;horodatage, quelle colonne porte la valeur
 - le format d&#x27;horodatage réel : 31/12/2025 14:30, 2025-12-31T14:30:00Z, ou un numéro de série Excel (45383,60)
-- le fuseau horaire, s&#x27;il est indiqué
 - le pas de temps entre deux points, et s&#x27;il est régulier ou non
 - la période couverte (première et dernière date)
+- l&#x27;unité de mesure, si le fichier l&#x27;indique
 - les trous, les doublons d&#x27;horodatage, les valeurs vides ou non numériques
 
-Si quelque chose est ambigu — jour et mois inversés, deux colonnes candidates pour la valeur — pose-moi la question au lieu de deviner.
+Sur le fuseau horaire, en particulier :
+
+- les horodatages portent-ils un décalage explicite (+02:00) ou un Z final, ou sont-ils nus ?
+- si tu vois un décalage, change-t-il en cours de fichier ? Un export qui passe de +01:00 à +02:00 en mars indique une heure locale européenne avec changement d&#x27;heure
+- la période couvre-t-elle un passage à l&#x27;heure d&#x27;été ou d&#x27;hiver ? Si oui, dis-moi précisément à quelle date
+
+Si quelque chose est ambigu — jour et mois inversés, deux colonnes candidates pour la valeur, fuseau horaire indéterminable — pose-moi la question. Ne devine pas.
 
 ## 2. Produis le fichier au format Naia
 
-Un CSV encodé en UTF-8, avec exactement deux colonnes dans cet ordre :
+Un fichier CSV encodé en UTF-8, avec exactement deux colonnes dans cet ordre :
 
     timestamp;valeur
     2026-04-01 00:00;42.8
     2026-04-01 00:15;41.2
 
-Règles :
+Règles de forme :
 
-- séparateur de colonnes : point-virgule
+- séparateur de colonnes : le point-virgule
 - horodatage au format ISO 8601 : AAAA-MM-JJ HH:MM
 - séparateur décimal : le point, jamais la virgule
-- une seule valeur par horodatage, triée par ordre chronologique croissant
+- une seule valeur par horodatage, triée du plus ancien au plus récent
 - pas de séparateur de milliers, pas d&#x27;unité dans la cellule, pas de guillemets
 - conserve la ligne d&#x27;en-tête timestamp;valeur
 - une donnée manquante est une ligne absente : n&#x27;écris ni 0, ni NA, ni tiret
-- ne comble aucun trou par interpolation
+
+Règles de fuseau horaire — c&#x27;est le point le plus délicat, lis-le en entier :
+
+- les horodatages doivent être exprimés en **heure locale de la centrale**, et écrits **sans décalage ni Z**. Naia convertit ensuite lui-même vers son stockage interne
+- ne convertis rien en UTC. Si le fichier est déjà en UTC (suffixe Z, ou décalage +00:00 constant), convertis-le **vers** l&#x27;heure locale de la centrale, et dis-moi explicitement que tu l&#x27;as fait
+- si tu ne connais pas le fuseau de la centrale, demande-le-moi avant de convertir quoi que ce soit
+- au passage à l&#x27;heure d&#x27;hiver, une même heure locale apparaît deux fois dans la journée. Conserve les deux occurrences, dans l&#x27;ordre chronologique du fichier source. Ne les considère pas comme des doublons et n&#x27;en supprime aucune
+- au passage à l&#x27;heure d&#x27;été, une heure locale n&#x27;existe pas. Il est normal qu&#x27;aucune ligne ne la couvre : n&#x27;invente rien pour combler
+- si le fichier mélange les conventions — une partie en UTC, une partie en heure locale, ce qui arrive sur les exports à cheval sur un changement d&#x27;heure — arrête-toi et signale-le-moi. Ne tente pas de rattraper ça tout seul
+
+Règles de contenu :
+
 - ne convertis aucune unité et ne recalcule aucune valeur. Si tu penses qu&#x27;une conversion est nécessaire, signale-le-moi, ne la fais pas
+- ne comble aucun trou par interpolation, et ne lisse aucune valeur
 - si le fichier dépasse 50 Mo ou plus d&#x27;un an de données, découpe-le en plusieurs fichiers d&#x27;un an maximum, nommés clairement
 
 ## 3. Dis-moi quoi sélectionner dans Naia
 
-Termine par un récapitulatif de ce que je dois choisir dans l&#x27;écran « Données → Charger un fichier » :
+L&#x27;écran d&#x27;import me demande de renseigner quelques champs. Termine par un récapitulatif de ce que je dois y choisir, en reprenant les libellés exacts ci-dessous :
 
-- Type de données : Électricité, Pluies, Indicateurs, Comparateurs ou Prix d&#x27;électricité, d&#x27;après ce que contient le fichier
-- Format timestamp : après ta conversion ce sera ISO 8601, mais rappelle-moi le format d&#x27;origine pour que je vérifie
-- Mode d&#x27;enregistrement : « Fréquentiel » si le pas de temps est régulier, « Évènementiel » s&#x27;il n&#x27;y a un point que lorsque la valeur change
-- Unité : dis-moi l&#x27;unité que tu as trouvée dans le fichier. Elle n&#x27;est pas modifiable à l&#x27;import, elle est définie dans Paramètres. Si elle ne correspond pas, préviens-moi
+- **Format timestamp** — les options proposées sont « ISO 8601 — 2026-04-01 14:30 », « JJ/MM/AA HH:MM — 01/04/26 14:30 », « MM/JJ/AA HH:MM — 04/01/26 14:30 » et « XLS — n° de série Excel (45383,60) ». Après ta conversion ce sera ISO 8601, mais rappelle-moi le format d&#x27;origine pour que je vérifie que tu ne t&#x27;es pas trompé de convention jour/mois
+- **Mode d&#x27;enregistrement** — deux options : « Fréquentiel » si le pas de temps est régulier, « Évènementiel » s&#x27;il n&#x27;y a un point que lorsque la valeur change. Dis-moi laquelle correspond à mon fichier, et sur quoi tu te fondes
+- **Unité** — l&#x27;unité n&#x27;est pas modifiable au moment de l&#x27;import, elle est définie une fois pour toutes dans les Paramètres de la source. Dis-moi l&#x27;unité que tu as trouvée dans le fichier, pour que je vérifie qu&#x27;elle correspond à celle déjà configurée. Si elle diffère, préviens-moi plutôt que de convertir
 
-Ajoute un avertissement pour chaque point qui mérite mon attention avant l&#x27;import : trous, doublons, valeurs aberrantes, changement d&#x27;heure, ou pas de temps qui change en cours de fichier.</pre>
+Termine par un avertissement pour chaque point qui mérite mon attention avant l&#x27;import : trous, doublons, valeurs aberrantes, changement d&#x27;heure, pas de temps qui change en cours de fichier, ou toute autre chose qui t&#x27;a semblé douteuse.</pre>
 
     <div style="display:flex; gap:8px; justify-content:space-between; align-items:center; margin-top:18px; padding-top:14px; border-top:1px solid var(--border-subtle)">
       <span class="muted" style="font-size:11.5px">Aucune donnée n'est envoyée par Naia. Vous restez maître de ce que vous transmettez à l'assistant.</span>
