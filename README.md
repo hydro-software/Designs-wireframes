@@ -109,6 +109,13 @@ et ce qu'on va gagner.
   on l'ajuste après, dans le vrai tableau.
 - `AUTOFILL_SETS` porte désormais les sous-types et les défauts pour les 2 templates
   et les 3 centrales — il n'y avait que des catégories à plat.
+- Le template 2 est **raboté de 10 à 6 catégories**. Le backend plafonne à
+  `MAX_USER_CATEGORIES = 6` (slots 1-6, le slot 9 « Correction » étant système), et
+  relever la limite toucherait le mapping de slots du graphe agrégé. Le grain fin
+  n'est pas perdu, il descend d'un cran : ce qui était une catégorie devient un
+  sous-type — 19 sous-types au lieu de 10 catégories. Règle générale posée à cette
+  occasion : **le wireframe est indicatif, pas normatif ; là où les deux divergent,
+  c'est l'app qui gagne** (platform#1324).
 - Le compteur de l'encart annonce catégories **et** sous-types.
 
 ### Bascule des deux registres alignée sur le menu

@@ -2782,25 +2782,24 @@
       { name: "Données", badge: "badge-slate", off: true, subs: [
         { name: "Capteur défaillant", def: true, off: true } ] },
     ],
+    // Rabot v6.7 : 10 catégories -> 6. Le backend plafonne à MAX_USER_CATEGORIES = 6
+    // (slots 1-6 ; le slot 9 « Correction » est système). Le grain fin de l'ancien
+    // template 2 n'est pas perdu, il descend d'un cran : ce qui était une catégorie
+    // devient un sous-type. Voir platform#1324.
     template2: [
-      { name: "Maintenance planifiée", badge: "badge-amber", subs: [
-        { name: "Révision annuelle", def: true }, { name: "Graissage" }, { name: "Vidange" } ] },
-      { name: "Maintenance corrective", badge: "badge-amber", subs: [
-        { name: "Remplacement de pièce", def: true }, { name: "Réparation sur site" } ] },
-      { name: "Panne électrique", badge: "badge-red", subs: [
-        { name: "Défaut automate", def: true }, { name: "Défaut réseau interne" } ] },
-      { name: "Panne mécanique", badge: "badge-red", subs: [
-        { name: "Turbine", def: true }, { name: "Multiplicateur" } ] },
-      { name: "Crue", badge: "badge-cyan", subs: [
-        { name: "Débit excédentaire", def: true }, { name: "Embâcle" } ] },
-      { name: "Étiage", badge: "badge-cyan", subs: [
-        { name: "Débit réservé", def: true } ] },
-      { name: "Arrêt manuel", badge: "badge-blue", def: true, subs: [
+      { name: "Maintenance", badge: "badge-amber", subs: [
+        { name: "Révision annuelle", def: true }, { name: "Graissage" }, { name: "Vidange" },
+        { name: "Remplacement de pièce" }, { name: "Réparation sur site" } ] },
+      { name: "Panne", badge: "badge-red", subs: [
+        { name: "Défaut automate", def: true }, { name: "Défaut réseau interne" },
+        { name: "Turbine" }, { name: "Multiplicateur" } ] },
+      { name: "Environnement", badge: "badge-cyan", subs: [
+        { name: "Débit excédentaire", def: true }, { name: "Embâcle" }, { name: "Débit réservé" } ] },
+      { name: "Exploitation", badge: "badge-blue", def: true, subs: [
         { name: "Consigne exploitant", def: true }, { name: "Essai de régulation" } ] },
-      { name: "Contrainte réseau", badge: "badge-purple", subs: [
-        { name: "Ordre GRD", def: true }, { name: "Tension hors plage" } ] },
-      { name: "Effacement contractuel", badge: "badge-purple", subs: [
-        { name: "Effacement tarifaire", def: true } ] },
+      { name: "Contraintes", badge: "badge-purple", subs: [
+        { name: "Ordre GRD", def: true }, { name: "Tension hors plage" },
+        { name: "Effacement tarifaire" } ] },
       { name: "Données", badge: "badge-slate", off: true, subs: [
         { name: "Capteur défaillant", def: true, off: true }, { name: "Trou de télérelève", off: true } ] },
     ],
