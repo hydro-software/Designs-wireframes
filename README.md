@@ -75,13 +75,16 @@ pas une deuxième façon de le déposer.
   colonnes, `;`, ISO 8601, point décimal, trous laissés vides), et **rendre un
   récapitulatif de ce qu'il faut sélectionner** — format d'horodatage, fréquentiel /
   évènementiel, unité, avec les libellés exacts des options de l'écran.
-- **Le fuseau horaire y a sa propre section.** Naia stocke en UTC mais son import
-  attend l'**heure locale de la centrale**, écrite sans décalage ni `Z` (cf.
-  `product-system/features/timezone-storage-strategy/`). Le prompt fait détecter la
-  convention du fichier, interdit toute conversion vers UTC, impose de demander le
-  fuseau plutôt que de le supposer, et traite les deux cas de changement d'heure :
-  l'heure doublée d'octobre — à conserver en double, ce ne sont pas des doublons —
-  et l'heure manquante de mars, qu'il ne faut pas combler.
+- **Le fuseau horaire y a sa propre section, et le modèle n'y tranche jamais seul.**
+  Naia stocke en UTC mais son import attend l'**heure locale de la centrale**, écrite
+  sans décalage ni `Z` (cf. `product-system/features/timezone-storage-strategy/`).
+  Deux cas, deux comportements, tous deux bloquants : si le fichier **porte** une
+  information de fuseau (`Z`, `+02:00`, en-tête « UTC »), le modèle le signale et
+  attend l'accord de l'utilisateur avant toute conversion ; s'il n'en porte **aucune**,
+  il ne suppose pas que c'est de l'heure locale — il le fait confirmer. Conversion vers
+  UTC interdite dans tous les cas. Les deux changements d'heure sont traités : l'heure
+  doublée d'octobre — à conserver en double, ce ne sont pas des doublons — et l'heure
+  manquante de mars, qu'il ne faut pas combler.
 - Il interdit au modèle de convertir des unités, de recalculer une valeur ou de
   combler un trou par interpolation. Un import silencieusement « corrigé » est pire
   qu'un import refusé.

@@ -389,11 +389,12 @@ Règles de forme :
 - conserve la ligne d&#x27;en-tête timestamp;valeur
 - une donnée manquante est une ligne absente : n&#x27;écris ni 0, ni NA, ni tiret
 
-Règles de fuseau horaire — c&#x27;est le point le plus délicat, lis-le en entier :
+Règles de fuseau horaire — c&#x27;est le point le plus délicat, et tu ne dois jamais trancher seul :
 
 - les horodatages doivent être exprimés en **heure locale de la centrale**, et écrits **sans décalage ni Z**. Naia convertit ensuite lui-même vers son stockage interne
-- ne convertis rien en UTC. Si le fichier est déjà en UTC (suffixe Z, ou décalage +00:00 constant), convertis-le **vers** l&#x27;heure locale de la centrale, et dis-moi explicitement que tu l&#x27;as fait
-- si tu ne connais pas le fuseau de la centrale, demande-le-moi avant de convertir quoi que ce soit
+- ne convertis jamais vers UTC
+- **si le fichier porte une information de fuseau** — un Z final, un décalage +02:00, une colonne ou un en-tête qui dit UTC ou GMT — arrête-toi et signale-le-moi. Dis-moi ce que tu as trouvé et ce que tu comptes faire, puis **attends ma réponse**. Ne convertis rien tant que je ne te l&#x27;ai pas confirmé, et demande-moi le fuseau de la centrale si tu ne l&#x27;as pas
+- **si le fichier ne porte aucune information de fuseau** — des horodatages nus — ne pars pas du principe qu&#x27;il s&#x27;agit d&#x27;heure locale. Pose-moi la question explicitement : « ces horodatages sont-ils bien en heure locale de la centrale ? », et attends ma confirmation avant de produire le fichier
 - au passage à l&#x27;heure d&#x27;hiver, une même heure locale apparaît deux fois dans la journée. Conserve les deux occurrences, dans l&#x27;ordre chronologique du fichier source. Ne les considère pas comme des doublons et n&#x27;en supprime aucune
 - au passage à l&#x27;heure d&#x27;été, une heure locale n&#x27;existe pas. Il est normal qu&#x27;aucune ligne ne la couvre : n&#x27;invente rien pour combler
 - si le fichier mélange les conventions — une partie en UTC, une partie en heure locale, ce qui arrive sur les exports à cheval sur un changement d&#x27;heure — arrête-toi et signale-le-moi. Ne tente pas de rattraper ça tout seul
