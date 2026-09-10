@@ -213,7 +213,7 @@ function buildSidebar() {
         <div class="avatar" style="width:30px; height:30px; font-size:11px">MD</div>
         <div style="flex:1; min-width:0">
           <div style="color:white; font-size:13px; font-weight:500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis">Marc Dupont</div>
-          <div style="color:rgba(255,255,255,0.55); font-size:11px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis">Moulin du Bocq · BE</div>
+          <div data-org-foot style="color:rgba(255,255,255,0.55); font-size:11px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis">${orgFootLine()}</div>
         </div>
         <i data-lucide="chevron-right" style="width:14px; height:14px; color:rgba(255,255,255,0.55)"></i>
       </a>
@@ -645,6 +645,235 @@ function openHelp() {
   initIcons();
 }
 
+// ---- PORTAIL CLIENT : SELECTEUR D'ORGANISATION (v6.8, platform#1581) ----
+// Un utilisateur appartient a 0, 1 ou plusieurs organisations. L'appartenance est
+// optionnelle, multiple et TYPEE. L'utilisateur designe lui-meme son organisation
+// « principale » : preference stockee, pas regle automatique ; c'est elle qui decide
+// sur quelle organisation le portail s'ouvre a chaque connexion.
+//
+// REGLE DURE : rien n'est rendu en dessous de deux appartenances (garde-fou dans
+// buildOrgSwitcher). Un utilisateur mono-organisation ne doit jamais voir de
+// selecteur d'organisation.
+//
+// Le code vit ici et pas dans les trois pages du portail : les trois onglets
+// partagent le meme controle. Meme idiome que buildCentraleTabs(), qui cherche son
+// div hote et sort s'il n'existe pas.
+//
+// Vocabulaire d'appartenance : a valider par le PO. « Membre » est declare ci-dessous
+// mais volontairement absent des donnees de demo, parce que le mot est deja pris sur
+// profil.html, dans « Utilisateurs de l'organisation », ou il designe un NIVEAU DE
+// DROITS et non un type d'appartenance.
+const ORG_TYPES = {
+  signataire:  { label: "Signataire",  badge: "badge-cyan",   gloss: "Signe le contrat et recoit les factures." },
+  membre:      { label: "Membre",      badge: "badge-slate",  gloss: "Consulte et utilise les donnees de l'organisation." },
+  mandataire:  { label: "Mandataire",  badge: "badge-purple", gloss: "Mandate par l'organisation (mainteneur, comptable) ; aucun droit sur la facturation." },
+  ambassadeur: { label: "Ambassadeur", badge: "badge-green",  gloss: "Represente l'organisation dans la communaute Naia." },
+};
+
+// Donnees de demo. Moulin du Bocq reste l'organisation d'ouverture : c'est celle que
+// tout le reste de la maquette nomme (barre laterale, plan d'abonnement, factures).
+// Rwaza et Mairie d'Avaux sont les deux autres appartenances. TVA, adresses et emails
+// sont fictifs.
+const ORG_MEMBERSHIPS = [
+  {
+    slug: "bocq", name: "Moulin du Bocq", initials: "MB", type: "signataire",
+    country: "Belgique", code: "BE", meta: "2 utilisateurs · 1 centrale",
+    legal: "Moulin du Bocq SRL", vat: "BE0123.456.789",
+    address: "Rue du Bocq 12<br>5530 Yvoir, Belgique", billing: "compta@moulin.be",
+    ref: "MB-2026", plan: "Per-plant · 210 kW", points: "3 450",
+  },
+  {
+    slug: "rwaza", name: "Rwaza", initials: "RW", type: "mandataire",
+    country: "Rwanda", code: "RW", meta: "4 utilisateurs · 2 centrales",
+    legal: "Rwaza Hydro Ltd", vat: "RW 102 938 471",
+    address: "Rwaza, district de Musanze<br>Province du Nord, Rwanda", billing: "finance@rwaza.rw",
+    ref: "RW-2026", plan: "Per-plant · 2 centrales", points: "1 120",
+  },
+  {
+    slug: "avaux", name: "Mairie d'Avaux", initials: "MA", type: "ambassadeur",
+    country: "France", code: "FR", meta: "3 utilisateurs · 1 centrale",
+    legal: "Commune d'Avaux", vat: "FR 12 345 678 901",
+    address: "Place de la Mairie 1<br>08190 Avaux, France", billing: "compta@avaux.fr",
+    ref: "MA-2026", plan: "Per-plant · 90 kW", points: "260",
+  },
+];
+
+// Levier de demo : nombre d'appartenances effectivement rendues.
+//   3 = cas multi-organisations, le selecteur est visible ;
+//   1 = mono-organisation, le selecteur disparait entierement de la barre du haut et
+//       le marqueur « principale » disparait de la page d'accueil du portail ;
+//   0 = aucune organisation, idem, et le pied de la barre laterale affiche
+//       « Aucune organisation ».
+// Passer la valeur a 1 ou a 0 puis recharger suffit a montrer la regle au PO.
+const ORG_DEMO_COUNT = 3;
+
+function orgList() { return ORG_MEMBERSHIPS.slice(0, ORG_DEMO_COUNT); }
+
+// L'organisation principale decide sur quelle organisation le portail s'ouvre ;
+// l'organisation consultee peut ensuite en differer, le temps de la session.
+function getMainOrgSlug() {
+  const orgs = orgList();
+  if (!orgs.length) return "";
+  const stored = localStorage.getItem("naia-org-main");
+  return orgs.some(o => o.slug === stored) ? stored : orgs[0].slug;
+}
+function getCurrentOrgSlug() {
+  const orgs = orgList();
+  if (!orgs.length) return "";
+  const stored = localStorage.getItem("naia-org");
+  return orgs.some(o => o.slug === stored) ? stored : getMainOrgSlug();
+}
+function currentOrg() { return orgList().find(o => o.slug === getCurrentOrgSlug()) || null; }
+function orgFootLine() {
+  const org = currentOrg();
+  return org ? org.name + " · " + org.code : "Aucune organisation";
+}
+
+// ---- Rendu du selecteur ----
+function buildOrgSwitcher() {
+  const host = document.getElementById("org-switcher");
+  if (!host) return; // page hors portail : rien a faire
+  const orgs = orgList();
+
+  // REGLE DURE : a 0 ou 1 appartenance, pas de selecteur du tout.
+  if (orgs.length < 2) { host.innerHTML = ""; host.hidden = true; return; }
+  host.hidden = false;
+
+  const prev = document.getElementById("org-switch");
+  const wasOpen = !!prev && prev.dataset.open === "true";
+  const cur = currentOrg();
+  const mainSlug = getMainOrgSlug();
+
+  const rows = orgs.map(o => {
+    const t = ORG_TYPES[o.type];
+    const isCur = o.slug === cur.slug;
+    const isMain = o.slug === mainSlug;
+    const marker = isMain
+      ? `<span class="badge badge-amber" title="Le portail s'ouvre sur cette organisation."><i data-lucide="home"></i> Principale</span>`
+      : `<button class="org-row-main" type="button" aria-label="Définir ${o.name} comme organisation principale" title="Le portail s'ouvrira sur cette organisation." onclick="setMainOrg('${o.slug}')"><i data-lucide="home"></i> Définir comme principale</button>`;
+    return `
+        <div class="org-row ${isCur ? "is-current" : ""}">
+          <button class="org-row-pick" type="button" ${isCur ? 'aria-current="true"' : ""}
+                  title="${isCur ? "Organisation affichée" : "Afficher cette organisation"}"
+                  onclick="setCurrentOrg('${o.slug}')">
+            <span class="avatar" aria-hidden="true">${o.initials}</span>
+            <span class="org-row-txt">
+              <span class="org-row-name">
+                <span class="org-row-label">${o.name}</span>
+                ${isCur ? `<i data-lucide="check" class="org-check"></i>` : ""}
+              </span>
+              <span class="org-row-meta">
+                <span class="badge ${t.badge}" title="${t.gloss}">${t.label}</span>
+                <span>${o.meta}</span>
+              </span>
+            </span>
+          </button>
+          ${marker}
+        </div>`;
+  }).join("");
+
+  host.innerHTML = `
+      <div class="tb-menu org-switch" id="org-switch" data-open="${wasOpen}">
+        <button class="org-pill" type="button" id="org-switch-trigger"
+                aria-haspopup="true" aria-expanded="${wasOpen}" aria-controls="org-switch-menu"
+                aria-label="Organisation affichée : ${cur.name}. Changer d'organisation"
+                title="Changer d'organisation" onclick="toggleOrgMenu()">
+          <span class="avatar" aria-hidden="true">${cur.initials}</span>
+          <span class="org-pill-name">${cur.name}</span>
+          <i data-lucide="chevron-down" class="org-chev"></i>
+        </button>
+        <div class="org-menu" id="org-switch-menu" role="group" aria-label="Vos organisations">
+          <div class="org-menu-head">Vos organisations (${orgs.length})</div>
+          ${rows}
+          <div class="org-menu-foot">Votre organisation principale est celle sur laquelle le portail s'ouvre à chaque connexion.</div>
+        </div>
+      </div>`;
+
+  // Les <i data-lucide> qui viennent d'etre crees sont posterieurs a l'initIcons()
+  // du demarrage : il faut redemander le rendu, comme le fait openHelp().
+  initIcons();
+}
+
+// ---- Ouverture / fermeture ----
+function setOrgMenuOpen(open) {
+  const el = document.getElementById("org-switch");
+  if (!el) return;
+  el.dataset.open = open ? "true" : "false";
+  const trigger = document.getElementById("org-switch-trigger");
+  if (trigger) trigger.setAttribute("aria-expanded", open ? "true" : "false");
+}
+function toggleOrgMenu() {
+  const el = document.getElementById("org-switch");
+  if (el) setOrgMenuOpen(el.dataset.open !== "true");
+}
+function closeOrgMenu() { setOrgMenuOpen(false); }
+
+// Clic en dehors : on ne ferme que ce menu. Les menus de la barre d'outils de
+// production.html ont leur propre fermeture, locale a la page.
+document.addEventListener("click", e => { if (!e.target.closest("#org-switch")) closeOrgMenu(); });
+document.addEventListener("keydown", e => {
+  if (e.key !== "Escape") return;
+  const el = document.getElementById("org-switch");
+  if (!el || el.dataset.open !== "true") return;
+  closeOrgMenu();
+  const trigger = document.getElementById("org-switch-trigger");
+  if (trigger) trigger.focus();
+});
+
+// ---- Actions ----
+// Basculer vers une organisation : la maquette ne recharge pas la page, elle rejoue
+// les surfaces qui portent un data-org-*.
+function setCurrentOrg(slug) {
+  localStorage.setItem("naia-org", slug);
+  closeOrgMenu();
+  buildOrgSwitcher();
+  applyOrgIdentity();
+  refreshSidebarOrg();
+}
+// Definir l'organisation principale : le menu reste ouvert, pour que le deplacement
+// du marqueur soit visible sans avoir a rouvrir le panneau.
+function setMainOrg(slug) {
+  localStorage.setItem("naia-org-main", slug);
+  buildOrgSwitcher();
+  applyOrgIdentity();
+}
+
+// ---- Surfaces qui suivent l'organisation consultee ----
+function refreshSidebarOrg() {
+  const line = document.querySelector("[data-org-foot]");
+  if (line) line.textContent = orgFootLine();
+}
+function applyOrgIdentity() {
+  const org = currentOrg();
+  const many = orgList().length > 1;
+  const isMain = !!org && org.slug === getMainOrgSlug();
+
+  // Marqueur « principale » en lecture seule : visible seulement en multi-appartenance,
+  // et seulement quand l'organisation consultee est bien la principale.
+  document.querySelectorAll("[data-org-main-marker]").forEach(el => { el.hidden = !(many && isMain); });
+  if (!org) return;
+
+  const put = (attr, value) => document.querySelectorAll("[" + attr + "]").forEach(el => { el.textContent = value; });
+  put("data-org-name", org.name);
+  put("data-org-initials", org.initials);
+  put("data-org-meta", org.meta);
+  put("data-org-country", org.country);
+  put("data-org-legal", org.legal);
+  put("data-org-vat", org.vat);
+  put("data-org-billing", org.billing);
+  put("data-org-ref", org.ref);
+  put("data-org-plan", org.plan);
+  put("data-org-points", org.points);
+  document.querySelectorAll("[data-org-address]").forEach(el => { el.innerHTML = org.address; });
+
+  const t = ORG_TYPES[org.type];
+  document.querySelectorAll("[data-org-type]").forEach(el => {
+    el.className = "badge " + t.badge;
+    el.title = t.gloss;
+    el.textContent = t.label;
+  });
+}
+
 // ---- INIT ----
 document.addEventListener("DOMContentLoaded", () => {
   document.documentElement.setAttribute("data-theme", getTheme());
@@ -656,6 +885,8 @@ document.addEventListener("DOMContentLoaded", () => {
   applyCentrale(currentCentrale());
   injectHelpModal();
   injectAccessToggle();
+  buildOrgSwitcher();
+  applyOrgIdentity();
   initIcons();
   setTimeout(() => {
     buildHomeChart();
