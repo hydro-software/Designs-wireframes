@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulateur — Naia</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="css/style.css" rel="stylesheet"><script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body data-page="simulateur" data-section="simulateur">
+<div class="app-shell">
+  <aside class="sidebar"></aside>
+  <main class="main-area">
+    <header class="topbar">
+      <div>
+        <div class="page-eyebrow">Simulateur · <span class="badge badge-v2" style="margin-left:6px">V2</span></div>
+        <div style="font-size:18px; font-weight:600">Évaluez un investissement avant de l'engager</div>
+      </div>
+      <div class="topbar-meta"><div>Disponible en V2</div><div>Couvert par <a class="link" href="https://github.com/hydro-software/platform/issues/232" target="_blank">#232</a></div></div>
+    </header>
+
+    <!-- Centrale tabs (consistent with Production / Revenus / Données / Paramètres) -->
+    <div class="centrale-tabs">
+      <a class="centrale-tab all active" href="#all"><span>Tous · agrégé</span></a>
+      <a class="centrale-tab" href="#moulins"><span>Centrale des Moulins</span><span class="cap">450 kW</span></a>
+      <a class="centrale-tab" href="#bocq"><span>Moulin du Bocq</span><span class="cap">210 kW</span></a>
+      <a class="centrale-tab" href="#ariege"><span>Centrale d'Ariège</span><span class="cap">780 kW</span></a>
+      <a class="centrale-tab" href="#lesse"><span>Moulin de la Lesse</span><span class="cap">320 kW</span></a>
+    </div>
+
+    <div class="page-content">
+
+      <div class="v2-banner" style="margin-bottom:18px">
+        <i data-lucide="rocket"></i>
+        <div>
+          <b>V2 — visible dans le mockup pour validation, non livré en V1.</b><br>
+          Le simulateur permettra de tester un investissement (turbine, batterie, jumeau numérique) sur les conditions réelles de votre centrale, en utilisant les données historiques Naia + les prix marché (Belpex / EPEX).
+        </div>
+      </div>
+
+      <h2 class="font-display" style="font-size:18px; margin: 0 0 14px">3 types de simulations</h2>
+
+      <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:14px; margin-bottom:24px">
+
+        <!-- 1. Petite turbine -->
+        <div class="tile" style="cursor:pointer" onclick="alert('Wizard Petite turbine — choisir Pelton/Kaplan/Francis, puissance, hauteur de chute. Sortie : courbe de production attendue, comparée à votre flow-data réel.')">
+          <div class="tile-head">
+            <span class="badge badge-cyan"><i data-lucide="zap"></i> Petite turbine</span>
+            <span class="badge badge-amber" style="font-size:10px">Évaluation</span>
+          </div>
+          <div style="height:80px; background:linear-gradient(135deg, #0c4a6e, #075985, #1d4ed8); border-radius:8px; margin: 8px 0 6px; display:flex; align-items:center; justify-content:center; color:white; font-size:34px">⚙</div>
+          <div class="tile-title">Remplacer ou ajouter une turbine</div>
+          <div class="tile-desc">Choisissez un type (Pelton / Kaplan / Francis), une puissance et une hauteur de chute. Naia simule la production attendue sur vos 12 derniers mois de débit réel.</div>
+          <div class="tile-foot">
+            <span class="muted" style="font-size:11px">~5 min · 1 jeton</span>
+            <button class="btn btn-secondary btn-sm" disabled>Lancer (V2)</button>
+          </div>
+        </div>
+
+        <!-- 2. Batterie -->
+        <div class="tile" style="cursor:pointer" onclick="alert('Wizard Batterie BTM — capacité kWh, puissance kW, stratégie (peak shaving / arbitrage spot / FCR / aFRR). Sortie : revenus additionnels, payback, scenarios prix.')">
+          <div class="tile-head">
+            <span class="badge badge-green"><i data-lucide="battery-charging"></i> Batterie BTM</span>
+            <span class="badge badge-amber" style="font-size:10px">Évaluation</span>
+          </div>
+          <div style="height:80px; background:linear-gradient(135deg, #14532d, #15803d, #65a30d); border-radius:8px; margin: 8px 0 6px; display:flex; align-items:center; justify-content:center; color:white; font-size:34px">🔋</div>
+          <div class="tile-title">Ajouter une batterie behind-the-meter</div>
+          <div class="tile-desc">Capacité, puissance, stratégie de valorisation (arbitrage spot / aFRR / peak shaving). Naia simule sur 12 mois de prix Belpex réels et de votre profil de production.</div>
+          <div class="tile-foot">
+            <span class="muted" style="font-size:11px">~5 min · 1 jeton</span>
+            <button class="btn btn-secondary btn-sm" disabled>Lancer (V2)</button>
+          </div>
+        </div>
+
+        <!-- 3. Digital twin -->
+        <div class="tile" style="cursor:pointer" onclick="alert('Wizard Digital twin — recrée numériquement votre centrale (turbine, génératrice, hydraulique). Sortie : variantes maintenance/upgrade, sensibilités prix, modes de fonctionnement.')">
+          <div class="tile-head">
+            <span class="badge badge-purple"><i data-lucide="cpu"></i> Jumeau numérique</span>
+            <span class="badge badge-amber" style="font-size:10px">Évaluation</span>
+          </div>
+          <div style="height:80px; background:linear-gradient(135deg, #312e81, #4c1d95, #6d28d9); border-radius:8px; margin: 8px 0 6px; display:flex; align-items:center; justify-content:center; color:white; font-size:34px">🌐</div>
+          <div class="tile-title">Jumeau numérique de votre centrale</div>
+          <div class="tile-desc">Reproduisez votre installation actuelle, puis testez des variantes : changement de roue, ajout d'un compteur, modification du régime de fonctionnement.</div>
+          <div class="tile-foot">
+            <span class="muted" style="font-size:11px">~15 min · 3 jetons</span>
+            <button class="btn btn-secondary btn-sm" disabled>Lancer (V2)</button>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="card">
+        <div class="card-head"><div class="card-head-title">Mes simulations passées</div><span class="muted" style="font-size:12px">V2</span></div>
+        <div class="card-body">
+          <p class="muted" style="font-size:13px; margin:0">Quand le simulateur sera livré, vos simulations seront listées ici avec leurs résultats (production attendue, revenus additionnels, payback) et téléchargeables en PDF.</p>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="js/app.js"></script>
+</body></html>

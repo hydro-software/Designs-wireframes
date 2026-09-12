@@ -6,7 +6,8 @@ Interactive HTML wireframes / clickable prototypes for **Naia** (hydro-software)
 
 | Area | Version | Status | Live URL |
 |---|---|---|---|
-| **Platform** (integrated app) | **v6.7** | **Active** | https://hydro-software.github.io/Designs-wireframes/naia-platform/v6.7/ |
+| **Platform** (integrated app) | **v6.8** | **Active** | https://hydro-software.github.io/Designs-wireframes/naia-platform/v6.8/ |
+| | v6.7 | Reference (prompt d'import · aperçu catégories) | https://hydro-software.github.io/Designs-wireframes/naia-platform/v6.7/ |
 | | v6.6 | Reference (interventions WhatsApp) | https://hydro-software.github.io/Designs-wireframes/naia-platform/v6.6/ |
 | | v6.5 | Reference (Liste des événements · console Core) | https://hydro-software.github.io/Designs-wireframes/naia-platform/v6.5/ |
 | | v6.4 | Reference (Subscription PRD v2.6) | https://hydro-software.github.io/Designs-wireframes/naia-platform/v6.4/ |
@@ -28,7 +29,7 @@ The integrated app is the **`naia-platform/`** lineage (Insight / Pilotage · Co
 ```
 Designs-wireframes/
 ├── README.md             this file — index + changelog
-├── naia-platform/        integrated app: v0 v3 v4 v5 v6.1 v6.2 v6.3 v6.4 v6.5 v6.6 v6.7  (v6.7 = current)
+├── naia-platform/        integrated app: v0 v3 v4 v5 v6.1 v6.2 v6.3 v6.4 v6.5 v6.6 v6.7 v6.8  (v6.8 = current)
 │   ├── v0/               first wireframe document (2025, static screenshots)
 │   └── v5/bl_draft/      Bernard's original Paramètres drafts
 ├── naia-community/        standalone community/loyalty wireframes (archived): v1 v2
@@ -43,13 +44,110 @@ Static multi-page site, no build step: Tailwind (Play CDN), Inter, Lucide icons,
 
 ## Iteration
 
-Edit the **current** version folder (`naia-platform/v6.7/`), commit, and push to `main` — GitHub Pages auto-rebuilds in ~60 s. Older version folders are frozen comparison references and are not edited.
+Edit the **current** version folder (`naia-platform/v6.8/`), commit, and push to `main` — GitHub Pages auto-rebuilds in ~60 s. Older version folders are frozen comparison references and are not edited.
 
 ---
 
 # Changelog
 
-## v6.7 — Prompt d'import assisté · aperçu détaillé des catégories *(current)*
+## v6.8 — Production théoriquement atteignable · disponibilité énergétique *(current)*
+
+`v6.8` est `v6.7` plus **deux ajouts au Tableau de bord**, qui n'en font qu'un : le
+premier fournit le dénominateur du second. Demande de **Simon Cuvelier** (2026-09-12).
+
+**Le renommage « perte » → « événement » que la v6.7 annonçait pour cette version n'a
+pas été fait.** Il ne vient pas du demandeur, qui préfère le laisser de côté tant que
+son origine et sa justification n'ont pas été retrouvées. Il reste donc ouvert, sans
+version assignée.
+
+### Production théoriquement atteignable sur le graphique (`index.html`)
+
+Le graphique mensuel gagne une **seconde barre, côte à côte** avec la production
+réelle : ce que la centrale **aurait produit au débit réellement disponible dans la
+rivière**, si l'outil avait fonctionné sans défaut. L'écart entre les deux barres est
+l'objet même du produit — on ne le déduit plus, on le voit.
+
+- La barre est **creuse** (fond très transparent, contour plein) et non pleine, dans un
+  violet absent du reste de la légende. C'est **un modèle, pas une mesure** : la forme
+  le dit avant la couleur. Le cyan reste la donnée mesurée, le lime le cumul.
+- **Ce n'est pas une prévision.** C'est un recalcul *a posteriori* sur de l'hydrologie
+  **mesurée**, produit par le **jumeau numérique** de la centrale — Layer 2 « Simulate »
+  au sens de [`btm-valorisation`](https://github.com/hydro-software/platform/blob/dev/product-system/features/btm-valorisation/README.md).
+  La [PRD Production Forecasting](https://github.com/hydro-software/platform/blob/dev/product-system/features/production-forecasting/product-requirements.md)
+  est prospective, Layer 3, et volontairement non construite : elle n'est pas concernée.
+- **Dépendance connue, et non résolue** : l'alimentation de cette barre suppose
+  [platform#232 (« define: digital twin »)](https://github.com/hydro-software/platform/issues/232),
+  ouverte depuis le 2026-04-21, qui prévoit une table de correspondance
+  *niveau / débit de rivière → production* et range explicitement ce calcul « for a later
+  phase ». Aujourd'hui, seule **Maire d'Avaux** dispose d'une série théorique, ingérée
+  par CSV en comparateur `SIM` (`SIM_MDA_THEORIQUE`, ratios 0-1 × `plant_max_kw` × 24).
+  Le wireframe montre la cible, pas l'état du produit — **le wireframe est indicatif,
+  pas normatif** (règle posée en v6.7, platform#1324).
+- Une centrale **sans jumeau numérique** n'a pas de barre creuse, est **exclue** du calcul
+  de disponibilité et **nommée** — même grammaire que les centrales non validées.
+- Le survol d'un mois donne sa disponibilité et son énergie non catégorisée.
+
+### KPI « Disponibilité énergétique » (`index.html`)
+
+Cinquième tuile KPI. La méthodologie n'existait **nulle part** : « disponibilité » au sens
+de l'outil hydroélectrique n'apparaissait dans aucun des 8 dépôts. Le seul antécédent
+était [`tableau-de-bord/product-requirements.md`](https://github.com/hydro-software/platform/blob/dev/product-system/features/tableau-de-bord/product-requirements.md),
+où `availability %` figurait parmi les **candidats garés** de la question ouverte Q1.
+Elle est donc arrêtée ici, et reportée dans ce PRD.
+
+```
+Disponibilité = (production réelle + pertes non imputables) / production théoriquement atteignable
+```
+
+- **Insensible à l'hydrologie, par construction.** Le dénominateur étant bâti sur le débit
+  réellement disponible, un mois d'étiage abaisse les deux termes ensemble. Une saison
+  sèche ne dégrade pas le taux — c'est précisément ce qu'on veut d'un indicateur d'outil.
+- **Les pertes non imputables sont réintégrées au numérateur** — délestage réseau, consigne
+  réglementaire, travaux d'un tiers, effacement volontaire sur prix négatif. La centrale
+  n'en répond pas, elle n'en est pas pénalisée.
+- **Une perte non catégorisée est comptée contre la centrale.** Choix délibéré, et c'est le
+  cœur de la décision : classer une perte ne peut que faire **monter** le taux, jamais le
+  baisser. La catégorisation devient payante pour l'exploitant au lieu d'être une corvée.
+  La tuile affiche donc l'énergie non classée du mois, avec un lien direct vers la liste.
+- **Agrégation** : somme des numérateurs ÷ somme des dénominateurs, **jamais une moyenne
+  des taux** — sinon une centrale de 80 kW pèserait autant qu'une de 900 kW.
+- Un « **i** » sur la tuile ouvre une **modale de méthodologie** : la formule, les trois
+  termes, la ventilation chiffrée du mois et les cas limites. Un taux dont on ignore la
+  formule ne se discute pas en réunion, il se subit.
+- Le graphique, la tuile et la modale lisent **le même jeu de chiffres** (`HOME_DATA` dans
+  `js/app.js`), conformément au critère d'acceptation 2 du PRD : un chiffre identique partout.
+
+⚠ **Collision de vocabulaire.** « Availability » est déjà employé dans
+[`revenue/exploration.md`](https://github.com/hydro-software/platform/blob/dev/product-system/features/revenue/exploration.md)
+au sens **hydraulique** — l'eau disponible dans la rivière — dans la définition de
+`CURTAILMENT_LOSS_VOLONTAIRE`. D'où l'intitulé complet « disponibilité **énergétique** »,
+à conserver dans l'interface. Accessoirement, définir le théorique ferme l'item ouvert de
+ce même document (« what is theoretical production ? », renvoyé au domaine des pertes).
+
+### Colonne « Disponibilité » sur les catégories de pertes (`parametres.html`)
+
+Conséquence nécessaire du choix ci-dessus, et non un ajout d'opportunité : **sans attribut
+d'imputabilité, la formule n'a aucune source de données.** Le tableau « Catégories de
+pertes » gagne donc une cinquième colonne — cochée = la perte pèse sur le taux.
+
+- Réglable **par catégorie et par sous-type** : un sous-type peut s'écarter de sa catégorie
+  (une « consigne exploitant » et un « essai de régulation » ne s'imputent pas pareil).
+- Défauts posés : Maintenance, Panne, Opérationnel / Exploitation **imputables** ;
+  Environnement, Réseau / Contrainte, Données **non imputables**.
+- L'**aperçu détaillé** du wizard « Remplir automatiquement » porte la colonne lui aussi —
+  il doit rester le calque exact du tableau de la page. `AUTOFILL_SETS` gagne un champ
+  `dispo` par catégorie, dont les sous-types héritent à l'application.
+
+### Reste ouvert
+
+- **Les périodes de données manquantes** (catégorie système « Correction / Données
+  manquantes », slot 9) : les exclure du dénominateur, ou les compter comme indisponibles ?
+  Les deux se défendent ; non tranché ici.
+- **La disponibilité technique (temporelle)** — heures en état de fonctionner ÷ heures de la
+  période, la définition des contrats d'exploitation-maintenance — n'est **pas** retenue en
+  v1. Elle répond à une autre question et coûterait une seconde tuile à expliquer.
+
+## v6.7 — Prompt d'import assisté · aperçu détaillé des catégories
 
 `v6.7` est `v6.6` plus **deux ajouts** et **un alignement de vocabulaire**. Aucun
 renommage « perte » → « événement » : ce balayage est réservé à une v6.8 dédiée.

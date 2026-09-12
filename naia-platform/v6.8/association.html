@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Naia · Tableau de bord parrainage · France Hydro Électricité</title>
+<style>
+  :root{
+    --blue:#00A8E8;--teal:#00D9FF;--ink:#0A0E27;--ink2:#1c2547;--muted:#5a6485;
+    --line:#e3e8f5;--bg:#f4f7fb;--card:#fff;--green:#16a34a;--amber:#d97706;
+    --grad:linear-gradient(135deg,#00A8E8 0%,#00D9FF 100%);
+    --grad-soft:linear-gradient(135deg,rgba(0,168,232,.08) 0%,rgba(0,217,255,.08) 100%);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{background:var(--bg);color:var(--ink2);
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Roboto','Helvetica','Arial',sans-serif;
+    line-height:1.5;-webkit-font-smoothing:antialiased;font-size:14px}
+
+  .topbar{background:#fff;border-bottom:1px solid var(--line);padding:14px 0}
+  .container{max-width:1080px;margin:0 auto;padding:0 24px}
+  .topbar-inner{display:flex;align-items:center;justify-content:space-between;gap:20px}
+  .logo{font-weight:800;font-size:18px;color:var(--ink);letter-spacing:-0.01em}
+  .logo .accent{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .topbar .meta{font-size:12px;color:var(--muted)}
+
+  .hero{padding:36px 0 28px}
+  .hero .kicker{font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:var(--blue);font-weight:700;margin-bottom:8px}
+  .hero h1{font-size:28px;font-weight:800;color:var(--ink);letter-spacing:-0.01em;line-height:1.18}
+  .hero h1 .accent{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .hero p.lead{margin-top:10px;font-size:14px;color:var(--ink2);max-width:680px}
+  .hero .code-badge{display:inline-flex;align-items:center;gap:8px;margin-top:14px;padding:6px 14px;background:var(--grad-soft);border:1px solid var(--blue);border-radius:8px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;color:var(--ink)}
+  .hero .code-badge b{color:var(--blue)}
+
+  .kpi-grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));margin-top:22px}
+  .kpi-card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 20px}
+  .kpi-label{font-size:11px;letter-spacing:0.06em;text-transform:uppercase;color:var(--muted);font-weight:600;margin-bottom:8px}
+  .kpi-value{font-size:34px;font-weight:800;color:var(--ink);letter-spacing:-0.01em;line-height:1}
+  .kpi-meta{font-size:12px;color:var(--muted);margin-top:6px}
+  .kpi-meta.up{color:var(--green);font-weight:600}
+  .kpi-meta.amber{color:var(--amber);font-weight:600}
+
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:14px;margin-top:22px;overflow:hidden}
+  .panel-head{padding:16px 22px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
+  .panel-title{font-size:16px;font-weight:700;color:var(--ink)}
+  .panel-sub{font-size:12px;color:var(--muted);margin-top:2px}
+  .btn{padding:8px 14px;border:0;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+  .btn-primary{background:var(--grad);color:#fff}
+  .btn-secondary{background:#fff;color:var(--ink2);border:1px solid var(--line)}
+  .btn:hover{filter:brightness(1.05)}
+
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th{text-align:left;padding:12px 22px;font-size:11px;letter-spacing:0.06em;text-transform:uppercase;color:var(--muted);font-weight:600;background:#fafbfd;border-bottom:1px solid var(--line)}
+  td{padding:12px 22px;border-bottom:1px solid var(--line);vertical-align:middle}
+  tr:last-child td{border-bottom:0}
+  .badge{display:inline-block;padding:2px 8px;border-radius:5px;font-size:11px;font-weight:600;letter-spacing:0.02em}
+  .badge-green{background:rgba(22,163,74,.12);color:var(--green)}
+  .badge-amber{background:rgba(217,119,6,.14);color:var(--amber)}
+  .badge-slate{background:rgba(90,100,133,.14);color:var(--muted)}
+  .muted{color:var(--muted)}
+  .tabular{font-variant-numeric:tabular-nums}
+
+  .progress{height:6px;background:rgba(90,100,133,.14);border-radius:3px;overflow:hidden;margin-top:4px}
+  .progress-fill{height:100%;background:var(--grad);border-radius:3px}
+
+  .footer{padding:28px 0 42px;text-align:center;font-size:11px;color:var(--muted)}
+  .footer a{color:var(--blue);text-decoration:none}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="container topbar-inner">
+    <div class="logo">naia<span class="accent">.</span> communauté</div>
+    <div class="meta">Tableau de bord public · accès libre par lien</div>
+  </div>
+</div>
+
+<div class="container">
+
+  <section class="hero">
+    <div class="kicker">Association partenaire</div>
+    <h1>France Hydro <span class="accent">Électricité</span></h1>
+    <p class="lead">
+      Ce tableau de bord retrace l'activité Naia issue de votre code de parrainage : combien de vos adhérents ont reçu une invitation, combien ont activé un compte, et où ils en sont dans leur découverte de la plateforme. Données rafraîchies en continu (FR-PARRAINAGE-5).
+    </p>
+    <div class="code-badge">
+      <i style="display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--blue)"></i>
+      Code partenaire <b>FHE-2026</b>
+    </div>
+  </section>
+
+  <!-- KPIs -->
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <div class="kpi-label">Invités</div>
+      <div class="kpi-value tabular">42</div>
+      <div class="kpi-meta">via votre code · cumul total</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Comptes activés</div>
+      <div class="kpi-value tabular">28</div>
+      <div class="kpi-meta up">+9 ces 30 derniers jours</div>
+      <div class="progress"><div class="progress-fill" style="width:66%"></div></div>
+      <div class="kpi-meta" style="margin-top:6px">66 % de taux d'activation</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Démos actives</div>
+      <div class="kpi-value tabular">14</div>
+      <div class="kpi-meta amber">en cours d'évaluation</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Clients payants</div>
+      <div class="kpi-value tabular">7</div>
+      <div class="kpi-meta up">+3 ces 30 derniers jours</div>
+      <div class="kpi-meta" style="margin-top:6px">17 % de votre base totale</div>
+    </div>
+  </div>
+
+  <!-- Member orgs list -->
+  <div class="panel">
+    <div class="panel-head">
+      <div>
+        <div class="panel-title">Organisations adhérentes Naia</div>
+        <div class="panel-sub">Liste anonymisée par statut · 28 lignes affichées</div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-secondary"><span style="display:inline-block;width:14px;height:14px;border:1px solid currentColor;border-radius:2px;position:relative"></span> Filtrer par statut</button>
+        <button class="btn btn-primary"><span style="display:inline-block;width:14px;height:14px;border:1.5px solid currentColor;border-radius:3px;border-bottom-width:3px"></span> Télécharger CSV</button>
+      </div>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Organisation</th>
+          <th>Région</th>
+          <th>Capacité</th>
+          <th>Inscrite le</th>
+          <th>Statut Naia</th>
+          <th>Activité 30j</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><b>Microcentrale du Doubs</b></td>
+          <td class="muted">Bourgogne-Franche-Comté</td>
+          <td class="muted tabular">425 kW</td>
+          <td class="muted tabular">8 janv. 2026</td>
+          <td><span class="badge badge-green">Client payant</span></td>
+          <td class="muted tabular">14 connexions</td>
+        </tr>
+        <tr>
+          <td><b>Hydroélec du Vercors</b></td>
+          <td class="muted">Auvergne-Rhône-Alpes</td>
+          <td class="muted tabular">1.2 MW</td>
+          <td class="muted tabular">12 janv. 2026</td>
+          <td><span class="badge badge-green">Client payant</span></td>
+          <td class="muted tabular">22 connexions</td>
+        </tr>
+        <tr>
+          <td><b>Moulin de la Cèze</b></td>
+          <td class="muted">Occitanie</td>
+          <td class="muted tabular">180 kW</td>
+          <td class="muted tabular">15 janv. 2026</td>
+          <td><span class="badge badge-green">Client payant</span></td>
+          <td class="muted tabular">8 connexions</td>
+        </tr>
+        <tr>
+          <td><b>Pyrénées Hydroélec</b></td>
+          <td class="muted">Occitanie</td>
+          <td class="muted tabular">2.4 MW</td>
+          <td class="muted tabular">3 févr. 2026</td>
+          <td><span class="badge badge-green">Client payant</span></td>
+          <td class="muted tabular">31 connexions</td>
+        </tr>
+        <tr>
+          <td><b>Centrale d'Annecy</b></td>
+          <td class="muted">Auvergne-Rhône-Alpes</td>
+          <td class="muted tabular">850 kW</td>
+          <td class="muted tabular">22 mars 2026</td>
+          <td><span class="badge badge-green">Client payant</span></td>
+          <td class="muted tabular">11 connexions</td>
+        </tr>
+        <tr>
+          <td><b>MicroHydro SARL</b></td>
+          <td class="muted">Occitanie</td>
+          <td class="muted tabular">340 kW</td>
+          <td class="muted tabular">4 avr. 2026</td>
+          <td><span class="badge badge-amber">En démo · 18j restants</span></td>
+          <td class="muted tabular">5 connexions</td>
+        </tr>
+        <tr>
+          <td><b>Hydroélec du Doubs</b></td>
+          <td class="muted">Bourgogne-Franche-Comté</td>
+          <td class="muted tabular">760 kW</td>
+          <td class="muted tabular">11 avr. 2026</td>
+          <td><span class="badge badge-amber">En démo · 25j restants</span></td>
+          <td class="muted tabular">9 connexions</td>
+        </tr>
+        <tr>
+          <td><b>Hydromill SRL</b></td>
+          <td class="muted">Provence-Alpes-Côte d'Azur</td>
+          <td class="muted tabular">1.8 MW</td>
+          <td class="muted tabular">18 avr. 2026</td>
+          <td><span class="badge badge-amber">En démo · 30j restants</span></td>
+          <td class="muted tabular">12 connexions</td>
+        </tr>
+        <tr>
+          <td><b>Centrale du Lez</b></td>
+          <td class="muted">Occitanie</td>
+          <td class="muted tabular">220 kW</td>
+          <td class="muted tabular">22 avr. 2026</td>
+          <td><span class="badge badge-slate">Activé · non-démo</span></td>
+          <td class="muted tabular">2 connexions</td>
+        </tr>
+        <tr>
+          <td><b>Vallée du Tarn</b></td>
+          <td class="muted">Occitanie</td>
+          <td class="muted tabular">580 kW</td>
+          <td class="muted tabular">28 avr. 2026</td>
+          <td><span class="badge badge-slate">Activé · non-démo</span></td>
+          <td class="muted tabular">1 connexion</td>
+        </tr>
+        <tr>
+          <td colspan="6" style="text-align:center;padding:14px 22px;color:var(--muted);font-size:12px;background:#fafbfd">
+            ...18 autres organisations · <a href="#" style="color:var(--blue);text-decoration:none;font-weight:600">voir tout (CSV)</a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Privacy + provenance note -->
+  <div class="panel" style="background:var(--grad-soft);border-color:rgba(0,168,232,0.3)">
+    <div style="padding:16px 22px;font-size:12px;color:var(--ink2);line-height:1.6">
+      <b style="color:var(--ink)">Sur ce tableau de bord.</b> Les organisations sont issues du parrainage rattaché à votre code <b>FHE-2026</b> (FR-PARRAINAGE-5). Aucun nom de contact individuel, aucun e-mail ni numéro de téléphone n'est exposé ici. Les colonnes Région et Capacité proviennent de l'inscription Naia ; le détail individuel d'un compte n'est visible que par l'adhérent lui-même. Pour toute question : <a style="color:var(--blue);text-decoration:none;font-weight:600" href="mailto:partenaires@naia.energy">partenaires@naia.energy</a>.
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">
+  <div class="container">
+    Naia · plateforme d'observation pour producteurs hydroélectriques · <a href="https://naia.energy">naia.energy</a><br>
+    Ce tableau de bord est généré pour France Hydro Électricité — accès par lien, sans authentification (FR-PARRAINAGE-5).
+  </div>
+</div>
+
+</body></html>

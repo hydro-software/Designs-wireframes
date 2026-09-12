@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tableau de bord — Naia</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="css/style.css" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body data-page="home" data-section="" data-centrale="all">
+
+<div class="app-shell">
+  <aside class="sidebar"></aside>
+
+  <main class="main-area">
+    <header class="topbar">
+      <div>
+        <div class="page-eyebrow">Pilotage</div>
+        <div style="font-size:18px; font-weight:600" data-centrale-name>Tableau de bord · vue agrégée</div>
+      </div>
+      <div class="topbar-meta">
+        <div class="plant" data-centrale-capacity>Total · 1 760 kW</div>
+        <div>2026 — année en cours</div>
+      </div>
+    </header>
+
+    <!-- v5: centrales tabs at top (sum/All first, like Production) -->
+    <div id="centrale-tabs" class="centrale-tabs"></div>
+
+    <div class="page-content">
+
+      <style>
+        [data-centrale-note]{display:none; margin-bottom:14px; padding:12px 14px; border-radius:10px; background:rgba(251,191,36,0.10); border:1px solid rgba(251,191,36,0.35); font-size:13px; gap:10px; align-items:flex-start; line-height:1.55}
+        [data-centrale-note].show{display:flex}
+        #sub-blocked-view{display:none}
+        body[data-sub="inactive"] #sub-active-view{display:none}
+        body[data-sub="inactive"] #sub-blocked-view{display:block}
+      </style>
+
+      <!-- Démo : bascule Abonnement actif / non actif (FR-SUB-5) — montre la vue client lorsque l'abonnement de l'organisation n'est plus actif. -->
+      <div style="display:flex; align-items:center; gap:10px; margin-bottom:16px; font-size:12.5px">
+        <span class="muted">Démo · Abonnement :</span>
+        <span class="access-seg">
+          <button data-sub-btn="active" class="on" onclick="setSubDemo('active')">Actif</button>
+          <button data-sub-btn="inactive" onclick="setSubDemo('inactive')">Non actif</button>
+        </span>
+      </div>
+
+      <div id="sub-active-view">
+
+      <!-- Centrale non connectée — notes pilotées par l'onglet centrale actif (app.js applyCentrale). -->
+      <div data-centrale-note="all">
+        <i data-lucide="alert-triangle" style="width:16px;height:16px;color:var(--accent-amber);flex-shrink:0;margin-top:2px"></i>
+        <span>La production de la <b>Centrale d'Ariège</b> n'est pas prise en compte dans la vue agrégée — centrale non connectée (un compteur en attente de validation).</span>
+      </div>
+      <div data-centrale-note="ariege">
+        <i data-lucide="alert-triangle" style="width:16px;height:16px;color:var(--accent-amber);flex-shrink:0;margin-top:2px"></i>
+        <span>Un compteur de cette centrale n'est <b>pas validé</b> — ses données ne sont pas prises en compte. Le mandat DSO signé est en attente de validation par l'équipe Naia.</span>
+      </div>
+
+      <!-- Dashboard KPIs per #261: production this month / YTD / vs last year, facteur de charge.
+           v5: these tiles live ONLY here on the Tableau de bord. Production and Revenus
+           pages drop them to focus on the chart. -->
+      <div style="display:grid; gap:14px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); margin-bottom:18px">
+        <div class="kpi-card feature">
+          <div class="kpi-label"><i data-lucide="zap" style="width:13px;height:13px"></i> Production · ce mois</div>
+          <div class="kpi-value tabular">196 <span style="font-size:14px; color:var(--text-muted)">MWh</span></div>
+          <div class="kpi-delta up"><i data-lucide="trending-up"></i> +18 % vs avr. 2025</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label"><i data-lucide="calendar" style="width:13px;height:13px"></i> Production · YTD</div>
+          <div class="kpi-value tabular">854 <span style="font-size:14px; color:var(--text-muted)">MWh</span></div>
+          <div class="kpi-delta up"><i data-lucide="trending-up"></i> +9 % vs YTD 2025</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label"><i data-lucide="activity" style="width:13px;height:13px"></i> Facteur de charge · MTD</div>
+          <div class="kpi-value tabular">61 %</div>
+          <div class="kpi-delta muted">vs 58 % avr. 2025</div>
+        </div>
+        <!-- v6.8 : disponibilité énergétique. Nouvelle tuile — cf. PRD Tableau de bord §3
+             (sort « availability % » des candidats garés, Q1). Le « i » ouvre la
+             méthodologie : un taux dont on ne connaît pas la formule ne se discute pas
+             en réunion, il se subit. -->
+        <div class="kpi-card">
+          <div class="kpi-label">
+            <i data-lucide="gauge" style="width:13px;height:13px"></i> Disponibilité énergétique · MTD
+            <span class="info-i" style="margin-left:auto; cursor:pointer" onclick="openOverlay('dispo-method')" title="Méthodologie de calcul">i</span>
+          </div>
+          <div class="kpi-value tabular" data-dispo-mtd>—</div>
+          <div class="kpi-delta muted" data-dispo-delta>vs 96,1 % avr. 2025</div>
+          <!-- L'incitation à catégoriser est ici, pas dans un message d'aide : l'énergie
+               non classée est comptée contre la centrale, et on le dit sur la tuile. -->
+          <div data-dispo-uncat style="display:none; margin-top:8px; padding:7px 9px; border-radius:7px; background:rgba(251,191,36,0.10); border:1px solid rgba(251,191,36,0.30); font-size:11.5px; line-height:1.5">
+            <i data-lucide="alert-triangle" style="width:12px;height:12px;color:var(--accent-amber);vertical-align:-2px"></i>
+            <b data-dispo-uncat-val></b> non catégorisés, comptés contre la centrale.
+            <a href="evenements.html" style="color:var(--brand-cyan)">Classer</a>
+          </div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label"><i data-lucide="euro" style="width:13px;height:13px"></i> Revenus · YTD</div>
+          <div class="kpi-value tabular">78 240 €</div>
+          <div class="kpi-delta up"><i data-lucide="trending-up"></i> +14 %</div>
+        </div>
+      </div>
+
+      <!-- Main monthly chart with cumulative line -->
+      <div class="card" style="margin-bottom:18px">
+        <div class="card-head">
+          <div>
+            <div class="card-head-title">Production mensuelle &amp; cumul</div>
+            <div class="card-head-sub">12 derniers mois · barres pleines : production réelle — barres creuses : théoriquement atteignable — ligne : cumul YTD</div>
+          </div>
+          <div style="display:flex; gap:8px">
+            <select class="select" style="max-width:200px"><option>12 derniers mois</option><option>2025</option><option>2024</option></select>
+            <button class="btn btn-secondary btn-sm" onclick="alert('Comparer à une autre période — wizard à venir')"><i data-lucide="git-compare"></i> Comparer</button>
+          </div>
+        </div>
+        <div class="card-body" style="height:340px"><div class="chart-container" style="height:100%"><canvas id="home-chart"></canvas></div></div>
+        <!-- v6.8 : provenance du barreau théorique. Il est creux et non plein parce que
+             c'est un modèle et non une mesure — la forme le dit avant la couleur. -->
+        <div style="padding:0 22px 16px; display:flex; gap:9px; align-items:flex-start; font-size:12px; line-height:1.6" class="muted">
+          <i data-lucide="info" style="width:14px;height:14px;flex-shrink:0;margin-top:3px"></i>
+          <span>
+            La <b>production théoriquement atteignable</b> est ce que la centrale aurait produit
+            <b>au débit réellement disponible dans la rivière</b>, si l'outil avait fonctionné sans défaut.
+            Elle vient du <b>jumeau numérique</b> de la centrale, pas d'une prévision&#8239;: c'est un
+            recalcul a posteriori sur de l'hydrologie mesurée.
+            Une centrale <b>sans jumeau numérique</b> n'a pas de barre creuse et est exclue du calcul de
+            disponibilité&#8239;— elle est alors nommée, comme les centrales non validées.
+          </span>
+        </div>
+      </div>
+
+      <!-- v5: report generator promoted from a sidebar entry to a CTA on the Tableau de bord.
+           Old "Par centrale · ce mois" table at the bottom is gone — centrales tabs at the top
+           replace that role. -->
+      <div class="card" style="display:flex; align-items:center; gap:18px; padding:18px 22px">
+        <div style="width:42px; height:42px; border-radius:10px; background:rgba(56,189,248,0.16); color:var(--brand-cyan); display:flex; align-items:center; justify-content:center; flex-shrink:0">
+          <i data-lucide="file-plus" style="width:20px; height:20px"></i>
+        </div>
+        <div style="flex:1; min-width:0">
+          <div style="font-size:14px; font-weight:600">Générer un rapport</div>
+          <div class="muted" style="font-size:12.5px; margin-top:2px">
+            PDF prêt-à-partager — production, pertes (incl. <b>top 5 détectées</b>), comparaisons, contexte météo. Pour avril 2026 ou la période de votre choix.
+          </div>
+        </div>
+        <div style="display:flex; gap:8px; flex-shrink:0">
+          <button class="dash-cta" onclick="openOverlay('report-wizard')"><i data-lucide="file-plus"></i> Générer un rapport</button>
+          <a href="reports.html" class="btn btn-secondary btn-sm"><i data-lucide="folder-open"></i> Historique</a>
+        </div>
+      </div>
+
+      </div><!-- /#sub-active-view -->
+
+      <!-- Vue « abonnement non actif » (FR-SUB-5) — affichée via la bascule de démo en haut de page. -->
+      <div id="sub-blocked-view">
+        <div class="card" style="border:1px solid var(--accent-red)">
+          <div class="card-body" style="display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; gap:12px; padding:56px 24px">
+            <div style="width:56px; height:56px; border-radius:50%; background:rgba(248,113,113,0.14); color:var(--accent-red); display:flex; align-items:center; justify-content:center">
+              <i data-lucide="lock" style="width:26px; height:26px"></i>
+            </div>
+            <div style="font-size:18px; font-weight:600">Abonnement non actif</div>
+            <div class="muted" style="font-size:13px; max-width:470px; line-height:1.6">L'abonnement de votre organisation n'est plus actif&#8239;: les données de production de vos centrales ne sont plus accessibles. Le nom de chaque centrale reste visible dans ses onglets. Contactez votre administrateur&#8239;: <b>Jean Dupont</b> (admin de l'organisation) ou l'équipe Naia.</div>
+          </div>
+        </div>
+      </div>
+
+      <script>
+        // v6.8 — la tuile « Disponibilité énergétique » et la modale lisent HOME_DATA
+        // (js/app.js), le même jeu de chiffres que le graphique. Rien n'est recopié à
+        // la main : le PRD Tableau de bord exige qu'un chiffre soit identique partout.
+        function fillDispo(){
+          if (typeof HOME_DATA === "undefined") return;
+          const last = HOME_DATA.months.length - 1;              // avr. 2026, mois en cours
+          const real = HOME_DATA.real[last], theo = HOME_DATA.theoretical[last];
+          const nonImp = HOME_DATA.nonImputable[last], uncat = HOME_DATA.uncategorised[last];
+          // L'écart se partage en trois parts disjointes : non imputable + imputable
+          // avéré + non encore catégorisé. Le non-catégorisé pèse comme l'imputable
+          // dans la formule, mais il est compté à part pour qu'on voie ce qu'il reste
+          // à gagner en classant.
+          const imput = theo - real - nonImp - uncat;
+
+          const set = (sel, txt) => document.querySelectorAll(sel).forEach(e => e.textContent = txt);
+          set("[data-dispo-mtd]", fmtPct(homeAvailability(last)));
+          set("[data-dispo-ytd]", fmtPct(homeAvailabilityRange(8, last)));   // Jan → Avr
+          set("[data-dispo-real]", real + " MWh");
+          set("[data-dispo-theo]", theo + " MWh");
+          set("[data-dispo-gap]", (theo - real) + " MWh");
+          set("[data-dispo-nonimp]", nonImp + " MWh");
+          set("[data-dispo-imput]", imput + " MWh");
+          set("[data-dispo-uncat-val]", uncat + " MWh");
+
+          if (uncat > 0) document.querySelector("[data-dispo-uncat]").style.display = "block";
+          if (window.lucide) lucide.createIcons();
+        }
+        document.addEventListener("DOMContentLoaded", () => setTimeout(fillDispo, 0));
+
+        function setSubDemo(s){
+          document.body.dataset.sub = s;
+          document.querySelectorAll('[data-sub-btn]').forEach(b => b.classList.toggle('on', b.dataset.subBtn === s));
+          if (window.lucide) lucide.createIcons();
+        }
+      </script>
+
+    </div>
+  </main>
+</div>
+
+<!-- v6.8 — Méthodologie de la disponibilité énergétique.
+     Une modale et non une bulle d'aide : la formule, son périmètre et ses cas limites
+     ne tiennent pas dans un survol, et c'est un chiffre destiné à être discuté avec un
+     banquier ou un mainteneur. Contenu miroir du PRD Tableau de bord §3. -->
+<div id="dispo-method" class="overlay" onclick="if(event.target===this) closeOverlay('dispo-method')">
+  <div class="modal modal-lg">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:16px">
+      <div>
+        <div class="modal-title">Disponibilité énergétique — méthodologie</div>
+        <div class="modal-subtitle">Comment ce taux est calculé, ce qu'il pénalise et ce qu'il ne pénalise pas.</div>
+      </div>
+      <button class="btn btn-ghost" onclick="closeOverlay('dispo-method')"><i data-lucide="x"></i></button>
+    </div>
+
+    <div style="padding:14px 16px; border-radius:10px; background:var(--bg-input); border:1px solid var(--border-default); font-size:13.5px; line-height:1.7; margin-bottom:16px">
+      <b>Disponibilité</b> &nbsp;=&nbsp;
+      <span style="color:var(--brand-cyan)">production réelle</span> &nbsp;+&nbsp;
+      <span style="color:var(--accent-green)">pertes non imputables</span>
+      <div style="border-top:1px solid var(--border-default); margin:6px 0 6px 108px"></div>
+      <span style="margin-left:108px; color:#a78bfa">production théoriquement atteignable</span>
+    </div>
+
+    <div style="font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em; font-weight:600; margin-bottom:8px">Les trois termes</div>
+    <div style="font-size:13px; line-height:1.65; display:flex; flex-direction:column; gap:11px; margin-bottom:18px">
+      <div>
+        <b style="color:#a78bfa">Production théoriquement atteignable</b> — ce que la centrale aurait produit
+        <b>au débit réellement disponible dans la rivière</b> sur la période, si l'outil avait fonctionné sans
+        défaut. Fournie par le <b>jumeau numérique</b>. C'est le dénominateur, et c'est lui qui rend le taux
+        <b>insensible à l'hydrologie</b>&#8239;: un mois d'étiage abaisse la production réelle <i>et</i> le
+        théorique dans les mêmes proportions. Une saison sèche ne dégrade pas la disponibilité.
+      </div>
+      <div>
+        <b style="color:var(--accent-green)">Pertes non imputables</b> — l'énergie non produite pour une cause
+        <b>extérieure à l'outil</b>&#8239;: délestage réseau, consigne réglementaire (débit réservé, chasse),
+        travaux d'un tiers, effacement volontaire en heures de prix négatif. Elles sont <b>réintégrées au
+        numérateur</b>&#8239;: la centrale n'en est pas responsable, elle n'en est pas pénalisée.
+      </div>
+      <div>
+        <b style="color:var(--accent-red)">Pertes imputables</b> — panne, maintenance, encrassement des grilles,
+        défaut de régulation. Elles pèsent sur le taux. C'est précisément leur raison d'être&#8239;: le chiffre
+        mesure l'aptitude de l'outil à convertir l'eau qui était là.
+      </div>
+    </div>
+
+    <div style="padding:12px 14px; border-radius:9px; background:rgba(251,191,36,0.10); border:1px solid rgba(251,191,36,0.32); font-size:13px; line-height:1.65; margin-bottom:18px">
+      <b><i data-lucide="alert-triangle" style="width:14px;height:14px;vertical-align:-2px;color:var(--accent-amber)"></i>
+      Une perte non catégorisée est comptée <u>contre</u> la centrale.</b>
+      C'est un choix délibéré, et non un défaut de calcul&#8239;: tant qu'un écart n'est pas classé, il est traité
+      comme imputable. Classer une perte ne peut donc que faire <i>monter</i> le taux, jamais le baisser —
+      c'est ce qui rend la catégorisation payante pour l'exploitant plutôt que corvéable.
+    </div>
+
+    <div style="font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em; font-weight:600; margin-bottom:8px">Avril 2026 — vue agrégée</div>
+    <table class="table" style="font-size:13px; margin-bottom:18px">
+      <tbody>
+        <tr><td>Production théoriquement atteignable</td><td class="tabular" style="text-align:right" data-dispo-theo>—</td></tr>
+        <tr><td>Production réelle</td><td class="tabular" style="text-align:right" data-dispo-real>—</td></tr>
+        <tr><td class="muted" style="padding-left:18px">dont écart total</td><td class="tabular muted" style="text-align:right" data-dispo-gap>—</td></tr>
+        <tr><td class="muted" style="padding-left:32px">non imputable — réintégré</td><td class="tabular" style="text-align:right; color:var(--accent-green)" data-dispo-nonimp>—</td></tr>
+        <tr><td class="muted" style="padding-left:32px">imputable — pèse sur le taux</td><td class="tabular" style="text-align:right; color:var(--accent-red)" data-dispo-imput>—</td></tr>
+        <tr><td class="muted" style="padding-left:32px">non catégorisé — compté contre la centrale</td><td class="tabular" style="text-align:right; color:var(--accent-amber)" data-dispo-uncat-val>—</td></tr>
+        <tr><td><b>Disponibilité énergétique · avril</b></td><td class="tabular" style="text-align:right"><b data-dispo-mtd>—</b></td></tr>
+        <tr><td><b>Disponibilité énergétique · YTD</b></td><td class="tabular" style="text-align:right"><b data-dispo-ytd>—</b></td></tr>
+      </tbody>
+    </table>
+
+    <div style="font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em; font-weight:600; margin-bottom:8px">Périmètre &amp; cas limites</div>
+    <ul style="font-size:12.5px; line-height:1.7; padding-left:18px; margin:0 0 18px; display:flex; flex-direction:column; gap:6px">
+      <li><b>Agrégation</b> — somme des numérateurs ÷ somme des dénominateurs sur les centrales retenues, <b>jamais une moyenne des taux</b>&#8239;: sinon une centrale de 80&nbsp;kW pèserait autant qu'une de 900&nbsp;kW.</li>
+      <li><b>Centrale sans jumeau numérique</b> — pas de dénominateur, donc <b>exclue</b> du calcul et <b>nommée</b>, au même titre qu'une centrale non validée. Un taux partiel non annoncé serait pire que pas de taux.</li>
+      <li><b>Ne pas confondre avec la disponibilité «&nbsp;hydraulique&nbsp;»</b> — ce mot désigne ailleurs dans Naia l'eau disponible dans la rivière. Ici il désigne l'outil. D'où l'intitulé complet «&nbsp;disponibilité <b>énergétique</b>&nbsp;», à conserver dans l'interface.</li>
+      <li><b>À trancher</b> — le traitement des périodes de <b>données manquantes</b> (catégorie système «&nbsp;Correction / Données manquantes&nbsp;», slot&nbsp;9)&#8239;: les exclure du dénominateur, ou les compter comme indisponibles&#8239;? Les deux se défendent, la question reste ouverte.</li>
+    </ul>
+
+    <div style="display:flex; gap:8px; justify-content:flex-end">
+      <button class="btn btn-secondary" onclick="closeOverlay('dispo-method')">Fermer</button>
+    </div>
+  </div>
+</div>
+
+<!-- Report wizard overlay (stub) — shows the new "Pertes détectées top 5" report option
+     that v5 moves out of the Production page. -->
+<div id="report-wizard" class="overlay" onclick="if(event.target===this) closeOverlay('report-wizard')">
+  <div class="modal modal-lg">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px">
+      <div>
+        <div class="modal-title">Générer un rapport</div>
+        <div class="modal-subtitle">Choisissez le type de rapport, la période et les centrales.</div>
+      </div>
+      <button class="btn btn-ghost" onclick="closeOverlay('report-wizard')"><i data-lucide="x"></i></button>
+    </div>
+
+    <div style="font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em; font-weight:600; margin-bottom:8px">Type de rapport</div>
+    <div style="display:grid; gap:10px; grid-template-columns: 1fr 1fr; margin-bottom:14px">
+      <label class="tile" style="cursor:pointer">
+        <div class="tile-head"><span class="badge badge-blue"><i data-lucide="bar-chart-3"></i> Mensuel</span></div>
+        <div class="tile-title">Rapport mensuel standard</div>
+        <div class="tile-desc">Production, pertes, comparaisons, contexte météo.</div>
+      </label>
+      <label class="tile" style="cursor:pointer; border:1px solid var(--brand-cyan)">
+        <div class="tile-head"><span class="badge badge-amber"><i data-lucide="alert-triangle"></i> v5 · nouveau</span></div>
+        <div class="tile-title">Pertes détectées · top 5</div>
+        <div class="tile-desc">Identifie les 5 plus gros événements de perte sur la période (déplacé depuis Production).</div>
+      </label>
+      <label class="tile" style="cursor:pointer">
+        <div class="tile-head"><span class="badge badge-green"><i data-lucide="euro"></i> Financier</span></div>
+        <div class="tile-title">Revenus &amp; manque à gagner</div>
+        <div class="tile-desc">Récap revenus, prix moyen, pertes valorisées.</div>
+      </label>
+      <label class="tile" style="cursor:pointer">
+        <div class="tile-head"><span class="badge badge-purple"><i data-lucide="file-text"></i> Personnalisé</span></div>
+        <div class="tile-title">Rapport sur mesure</div>
+        <div class="tile-desc">Composez vos sections.</div>
+      </label>
+    </div>
+
+    <div style="display:flex; gap:8px; justify-content:flex-end">
+      <button class="btn btn-ghost" onclick="closeOverlay('report-wizard')">Annuler</button>
+      <button class="btn btn-primary" onclick="alert('Génération du rapport (démo)'); closeOverlay('report-wizard')"><i data-lucide="file-plus"></i> Générer</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

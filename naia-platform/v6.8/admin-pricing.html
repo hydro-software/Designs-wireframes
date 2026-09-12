@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin · Pricing schedules — Naia</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="css/style.css" rel="stylesheet"><script src="https://cdn.tailwindcss.com"></script>
+<style>
+  .pr-sub { display:flex; justify-content:space-between; align-items:center; margin:0 0 8px }
+  .pr-sub h4 { font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em; font-weight:600; margin:0 }
+  .pr-note { padding:10px 12px; border-radius:8px; font-size:12px; color:var(--text-muted); line-height:1.6; margin-bottom:16px }
+  .pr-changed { color:var(--accent-amber); font-weight:600 }
+</style>
+</head>
+<body data-page="admin-pricing" data-section="admin">
+<div class="app-shell">
+  <aside class="sidebar"></aside>
+  <main class="main-area">
+    <header class="topbar"><div><div class="page-eyebrow">Administration · Abonnements</div><div style="font-size:18px; font-weight:600">Pricing schedules</div></div></header>
+
+    <div class="page-content">
+
+      <!-- ===== ACTIVE schedule (immutable / grandfathered) ===== -->
+      <div class="card" style="margin-bottom:14px">
+        <div class="card-head">
+          <div><div class="card-head-title">Schedule v01 · Active</div><div class="card-head-sub">Effective depuis le 1 janvier 2026 · 87 / 87 clients pinnés</div></div>
+          <div style="display:flex; gap:8px; align-items:center">
+            <span class="badge badge-green"><i data-lucide="lock" style="width:11px; height:11px; vertical-align:-1px"></i> Active · verrouillée</span>
+            <button class="btn btn-secondary btn-sm" onclick="openOverlay('clone-schedule')"><i data-lucide="copy-plus"></i> Cloner pour modifier</button>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="pr-note" style="background:rgba(56,189,248,0.10); border:1px solid rgba(56,189,248,0.25)">
+            <i data-lucide="shield-check" style="width:13px; height:13px; vertical-align:-2px"></i> Une version <b>active est immuable</b> (grandfathering, FR-PRC-2) : ses tarifs ne se modifient pas en place. Pour changer un tarif, créez une nouvelle version (« Cloner pour modifier »), éditez le brouillon, puis activez-le.
+          </div>
+
+          <h4 style="font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em; font-weight:600; margin:0 0 8px">Per-plant · brackets</h4>
+          <table class="data-table" style="font-size:13px; margin-bottom:18px">
+            <thead><tr><th>Capacité</th><th class="num" style="text-align:right">€/plant/mois</th></tr></thead>
+            <tbody>
+              <tr><td>&lt; 250 kW</td><td class="num" style="text-align:right">25 €</td></tr>
+              <tr><td>250 kW – 1 MW</td><td class="num" style="text-align:right">50 €</td></tr>
+              <tr><td>1 – 5 MW</td><td class="num" style="text-align:right">100 €</td></tr>
+              <tr><td>5 – 10 MW</td><td class="num" style="text-align:right">250 €</td></tr>
+              <tr><td>&gt; 10 MW</td><td class="num" style="text-align:right">400 €</td></tr>
+            </tbody>
+          </table>
+          <h4 style="font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em; font-weight:600; margin:0 0 8px">Enterprise · capacity tiers (+ 10 €/plant add-on)</h4>
+          <table class="data-table" style="font-size:13px; margin-bottom:18px">
+            <thead><tr><th>Capacité totale</th><th class="num" style="text-align:right">€/mois</th></tr></thead>
+            <tbody>
+              <tr><td>&lt; 10 MW</td><td class="num" style="text-align:right">500 €</td></tr>
+              <tr><td>10 – 25 MW</td><td class="num" style="text-align:right">650 €</td></tr>
+              <tr><td>26 – 50 MW</td><td class="num" style="text-align:right">800 €</td></tr>
+              <tr><td>51 – 100 MW</td><td class="num" style="text-align:right">1 000 €</td></tr>
+              <tr><td>&gt; 100 MW</td><td class="num" style="text-align:right">1 500 €</td></tr>
+            </tbody>
+          </table>
+          <!-- (Hardware · Box block removed — FR-HARDWARE stays DEFERRED
+               per PO decision 2026-07-06; see PRD section 6.) -->
+        </div>
+      </div>
+
+      <!-- ===== DRAFT schedule (editable — per-block Modifier) ===== -->
+      <div class="card" style="margin-bottom:14px; border-color:rgba(251,191,36,0.35)">
+        <div class="card-head" style="background:rgba(251,191,36,0.06)">
+          <div><div class="card-head-title">Schedule v02 · Brouillon</div><div class="card-head-sub">Cloné de v01 · non activé · 0 client pinné</div></div>
+          <div style="display:flex; gap:8px; align-items:center">
+            <span class="badge badge-amber">Brouillon · modifiable</span>
+            <button class="btn btn-primary btn-sm" onclick="if(confirm('Activer la version v02 ? v01 sera retirée pour les NOUVEAUX clients ; les clients existants restent grandfatherés sur v01 sauf migration explicite.')) alert('Version v02 activée — à venir')"><i data-lucide="check-circle"></i> Activer la version</button>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="pr-note" style="background:rgba(251,191,36,0.08); border:1px solid rgba(251,191,36,0.25)">
+            <i data-lucide="info" style="width:13px; height:13px; vertical-align:-2px"></i> Brouillon <b>modifiable bloc par bloc</b>. Les modifications n'affectent aucun client tant que la version n'est pas activée. À l'activation, les nouveaux clients sont pinnés sur v02 ; la migration des clients existants reste une action explicite.
+          </div>
+
+          <div class="pr-sub">
+            <h4>Per-plant · brackets</h4>
+            <button class="btn btn-secondary btn-sm" onclick="openOverlay('edit-brackets')"><i data-lucide="edit-3"></i> Modifier</button>
+          </div>
+          <table class="data-table" style="font-size:13px; margin-bottom:18px">
+            <thead><tr><th>Capacité</th><th class="num" style="text-align:right">€/plant/mois</th></tr></thead>
+            <tbody>
+              <tr><td>&lt; 250 kW</td><td class="num" style="text-align:right">25 €</td></tr>
+              <tr><td>250 kW – 1 MW</td><td class="num" style="text-align:right"><span class="pr-changed">55 €</span> <span class="muted" style="font-size:11px">(était 50 €)</span></td></tr>
+              <tr><td>1 – 5 MW</td><td class="num" style="text-align:right">100 €</td></tr>
+              <tr><td>5 – 10 MW</td><td class="num" style="text-align:right">250 €</td></tr>
+              <tr><td>&gt; 10 MW</td><td class="num" style="text-align:right">400 €</td></tr>
+            </tbody>
+          </table>
+
+          <div class="pr-sub">
+            <h4>Enterprise · capacity tiers (+ 10 €/plant add-on)</h4>
+            <button class="btn btn-secondary btn-sm" onclick="openOverlay('edit-tiers')"><i data-lucide="edit-3"></i> Modifier</button>
+          </div>
+          <table class="data-table" style="font-size:13px; margin-bottom:18px">
+            <thead><tr><th>Capacité totale</th><th class="num" style="text-align:right">€/mois</th></tr></thead>
+            <tbody>
+              <tr><td>&lt; 10 MW</td><td class="num" style="text-align:right">500 €</td></tr>
+              <tr><td>10 – 25 MW</td><td class="num" style="text-align:right">650 €</td></tr>
+              <tr><td>26 – 50 MW</td><td class="num" style="text-align:right">800 €</td></tr>
+              <tr><td>51 – 100 MW</td><td class="num" style="text-align:right">1 000 €</td></tr>
+              <tr><td>&gt; 100 MW</td><td class="num" style="text-align:right">1 500 €</td></tr>
+            </tbody>
+          </table>
+
+          <!-- (Hardware · Box block removed — FR-HARDWARE stays DEFERRED
+               per PO decision 2026-07-06.) -->
+        </div>
+      </div>
+
+      <!-- ===== History ===== -->
+      <div class="card">
+        <div class="card-head"><div class="card-head-title">Historique des schedules</div></div>
+        <table class="data-table">
+          <thead><tr><th>Version</th><th>Statut</th><th>Effective</th><th>Clients pinnés</th><th>Notes</th><th></th></tr></thead>
+          <tbody>
+            <tr><td><b>v01</b></td><td><span class="badge badge-green">Active</span></td><td class="muted">1 jan. 2026 → ∞</td><td class="num">87</td><td class="muted">Schedule initial · seedé depuis naia-pricing-v01.pdf</td><td class="muted" style="font-size:11px; text-align:right">verrouillée</td></tr>
+            <tr><td>v02</td><td><span class="badge badge-amber">Draft</span></td><td class="muted">à activer</td><td class="num">0</td><td class="muted">Cloné de v01 · bracket 250 kW–1 MW augmenté à 55 €</td><td style="text-align:right; white-space:nowrap"><button class="btn btn-ghost btn-sm" title="Modifier les tarifs du brouillon" onclick="openOverlay('edit-brackets')"><i data-lucide="edit-3" style="width:13px"></i></button><button class="btn btn-ghost btn-sm" title="Activer la version" onclick="if(confirm('Activer la version v02 ?')) alert('Version v02 activée — à venir')"><i data-lucide="check-circle" style="width:13px"></i></button></td></tr>
+          </tbody>
+        </table>
+        <div style="padding:10px 16px; border-top:1px solid var(--border-subtle); font-size:12px; color:var(--text-muted)">
+          Les versions actives sont conservées indéfiniment (grandfathering). Une nouvelle version se crée par clonage, s'édite en brouillon, puis s'active — elle ne réécrit jamais une version pinnée.
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<!-- ===== Modal: Cloner et créer une version ===== -->
+<div class="overlay" id="clone-schedule" onclick="if(event.target===this)closeOverlay('clone-schedule')">
+  <div class="modal">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px">
+      <div>
+        <div class="modal-title">Cloner et créer une nouvelle version</div>
+        <div class="modal-subtitle">Crée un brouillon éditable à partir de la version active (v01). Aucun client n'est affecté avant activation.</div>
+      </div>
+      <button class="btn btn-ghost" onclick="closeOverlay('clone-schedule')"><i data-lucide="x"></i></button>
+    </div>
+    <div style="display:flex; flex-direction:column; gap:14px">
+      <div>
+        <label class="muted" style="font-size:11px; text-transform:uppercase; letter-spacing:0.06em; font-weight:600">Cloner depuis</label>
+        <select class="select" style="width:100%; margin-top:4px"><option>v01 · Active</option></select>
+      </div>
+      <div>
+        <label class="muted" style="font-size:11px; text-transform:uppercase; letter-spacing:0.06em; font-weight:600">Nouvelle version</label>
+        <input class="input" style="width:100%; margin-top:4px" value="v02">
+      </div>
+      <div>
+        <label class="muted" style="font-size:11px; text-transform:uppercase; letter-spacing:0.06em; font-weight:600">Date d'effet prévue</label>
+        <input class="input" type="date" style="width:100%; margin-top:4px">
+      </div>
+      <div>
+        <label class="muted" style="font-size:11px; text-transform:uppercase; letter-spacing:0.06em; font-weight:600">Notes</label>
+        <input class="input" style="width:100%; margin-top:4px" placeholder="ex. revalorisation bracket 250 kW–1 MW">
+      </div>
+    </div>
+    <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:18px; padding-top:14px; border-top:1px solid var(--border-subtle)">
+      <button class="btn btn-secondary" onclick="closeOverlay('clone-schedule')">Annuler</button>
+      <button class="btn btn-primary" onclick="window.location.href='admin-pricing-create.html'"><i data-lucide="copy-plus"></i> Créer nouveau pricing</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Modal: Modifier les brackets per-plant (draft) ===== -->
+<div class="overlay" id="edit-brackets" onclick="if(event.target===this)closeOverlay('edit-brackets')">
+  <div class="modal">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px">
+      <div>
+        <div class="modal-title">Modifier les tarifs per-plant · v02 (brouillon)</div>
+        <div class="modal-subtitle">€/plant/mois par palier de capacité. Modifie uniquement le brouillon v02.</div>
+      </div>
+      <button class="btn btn-ghost" onclick="closeOverlay('edit-brackets')"><i data-lucide="x"></i></button>
+    </div>
+    <div style="display:flex; flex-direction:column; gap:10px">
+      <div style="display:flex; align-items:center; gap:10px"><span style="flex:1; font-size:13px">&lt; 250 kW</span><input class="input tabular" type="number" style="width:120px" value="25"><span class="muted">€</span></div>
+      <div style="display:flex; align-items:center; gap:10px"><span style="flex:1; font-size:13px">250 kW – 1 MW</span><input class="input tabular" type="number" style="width:120px" value="55"><span class="muted">€</span></div>
+      <div style="display:flex; align-items:center; gap:10px"><span style="flex:1; font-size:13px">1 – 5 MW</span><input class="input tabular" type="number" style="width:120px" value="100"><span class="muted">€</span></div>
+      <div style="display:flex; align-items:center; gap:10px"><span style="flex:1; font-size:13px">5 – 10 MW</span><input class="input tabular" type="number" style="width:120px" value="250"><span class="muted">€</span></div>
+      <div style="display:flex; align-items:center; gap:10px"><span style="flex:1; font-size:13px">&gt; 10 MW</span><input class="input tabular" type="number" style="width:120px" value="400"><span class="muted">€</span></div>
+    </div>
+    <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:18px; padding-top:14px; border-top:1px solid var(--border-subtle)">
+      <button class="btn btn-secondary" onclick="closeOverlay('edit-brackets')">Annuler</button>
+      <button class="btn btn-primary" onclick="closeOverlay('edit-brackets'); alert('Tarifs per-plant du brouillon enregistrés — à venir')"><i data-lucide="check"></i> Enregistrer le brouillon</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Modal: Modifier les tiers enterprise (draft) ===== -->
+<div class="overlay" id="edit-tiers" onclick="if(event.target===this)closeOverlay('edit-tiers')">
+  <div class="modal">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px">
+      <div>
+        <div class="modal-title">Modifier les paliers Enterprise · v02 (brouillon)</div>
+        <div class="modal-subtitle">€/mois par palier de capacité totale, + add-on par centrale.</div>
+      </div>
+      <button class="btn btn-ghost" onclick="closeOverlay('edit-tiers')"><i data-lucide="x"></i></button>
+    </div>
+    <div style="display:flex; flex-direction:column; gap:10px">
+      <div style="display:flex; align-items:center; gap:10px"><span style="flex:1; font-size:13px">&lt; 10 MW</span><input class="input tabular" type="number" style="width:120px" value="500"><span class="muted">€</span></div>
+      <div style="display:flex; align-items:center; gap:10px"><span style="flex:1; font-size:13px">10 – 25 MW</span><input class="input tabular" type="number" style="width:120px" value="650"><span class="muted">€</span></div>
+      <div style="display:flex; align-items:center; gap:10px"><span style="flex:1; font-size:13px">26 – 50 MW</span><input class="input tabular" type="number" style="width:120px" value="800"><span class="muted">€</span></div>
+      <div style="display:flex; align-items:center; gap:10px"><span style="flex:1; font-size:13px">51 – 100 MW</span><input class="input tabular" type="number" style="width:120px" value="1000"><span class="muted">€</span></div>
+      <div style="display:flex; align-items:center; gap:10px"><span style="flex:1; font-size:13px">&gt; 100 MW</span><input class="input tabular" type="number" style="width:120px" value="1500"><span class="muted">€</span></div>
+      <div style="display:flex; align-items:center; gap:10px; border-top:1px solid var(--border-subtle); padding-top:10px"><span style="flex:1; font-size:13px">Add-on par centrale</span><input class="input tabular" type="number" style="width:120px" value="10"><span class="muted">€</span></div>
+    </div>
+    <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:18px; padding-top:14px; border-top:1px solid var(--border-subtle)">
+      <button class="btn btn-secondary" onclick="closeOverlay('edit-tiers')">Annuler</button>
+      <button class="btn btn-primary" onclick="closeOverlay('edit-tiers'); alert('Paliers Enterprise du brouillon enregistrés — à venir')"><i data-lucide="check"></i> Enregistrer le brouillon</button>
+    </div>
+  </div>
+</div>
+
+<!-- (Modal « Modifier le hardware » removed — FR-HARDWARE stays DEFERRED
+     per PO decision 2026-07-06; see PRD section 6.) -->
+
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="js/app.js"></script>
+</body></html>
