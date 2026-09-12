@@ -10,7 +10,7 @@
 <div class="app-shell">
   <aside class="sidebar"></aside>
   <main class="main-area">
-    <header class="topbar"><div><div class="page-eyebrow">Profil</div><div style="font-size:18px; font-weight:600">Mon profil</div></div></header>
+    <header class="topbar"><div><div class="page-eyebrow">Profil</div><div style="font-size:18px; font-weight:600">Mon profil</div></div><div id="org-switcher"></div></header>
 
     <!-- Profile sub-tabs.
          v5 update: Sécurité tab removed (moved into the Paramètres utilisateur tile on Identité).
@@ -39,11 +39,11 @@
             </div>
 
             <div style="display:flex; flex-direction:column; gap:0">
-              <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--border-subtle)"><span class="muted">Organisation</span><span>Moulin du Bocq</span></div>
-              <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--border-subtle)"><span class="muted">Pays</span><span>Belgique</span></div>
-              <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--border-subtle)"><span class="muted">Rôle organisation</span><span>Owner-operator</span></div>
+              <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--border-subtle)"><span class="muted">Organisation</span><span data-org-name>Moulin du Bocq</span></div>
+              <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--border-subtle)"><span class="muted">Pays</span><span data-org-country>Belgique</span></div>
+              <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--border-subtle)"><span class="muted">Type d'appartenance</span><span class="badge badge-cyan" data-org-type>Signataire</span></div>
               <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--border-subtle)"><span class="muted">Membre depuis</span><span>mars 2024</span></div>
-              <div style="display:flex; justify-content:space-between; padding:8px 0"><span class="muted">Code parrainage org.</span><span style="font-family: monospace">MB-2026</span></div>
+              <div style="display:flex; justify-content:space-between; padding:8px 0"><span class="muted">Code parrainage org.</span><span style="font-family: monospace" data-org-ref>MB-2026</span></div>
             </div>
           </div>
         </div>
@@ -59,8 +59,19 @@
           <div class="card-head"><div class="card-head-title">Mon organisation</div></div>
           <div class="card-body">
             <div style="display:flex; gap:14px; align-items:center; padding-bottom:14px; border-bottom:1px solid var(--border-subtle); margin-bottom:14px">
-              <div class="avatar" style="width:48px; height:48px; font-size:16px">MB</div>
-              <div><div style="font-weight:600">Moulin du Bocq</div><div class="muted" style="font-size:12px">2 utilisateurs · 1 centrale</div></div>
+              <div class="avatar" style="width:48px; height:48px; font-size:16px" data-org-initials>MB</div>
+              <div style="min-width:0">
+                <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap">
+                  <span style="font-weight:600" data-org-name>Moulin du Bocq</span>
+                  <!-- Marqueur « principale » en LECTURE SEULE (décision PO du 2026-09-10) :
+                       l'action « Définir comme principale » vit uniquement dans le sélecteur
+                       de la barre du haut, une entrée par organisation. applyOrgIdentity()
+                       le masque en dessous de deux appartenances, et quand l'organisation
+                       consultée n'est pas la principale. -->
+                  <span class="badge badge-amber org-main-tag" data-org-main-marker hidden title="Le portail s'ouvre sur cette organisation."><i data-lucide="home"></i> Organisation principale</span>
+                </div>
+                <div class="muted" style="font-size:12px; margin-top:3px" data-org-meta>2 utilisateurs · 1 centrale</div>
+              </div>
             </div>
 
             <!-- Read-only legal summary mirrored from Odoo -->
@@ -68,15 +79,15 @@
               <i data-lucide="info" style="width:14px; height:14px; color:var(--brand-cyan); flex-shrink:0; margin-top:2px"></i>
               <div class="muted" style="font-size:11.5px; line-height:1.5">Les informations légales (raison sociale, TVA, adresse, email de facturation) sont gérées dans <b>Odoo</b>, notre source de référence. Naia en affiche un résumé en lecture seule.</div>
             </div>
-            <div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid var(--border-subtle)"><span class="muted">Raison sociale</span><span>Moulin du Bocq SRL</span></div>
-            <div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid var(--border-subtle)"><span class="muted">N<sup>o</sup> TVA</span><span class="tabular">BE0123.456.789</span></div>
-            <div style="display:flex; justify-content:space-between; gap:14px; padding:6px 0; border-bottom:1px solid var(--border-subtle)"><span class="muted">Adresse</span><span style="text-align:right; font-size:13px">Rue du Bocq 12<br>5530 Yvoir, Belgique</span></div>
-            <div style="display:flex; justify-content:space-between; padding:6px 0"><span class="muted">Email de facturation</span><span style="font-size:12px">compta@moulin.be</span></div>
+            <div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid var(--border-subtle)"><span class="muted">Raison sociale</span><span data-org-legal>Moulin du Bocq SRL</span></div>
+            <div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid var(--border-subtle)"><span class="muted">N<sup>o</sup> TVA</span><span class="tabular" data-org-vat>BE0123.456.789</span></div>
+            <div style="display:flex; justify-content:space-between; gap:14px; padding:6px 0; border-bottom:1px solid var(--border-subtle)"><span class="muted">Adresse</span><span style="text-align:right; font-size:13px" data-org-address>Rue du Bocq 12<br>5530 Yvoir, Belgique</span></div>
+            <div style="display:flex; justify-content:space-between; padding:6px 0"><span class="muted">Email de facturation</span><span style="font-size:12px" data-org-billing>compta@moulin.be</span></div>
 
             <!-- Org Naia-points pill kept on the profile per Jan (2026-06-17). PRD v2.6 / decision B
                  declutters token TILES from the dashboard; the points pill on the profile stays. -->
-            <div style="display:flex; justify-content:space-between; padding:6px 0; border-top:1px solid var(--border-subtle); margin-top:12px"><span class="muted">Naia points (org.)</span><span class="points-pill"><i data-lucide="sparkles"></i><span class="tabular">3 450</span></span></div>
-            <div style="display:flex; justify-content:space-between; padding:6px 0"><span class="muted">Plan d'abonnement</span><span>Per-plant · 210 kW</span></div>
+            <div style="display:flex; justify-content:space-between; padding:6px 0; border-top:1px solid var(--border-subtle); margin-top:12px"><span class="muted">Naia points (org.)</span><span class="points-pill"><i data-lucide="sparkles"></i><span class="tabular" data-org-points>3 450</span></span></div>
+            <div style="display:flex; justify-content:space-between; padding:6px 0"><span class="muted">Plan d'abonnement</span><span data-org-plan>Per-plant · 210 kW</span></div>
 
             <a href="profil-abonnement.html" class="btn btn-secondary btn-block" style="margin-top:14px">Gérer l'abonnement</a>
           </div>

@@ -55,6 +55,10 @@ Edit the **current** version folder (`naia-platform/v6.8/`), commit, and push to
 `v6.8` est `v6.7` plus **deux ajouts au Tableau de bord**, qui n'en font qu'un : le
 premier fournit le dénominateur du second. Demande de **Simon Cuvelier** (2026-09-12).
 
+La base est la v6.7 **complète**, sélecteur d'organisation compris (`5b22ac7`,
+`086b8b6`, platform#1581). La v6.8 avait d'abord été dérivée d'une copie antérieure
+à ces deux commits ; le décalage a été rattrapé avant publication.
+
 **Le renommage « perte » → « événement » que la v6.7 annonçait pour cette version n'a
 pas été fait.** Il ne vient pas du demandeur, qui préfère le laisser de côté tant que
 son origine et sa justification n'ont pas été retrouvées. Il reste donc ouvert, sans
