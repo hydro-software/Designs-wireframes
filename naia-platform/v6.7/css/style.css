@@ -1682,3 +1682,150 @@ a.tb-btn { text-decoration: none; }
 .wa-popup-more {
   font-size: 10.5px; color: var(--brand-cyan); margin-top: 8px;
 }
+
+/* ============ v6.7 : SELECTEUR D'ORGANISATION (portail client, platform#1581) ============
+   Un utilisateur appartient a 0, 1 ou plusieurs organisations. L'appartenance est
+   optionnelle, multiple et typee (signataire / membre / mandataire / ambassadeur).
+   L'utilisateur designe lui-meme son organisation « principale » : c'est une
+   preference stockee, pas une regle automatique, et c'est elle qui decide sur
+   quelle organisation le portail s'ouvre.
+
+   REGLE DURE : le controle n'existe pas en dessous de deux appartenances. Le rendu
+   est fait par buildOrgSwitcher() dans js/app.js, qui sort avant d'ecrire quoi que
+   ce soit quand la liste contient moins de deux organisations.
+
+   Le declencheur n'est pas un composant neuf : c'est la pastille .org-pill des pages
+   Communaute (community-agenda / -intelligence / -market), rendue cliquable et posee
+   au meme endroit, a droite de la barre du haut. La mecanique d'ouverture est celle
+   des menus de la barre d'outils Production : etat data-open porte par le wrapper
+   .tb-menu, affichage pilote en CSS.
+
+   Seul le PANNEAU est ecrit a neuf : .tb-dropdown impose « une ligne = une action »
+   (.tb-dropdown button { width: 100% }), alors qu'une ligne d'organisation porte deux
+   cibles (choisir l'organisation ; la definir comme principale) et deux niveaux de
+   texte (nom ; type d'appartenance + volumetrie).
+   ======================================================================================= */
+
+/* ---- Declencheur : la pastille .org-pill devient un bouton ---- */
+button.org-pill {
+  font-family: inherit;
+  padding-right: 9px;
+  cursor: pointer;
+  transition: background 0.12s, border-color 0.12s;
+}
+button.org-pill:hover { background: var(--bg-active); border-color: var(--border-default); }
+button.org-pill:focus-visible {
+  outline: none;
+  border-color: var(--brand-cyan);
+  box-shadow: 0 0 0 3px var(--brand-cyan-soft);
+}
+/* Un nom long (« Mairie d'Avaux », « Federation hydro wallonne ») ne doit jamais
+   faire retomber la barre du haut sur deux lignes. */
+.org-pill .org-pill-name { max-width: 190px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.org-pill .org-chev { width: 14px; height: 14px; color: var(--text-muted); transition: transform 0.15s; }
+.tb-menu[data-open="true"] .org-chev { transform: rotate(180deg); }
+
+/* ---- Panneau ---- */
+.org-menu {
+  display: none;
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  min-width: 460px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
+  border-radius: 10px;
+  padding: 6px;
+  z-index: 60;
+  box-shadow: var(--shadow-pop);
+}
+.tb-menu[data-open="true"] .org-menu { display: block; }
+
+.org-menu-head {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+  padding: 8px 10px 9px;
+  border-bottom: 1px solid var(--border-subtle);
+  margin-bottom: 4px;
+}
+
+/* ---- Une ligne = une appartenance ----
+   Deux faits orthogonaux cohabitent sur la ligne et ne doivent pas etre confondus :
+   « c'est l'organisation que je consulte » (fond cyan + coche) et « c'est mon
+   organisation principale » (pastille ambre). Un utilisateur peut consulter une
+   organisation qui n'est pas sa principale. */
+.org-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 8px;
+}
+.org-row + .org-row { margin-top: 2px; }
+.org-row:hover { background: var(--bg-card-hover); }
+.org-row.is-current { background: var(--brand-cyan-soft); }
+
+/* Cible 1 : basculer vers cette organisation. */
+.org-row-pick {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  font-family: inherit;
+  font-size: 13px;
+  color: var(--text-primary);
+  text-align: left;
+  cursor: pointer;
+}
+.org-row-pick:focus-visible { outline: 2px solid var(--brand-cyan); outline-offset: 3px; border-radius: 6px; }
+.org-row-txt { min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.org-row-name { display: flex; align-items: center; gap: 6px; min-width: 0; }
+.org-row-label { font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.org-row-pick .org-check { width: 14px; height: 14px; flex: none; color: var(--brand-cyan); }
+.org-row-meta { display: flex; align-items: center; gap: 7px; font-size: 11px; color: var(--text-muted); white-space: nowrap; }
+
+/* Cible 2 : definir cette organisation comme principale.
+   Meme geste que « Definir » sur le contact principal (profil.html), mais icone
+   « home » et pastille ambre plutot que l'etoile verte, pour que les deux marqueurs
+   restent distincts sur la meme page. */
+.org-row-main {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: transparent;
+  border: 0;
+  padding: 4px 7px;
+  border-radius: 7px;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-muted);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.org-row-main i { width: 13px; height: 13px; }
+.org-row-main:hover { background: var(--bg-active); color: var(--text-primary); }
+.org-row-main:focus-visible { outline: 2px solid var(--brand-cyan); outline-offset: 1px; }
+
+/* ---- Pied du panneau ---- */
+.org-menu-foot {
+  border-top: 1px solid var(--border-subtle);
+  margin-top: 4px;
+  padding: 9px 10px 6px;
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--text-muted);
+}
+
+/* ---- Marqueur « principale » en lecture seule (pastille .badge existante) ----
+   .badge est en display: inline-flex : sans cette regle, l'attribut hidden pose par
+   applyOrgIdentity() ne masquerait rien. */
+.org-main-tag[hidden] { display: none; }
