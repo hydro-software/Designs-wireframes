@@ -151,28 +151,32 @@ pertes » gagne donc une cinquième colonne — cochée = la perte pèse sur le 
   période, la définition des contrats d'exploitation-maintenance — n'est **pas** retenue en
   v1. Elle répond à une autre question et coûterait une seconde tuile à expliquer.
 
-### Maquette à trancher : l'accès rappelé sous l'avatar (barre latérale étendue et repliée)
+### Maquette à trancher : l'accès porté par l'avatar (barre latérale étendue et repliée)
 
 **Proposition, pas une décision.** Dans l'app, le rappel « Accès : <rôle> » est une ligne
 en tête de chaque écran de centrale (platform#1604). Le placement a été contesté ; la
-maquette le déplace sous l'avatar pour en juger sur pièce, dans les deux états de la barre.
+maquette le déplace sur l'avatar de la barre latérale, dans ses deux états.
 
 - **Barre latérale repliable.** Bouton en tête de la barre du haut, là où l'app place le
-  sien. L'état est mémorisé dans le navigateur (`naia-sidebar`). À noter : l'app s'ouvre
-  **repliée** à chaque chargement, c'est donc la version repliée que l'utilisateur voit le plus.
-- **Étendue.** Sous le nom et l'organisation : « Accès sur <centrale> », la pastille du rôle
-  et, pour un Lecteur, son étendue de lecture. Survol ou focus clavier : la phrase qui
-  explique l'accès.
-- **Repliée.** Un anneau à la teinte du rôle autour de l'avatar et une pastille courte
-  dessous (« Admin », « Lecteur », « Mixte »…). Le détail passe dans l'infobulle. La
-  couleur ne porte jamais l'information seule.
-- **Onglet « Tous ».** Rôles différents selon la centrale : « Selon la centrale » (« Mixte »
-  replié), et la liste par centrale dans l'infobulle. Rôle identique partout : le rôle.
-- **Page sans centrale** (Profil, Communauté, Administration) : le bloc disparaît. Un accès
-  appartient à une centrale, pas à la personne.
+  sien. L'état est mémorisé dans le navigateur (`naia-sidebar`). L'app s'ouvre **repliée**
+  à chaque chargement.
+- **Un seul signal visible : un anneau à la teinte du rôle autour de l'avatar.** Aucun
+  texte dans la barre, étendue comme repliée.
+- **Le texte est dans l'infobulle**, au survol de l'avatar ou au focus clavier du bouton
+  profil : « Votre accès sur <centrale> », la pastille du rôle, l'étendue d'un Lecteur et la
+  phrase qui explique l'accès. Elle reste lue par les lecteurs d'écran.
+- **Onglet « Tous »** *(pas encore dans l'app)*. Rôle identique sur toutes les centrales :
+  sa teinte et sa phrase. Rôles différents : anneau gris et liste par centrale dans l'infobulle.
+- **Page sans centrale** (Profil, Communauté, Administration) : ni anneau ni infobulle. Un
+  accès appartient à une centrale, pas à la personne.
 - **Données de démo.** Moulins = Administrateur, Bocq = Lecteur · Production et pertes
-  détaillées (le libellé le plus long du catalogue), Ariège = Éditeur, Lesse = Finance.
-  Libellés, phrases et teintes repris de l'app (`PlantAccessBadge.vue`, `useAccessCopy`).
+  détaillées, Ariège = Éditeur, Lesse = Finance. Libellés, phrases et teintes repris de
+  l'app (`PlantAccessBadge.vue`, `useAccessCopy`).
+- ⚠ **L'anneau seul ne distingue pas tous les rôles.** Administrateur et Lecteur sont deux
+  bleus, et le gris « rôles différents » est proche du gris du rôle Support. L'anneau
+  signale qu'un accès s'applique ; c'est l'infobulle qui dit lequel.
+- ⚠ **Pas de survol sur écran tactile.** Sur mobile, toucher l'avatar ouvre le profil :
+  l'infobulle y est inatteignable. À prévoir avant la version responsive.
 - ⚠ **Écart de teintes non résolu.** Le tableau « Utilisateurs & rôles » de `parametres.html`
   colore les mêmes rôles autrement (Admin violet, Éditeur vert, Finance ambre). L'app a
   écarté l'ambre, réservé à « Accès bloqué ». À aligner si la proposition est retenue.
