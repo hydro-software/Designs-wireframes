@@ -151,6 +151,32 @@ pertes » gagne donc une cinquième colonne — cochée = la perte pèse sur le 
   période, la définition des contrats d'exploitation-maintenance — n'est **pas** retenue en
   v1. Elle répond à une autre question et coûterait une seconde tuile à expliquer.
 
+### Maquette à trancher : l'accès rappelé sous l'avatar (barre latérale étendue et repliée)
+
+**Proposition, pas une décision.** Dans l'app, le rappel « Accès : <rôle> » est une ligne
+en tête de chaque écran de centrale (platform#1604). Le placement a été contesté ; la
+maquette le déplace sous l'avatar pour en juger sur pièce, dans les deux états de la barre.
+
+- **Barre latérale repliable.** Bouton en tête de la barre du haut, là où l'app place le
+  sien. L'état est mémorisé dans le navigateur (`naia-sidebar`). À noter : l'app s'ouvre
+  **repliée** à chaque chargement, c'est donc la version repliée que l'utilisateur voit le plus.
+- **Étendue.** Sous le nom et l'organisation : « Accès sur <centrale> », la pastille du rôle
+  et, pour un Lecteur, son étendue de lecture. Survol ou focus clavier : la phrase qui
+  explique l'accès.
+- **Repliée.** Un anneau à la teinte du rôle autour de l'avatar et une pastille courte
+  dessous (« Admin », « Lecteur », « Mixte »…). Le détail passe dans l'infobulle. La
+  couleur ne porte jamais l'information seule.
+- **Onglet « Tous ».** Rôles différents selon la centrale : « Selon la centrale » (« Mixte »
+  replié), et la liste par centrale dans l'infobulle. Rôle identique partout : le rôle.
+- **Page sans centrale** (Profil, Communauté, Administration) : le bloc disparaît. Un accès
+  appartient à une centrale, pas à la personne.
+- **Données de démo.** Moulins = Administrateur, Bocq = Lecteur · Production et pertes
+  détaillées (le libellé le plus long du catalogue), Ariège = Éditeur, Lesse = Finance.
+  Libellés, phrases et teintes repris de l'app (`PlantAccessBadge.vue`, `useAccessCopy`).
+- ⚠ **Écart de teintes non résolu.** Le tableau « Utilisateurs & rôles » de `parametres.html`
+  colore les mêmes rôles autrement (Admin violet, Éditeur vert, Finance ambre). L'app a
+  écarté l'ambre, réservé à « Accès bloqué ». À aligner si la proposition est retenue.
+
 ## v6.7 — Prompt d'import assisté · aperçu détaillé des catégories
 
 `v6.7` est `v6.6` plus **deux ajouts** et **un alignement de vocabulaire**. Aucun

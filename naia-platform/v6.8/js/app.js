@@ -6,10 +6,12 @@
 //   - No more "Rapports" entry — the generator lives on the Tableau de bord
 
 const CENTRALES = [
-  { slug: "moulins",  label: "Centrale des Moulins", capacity: "450 kW", country: "FR" },
-  { slug: "bocq",     label: "Moulin du Bocq",       capacity: "210 kW", country: "BE" },
-  { slug: "ariege",   label: "Centrale d'Ariège",    capacity: "780 kW", country: "FR" },
-  { slug: "lesse",    label: "Moulin de la Lesse",   capacity: "320 kW", country: "BE" },
+  // v6.8 maquette : `access` = rôle de Marc Dupont sur la centrale (voir PLANT_ROLES).
+  // Bocq porte le libellé le plus long du catalogue, pour éprouver la mise en page.
+  { slug: "moulins",  label: "Centrale des Moulins", capacity: "450 kW", country: "FR", access: { role: "PLANT_ADMIN" } },
+  { slug: "bocq",     label: "Moulin du Bocq",       capacity: "210 kW", country: "BE", access: { role: "VIEWER", viewLevel: 3 } },
+  { slug: "ariege",   label: "Centrale d'Ariège",    capacity: "780 kW", country: "FR", access: { role: "EDITOR" } },
+  { slug: "lesse",    label: "Moulin de la Lesse",   capacity: "320 kW", country: "BE", access: { role: "FINANCE" } },
 ];
 
 const COMMUNITY_TOPICS = [
@@ -211,12 +213,14 @@ function buildSidebar() {
            as tabs and a User Settings tile hosts language, theme and security. -->
       <a id="profile-trigger" class="profile-trigger" href="profil.html">
         <div class="avatar" style="width:30px; height:30px; font-size:11px">MD</div>
-        <div style="flex:1; min-width:0">
+        <div class="profile-id" style="flex:1; min-width:0">
           <div style="color:white; font-size:13px; font-weight:500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis">Marc Dupont</div>
           <div data-org-foot style="color:rgba(255,255,255,0.55); font-size:11px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis">${orgFootLine()}</div>
         </div>
-        <i data-lucide="chevron-right" style="width:14px; height:14px; color:rgba(255,255,255,0.55)"></i>
+        <i data-lucide="chevron-right" class="profile-chev" style="width:14px; height:14px; color:rgba(255,255,255,0.55)"></i>
       </a>
+      <!-- v6.8 maquette : rappel de l'accès sous l'avatar, rempli par refreshSidebarAccess(). -->
+      <div id="sidebar-access" class="sb-access" tabindex="0" aria-describedby="sb-access-pop" hidden></div>
     </div>
   `;
 }
@@ -931,6 +935,125 @@ function applyOrgIdentity() {
   });
 }
 
+// ---- V6.8 MAQUETTE : BARRE LATÉRALE REPLIABLE · ACCÈS SOUS L'AVATAR ----
+// Proposition à trancher (README, v6.8). Dans l'app, le rappel « Accès : <rôle> » est
+// une ligne en tête de chaque écran de centrale (platform#1604). Ici il vit sous
+// l'avatar, dans la barre étendue comme dans le rail replié.
+//
+// Libellés, phrases et teintes repris tels quels de l'app (PlantAccessBadge.vue,
+// useAccessCopy, dashboard.access.* en FR) : deux vocabulaires pour un même accès
+// finissent toujours par se contredire.
+const PLANT_ROLES = {
+  PLANT_ADMIN: { label: "Administrateur", short: "Admin",   hue: "#3b6fd4", help: "Accès complet : production, revenus, pertes détaillées, création et édition des pertes, ingestion de données, paramètres de la centrale et gestion des accès. Configuration de son panneau." },
+  EDITOR:      { label: "Éditeur",        short: "Éditeur", hue: "#fb923c", help: "Accès : production et pertes détaillées, création et édition des pertes, ingestion de données. Sans les revenus. Configuration de son panneau." },
+  VIEWER:      { label: "Lecteur",        short: "Lecteur", hue: "#60a5fa", help: "" },
+  FINANCE:     { label: "Finance",        short: "Finance", hue: "#4ade80", help: "Accès restreint en lecture : production et revenus, sans aucune perte. Configuration de son panneau." },
+};
+// Le Lecteur tire son étendue et sa phrase du niveau de vue : « Lecteur » seul ne dit
+// pas ce qui est retenu.
+const VIEW_LEVELS = {
+  1: { label: "Production seule",                help: "Accès restreint en lecture : production, sans les pertes ni les revenus. Configuration de son panneau." },
+  2: { label: "Production et pertes totales",    help: "Accès restreint en lecture : production et total des pertes, sans les revenus. Configuration de son panneau." },
+  3: { label: "Production et pertes détaillées", help: "Accès restreint en lecture : production et pertes par catégorie, sans les revenus. Configuration de son panneau." },
+};
+// Onglet « Tous » quand les rôles diffèrent. Gris proche de celui du rôle Support de
+// l'app : c'est le texte (« Mixte ») qui les distingue, jamais la teinte seule.
+const MIXED_ACCESS = { key: "MIXED", label: "Selon la centrale", short: "Mixte", hue: "#94a3b8", scope: "", help: "" };
+
+function accessView(access) {
+  const role = PLANT_ROLES[access.role];
+  const level = access.role === "VIEWER" ? VIEW_LEVELS[access.viewLevel] : null;
+  return {
+    key: access.role + (level ? ":" + access.viewLevel : ""),
+    label: role.label,
+    short: role.short,
+    hue: role.hue,
+    scope: level ? level.label : "",
+    help: level ? level.help : role.help,
+  };
+}
+
+// Pastille du rôle (+ étendue du Lecteur). `withShort` ajoute le libellé court du rail.
+function accessLineHTML(v, withShort = false) {
+  const short = withShort ? `<span class="sb-role-short">${v.short}</span>` : "";
+  const scope = v.scope ? `<span class="sb-access-scope">${v.scope}</span>` : "";
+  return `<div class="sb-access-line"><span class="sb-role" style="--hue:${v.hue}"><span class="sb-role-full">${v.label}</span>${short}</span>${scope}</div>`;
+}
+
+// Un accès appartient à une centrale, pas à la personne : sans onglets de centrale
+// (Profil, Communauté, Administration), le bloc disparaît.
+function sidebarPlantSlug() {
+  if (!document.querySelector("#centrale-tabs, #parametres-tabs, .centrale-tab[data-centrale]")) return null;
+  return document.body.dataset.centrale || "all";
+}
+
+function refreshSidebarAccess() {
+  const host = document.getElementById("sidebar-access");
+  if (!host) return;
+  const avatar = document.querySelector("#profile-trigger .avatar");
+  const slug = sidebarPlantSlug();
+  if (!slug) {
+    host.hidden = true;
+    host.innerHTML = "";
+    if (avatar) avatar.style.boxShadow = "";
+    return;
+  }
+  const one = CENTRALES.find(c => c.slug === slug);
+  const plants = one ? [one] : CENTRALES;
+  const views = plants.map(c => accessView(c.access));
+  const head = views.every(v => v.key === views[0].key) ? views[0] : MIXED_ACCESS;
+  const where = one ? one.label : "les " + plants.length + " centrales";
+
+  const detail = head === MIXED_ACCESS
+    ? `<div class="sb-pop-rows">${plants.map((c, i) => `<div><div class="sb-pop-plant">${c.label}</div>${accessLineHTML(views[i])}</div>`).join("")}</div>`
+    : `${accessLineHTML(head)}<p class="sb-pop-help">${head.help}</p>`;
+
+  host.hidden = false;
+  // Anneau à la teinte du rôle : le seul signal qui survit au rail replié sans survol.
+  if (avatar) avatar.style.boxShadow = `0 0 0 2px #070e20, 0 0 0 4px ${head.hue}`;
+  host.innerHTML = `
+    <div class="sb-access-cap">Accès sur ${where}</div>
+    ${accessLineHTML(head, true)}
+    <div class="sb-access-pop" id="sb-access-pop" role="tooltip">
+      <div class="sb-pop-title">Votre accès sur ${where}</div>
+      ${detail}
+    </div>`;
+}
+
+// Rail replié, mémorisé dans le navigateur. Le bouton est en tête de la barre du haut,
+// là où l'app place UDashboardSidebarCollapse.
+function isSidebarCollapsed() { return localStorage.getItem("naia-sidebar") === "collapsed"; }
+function setSidebarCollapsed(collapsed) {
+  localStorage.setItem("naia-sidebar", collapsed ? "collapsed" : "expanded");
+  applySidebarState();
+}
+function applySidebarState() {
+  const collapsed = isSidebarCollapsed();
+  document.body.dataset.sidebar = collapsed ? "collapsed" : "expanded";
+  // Libellés masqués dans le rail : l'infobulle native les rend au survol.
+  document.querySelectorAll("aside.sidebar .sidebar-item, #profile-trigger").forEach(el => {
+    const label = (el.querySelector(".profile-id > div, span")?.textContent || "").trim();
+    if (collapsed) el.title = label;
+    else el.removeAttribute("title");
+  });
+  const btn = document.getElementById("sidebar-toggle");
+  if (!btn) return;
+  const text = collapsed ? "Déployer la barre latérale" : "Réduire la barre latérale";
+  btn.title = text;
+  btn.setAttribute("aria-label", text);
+  btn.setAttribute("aria-expanded", String(!collapsed));
+}
+function injectSidebarToggle() {
+  const bar = document.querySelector("header.topbar");
+  if (!bar || document.getElementById("sidebar-toggle")) return;
+  const first = bar.firstElementChild;
+  const lead = document.createElement("div");
+  lead.className = "topbar-lead";
+  lead.innerHTML = `<button id="sidebar-toggle" class="sidebar-toggle" type="button" onclick="setSidebarCollapsed(!isSidebarCollapsed())"><i data-lucide="panel-left"></i></button>`;
+  bar.insertBefore(lead, first);
+  if (first) lead.appendChild(first);
+}
+
 // ---- INIT ----
 document.addEventListener("DOMContentLoaded", () => {
   document.documentElement.setAttribute("data-theme", getTheme());
@@ -944,6 +1067,12 @@ document.addEventListener("DOMContentLoaded", () => {
   injectAccessToggle();
   buildOrgSwitcher();
   applyOrgIdentity();
+  injectSidebarToggle();
+  applySidebarState();
+  refreshSidebarAccess();
+  // app.js, data.html et parametres.html écrivent tous body[data-centrale] au changement
+  // d'onglet : observer l'attribut évite de brancher chaque page.
+  new MutationObserver(refreshSidebarAccess).observe(document.body, { attributes: true, attributeFilter: ["data-centrale"] });
   initIcons();
   setTimeout(() => {
     buildHomeChart();

@@ -1829,3 +1829,89 @@ button.org-pill:focus-visible {
    .badge est en display: inline-flex : sans cette regle, l'attribut hidden pose par
    applyOrgIdentity() ne masquerait rien. */
 .org-main-tag[hidden] { display: none; }
+
+/* ============ V6.8 MAQUETTE — BARRE LATÉRALE REPLIABLE · ACCÈS SOUS L'AVATAR ============
+   Proposition à trancher (README, v6.8). La pastille reprend exactement la forme et les
+   teintes de PlantAccessBadge.vue dans l'app ; seule sa place change. */
+
+/* L'infobulle d'accès déborde sur la page : la barre passe au-dessus du contenu,
+   mais reste sous les modales (.overlay, z-index 50). */
+.sidebar { z-index: 45; }
+.app-shell { transition: grid-template-columns 0.18s ease; }
+
+.topbar-lead { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.sidebar-toggle {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 30px; height: 30px; flex-shrink: 0;
+  border-radius: 8px; border: 1px solid var(--border-default);
+  background: transparent; color: var(--text-muted); cursor: pointer;
+}
+.sidebar-toggle:hover { color: var(--text-primary); background: var(--bg-card-hover); }
+.sidebar-toggle svg { width: 16px; height: 16px; }
+
+/* ---- Bloc accès, barre étendue : aligné sur la colonne du nom ---- */
+#profile-container { position: relative; }
+.sb-access { position: relative; padding: 0 16px 14px 57px; margin-top: -6px; outline: none; }
+.sb-access:focus-visible { box-shadow: inset 0 0 0 2px var(--brand-cyan); border-radius: 8px; }
+.sb-access-cap {
+  font-size: 11px; color: rgba(255,255,255,0.45); margin-bottom: 6px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.sb-access-line { display: flex; flex-wrap: wrap; align-items: center; gap: 5px 7px; }
+.sb-role {
+  font-size: 11px; font-weight: 600; line-height: 1;
+  padding: 4px 8px; border-radius: 999px; white-space: nowrap;
+  color: var(--hue);
+  background: color-mix(in srgb, var(--hue) 15%, transparent);
+  border: 1px solid color-mix(in srgb, var(--hue) 40%, transparent);
+}
+.sb-role-short { display: none; }
+.sb-access-scope { font-size: 11px; line-height: 1.35; color: rgba(255,255,255,0.62); }
+
+/* ---- Infobulle : toujours sombre, comme la barre dont elle sort (les teintes des
+   rôles ne sont lisibles que sur fond sombre, y compris en thème clair) ---- */
+.sb-access-pop {
+  display: none; position: absolute; left: calc(100% + 10px); bottom: 8px;
+  width: 290px; padding: 12px 14px; text-align: left;
+  background: #0f1a32; border: 1px solid rgba(255,255,255,0.10); border-radius: 10px;
+  box-shadow: 0 16px 40px -8px rgba(0,0,0,0.55);
+  color: #e2e8f0; font-size: 12.5px; line-height: 1.5;
+}
+.sb-access:hover .sb-access-pop,
+.sb-access:focus-within .sb-access-pop { display: block; }
+.sb-pop-title { font-size: 11px; font-weight: 600; color: #94a3b8; margin-bottom: 8px; }
+.sb-pop-help { margin: 8px 0 0; color: #b4becc; }
+.sb-pop-rows { display: grid; gap: 10px; }
+.sb-pop-plant { font-weight: 500; margin-bottom: 4px; }
+
+/* ---- Rail replié ---- */
+@media (min-width: 769px) {
+  body[data-sidebar="collapsed"] .app-shell { grid-template-columns: 72px 1fr; }
+  body[data-sidebar="collapsed"] .sidebar-brand { padding: 18px 10px 12px; }
+  body[data-sidebar="collapsed"] .sidebar-brand img { max-width: 52px !important; margin: 0 auto; }
+  body[data-sidebar="collapsed"] .sidebar-nav { padding: 6px 8px; }
+  body[data-sidebar="collapsed"] .sidebar-section-title {
+    font-size: 0; padding: 0; height: 1px; margin: 12px 10px 8px; background: rgba(255,255,255,0.08);
+  }
+  body[data-sidebar="collapsed"] .sidebar-item { justify-content: center; padding: 10px 0; gap: 0; }
+  /* Masqué à l'œil, lu par les lecteurs d'écran. */
+  body[data-sidebar="collapsed"] .sidebar-item > span {
+    position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap;
+  }
+  body[data-sidebar="collapsed"] .sidebar-item .chev,
+  body[data-sidebar="collapsed"] .subnav { display: none; }
+  body[data-sidebar="collapsed"] .sidebar-foot { padding: 6px 8px 8px; }
+
+  body[data-sidebar="collapsed"] .profile-trigger { justify-content: center; padding: 14px 0 8px; }
+  body[data-sidebar="collapsed"] .profile-id,
+  body[data-sidebar="collapsed"] .profile-chev { display: none; }
+  /* Centrage limité à la pastille du rail : l'infobulle garde sa mise en page. */
+  body[data-sidebar="collapsed"] .sb-access { padding: 0 0 14px; margin-top: 0; }
+  body[data-sidebar="collapsed"] .sb-access > .sb-access-line { justify-content: center; }
+  body[data-sidebar="collapsed"] .sb-access-cap,
+  body[data-sidebar="collapsed"] .sb-access > .sb-access-line .sb-access-scope,
+  body[data-sidebar="collapsed"] .sb-access > .sb-access-line .sb-role-full { display: none; }
+  body[data-sidebar="collapsed"] .sb-access > .sb-access-line .sb-role-short { display: inline; }
+  body[data-sidebar="collapsed"] .sb-access > .sb-access-line .sb-role { font-size: 10px; padding: 3px 6px; }
+}
+@media (max-width: 768px) { .sidebar-toggle { display: none; } }
