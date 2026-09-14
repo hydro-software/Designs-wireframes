@@ -151,11 +151,11 @@ pertes » gagne donc une cinquième colonne — cochée = la perte pèse sur le 
   période, la définition des contrats d'exploitation-maintenance — n'est **pas** retenue en
   v1. Elle répond à une autre question et coûterait une seconde tuile à expliquer.
 
-### Maquette à trancher : l'accès porté par l'avatar (barre latérale étendue et repliée)
+### Retenu : l'accès porté par l'avatar (barre latérale étendue et repliée)
 
-**Proposition, pas une décision.** Dans l'app, le rappel « Accès : <rôle> » est une ligne
-en tête de chaque écran de centrale (platform#1604). Le placement a été contesté ; la
-maquette le déplace sur l'avatar de la barre latérale, dans ses deux états.
+**Retenu le 2026-09-14**, et porté dans l'app. Le rappel « Accès : <rôle> » y était une
+ligne en tête de chaque écran de centrale (platform#1604). Il quitte la page pour l'avatar
+de la barre latérale, dans ses deux états.
 
 - **Barre latérale repliable.** Bouton en tête de la barre du haut, là où l'app place le
   sien. L'état est mémorisé dans le navigateur (`naia-sidebar`). L'app s'ouvre **repliée**
@@ -171,15 +171,23 @@ maquette le déplace sur l'avatar de la barre latérale, dans ses deux états.
   accès appartient à une centrale, pas à la personne.
 - **Données de démo.** Moulins = Administrateur, Bocq = Lecteur · Production et pertes
   détaillées, Ariège = Éditeur, Lesse = Finance. Libellés, phrases et teintes repris de
-  l'app (`PlantAccessBadge.vue`, `useAccessCopy`).
+  l'app (`plant-role-hue.ts`, `useAccessCopy`).
+- **Écrans refusés** *(app uniquement, le wireframe n'en montre pas)*. L'accès n'étant plus
+  rappelé dans la page, la phrase de refus le nomme : « Votre accès : <pastille> sur cette
+  centrale ne permet pas d'importer des données. » sur Données, et « … ne donne pas accès
+  aux revenus. » sur Revenus.
 - ⚠ **L'anneau seul ne distingue pas tous les rôles.** Administrateur et Lecteur sont deux
   bleus, et le gris « rôles différents » est proche du gris du rôle Support. L'anneau
   signale qu'un accès s'applique ; c'est l'infobulle qui dit lequel.
 - ⚠ **Pas de survol sur écran tactile.** Sur mobile, toucher l'avatar ouvre le profil :
   l'infobulle y est inatteignable. À prévoir avant la version responsive.
-- ⚠ **Écart de teintes non résolu.** Le tableau « Utilisateurs & rôles » de `parametres.html`
+- ⚠ **Écart de teintes non résolu.** Le tableau « Accès utilisateurs » de `parametres.html`
   colore les mêmes rôles autrement (Admin violet, Éditeur vert, Finance ambre). L'app a
-  écarté l'ambre, réservé à « Accès bloqué ». À aligner si la proposition est retenue.
+  écarté l'ambre, réservé à « Accès bloqué ». Toujours à aligner.
+
+### Paramètres : « Utilisateurs & rôles » devient « Accès utilisateurs » (`parametres.html`)
+
+La section 9 change de titre, dans le wireframe comme dans l'app. Son contenu ne change pas.
 
 ## v6.7 — Prompt d'import assisté · aperçu détaillé des catégories
 
