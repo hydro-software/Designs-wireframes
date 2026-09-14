@@ -173,9 +173,10 @@ de la barre latérale, dans ses deux états.
   détaillées, Ariège = Éditeur, Lesse = Finance. Libellés, phrases et teintes repris de
   l'app (`plant-role-hue.ts`, `useAccessCopy`).
 - **Écrans refusés** *(app uniquement, le wireframe n'en montre pas)*. L'accès n'étant plus
-  rappelé dans la page, la phrase de refus le nomme : « Votre accès : <pastille> sur cette
-  centrale ne permet pas d'importer des données. » sur Données, et « … ne donne pas accès
-  aux revenus. » sur Revenus.
+  rappelé dans la page, la phrase de refus le nomme, sur le même modèle pour Données,
+  Revenus et Paramètres : « Votre accès : <pastille> sur cette centrale ne permet pas
+  d'importer des données. Contactez votre administrateur pour le faire évoluer. » Seule
+  l'action change : « consulter les revenus », « consulter les paramètres ».
 - ⚠ **L'anneau seul ne distingue pas tous les rôles.** Administrateur et Lecteur sont deux
   bleus, et le gris « rôles différents » est proche du gris du rôle Support. L'anneau
   signale qu'un accès s'applique ; c'est l'infobulle qui dit lequel.
