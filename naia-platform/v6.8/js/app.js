@@ -949,6 +949,7 @@ const PLANT_ROLES = {
   EDITOR:      { label: "Éditeur",        hue: "#fb923c", help: "Accès : production et pertes détaillées, création et édition des pertes, ingestion de données. Sans les revenus. Configuration de son panneau." },
   VIEWER:      { label: "Lecteur",        hue: "#60a5fa", help: "" },
   FINANCE:     { label: "Finance",        hue: "#4ade80", help: "Accès restreint en lecture : production et revenus, sans aucune perte. Configuration de son panneau." },
+  SUPPORT:     { label: "Support Naia",   hue: "#cbd5e1", help: "Accès accordé à l'équipe Naia pour diagnostiquer un problème sur cette centrale. Mêmes droits qu'un administrateur, retiré par Naia une fois le diagnostic terminé." },
 };
 // Le Lecteur tire son étendue et sa phrase du niveau de vue : « Lecteur » seul ne dit
 // pas ce qui est retenu.

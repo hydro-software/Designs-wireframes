@@ -467,7 +467,7 @@
               <div style="display:grid; gap:14px">
                 <div><span class="mini-label">Utilisateur</span><input class="input" placeholder="jean.dupont@exemple.fr" style="width:100%"></div>
                 <div><span class="mini-label">Centrale</span><select class="select" style="width:100%"><option>Centrale des Moulins</option><option>Moulin du Bocq</option><option>Centrale d'Ariège</option><option>Moulin de la Lesse</option></select></div>
-                <div><span class="mini-label">Rôle sur la centrale</span><select class="select" style="width:100%"><option>Propriétaire</option><option>Exploitant</option><option>Lecture seule</option></select></div>
+                <div><span class="mini-label">Rôle sur la centrale</span><select class="select" style="width:100%"><option>Administrateur</option><option>Éditeur</option><option>Lecteur</option><option>Finance</option></option></select></div>
               </div>
               <button class="btn btn-primary" style="margin-top:16px" onclick="grantAccess()"><i data-lucide="key-round"></i> Donner l'accès</button>
               <div id="g-result" style="margin-top:14px; display:none"></div>
@@ -482,18 +482,25 @@
         <div class="card" style="margin-bottom:14px">
           <div class="card-head">
             <div><div class="card-head-title">Accès existants</div><div class="card-head-sub">Qui voit quelle centrale</div></div>
-            <div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end">
-              <input class="input" placeholder="Rechercher un utilisateur…" style="width:210px">
-              <select class="select" style="width:200px"><option>Toutes les centrales</option><option>Centrale des Moulins</option><option>Moulin du Bocq</option><option>Centrale d'Ariège</option><option>Moulin de la Lesse</option></select>
+            <!-- Recherche dans l'en-tête de carte ; les filtres par colonne vivent dans l'en-tête du
+                 tableau, comme la liste des événements. L'entonnoir « Centrale » remplace l'ancien
+                 sélecteur de centrale. -->
+            <div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end; align-items:center">
+              <input class="input" id="ac-q" placeholder="Rechercher un utilisateur…" style="width:210px" oninput="acRender()">
+              <button class="btn btn-secondary btn-sm" id="ac-clear" style="display:none" onclick="acClearFilters()"><i data-lucide="filter-x"></i> Effacer les filtres</button>
             </div>
           </div>
           <table class="data-table">
-            <thead><tr><th>Utilisateur</th><th>E-mail</th><th>Centrale</th><th>Rôle</th><th>Depuis</th><th>Dernière connexion</th><th></th></tr></thead>
-            <tbody>
-              <tr><td>Marc Dupont</td><td class="muted">marc.dupont@exemple.fr</td><td>Moulin du Bocq</td><td><span class="badge badge-blue">Propriétaire</span></td><td>14 mars 2026</td><td>il y a 2 j</td><td style="text-align:right"><button class="btn btn-ghost btn-sm" onclick="alert('Révocation de l\'accès (démo)')"><i data-lucide="user-minus"></i> Révoquer</button></td></tr>
-              <tr><td>Claire Rousseau</td><td class="muted">claire.rousseau@exemple.fr</td><td>Centrale des Moulins</td><td><span class="badge badge-slate">Lecture seule</span></td><td>2 juin 2026</td><td>il y a 5 h</td><td style="text-align:right"><button class="btn btn-ghost btn-sm" onclick="alert('Révocation de l\'accès (démo)')"><i data-lucide="user-minus"></i> Révoquer</button></td></tr>
-              <tr><td>Bernard Lemoine</td><td class="muted">bernard.lemoine@exemple.fr</td><td>Centrale d'Ariège</td><td><span class="badge badge-blue">Exploitant</span></td><td>18 avr. 2026</td><td>hier</td><td style="text-align:right"><button class="btn btn-ghost btn-sm" onclick="alert('Révocation de l\'accès (démo)')"><i data-lucide="user-minus"></i> Révoquer</button></td></tr>
-            </tbody>
+            <thead><tr>
+              <th><span class="th-wrap">Utilisateur<button class="th-filter" data-col="user" onclick="acOpenFilter(event, 'user')" title="Filtrer les utilisateurs"><i data-lucide="filter"></i></button></span></th>
+              <th><span class="th-wrap">E-mail<button class="th-filter" data-col="email" onclick="acOpenFilter(event, 'email')" title="Filtrer les e-mails"><i data-lucide="filter"></i></button></span></th>
+              <th><span class="th-wrap">Centrale<button class="th-filter" data-col="plant" onclick="acOpenFilter(event, 'plant')" title="Filtrer les centrales"><i data-lucide="filter"></i></button></span></th>
+              <th><span class="th-wrap">Rôle<button class="th-filter" data-col="role" onclick="acOpenFilter(event, 'role')" title="Filtrer les rôles"><i data-lucide="filter"></i></button></span></th>
+              <th>Depuis</th>
+              <th><span class="th-wrap">Dernière connexion<button class="th-filter" data-col="seen" onclick="acOpenFilter(event, 'seen')" title="Filtrer sur la dernière connexion"><i data-lucide="filter"></i></button></span></th>
+              <th></th>
+            </tr></thead>
+            <tbody id="ac-rows"></tbody>
           </table>
         </div>
 
@@ -553,6 +560,17 @@
 
     </div>
   </main>
+</div>
+<!-- Panneau de filtre du tableau « Accès existants » — même panneau que la liste des événements. -->
+<div class="ev-filter" id="ac-filter" data-open="false">
+  <div class="ev-filter-search">
+    <input type="text" id="ac-filter-q" placeholder="Rechercher…" oninput="acFilterList()">
+  </div>
+  <div class="ev-filter-list" id="ac-filter-list"></div>
+  <div class="ev-filter-foot">
+    <button class="btn btn-ghost btn-sm" onclick="acFilterClose()">Annuler</button>
+    <button class="btn btn-primary btn-sm" onclick="acFilterApply()">OK</button>
+  </div>
 </div>
 <script src="https://unpkg.com/lucide@latest"></script>
 <script src="js/app.js"></script>
@@ -824,9 +842,141 @@ function grantAccess() {
   const box = document.getElementById("g-result");
   box.style.display = "block";
   box.innerHTML = resultBox("ok", "check-circle", "Accès accordé",
-    "Jean Dupont accède désormais à <b>Centrale des Moulins</b> en tant que propriétaire. Ses réglages d'affichage ont été initialisés.");
+    "Jean Dupont accède désormais à <b>Centrale des Moulins</b> en tant qu'administrateur. Ses réglages d'affichage ont été initialisés.");
   icons();
 }
+
+// ---------- 2 · accès existants : pastilles + filtres par colonne ----------
+// Vocabulaire et teintes de l'app : PLANT_ROLES (js/app.js), ambre pour « Accès bloqué ».
+// Filtres : même comportement que la liste des événements — cocher les valeurs à garder,
+// tout coché = pas de filtre, l'entonnoir s'allume sur une colonne filtrée.
+const AC_ROWS = [
+  { user: "Marc Dupont",     email: "marc.dupont@exemple.fr",     plant: "Moulin du Bocq",       role: "PLANT_ADMIN", label: "Administrateur",             since: "14 mars 2026", seen: "il y a 2 j",  range: "1 à 7 jours" },
+  { user: "Claire Rousseau", email: "claire.rousseau@exemple.fr", plant: "Centrale des Moulins", role: "VIEWER",      label: "Lecteur · Production seule", since: "2 juin 2026",  seen: "il y a 5 h",  range: "Dernières 24 h" },
+  { user: "Claire Rousseau", email: "claire.rousseau@exemple.fr", plant: "Moulin du Bocq",       role: "NO_ACCESS",   label: "Accès bloqué", blocked: true, since: "2 juin 2026",  seen: "il y a 5 h",  range: "Dernières 24 h" },
+  { user: "Bernard Lemoine", email: "bernard.lemoine@exemple.fr", plant: "Centrale d'Ariège",    role: "EDITOR",      label: "Éditeur",                    since: "18 avr. 2026", seen: "hier",        range: "1 à 7 jours" },
+  { user: "Banque Dupuis",   email: "credit@banque-dupuis.fr",    plant: "Centrale des Moulins", role: "FINANCE",     label: "Finance",                    since: "1 juil. 2026", seen: "il y a 41 j", range: "Plus de 30 jours" },
+  { user: "Support Naia",    email: "support@naiahydro.com",      plant: "Centrale d'Ariège",    role: "SUPPORT",     label: "Support Naia",               since: "9 sept. 2026", seen: "—",           range: "Aucune enregistrée" },
+];
+const AC_RANGES = ["Dernières 24 h", "1 à 7 jours", "7 à 30 jours", "Plus de 30 jours", "Aucune enregistrée"];
+const AC_COLS = {
+  user:  r => r.user,
+  email: r => r.email,
+  plant: r => r.plant,
+  role:  r => r.label,
+  seen:  r => r.range,
+};
+let acFilters = { user: null, email: null, plant: null, role: null, seen: null };
+let acCol = null;
+let acDraft = new Set();
+
+function acEsc(v) { return String(v).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;"); }
+
+function acValues(col) {
+  const vals = [...new Set(AC_ROWS.map(AC_COLS[col]))];
+  return col === "seen"
+    ? vals.sort((a, b) => AC_RANGES.indexOf(a) - AC_RANGES.indexOf(b))
+    : vals.sort((a, b) => a.localeCompare(b, "fr"));
+}
+
+function acChip(r) {
+  const hue = r.blocked ? "var(--accent-amber)" : (PLANT_ROLES[r.role] || {}).hue;
+  return hue ? '<span class="role-chip" style="--hue:' + hue + '">' + acEsc(r.label) + '</span>' : acEsc(r.label);
+}
+
+function acRender() {
+  const q = (document.getElementById("ac-q").value || "").trim().toLowerCase();
+  const rows = AC_ROWS.filter(r =>
+    Object.keys(AC_COLS).every(col => acFilters[col] === null || acFilters[col].includes(AC_COLS[col](r)))
+    && (!q || (r.user + " " + r.email).toLowerCase().includes(q)));
+  const body = document.getElementById("ac-rows");
+  body.innerHTML = rows.length
+    ? rows.map(r => '<tr><td>' + acEsc(r.user) + '</td><td class="muted">' + acEsc(r.email) + '</td><td>' + acEsc(r.plant) +
+        '</td><td>' + acChip(r) + '</td><td>' + acEsc(r.since) + '</td><td>' + acEsc(r.seen) +
+        '</td><td style="text-align:right"><button class="btn btn-ghost btn-sm" onclick="alert(\'Révocation de l\\\'accès (démo)\')"><i data-lucide="user-minus"></i> Révoquer</button></td></tr>').join("")
+    : '<tr><td colspan="7" class="muted" style="padding:16px">Aucun accès ne correspond.</td></tr>';
+  document.querySelectorAll(".th-filter[data-col]").forEach(b => b.classList.toggle("on", acFilters[b.dataset.col] !== null));
+  const active = q !== "" || Object.values(acFilters).some(v => v !== null);
+  document.getElementById("ac-clear").style.display = active ? "" : "none";
+  icons();
+}
+
+function acOpenFilter(e, col) {
+  e.stopPropagation();
+  const panel = document.getElementById("ac-filter");
+  if (acCol === col && panel.dataset.open === "true") return acFilterClose();
+  acCol = col;
+  acDraft = new Set(acFilters[col] === null ? acValues(col) : acFilters[col]);
+  document.getElementById("ac-filter-q").value = "";
+  acFilterList();
+  const box = e.currentTarget.getBoundingClientRect();
+  panel.dataset.open = "true";
+  const w = panel.offsetWidth;
+  let left = box.left;
+  if (left + w > window.innerWidth - 12) left = window.innerWidth - w - 12;
+  panel.style.left = Math.max(12, left) + "px";
+  panel.style.top = (box.bottom + 6) + "px";
+  document.getElementById("ac-filter-q").focus();
+}
+
+function acFilterClose() {
+  document.getElementById("ac-filter").dataset.open = "false";
+  acCol = null;
+}
+
+function acFilterList() {
+  const q = (document.getElementById("ac-filter-q").value || "").toLowerCase();
+  const vals = acValues(acCol).filter(v => v.toLowerCase().indexOf(q) !== -1);
+  const host = document.getElementById("ac-filter-list");
+  if (!vals.length) { host.innerHTML = '<div class="none">Aucune valeur ne correspond.</div>'; return; }
+  host.innerHTML = '<label class="all"><input type="checkbox" onchange="acFilterToggleAll(this.checked)"> (Tout sélectionner)</label>' +
+    vals.map(v => '<label><input type="checkbox" value="' + acEsc(v) + '" ' + (acDraft.has(v) ? "checked" : "") +
+      ' onchange="acFilterToggle(this)"> ' + acEsc(v) + '</label>').join("");
+  acFilterSyncAll();
+}
+
+function acFilterToggle(input) {
+  if (input.checked) acDraft.add(input.value); else acDraft.delete(input.value);
+  acFilterSyncAll();
+}
+
+function acFilterSyncAll() {
+  const all = document.querySelector("#ac-filter-list label.all input");
+  if (!all) return;
+  const boxes = document.querySelectorAll("#ac-filter-list label:not(.all) input");
+  const checked = [].filter.call(boxes, b => b.checked).length;
+  all.checked = checked === boxes.length && boxes.length > 0;
+  all.indeterminate = checked > 0 && checked < boxes.length;
+}
+
+function acFilterToggleAll(checked) {
+  document.querySelectorAll("#ac-filter-list label:not(.all) input").forEach(b => {
+    b.checked = checked;
+    if (checked) acDraft.add(b.value); else acDraft.delete(b.value);
+  });
+  acFilterSyncAll();
+}
+
+function acFilterApply() {
+  const all = acValues(acCol);
+  const q = (document.getElementById("ac-filter-q").value || "").trim().toLowerCase();
+  const kept = all.filter(v => acDraft.has(v) && (!q || v.toLowerCase().indexOf(q) !== -1));
+  acFilters[acCol] = kept.length === all.length ? null : kept;
+  acFilterClose();
+  acRender();
+}
+
+function acClearFilters() {
+  Object.keys(acFilters).forEach(k => acFilters[k] = null);
+  document.getElementById("ac-q").value = "";
+  acRender();
+}
+
+document.addEventListener("click", e => {
+  if (!e.target.closest("#ac-filter") && !e.target.closest(".th-filter")) acFilterClose();
+});
+document.addEventListener("keydown", e => { if (e.key === "Escape") acFilterClose(); });
+window.addEventListener("DOMContentLoaded", acRender);
 
 // ---------- init ----------
 window.addEventListener("DOMContentLoaded", () => {

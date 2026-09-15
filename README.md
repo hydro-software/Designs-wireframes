@@ -191,6 +191,19 @@ de la barre latérale, dans ses deux états.
 
 La section 9 change de titre, dans le wireframe comme dans l'app. Son contenu ne change pas.
 
+### Console Naia (Core) : « Accès existants » en pastilles, filtrable par colonne (`admin-core.html`)
+
+- **Pastilles de l'app.** La colonne « Rôle » reprend le vocabulaire et les teintes de l'app :
+  Administrateur, Lecteur · <étendue>, Éditeur, Finance, **Support Naia en gris**, **Accès
+  bloqué en ambre**. Plus de « Propriétaire », « Exploitant », « Lecture seule ».
+- **Filtres par colonne**, avec l'entonnoir de la liste des événements : Utilisateur, E-mail,
+  Centrale, Rôle et Dernière connexion. Cocher les valeurs à garder ; tout coché = pas de
+  filtre. La dernière connexion se filtre par tranches : dernières 24 h, 1 à 7 jours,
+  7 à 30 jours, plus de 30 jours, aucune enregistrée.
+- L'entonnoir « Centrale » **remplace** le sélecteur « Toutes les centrales ». La recherche
+  reste dans l'en-tête de carte, à côté d'« Effacer les filtres ».
+- Le CSS de l'entonnoir et du panneau passe de `evenements.html` à `css/style.css`, partagé.
+
 ## v6.7 — Prompt d'import assisté · aperçu détaillé des catégories
 
 `v6.7` est `v6.6` plus **deux ajouts** et **un alignement de vocabulaire**. Aucun
