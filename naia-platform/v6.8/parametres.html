@@ -1229,8 +1229,8 @@
           <table class="data-table" id="users-table">
             <thead><tr><th>Nom</th><th>Email</th><th>Rôle (sur cette centrale)</th><th>2FA</th><th></th></tr></thead>
             <tbody>
-              <tr data-self="true" data-name="Marc Dupont" data-email="marc.dupont@moulin.be" data-role="Administrateur"><td><b>Marc Dupont</b><br><span class="muted" style="font-size:11px">vous</span></td><td>marc.dupont@moulin.be</td><td><span class="badge badge-purple">Admin</span></td><td><span class="badge badge-green">✓</span></td><td><a class="link" style="font-size:12px" onclick="openEditUser(this)">Modifier</a></td></tr>
-              <tr data-name="Sophie Legrand" data-email="sophie@moulin.be" data-role="Opérateur de centrale"><td><b>Sophie Legrand</b></td><td>sophie@moulin.be</td><td><span class="badge badge-blue">Opérateur</span></td><td><span class="badge badge-amber">à activer</span></td><td><a class="link" style="font-size:12px" onclick="openEditUser(this)">Modifier</a></td></tr>
+              <tr data-self="true" data-name="Marc Dupont" data-email="marc.dupont@moulin.be" data-role="Administrateur"><td><b>Marc Dupont</b><br><span class="muted" style="font-size:11px">vous</span></td><td>marc.dupont@moulin.be</td><td>Admin</td><td><span class="badge badge-green">✓</span></td><td><a class="link" style="font-size:12px" onclick="openEditUser(this)">Modifier</a></td></tr>
+              <tr data-name="Sophie Legrand" data-email="sophie@moulin.be" data-role="Opérateur de centrale"><td><b>Sophie Legrand</b></td><td>sophie@moulin.be</td><td>Opérateur</td><td><span class="badge badge-amber">à activer</span></td><td><a class="link" style="font-size:12px" onclick="openEditUser(this)">Modifier</a></td></tr>
             </tbody>
           </table>
           <div style="display:flex; gap:8px; margin-top:14px">
@@ -2410,18 +2410,28 @@
   }
 
   // ============================ Accès utilisateurs (brouillon BL) ============================
-  // Rôle long (PRD) -> badge court affiché dans le tableau.
+  // Rôle long (PRD) -> pastille courte affichée dans le tableau. Les teintes sont
+  // celles de l'app (PLANT_ROLES dans js/app.js, repris de plant-role-hue.ts) : un
+  // même rôle ne porte pas deux couleurs selon l'écran.
   const USER_ROLE_BADGE = {
-    "Administrateur":        { label: "Admin",     cls: "badge-purple" },
+    "Administrateur":        { label: "Admin",     code: "PLANT_ADMIN" },
+    // Absent du catalogue de rôles de l'app : pas de teinte de référence.
     "Opérateur de centrale": { label: "Opérateur", cls: "badge-blue" },
-    "Éditeur":               { label: "Éditeur",   cls: "badge-green" },
-    "Lecteur":               { label: "Lecteur",   cls: "badge-slate" },
-    "Finance":               { label: "Finance",   cls: "badge-amber" },
+    "Éditeur":               { label: "Éditeur",   code: "EDITOR" },
+    "Lecteur":               { label: "Lecteur",   code: "VIEWER" },
+    "Finance":               { label: "Finance",   code: "FINANCE" },
   };
   function userRoleBadgeHTML(role) {
     const m = USER_ROLE_BADGE[role] || { label: role, cls: "badge-slate" };
-    return '<span class="badge ' + m.cls + '">' + m.label + '</span>';
+    const known = m.code && PLANT_ROLES[m.code];
+    return known
+      ? '<span class="role-chip" style="--hue:' + known.hue + '">' + m.label + '</span>'
+      : '<span class="badge ' + m.cls + '">' + m.label + '</span>';
   }
+  // Les pastilles des lignes de départ sont rendues ici aussi, depuis la même table.
+  document.querySelectorAll("#users-table tbody tr").forEach(function (tr) {
+    tr.children[2].innerHTML = userRoleBadgeHTML(tr.dataset.role);
+  });
 
   let editUserRow = null; // ligne <tr> en cours d'édition
 

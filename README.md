@@ -182,9 +182,10 @@ de la barre latérale, dans ses deux états.
   signale qu'un accès s'applique ; c'est l'infobulle qui dit lequel.
 - ⚠ **Pas de survol sur écran tactile.** Sur mobile, toucher l'avatar ouvre le profil :
   l'infobulle y est inatteignable. À prévoir avant la version responsive.
-- ⚠ **Écart de teintes non résolu.** Le tableau « Accès utilisateurs » de `parametres.html`
-  colore les mêmes rôles autrement (Admin violet, Éditeur vert, Finance ambre). L'app a
-  écarté l'ambre, réservé à « Accès bloqué ». Toujours à aligner.
+- **Teintes des rôles alignées sur l'app (2026-09-15).** Le tableau « Accès utilisateurs » de
+  `parametres.html` reprend les teintes de la pastille : Administrateur bleu marine, Lecteur
+  bleu clair, Éditeur orange, Finance vert. Plus d'ambre, réservé à « Accès bloqué ». Seul
+  « Opérateur de centrale » garde son badge bleu : ce rôle n'existe pas dans l'app.
 
 ### Paramètres : « Utilisateurs & rôles » devient « Accès utilisateurs » (`parametres.html`)
 
